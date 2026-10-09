@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+out.html
+out5.html
+base43.html
+checks.json
+pyo/
+*.png
+*.bak

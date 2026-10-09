@@ -1,0 +1,385 @@
+import sys, builtins, traceback, linecache, os, types, random, hashlib, time, io
+import importlib.abc, importlib.util
+
+# ---- поправки под 64-битный CPython (в браузере сборка 32-битная) ----
+sys.maxsize = 2 ** 63 - 1
+_gs0 = sys.getsizeof
+
+
+def _dict_size(o, w):
+    if not o and w == 40:
+        return 64
+    k32 = w - 40
+    uni = all(type(k) is str for k in o)
+    for kk in range(3, 31):
+        ib = 1 if kk <= 7 else 2 if kk <= 15 else 4 if kk <= 31 else 8
+        idx = (1 << kk) * ib
+        use = ((1 << kk) * 2) // 3
+        for u in ((True, False) if uni else (False, True)):
+            if 20 + idx + use * (8 if u else 12) == k32:
+                return 64 + 32 + idx + use * (16 if u else 24)
+    return 2 * w
+
+
+def _getsizeof(o, *default):
+    try:
+        w = _gs0(o)
+    except TypeError:
+        if default:
+            return default[0]
+        raise
+    t = type(o)
+    if t is int or t is bool:
+        return 24 + 4 * max(1, (abs(o).bit_length() + 29) // 30)
+    if t is str:
+        if o.isascii():
+            return 41 + len(o)
+        m = max(o)
+        kind = 1 if ord(m) < 256 else 2 if ord(m) < 65536 else 4
+        return 56 + (len(o) + 1) * kind
+    if t is float:
+        return 24
+    if t is complex:
+        return 32
+    if t is bytes:
+        return 33 + len(o)
+    if t is bytearray:
+        return 56 + (w - 28)
+    if t is list:
+        return 56 + 2 * (w - 28)
+    if t is dict:
+        return _dict_size(o, w)
+    if t is types.GeneratorType or t is types.CoroutineType:
+        return 2 * w - 8
+    if t is memoryview:
+        return 2 * w - 8
+    return 2 * w
+
+
+sys.getsizeof = _getsizeof
+
+_EMAP = {44: 2, 20: 17, 2: 13, 31: 21, 54: 20, 63: 1, 55: 39, 28: 22, 8: 9}
+_ECLS = {2: FileNotFoundError, 17: FileExistsError, 13: PermissionError, 21: IsADirectoryError, 20: NotADirectoryError, 1: PermissionError, 39: OSError, 22: OSError, 9: OSError}
+
+
+def _fixos(e):
+    n = getattr(e, 'errno', None)
+    if n in _EMAP and type(e).__module__ == 'builtins' and not getattr(e, '_itp', False):
+        ln = _EMAP[n]
+        a = [ln, e.strerror, e.filename]
+        if e.filename2 is not None:
+            a += [None, e.filename2]
+        ne = _ECLS[ln](*a)
+        ne._itp = True
+        return ne
+    return e
+
+
+import errno as _errno
+for _k, _v in (('ENOENT', 2), ('EEXIST', 17), ('EACCES', 13), ('EISDIR', 21), ('ENOTDIR', 20), ('EPERM', 1), ('ENOTEMPTY', 39), ('EINVAL', 22), ('EBADF', 9)):
+    setattr(_errno, _k, _v)
+_errno.errorcode.clear()
+_errno.errorcode.update({2: 'ENOENT', 17: 'EEXIST', 13: 'EACCES', 21: 'EISDIR', 20: 'ENOTDIR', 1: 'EPERM', 39: 'ENOTEMPTY', 22: 'EINVAL', 9: 'EBADF'})
+
+
+def _wrapos(f):
+    def g(*a, **k):
+        try:
+            return f(*a, **k)
+        except OSError as e:
+            ne = _fixos(e)
+            if ne is e:
+                raise
+            raise ne from None
+    g.__name__ = getattr(f, '__name__', 'f')
+    g.__doc__ = getattr(f, '__doc__', None)
+    return g
+
+
+builtins.open = io.open = _wrapos(builtins.open)
+for _n in ('listdir', 'remove', 'unlink', 'mkdir', 'rmdir', 'rename', 'stat', 'makedirs', 'chdir', 'scandir', 'replace', 'lstat'):
+    if hasattr(os, _n):
+        setattr(os, _n, _wrapos(getattr(os, _n)))
+
+
+# ---- asyncio без JSPI: обычный цикл событий, как в CPython ----
+import asyncio
+
+class _Sel:
+    def select(self, timeout=None):
+        t = 0.005 if timeout is None else min(timeout, 0.05)
+        if t > 0:
+            time.sleep(t)
+        return []
+    def close(self):
+        pass
+    def get_map(self):
+        return {}
+
+class _Loop(asyncio.BaseEventLoop):
+    def __init__(self):
+        super().__init__()
+        self._selector = _Sel()
+    def _process_events(self, event_list):
+        pass
+    def _write_to_self(self):
+        pass
+    def close(self):
+        if self.is_running():
+            raise RuntimeError("Cannot close a running event loop")
+        super().close()
+    def call_soon_threadsafe(self, callback, *args, context=None):
+        return self.call_soon(callback, *args, context=context)
+
+class _Policy(asyncio.DefaultEventLoopPolicy):
+    _loop_factory = _Loop
+
+_WL = asyncio._get_running_loop()
+asyncio.set_event_loop_policy(_Policy())
+
+
+# ---- hash чисел как в 64-битном CPython ----
+import math as _math
+_HM = (1 << 61) - 1
+_hash0 = builtins.hash
+
+
+def _hash_int(n):
+    r = n % _HM if n >= 0 else -((-n) % _HM)
+    return -2 if r == -1 else r
+
+
+def _hash_float(v):
+    if v != v:
+        return _hash0(v)
+    if v in (float('inf'), float('-inf')):
+        return 314159 if v > 0 else -314159
+    m, e = _math.frexp(v)
+    sign = 1
+    if m < 0:
+        sign = -1
+        m = -m
+    x = 0
+    while m:
+        x = ((x << 28) & _HM) | (x >> (61 - 28))
+        m *= 268435456.0
+        e -= 28
+        y = int(m)
+        m -= y
+        x += y
+        if x >= _HM:
+            x -= _HM
+    e = e % 61 if e >= 0 else 61 - 1 - ((-1 - e) % 61)
+    x = ((x << e) & _HM) | (x >> (61 - e))
+    x *= sign
+    return -2 if x == -1 else x
+
+
+def hash(o):
+    t = type(o)
+    if t is int or t is bool:
+        return _hash_int(int(o))
+    if t is float:
+        return _hash_float(o)
+    return _hash0(o)
+
+
+builtins.hash = hash
+_seed0 = random.Random.seed
+
+
+def _seed(self, a=None, version=2):
+    if type(a) is float:
+        a = abs(_hash_float(a))
+    return _seed0(self, a, version)
+
+
+random.Random.seed = _seed
+random.seed = random._inst.seed
+
+_BASEMODS = set(sys.modules)
+_BI = dict(builtins.__dict__)
+_H = os.getcwd()
+_BASEFILES = set(os.listdir(_H))
+_SYSK = ('stdin', 'stdout', 'stderr', 'excepthook', 'displayhook', 'argv', 'ps1', 'ps2')
+_SYS0 = {k: getattr(sys, k) for k in _SYSK if hasattr(sys, k)}
+_PATH0 = list(sys.path)
+_RL0 = sys.getrecursionlimit()
+_MAIN0 = sys.modules.get('__main__')
+_urandom0 = os.urandom
+_input0 = builtins.input
+_mark = None  # JS-функция: _mark(длина_подсказки)
+_flush = None
+
+
+def _install_urandom(seed):
+    state = [0]
+    def urandom(n):
+        out = b''
+        while len(out) < n:
+            state[0] += 1
+            out += hashlib.sha256(('%s:%d' % (seed, state[0])).encode()).digest()
+        return out[:n]
+    os.urandom = urandom
+    try:
+        import random as _r
+        _r._urandom = urandom
+    except Exception:
+        pass
+
+
+def _marked_input(prompt=''):
+    sys.stdout.flush()
+    _mark(len(str(prompt)))
+    return _input0(prompt)
+
+
+def _clean_te(te):
+    seen = set()
+    def walk(t):
+        if t is None or id(t) in seen:
+            return
+        seen.add(id(t))
+        t.stack = traceback.StackSummary.from_list([f for f in t.stack if f.filename != '<itp>'])
+        walk(t.__cause__)
+        walk(t.__context__)
+        for g in (getattr(t, 'exceptions', None) or ()):
+            walk(g)
+    walk(te)
+    return te
+
+
+def _itp_run(code, marks, seed):
+    _install_urandom(seed)
+    asyncio._set_running_loop(None)
+    asyncio.set_event_loop(None)
+    if marks:
+        builtins.input = _marked_input
+    mod = types.ModuleType('__main__')
+    mod.__dict__.update({'__doc__': None, '__package__': None, '__loader__': None, '__spec__': None,
+                         '__file__': 'main.py', '__cached__': None, '__builtins__': builtins})
+    sys.modules['__main__'] = mod
+    ns = mod.__dict__
+    sys.argv = ['main.py']
+    linecache.cache['main.py'] = (len(code), None, code.splitlines(True), 'main.py')
+    res = None
+    try:
+        try:
+            co = compile(code, 'main.py', 'exec')
+        except SyntaxError as e:
+            return ''.join(traceback.format_exception_only(type(e), e))
+        except (ValueError, OverflowError, RecursionError, MemoryError) as e:
+            return ''.join(traceback.format_exception_only(type(e), e))
+        try:
+            exec(co, ns)
+        except SystemExit as e:
+            c = e.code
+            if c is not None and not isinstance(c, int):
+                try:
+                    sys.stderr.write(str(c) + '\n')
+                except Exception:
+                    pass
+        except BaseException as e:
+            if sys.excepthook is not _SYS0['excepthook']:
+                try:
+                    sys.excepthook(type(e), e, e.__traceback__.tb_next)
+                except BaseException:
+                    pass
+            else:
+                tb = e.__traceback__.tb_next if e.__traceback__ else None
+                te = _clean_te(traceback.TracebackException(type(e), e, tb))
+                res = ''.join(te.format())
+        try:
+            sys.stdout.flush()
+            sys.stderr.flush()
+        except Exception:
+            pass
+    finally:
+        pass
+    return res
+
+
+def _itp_reset():
+    try:
+        for s in (sys.stdout, sys.stderr):
+            try:
+                s.flush()
+            except Exception:
+                pass
+    except Exception:
+        pass
+    for k, v in _SYS0.items():
+        try:
+            setattr(sys, k, v)
+        except Exception:
+            pass
+    sys.path[:] = _PATH0
+    try:
+        sys.setrecursionlimit(_RL0)
+    except Exception:
+        pass
+    for m in list(sys.modules):
+        if m not in _BASEMODS:
+            del sys.modules[m]
+    if _MAIN0 is not None:
+        sys.modules['__main__'] = _MAIN0
+    builtins.input = _input0
+    try:
+        asyncio._set_running_loop(_WL)
+        asyncio.set_event_loop(None)
+    except Exception:
+        pass
+    d = builtins.__dict__
+    for k in list(d):
+        if k not in _BI:
+            del d[k]
+    for k, v in _BI.items():
+        if d.get(k) is not v:
+            d[k] = v
+    os.urandom = _urandom0
+    try:
+        os.chdir(_H)
+    except Exception:
+        pass
+    import shutil
+    for n in os.listdir(_H):
+        if n not in _BASEFILES:
+            p = os.path.join(_H, n)
+            try:
+                shutil.rmtree(p) if os.path.isdir(p) and not os.path.islink(p) else os.remove(p)
+            except Exception:
+                pass
+    linecache.cache.pop('main.py', None)
+    random.seed()
+
+# ---- v5.4.0: модуль turtle (исходник добавляется при сборке в _TURTLE_SRC) ----
+import importlib.abc, importlib.util
+
+
+class _TurtleLoader(importlib.abc.Loader):
+    def create_module(self, spec):
+        return None
+
+    def exec_module(self, module):
+        module.__file__ = '<turtle>'
+        exec(compile(_TURTLE_SRC, '<turtle>', 'exec'), module.__dict__)
+
+
+class _TurtleFinder(importlib.abc.MetaPathFinder):
+    def find_spec(self, name, path=None, target=None):
+        if name == 'turtle' and globals().get('_TURTLE_SRC'):
+            return importlib.util.spec_from_loader('turtle', _TurtleLoader())
+        return None
+
+
+sys.meta_path.insert(0, _TurtleFinder())
+
+
+def _tdump():
+    m = sys.modules.get('turtle')
+    if m is None:
+        return None
+    try:
+        return m._dump()
+    except Exception:
+        return None
