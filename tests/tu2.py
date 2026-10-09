@@ -1,0 +1,40 @@
+from playwright.sync_api import sync_playwright
+import h,t5,sys
+with sync_playwright() as p:
+    b,ctx,pg,logs=h.open_page(p,t5.W+'out5.html',t5.ST,390,860)
+    pg.wait_for_timeout(800)
+    ti=pg.evaluate("TOPICS.findIndex(function(x){return /^Задание 6\\./.test(x.n)})")
+    print('topic idx',ti)
+    pg.evaluate("S.mode='ex';save()")
+    J=pg.evaluate("TOPICS[%d].items.map(function(x,i){return i+':'+x.t+':'+x.n})"%ti)
+    print(J[6:8], J[11:14])
+    pg.evaluate("for(var u=0;u<40;u++)S.d['%d-'+u]=1;save();go(%d,6)"%(ti,ti)); pg.wait_for_timeout(500)
+    pg.screenshot(path='tu_t1.png')
+    n=pg.locator('.tudemo button').count(); print('demos',n)
+    pg.locator('.tudemo button').first.click(); pg.wait_for_selector('.tuw',timeout=30000); pg.wait_for_timeout(1500)
+    print('win info:',pg.inner_text('#tuinfo'))
+    pg.screenshot(path='tu_t2.png'); pg.click('#tux'); pg.wait_for_timeout(200)
+    # тренировка 6.1
+    AI=pg.evaluate("TOPICS[%d].items.findIndex(function(x){return x.t==='ans'})"%ti)
+    pg.evaluate("go(%d,%d)"%(ti,AI)); pg.wait_for_timeout(500)
+    print('statement:',pg.inner_text('.exst')[:300].replace('\n',' | '))
+    print('has expr',pg.locator('pre.expr').count(),'hint btn',pg.locator('#hb').count(),'tools',pg.locator('.extl button').count())
+    pg.screenshot(path='tu_a1.png')
+    pg.click('#exbt'); pg.wait_for_selector('.tuw',timeout=30000); pg.wait_for_timeout(1500)
+    print('task win:',pg.inner_text('#tuinfo'),pg.inner_text('#tun'))
+    pg.click('#tupt'); pg.screenshot(path='tu_a2.png'); pg.click('#tux'); pg.wait_for_timeout(200)
+    pg.click('#exbc'); pg.wait_for_timeout(300)
+    print('starter:',pg.input_value('#code')[:200].replace('\n',' / '))
+    pg.screenshot(path='tu_a3.png')
+    # ответ
+    ans=pg.evaluate("TOPICS[%d].items[%d].tasks[0].a"%(ti,AI)); print('ans',ans)
+    pg.fill('#ai',ans); pg.click('#ac'); pg.wait_for_timeout(500); print('feedback:',pg.inner_text('#fb')[:120].replace('\n',' | '))
+    pg.screenshot(path='tu_a4.png')
+    # тренажёр
+    for t in ['6.1','6.2','6.3','6.4','6.5','6.6']:
+        pg.evaluate("EXST={ok:0,all:0};exTrain(6,'%s')"%t); pg.wait_for_timeout(300)
+        st=pg.inner_text('.exst')[:90].replace('\n',' | ')
+        pr=pg.locator('pre.expr').count(); print(t,'expr',pr,'|',st)
+        q=pg.evaluate("1")
+    print([l for l in logs if 'rror' in l][:6])
+    b.close()

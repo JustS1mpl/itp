@@ -1,0 +1,1 @@
+</span></div><section class="exst pyq"><div class="exlab">Задание</div><h2 style="font-size:19px;margin:0">'+esc(q.q)+'</h2>'+(q.ex?'<div class="pyex"><span>Пример</span>'+(q.strict?'<pre class="cmp">'+esc(q.ex)+'</pre>':'<p>'+esc(q.ex).replace(/\n/g,'<br>')+'</p>')+'</div>':'')+'</section>'

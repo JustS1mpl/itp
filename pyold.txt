@@ -1,0 +1,1 @@
+</span></div><h2 style="font-size:20px">'+esc(q.q)+'</h2>'+(q.strict?'<pre class="cmp">'+esc(q.ex||'')+'</pre>':'<p class="mu" style="margin:0 0 12px">'+esc(q.ex||'').replace(/\n/g,'<br>')+'</p>')
