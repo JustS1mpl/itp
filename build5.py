@@ -1,0 +1,183 @@
+import re, sys, json
+sys.path.insert(0, '.')
+VER = '5.4.0'
+s = open('base43.html', encoding='utf-8').read()
+
+def rep(a, b, n=1):
+    global s
+    c = s.count(a)
+    assert c == n, ('якорь найден %d раз(а), нужно %d' % (c, n), a[:100])
+    s = s.replace(a, b)
+
+
+rep("if(/bad input|SyntaxError/.test(err)&&/:=/.test(OC))err+='. Оператор := в ИТП работает только в условии цикла while'",'')
+rep("navigator.share(d).catch(function(){});return false","navigator.share(d).then(function(){ach('share')}).catch(function(){});return false")
+rep("execLimit:src.ask?5000:3000","execLimit:src.ask?null:10000,yieldLimit:src.ask?60:null")
+rep("if(out.length+x.length>4000){out+=x.slice(0,4000-out.length);cut=true}else out+=x;if(src.live)src.live(out)}","if(out.length+x.length>LIM){out+=x.slice(0,LIM-out.length);cut=true}else out+=x;if(src.live)lv()}")
+rep("var out='',n=0,marks=[],my=++TK,cut=false,ov=false,LS=0,LL=0;","var LIM=src.ask?300000:100000,LT0=0,PD=0,out='',n=0,marks=[],my=++TK,cut=false,ov=false,LS=0,LL=0;function lv(){var t=Date.now();if(t-LT0>90){LT0=t;PD=0;src.live(out)}else PD=1}")
+rep("over:ov,used:n","over:ov,stopped:STOPT===my,used:n")
+rep("return src.ask(p).then(function(v){Sk.execStart=new Date();","return src.ask(p).then(function(v){if(STOPT===my)throw new Error('ITPSTOP');Sk.execStart=new Date();")
+rep("function exec(code,src){","var STOPT=-1;function exec(code,src){")
+rep("(cut?'\\n…вывод обрезан':'')","(cut?'\\n…вывод обрезан: показаны первые '+LIM+' символов (программа при этом выполнялась до конца)':'')")
+
+rep("function fixErr(e,code){if(!e)return e;","function fixErr(e,code){if(!e)return e;try{e=itpTrFull(e)}catch(_x){}")
+rep("function fin2(err){","function fin2(err){if(err&&/^SystemExit\\b/.test(err))err=null;")
+rep("function isOpen(i,j){var k=i+'-'+j;", "function isOpen(i,j){if(typeof DEV==='function'&&DEV())return 1;var k=i+'-'+j;")
+rep("esc(q.e||'')", "esc(q.e||'')+xm(q)", 3)
+rep("(String(it.html).match(/\\[\\[([^\\]|]+)/g)||[])", "(String(it.html).replace(/<pre>[\\s\\S]*?<\\/pre>/g,'').match(/\\[\\[([^\\]|]+)/g)||[])")
+rep("it.html.split(/(<pre>[\\s\\S]*?<\\/pre>)/).map(function(p){return /^<pre>/.test(p)?", "it.html.split(/(<pre[^>]*>[\\s\\S]*?<\\/pre>)/).map(function(p){return /^<pre /.test(p)?p:/^<pre>/.test(p)?")
+rep("replace(/<pre>[\\s\\S]*?<\\/pre>/g,'').match", "replace(/<pre[^>]*>[\\s\\S]*?<\\/pre>/g,'').match")
+# --- версия
+s = s.replace('4.3.0', VER)
+
+# --- шрифт Nunito встроен
+FONT = open('assets/nunito.b64').read()
+rep("var l=document.createElement('link');l.rel='stylesheet';l.href='https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&display=swap';document.head.appendChild(l)", "")
+# --- замена CSS целиком
+css = open('v5/v5.css', encoding='utf-8').read() + '\n' + open('v5/v5b.css', encoding='utf-8').read()
+rep("""'<div class="q">'+esc(q.q)+'</div>'+(q.c?'<pre>'+hl(q.c)+'</pre>':'');
+    ord.forEach(function(k){h+='<button class="opt" data-k="'+k+'">'+esc(q.o[k])+'</button>'});
+    show(h+'<div id="fb"></div><button class="btn" id="go" disabled>Проверить</button>');""",
+"""'<div class="q">'+esc(q.q)+'</div>'+(q.v||'')+(q.c?'<pre>'+hl(q.c)+'</pre>':'');
+    ord.forEach(function(k){h+='<button class="opt" data-k="'+k+'">'+esc(q.o[k])+'</button>'});
+    show(h+'<div id="fb"></div><button class="btn" id="go" disabled>Проверить</button>');if(q.v&&window.exImgs)exImgs(app);""")
+for extra in ('v5/v5c.css',):
+    try: css += '\n' + open(extra, encoding='utf-8').read()
+    except FileNotFoundError: pass
+css = "@font-face{font-family:'Nunito';font-style:normal;font-weight:200 1000;font-display:swap;src:url(data:font/woff;base64," + FONT + ") format('woff')}\n" + css
+a = s.index('<style>'); b = s.index('</style>')
+s = s[:a] + '<style>\n' + css + '\n' + s[b:]
+
+# --- пакет смайликов
+pack = open('assets/emoji_pack.b64').read()
+rep('<script type="text/plain" id="sk-lib">', '<script type="text/plain" id="emo-pack">' + pack + '</script>\n<script type="text/plain" id="sk-lib">')
+
+# --- reduced-motion -> RM()
+mm = "matchMedia('(prefers-reduced-motion:reduce)').matches"
+a = s.index('<script>\nvar ') if '<script>\nvar ' in s else s.index('<script>', s.index('</script>') )
+n = s.count(mm); s = s.replace(mm, 'RM()'); print('RM заменено', n)
+
+rep(open('pyold.txt',encoding='utf8').read(), open('pynew.txt',encoding='utf8').read())
+# --- навигация
+rep("[['home','🏠','Главная'],['oge','📚','ОГЭ/ЕГЭ'],['ed','⌨️','Компилятор'],['prof','🐇','Профиль']]",
+    "[['home','🗺️','Путь'],['pr','🎯','Практика'],['ed','💻','Код'],['mx','🎓','ЕГЭ'],['prof','🐰','Профиль']]")
+rep("({home:home,oge:oge,ed:editor,prof:profile})[b.dataset.t]()", "({home:function(){EXOPEN=-1;home()},pr:practice,ed:editor,mx:modeSwap,prof:profile})[b.dataset.t]()")
+rep("'Главная, ОГЭ/ЕГЭ, Компилятор, Профиль'", "'Путь, Практика, Код, ЕГЭ, Профиль'")
+
+# --- clean
+rep('function clean(r){if(!r||typeof r', 'function clean0(r){if(!r||typeof r')
+
+# --- show: убрать оглавление
+rep('function show(h,tab){cancelAnimationFrame(TYR);HRE=null;', 'function show(h,tab){cancelAnimationFrame(TYR);HRE=null;tocKill();')
+
+# --- теория
+rep("if(!S.d[i+'-'+j])bump(i+'-'+j);if(TOPICS[i].intro&&!w", "if(!S.d[i+'-'+j]){snd('theory');bump(i+'-'+j)}if(TOPICS[i].intro&&!w")
+rep("if(fresh&&!rm)typeIn($('tb'),$('tm'));", "tocBuild();if(fresh&&!rm&&ST('ty'))typeIn($('tb'),$('tm'));")
+rep("(fresh&&!rm?TMSK:TMT)", "(fresh&&!rm&&ST('ty')?TMSK:TMT)")
+rep("function typeIn(box,tm){", "function typeIn(box,tm){box.classList.add('noemo');")
+rep("if(tm)tm.textContent=TMT;box.removeEventListener('click',fin)", "if(tm)tm.textContent=TMT;box.removeEventListener('click',fin);box.classList.remove('noemo');emoScan(box)")
+
+# --- подсказки
+rep("var use=function(){S.hc=1;HINT=1;drc(i,j,k);save();showHint()};", "var use=function(){S.hc=1;S.hu[i]=1;HINT=1;drc(i,j,k);save();showHint()};")
+
+# --- звуки/победы
+rep("fx(true);\n    if(!S.tk[tk]){S.tk[tk]=1;save()}", "fx(true,'test');\n    if(!S.tk[tk]){S.tk[tk]=1;save()}")
+rep("fx(true);projEnd(i,j);", "fx(true,'none');projEnd(i,j);")
+rep("S.at[key]='full';lv=addXp(x)}\n  bump(key);", "S.at[key]='full';lv=addXp(x)}\n  bump(key);ach('proj');snd('fanfare');")
+rep("var tj=!tj0&&tdone(i);home();\n  toast(tj?", "var tj=!tj0&&tdone(i);if(tj)topicDone(i);home();\n  toast(tj?")
+
+# --- индикатор ввода
+rep("ir.classList.add('on');ii.value='';st('⌨️ Программа ждёт ввод: напиши ответ в поле ниже и нажми «Ввод»');ii.focus();",
+    "ir.classList.add('on');ir.classList.remove('typing');ii.value='';st('⌨️ Программа ждёт ввод: напиши ответ в поле ниже и нажми «Ввод»','wait');snd('tick');ii.oninput=function(){ir.classList.add('typing');var r=$('rst');if(r)r.classList.remove('wait')};ii.focus();")
+
+# --- пульс кнопки «Проверить»
+rep("  skReady();\n  $('run').onclick=function(){var o=$('o');if(!SKOK){o.style.display='block';o.textContent='Загружаю среду Python…'}needSk()", "  skReady();chkPulse();\n  $('run').onclick=function(){var o=$('o');if(!SKOK){o.style.display='block';o.textContent='Загружаю среду Python…'}needSk()", 2)
+
+# --- экраны завершения: полоса опыта и пульс
+rep("""'<button class="btn" id="go">Дальше</button>'+(nx?""", """xpStrip()+'<button class="btn pulse" id="go">Дальше</button>'+(nx?""")
+rep("""<button class="btn" id="go">К темам</button></div>');\n  HINT=0;""", """'+xpStrip()+'<button class="btn pulse" id="go">К темам</button></div>');\n  HINT=0;""")
+rep("""<button class="btn" id="go">К темам</button>'+(it.sol?""", """'+xpStrip()+'<button class="btn pulse" id="go">К темам</button>'+(it.sol?""")
+
+# --- компилятор
+rep("show(head()+'<h2>Компилятор кода</h2><button class=\"fname\"", "show(head('Код')+'<button class=\"fname\"")
+rep('<div class="seg2 sm"><button id="fs" class="pri">', '<div class="edtools"><button id="fs" class="pri">')
+rep("pr={'(':')','[':']','{':'}','\"':'\"'},AP=String.fromCharCode(39);pr[AP]=AP;", "pr={'(':')','[':']','{':'}','\"':'\"'},AP=String.fromCharCode(39);pr[AP]=AP;if(!ST('ac'))pr={};")
+rep("if(p===q&&v[p]===d&&(d===')'", "if(ST('ac')&&p===q&&v[p]===d&&(d===')'")
+
+# --- календарь и заморозки
+rep("""g+='<i class="l'+l+'" data-d="'+k+'" title="'+calText(k)+'"></i>';""", """g+='<i class="l'+l+(!l&&S.fz.u.indexOf(k)>=0?' fz':'')+'" data-d="'+k+'" title="'+calText(k)+'"></i>';""")
+rep("return t+': '+(n?n+' '+pl(n,['островок','островка','островков']):'без занятий');", "return t+': '+(n?n+' '+pl(n,['островок','островка','островков']):(S.fz.u.indexOf(k)>=0?'заморозка сохранила серию':'без занятий'));")
+rep('больше</span></div>\';', 'больше</span>\'+(S.fz.u.length?\'<span class="cleg"><i class="l0 fz"></i> заморозка</span>\':\'\')+\'</div>\';')
+
+# --- резервная копия без блока «Обращение»
+a = s.index('<h2 style="font-size:20px">Настройки</h2><h3>Обращение</h3>')
+b = s.index('<h3>Резервная копия</h3>', a)
+s = s[:a] + '<h2 style="font-size:20px">Резервная копия</h2>' + s[b+len('<h3>Резервная копия</h3>'):]
+
+rep("show('<div class=\"center\"><h2>Добро пожаловать в ИТП</h2>", "show('<div class=\"center\" style=\"padding-top:14px\">'+rabbit('eat')+'<h2>Добро пожаловать в ИТП</h2>")
+# --- конфетти по настройке
+rep("function confetti(big){", "function confetti(big){if(!ST('gc')){snd('fanfare');return}")
+
+
+# --- v5.1: копирование кода, проекты-достижения, введение из настроек, поделиться
+rep("'<pre>'+hl(p.slice(5,-6))+'</pre>'", "'<div class=\"cpw\"><button type=\"button\" class=\"cp\" aria-label=\"Копировать код\"></button><pre>'+hl(p.slice(5,-6))+'</pre></div>'")
+rep("if(TOPICS[i].intro&&S.start>0){goBack();toast('Готово. Эта кнопка больше не нужна и пропала из профиля');return}", "if(TOPICS[i].intro&&(S.start>0||w)){goBack();if(!w)toast('Готово. Эта кнопка больше не нужна и пропала из профиля');return}")
+rep("bump(key);ach('proj');snd('fanfare');", "bump(key);ach('proj');if(!at||at==='skip'){S.cn.pj=Math.min(99999,S.cn.pj+1);save();if(S.cn.pj>=3)ach('pj3')}if(/Анализ качества/.test(it.n||''))ach('pran');if(/Обработка запроса/.test(it.n||''))ach('papi');snd('fanfare');")
+rep("saveFile('itp-progress.png',BLOB);toast('Картинка сохранена');return false", "saveFile('itp-progress.png',BLOB);ach('share');toast('Картинка сохранена');return false")
+
+
+
+# --- v5.1.3: ЕГЭ
+rep("['theory','flash','test','project'].indexOf(it.t)<0){e.push(q+'t должен быть theory, flash, test или project')","['theory','flash','test','project','ans'].indexOf(it.t)<0){e.push(q+'t должен быть theory, flash, test, project или ans')")
+rep("if(it.t==='theory')theory(i,j);\n  else if(it.t==='test'){","if(it.t==='theory')theory(i,j);\n  else if(it.t==='test'||it.t==='ans'){")
+rep("var k=0;while(k<it.tasks.length-1&&S.tk[key+'-'+k])k++;task(i,j,k);","var k=0;while(k<it.tasks.length-1&&S.tk[key+'-'+k])k++;(it.t==='ans'?ansTask:task)(i,j,k);")
+rep("TOPICS.forEach(function(t,i){if(t.intro)return;h+='<button class=\"lesson\"","TOPICS.forEach(function(t,i){if(t.intro||t.ex)return;h+='<button class=\"lesson\"")
+import json as _j2
+EXIMG = open('exam/eximg.json', encoding='utf-8').read()
+# --- движок: ввод, файлы, модули
+import json as _json
+_py = {}
+for _k, _f in (('json','json'),('csv','csv'),('pprint','pprint'),('_strptime','strptime'),('timeit','timeit'),('itpshim','main'),('io','io'),('functools','functools'),('heapq','heapq'),('statistics','statistics')):
+    _py[_k] = open('v5/shim_%s.py' % _f, encoding='utf-8').read()
+rep("output:function(x){if(my!==TK||cut)return;", "output:function(x){if(x==='\\x05'){SENT=1;return}if(my!==TK||cut)return;")
+rep("if(my!==TK)return new Promise(function(){});\n        if(src.ask){", "if(my!==TK)return new Promise(function(){});\n        if(SENT){SENT=0;if(src.ask)return src.ask('').then(function(v){Sk.execStart=new Date();out+=v+'\\n';if(src.live)src.live(out);return v===''?'\\x05EOF':v});LL=0;if(n>=src.lines.length)return '\\x05EOF';return src.lines[n++]}\n        if(src.ask){")
+rep("var OC=code,WL=wal(code);code=WL.code;", "var OC=code,WL=wal(code),PL=0,SENT=0;code=WL.code;if(ITPNEED.test(OC)){code='from itpshim import *\\n'+(/\\bstrict\\b/.test(OC)?'zip = zip_\\n':'')+code;PL=/\\bstrict\\b/.test(OC)?2:1}try{Sk.sysmodules.mp$del_subscript(new Sk.builtin.str('itpshim'));Sk.sysmodules.mp$del_subscript(new Sk.builtin.str('timeit'))}catch(e){}")
+rep("Sk.misceval.asyncToPromise(function(){return Sk.importMainWithBody('<stdin>',false,code,true)})", "Sk.builtins.__itp_files__=Sk.ffi.remapToPy(src.files||FCUR||{});Sk.builtins.__itp_stdin__=/\\bstdin\\b/.test(OC)?Sk.builtin.bool.true$:Sk.builtin.bool.false$;Sk.misceval.asyncToPromise(function(){return Sk.importMainWithBody('<stdin>',false,code,true)},{'Sk.yield':function(sp){if(PD){PD=0;if(src.live)src.live(out)}if(STOPT===my||(src.alive&&!src.alive()))return Promise.reject(new Error('ITPSTOP'));return new Promise(function(r,j){setTimeout(function(){try{r(sp.resume())}catch(x){j(x)}},0)})}})")
+rep("if(WL.map)err=err.replace(/(line |строке )(\\d+)/g,function(m0,a,b){return a+(WL.map[+b-1]||b)});", "if(WL.map||PL)err=err.replace(/(line |строке )(\\d+)/g,function(m0,a,b){return a+((WL.map?WL.map[+b-1-PL]:+b-PL)||b)});")
+
+
+# --- форматирование с разделителем _ (как в Python: f"{n:_}")
+rep("(0)?(\\d+)?(,)?(?:\\.(\\d+))?", "(0)?(\\d+)?([,_])?(?:\\.(\\d+))?")
+rep('d[0]=d[0].replace(/\\B(?=(\\d{3})+(?!\\d))/g,",")', 'd[0]=d[0].replace(/\\B(?=(\\d{3})+(?!\\d))/g,a[7])')
+rep('g[0]=g[0].replace(/\\B(?=(\\d{3})+(?!\\d))/g,",")', 'g[0]=g[0].replace(/\\B(?=(\\d{3})+(?!\\d))/g,h[7])')
+
+
+exec(open('msgs.py',encoding='utf-8').read())
+# --- вставка ядра и интерфейса
+core = open('v5/a_core.js', encoding='utf-8').read() + '\n' + open('v5/a_ui.js', encoding='utf-8').read()
+for extra in ('v5/a_fix.js','v5/a_fix2.js','v5/a_fix3.js','v5/a_fix4.js','v5/a_more.js','v5/a_dev.js','v5/a_gen.js','v5/a_gen2.js','v5/a_gen4.js','v5/a_gen3.js','v5/a_gen5.js','v5/a_gen6.js','v5/a_sheet.js','v5/a_exam.js','v5/a_py.js','v5/a_turtle.js','v5/a_ux.js'):
+    try: core += '\n' + open(extra, encoding='utf-8').read()
+    except FileNotFoundError: pass
+anchor = "seedLit();window.addEventListener('resize',function(){if(app.querySelector('.path'))links()});\napplyTheme();"
+core = 'var EXIMG=' + EXIMG + ';\nvar EX2D=' + open('exam/ex2d.json', encoding='utf-8').read() + ';\n' + core
+core = core.replace('/*ITPY*/{}', _json.dumps(_py, ensure_ascii=False))
+rep(anchor, core + "\nseedLit();window.addEventListener('resize',function(){if(app.querySelector('.path'))links()});\napplyTheme();if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',emoLoad);else emoLoad();")
+
+s=s.replace('.slice(0,16).join(','.slice(0,20).join(').replace('maxlength="16"','maxlength="20"')
+assert '4.3.0' not in s
+import base64 as _b64, gzip as _gz
+def _b(path, gz=False):
+    d = open(path, 'rb').read()
+    if gz: d = _gz.compress(d, 9)
+    return _b64.b64encode(d).decode()
+_P = 'pyo/pyodide/'
+_blocks = ''.join('<script type="text/plain" id="%s">%s</script>\n' % (i, t) for i, t in (
+    ('py-wasm', _b(_P + 'pyodide.asm.wasm', 1)), ('py-asm', _b(_P + 'pyodide.asm.js', 1)), ('py-zip', _b(_P + 'python_stdlib.zip')),
+    ('py-lock', open(_P + 'pyodide-lock.json', encoding='utf-8').read().replace('</', '<\\/')),
+    ('py-loader', open(_P + 'pyodide.js', encoding='utf-8').read().replace('</script', '<\\/script')),
+    ('py-glue', open('v5/py/glue.py', encoding='utf-8').read() + '\n_TURTLE_SRC = ' + repr(open('v5/py/turtle_shim.py', encoding='utf-8').read()) + '\n'), ('py-worker', open('v5/py/worker.js', encoding='utf-8').read())))
+assert s.count('</body>') == 1
+s = s.replace('</body>', _blocks + '</body>')
+s = s.replace('v5.1.3', VER)
+open('out5.html', 'w', encoding='utf-8').write(s)
+print('ok', len(s))

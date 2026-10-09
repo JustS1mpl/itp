@@ -1,0 +1,12 @@
+var vm=require('vm'),fs=require('fs');global.window=global;
+vm.runInThisContext(fs.readFileSync('v5/a_gen.js','utf8').split('(function(){')[0]);
+vm.runInThisContext(fs.readFileSync('v5/a_gen6.js','utf8'));
+var D=JSON.parse(fs.readFileSync('../in6/ege_task06/ege_task06/task06.json','utf8')),bad=0,n=0;
+D.types.forEach(function(t){t.examples.concat(t.tasks).forEach(function(e){n++;
+  var q={query:e.query,a:e.answer};exFill6(q);
+  if(q._v!==e.answer){bad++;console.log('MISMATCH',e.id,q._v,e.answer)}})});
+console.log('json',n,'bad',bad);
+var out=[];
+['6.1','6.2','6.3','6.4','6.5','6.6'].forEach(function(t){var c=0,fail=0;for(var i=0;i<150;i++){var q=EXGEN[6].make(t,exRnd(1000+i*7+t.charCodeAt(2)));if(!q){fail++;continue}c++;out.push({type:t,query:q.query,a:q.a,tu:q.tu})}console.log(t,'ok',c,'fail',fail)});
+fs.writeFileSync('t6_cases.json',JSON.stringify(out));
+var q=EXGEN[6].make('6.3',exRnd(5));console.log(q.pr+'\n'+q.qq+'\n'+q.a+'\n'+q.s.join('\n')+'\n'+q.h.join('|')+'\n'+q.m+'\n'+q.tu);
