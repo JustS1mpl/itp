@@ -50,7 +50,7 @@ function pyExec(code,src){
   return new Promise(function(resolve){
     if(PY.job)stopJob(PY.job);
     var job={my:my,dead:false,rec:null,tm:null,poll:null};PY.job=job;
-    var seed=String(Math.floor(Math.random()*2147483647)),CAP=20000,SCAP=200000;
+    var seed=String(Math.floor(Math.random()*2147483647)),CAP=ask?100000:20000,SCAP=200000;
     var raw='',D=0,skip=0,stdout='',marks=[],so=0,cut=false,lines=lines0.slice(),eofMode=/\bstdin\b/.test(code),usesIn=/\binput\b|\bstdin\b/.test(code),used=0,over=false,spare=null,done=false,lt=0;
     function live(){if(src.live&&!job.dead){var n=Date.now();if(n-lt<30)return;lt=n;try{src.live(raw)}catch(e){}}}
     function addRaw(s){
@@ -59,7 +59,7 @@ function pyExec(code,src){
       if(raw.length+s.length>CAP){raw+=s.slice(0,CAP-raw.length);cut=true}else raw+=s}
     function result(extra){
       var o=stdout;marks.slice().reverse().forEach(function(m){o=o.slice(0,m[0])+o.slice(m[0]+m[1])});
-      var r={out:o,raw:raw+(cut?'\n…вывод обрезан':''),err:null,over:over,used:used,total:lines0.length};
+      var r={out:o,raw:raw+(cut?'\n…вывод обрезан: показаны первые '+CAP+' символов':''),err:null,over:over,used:used,total:lines0.length};
       for(var k in extra)r[k]=extra[k];return r}
     function finish(r){
       if(done)return;done=true;job.dead=true;clearTimeout(job.tm);clearInterval(job.poll);

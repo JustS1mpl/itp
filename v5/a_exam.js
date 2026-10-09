@@ -178,7 +178,7 @@ function exMenu(){BACK=exMenu;document.documentElement.dataset.tr=EXDASH?'1':'';
   app.querySelectorAll('.ext').forEach(function(b){b.onclick=function(){var p=b.dataset.a.split(':');EXST={ok:0,all:0};exTrain(+p[1],p[2])}})}
 function exTrain(no,type){
   var g=EXGEN[no],q=null;
-  for(var n=0;n<5&&!q;n++)q=g.make(type);
+  for(var n=0;n<30&&!q;n++)q=g.make(type);
   if(!q){toast('Не удалось создать задание, попробуй ещё раз');return exMenu()}
   var tries=0,hn=0,fin=false;
   show('<div class="top"><button class="icon" id="x" aria-label="К выбору типа">✕</button><span class="chip s">🎲 '+EXST.ok+' из '+EXST.all+'</span></div>'+exDraw(q,'Тренажёр · задание №'+no+(q.type?' · тип '+q.type:''))+exAsk(q,'<div class="row"><button class="btn g" id="hb">💡 Подсказка</button><button class="btn g" id="sk">Пропустить</button></div>'));

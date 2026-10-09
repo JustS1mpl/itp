@@ -1,6 +1,6 @@
 import re, sys, json
 sys.path.insert(0, '.')
-VER = '5.4.0'
+VER = '5.4.1'
 s = open('base43.html', encoding='utf-8').read()
 
 def rep(a, b, n=1):
@@ -178,6 +178,7 @@ _blocks = ''.join('<script type="text/plain" id="%s">%s</script>\n' % (i, t) for
     ('py-glue', open('v5/py/glue.py', encoding='utf-8').read() + '\n_TURTLE_SRC = ' + repr(open('v5/py/turtle_shim.py', encoding='utf-8').read()) + '\n'), ('py-worker', open('v5/py/worker.js', encoding='utf-8').read())))
 assert s.count('</body>') == 1
 s = s.replace('</body>', _blocks + '</body>')
-s = s.replace('v5.1.3', VER)
+s = s.replace('v5.1.3', VER).replace('id="egv">5.1.3<', 'id="egv">' + VER + '<')
+assert 'id="egv">5.1.3<' not in s
 open('out5.html', 'w', encoding='utf-8').write(s)
 print('ok', len(s))

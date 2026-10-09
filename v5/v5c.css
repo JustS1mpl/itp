@@ -309,3 +309,32 @@ body.tuopen{overflow:hidden}
 .expr.pro{font:500 15px/1.6 inherit;font-family:inherit}
 .extl button#exbt{border-color:var(--exa);color:var(--exa)}
 .tf{font-weight:inherit}
+
+/* ===== v5.4.1: исправления вёрстки и мягкая полировка дизайна =====
+   Только оформление: логика и формат сохранения не затронуты. Чтобы вернуть прежний вид, удалите этот блок. */
+/* длинные ники и подписи не распирают экран на узких телефонах */
+.nmx,.gh,.pet b,.li .lt,.chip.s{overflow-wrap:anywhere}
+.hn{overflow:hidden}
+/* полоса прогресса у заголовка темы */
+.thead::after{content:'';position:absolute;left:5px;right:0;bottom:0;height:3px;background:linear-gradient(90deg,var(--accent) var(--tp,0%),transparent var(--tp,0%));opacity:.8}
+.thead.done::after{background:var(--gold);opacity:1}
+/* карточки и списки: двухслойные тени, плавный подъём на устройствах с мышью */
+:root{--sh1:0 1px 2px rgba(80,40,50,.05),0 2px 8px rgba(80,40,50,.04)}
+:root[data-theme=dark]{--sh1:0 1px 2px rgba(0,0,0,.3),0 2px 10px rgba(0,0,0,.18)}
+@media (hover:hover) and (pointer:fine){
+ .card,.thead,.lesson,.ext,.elink{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+ .lesson:hover,.ext:hover,.elink:hover{transform:translateY(-1px);box-shadow:var(--sh2);border-color:var(--line2)}
+ .lst .li:hover{background:color-mix(in srgb,var(--accent) 6%,var(--card))}
+}
+/* главная кнопка: лёгкий блик сверху */
+.btn:not(.g):not(.bad):not([disabled]){background-image:linear-gradient(180deg,color-mix(in srgb,#fff 16%,transparent),transparent 55%)}
+.btn:focus-visible{outline-offset:3px}
+/* нижняя навигация: активная вкладка подсвечена «таблеткой» */
+.nav button.act{background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.nav button{min-height:52px}
+/* тонкие полосы прокрутки в цвет темы */
+*{scrollbar-width:thin;scrollbar-color:var(--line2) transparent}
+::selection{background:color-mix(in srgb,var(--accent) 28%,transparent)}
+input,textarea,select{accent-color:var(--accent)}
+/* крупнее зона нажатия у мелких кнопок на сенсорных экранах */
+@media (pointer:coarse){.chip,.icon{min-height:40px}.seg2 button,.segc button{min-height:40px}}
