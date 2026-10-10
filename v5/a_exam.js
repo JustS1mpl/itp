@@ -7,7 +7,7 @@ allDone=function(){return TOPICS.every(function(t,i){return t.intro||t.ex||tdone
 cur=function(){var ex=S.mode==='ex';for(var i=ex?0:Math.max(S.start,0);i<TOPICS.length;i++){if(!!TOPICS[i].ex!==ex)continue;for(var j=0;j<ni(i);j++)if(!S.d[i+'-'+j])return i+'-'+j}return''};
 passed=function(type){var a=[];TOPICS.forEach(function(t,i){if(t.ex)return;(t.items||[]).forEach(function(x,j){if(x.t===type&&S.d[i+'-'+j])a.push([i,j])})});return a};
 (function(){
-  var io0=isOpen;isOpen=function(i,j){if(!TOPICS[i].ex)return io0(i,j);if(typeof DEV==='function'&&DEV())return 1;return!!S.d[i+'-'+j]||j===0||!!S.d[i+'-'+(j-1)]};
+  var io0=isOpen;isOpen=function(i,j){if(!TOPICS[i].ex)return io0(i,j);return!!S.d[i+'-'+j]||j===0||!!S.d[i+'-'+(j-1)]};
   var v0=vis;vis=function(i){return TOPICS[i].ex?true:v0(i)};
   var sn0=setNav;setNav=function(t){navMode();return sn0(t)};
   var th0=theory;theory=function(i,j){th0(i,j);exImgs(app)};
@@ -127,7 +127,6 @@ function exTools(key,starter,q){
 }
 function ansTask(i,j,k){
   var it=IT(i,j),T=it.tasks,q=T[k],key=i+'-'+j,tk=key+'-'+k,tries=0,hn=0,fin=!!S.tk[tk];if(q.expr&&!q.s)exFill2(q);if(q.query&&q.no===6&&window.exFill6)exFill6(q);else if(q.query&&q.no===5&&window.exFill5)exFill5(q);else if(q.query&&q.db&&window.exFill3)exFill3(q);else if(q.query&&window.exFill4)exFill4(q);
-  DVC={t:'ans',i:i,j:j,k:k};
   var hasH=q.h&&q.h.length;
   show('<div class="top"><button class="icon" id="x" aria-label="Назад">✕</button>'+(T.length<=12?exProg(k,T.length):'<span class="chip">Задание '+(k+1)+' из '+T.length+'</span>')+'</div>'+exDraw(q,'Тренировка · задание '+(k+1)+' из '+T.length)+exAsk(q,(hasH?'<button class="btn g exhb" id="hb">💡 Подсказка</button>':'')));
   exImgs(app);exTools('a'+key+'-'+k,exStart(q),q);

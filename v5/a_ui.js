@@ -128,14 +128,13 @@ function home(){BACK=home;fzApply();
   var all=allDone();
   if(PE.length){show(head()+'<div class="fb bad"><b>Ошибка в данных тем</b>'+PE.map(esc).join('<br>')+'</div>','home');bindHead(home);return}
   var ex=S.mode==='ex',first=!ex&&TOPICS[0]&&TOPICS[0].intro&&S.start===0&&!tdone(0)&&!REV;
-  var h=head()+(first?'':goalCard(all))+(ex?exBar():''),num=0;
+  var h=head()+(first?'':goalCard(all)),num=0;
   TOPICS.forEach(function(t,i){
     if(ex?!(t.ex&&t.ex===EXK):!!t.ex)return;if(!t.intro)num++;if(!vis(i))return;
     var c=0;(t.items||[]).forEach(function(x,j){if(S.d[i+'-'+j])c++});
     h+='<section class="topic'+(t.intro?' intro':'')+(REV&&!t.intro?' rv':'')+'">'+(t.intro?'<div class="ihead"><h2>'+esc(t.n)+'</h2><p class="mu">'+esc(t.s||'')+'</p></div>':'<div class="thead'+(tdone(i)?' done':'')+'" style="--tp:'+Math.round(c/Math.max(1,ni(i))*100)+'%"><div class="tn">'+num+'</div><div class="tt"><h2>'+esc(t.n)+'</h2><div class="mu">'+esc(t.s||'')+(i<S.start&&!tdone(i)?' · пропущено':'')+'</div></div><div class="tp">'+c+'/'+ni(i)+'</div></div>')+'<div class="path'+(RM()?'':' stg')+'" data-i="'+i+'">';
     for(var j=0;j<ni(i);j++)h+=island(i,j,j);
     h+='</div></section>'});
-  if(ex)h+=exTail();
   show(h,'home');bindHead(home);links();exBind();
   app.querySelectorAll('.isl').forEach(function(b){b.onclick=function(){go(+b.dataset.i,+b.dataset.j)}});
   var c=app.querySelector('.cur');if(c&&!REV)c.scrollIntoView({block:'center'});

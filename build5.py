@@ -1,6 +1,6 @@
 import re, sys, json
 sys.path.insert(0, '.')
-VER = '5.4.1'
+VER = '5.4.2'
 s = open('base43.html', encoding='utf-8').read()
 
 def rep(a, b, n=1):
@@ -22,7 +22,6 @@ rep("(cut?'\\n…вывод обрезан':'')","(cut?'\\n…вывод обр�
 
 rep("function fixErr(e,code){if(!e)return e;","function fixErr(e,code){if(!e)return e;try{e=itpTrFull(e)}catch(_x){}")
 rep("function fin2(err){","function fin2(err){if(err&&/^SystemExit\\b/.test(err))err=null;")
-rep("function isOpen(i,j){var k=i+'-'+j;", "function isOpen(i,j){if(typeof DEV==='function'&&DEV())return 1;var k=i+'-'+j;")
 rep("esc(q.e||'')", "esc(q.e||'')+xm(q)", 3)
 rep("(String(it.html).match(/\\[\\[([^\\]|]+)/g)||[])", "(String(it.html).replace(/<pre>[\\s\\S]*?<\\/pre>/g,'').match(/\\[\\[([^\\]|]+)/g)||[])")
 rep("it.html.split(/(<pre>[\\s\\S]*?<\\/pre>)/).map(function(p){return /^<pre>/.test(p)?", "it.html.split(/(<pre[^>]*>[\\s\\S]*?<\\/pre>)/).map(function(p){return /^<pre /.test(p)?p:/^<pre>/.test(p)?")
@@ -155,7 +154,7 @@ rep('g[0]=g[0].replace(/\\B(?=(\\d{3})+(?!\\d))/g,",")', 'g[0]=g[0].replace(/\\B
 exec(open('msgs.py',encoding='utf-8').read())
 # --- вставка ядра и интерфейса
 core = open('v5/a_core.js', encoding='utf-8').read() + '\n' + open('v5/a_ui.js', encoding='utf-8').read()
-for extra in ('v5/a_fix.js','v5/a_fix2.js','v5/a_fix3.js','v5/a_fix4.js','v5/a_more.js','v5/a_dev.js','v5/a_gen.js','v5/a_gen2.js','v5/a_gen4.js','v5/a_gen3.js','v5/a_gen5.js','v5/a_gen6.js','v5/a_sheet.js','v5/a_exam.js','v5/a_py.js','v5/a_turtle.js','v5/a_ux.js'):
+for extra in ('v5/a_fix.js','v5/a_fix2.js','v5/a_fix3.js','v5/a_fix4.js','v5/a_more.js','v5/a_gen.js','v5/a_gen2.js','v5/a_gen4.js','v5/a_gen3.js','v5/a_gen5.js','v5/a_gen6.js','v5/a_sheet.js','v5/a_exam.js','v5/a_py.js','v5/a_turtle.js','v5/a_ux.js','v5/a_bk.js','v5/a_tools.js'):
     try: core += '\n' + open(extra, encoding='utf-8').read()
     except FileNotFoundError: pass
 anchor = "seedLit();window.addEventListener('resize',function(){if(app.querySelector('.path'))links()});\napplyTheme();"

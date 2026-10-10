@@ -1,7 +1,7 @@
 import json, sys, os
 from playwright.sync_api import sync_playwright
 W=os.path.dirname(os.path.abspath(__file__))
-SK=W+'/sk/'
+SK=os.path.join(os.path.dirname(W),'sk')+'/'
 def route(r):
     u=r.request.url
     if 'skulpt@1.2.0/dist/' in u:
