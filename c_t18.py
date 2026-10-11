@@ -462,4 +462,4 @@ from collections import defaultdict
                  tests[2]: "Analytics Results:\nUnique users who solved tasks: 7\nUnique users list: Alex, Anna, Dima, Ivan, Kirill, Maria, Nikita\nTask popularity: {'BracketCheck': 2, 'CountWords': 5, 'FlattenList': 1, 'TwoSum': 3}\nMost popular task: 'CountWords' with 5 attempts",
                  tests[3]: "Analytics Results:\nUnique users who solved tasks: 6\nUnique users list: Ivan, Mari, Oleg, Pavel, Sveta, Yulia\nTask popularity: {'LongestWord': 1, 'Queens': 5, 'SortLetters': 1, 'SumDigits': 1, 'TwoSum': 2}\nMost popular task: 'Queens' with 5 attempts"})
 
-    return topic('Проект: ASGI/WSGI-сервер', 'микросервисы, запросы, генератор-сервер, декораторы, логи JSON, аналитика', [th1, fl1, th2, fl2, ts1, p1])
+    return topic('Веб-сервер своими руками', 'запросы и маршруты, декораторы-обработчики, сервер-генератор, логи в JSON, аналитика', [th1, fl1, th2, fl2, ts1, p1])
