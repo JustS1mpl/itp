@@ -1,6 +1,6 @@
 import re, sys, json
 sys.path.insert(0, '.')
-VER = '5.4.0'
+VER = '5.5.0'
 s = open('base43.html', encoding='utf-8').read()
 
 def rep(a, b, n=1):
@@ -122,7 +122,7 @@ rep("function confetti(big){", "function confetti(big){if(!ST('gc')){snd('fanfar
 # --- v5.1: копирование кода, проекты-достижения, введение из настроек, поделиться
 rep("'<pre>'+hl(p.slice(5,-6))+'</pre>'", "'<div class=\"cpw\"><button type=\"button\" class=\"cp\" aria-label=\"Копировать код\"></button><pre>'+hl(p.slice(5,-6))+'</pre></div>'")
 rep("if(TOPICS[i].intro&&S.start>0){goBack();toast('Готово. Эта кнопка больше не нужна и пропала из профиля');return}", "if(TOPICS[i].intro&&(S.start>0||w)){goBack();if(!w)toast('Готово. Эта кнопка больше не нужна и пропала из профиля');return}")
-rep("bump(key);ach('proj');snd('fanfare');", "bump(key);ach('proj');if(!at||at==='skip'){S.cn.pj=Math.min(99999,S.cn.pj+1);save();if(S.cn.pj>=3)ach('pj3')}if(/Анализ качества/.test(it.n||''))ach('pran');if(/Обработка запроса/.test(it.n||''))ach('papi');snd('fanfare');")
+rep("bump(key);ach('proj');snd('fanfare');", "bump(key);ach('proj');if(!at||at==='skip'){S.cn.pj=Math.min(99999,S.cn.pj+1);save();if(S.cn.pj>=3)ach('pj3')}if(/Анализ качества/.test(it.n||''))ach('pran');if(/Обработка запроса/.test(it.n||''))ach('papi');if(/WSGI/.test(it.n||''))ach('pwsgi');snd('fanfare');")
 rep("saveFile('itp-progress.png',BLOB);toast('Картинка сохранена');return false", "saveFile('itp-progress.png',BLOB);ach('share');toast('Картинка сохранена');return false")
 
 
@@ -134,6 +134,17 @@ rep("var k=0;while(k<it.tasks.length-1&&S.tk[key+'-'+k])k++;task(i,j,k);","var k
 rep("TOPICS.forEach(function(t,i){if(t.intro)return;h+='<button class=\"lesson\"","TOPICS.forEach(function(t,i){if(t.intro||t.ex)return;h+='<button class=\"lesson\"")
 import json as _j2
 EXIMG = open('exam/eximg.json', encoding='utf-8').read()
+# --- v5.5.0: картинки к новым темам (assets/img/*.webp) и скрытый «хвост» у задач на функции
+import base64 as _b64, glob as _glob, os as _os
+_im = _j2.loads(EXIMG)
+for _f in sorted(_glob.glob('assets/img/*.webp')):
+    _im['p-' + _os.path.basename(_f)[:-5]] = 'data:image/webp;base64,' + _b64.b64encode(open(_f, 'rb').read()).decode()
+EXIMG = _j2.dumps(_im, ensure_ascii=False)
+rep("var r=await exec(code,{lines:q.tests[n][0]===''?[]:q.tests[n][0].split('\\n')});", "var r=await exec(q.tail?code+'\\n'+q.tail:code,{lines:q.tests[n][0]===''?[]:q.tests[n][0].split('\\n')});")
+rep("(!r.err&&r.used<r.total?", "(!q.tail&&!r.err&&r.used<r.total?")
+rep("var hint=r.over?", "var hint=(r.over&&!q.tail)?")
+rep("(S.tk[tk]?'':'# Пиши код здесь\\n')", "(S.tk[tk]?'':'# Пиши код здесь\\n'+(q.starter||''))")
+rep("[0]||'# Пиши код здесь\\n',hs=String(it.h", "[0]||'# Пиши код здесь\\n'+(it.starter||''),hs=String(it.h")
 # --- движок: ввод, файлы, модули
 import json as _json
 _py = {}
