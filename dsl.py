@@ -10,6 +10,9 @@ FILESETS = {}
 def _fd(f):
     return FILESETS[f] if isinstance(f, str) else f
 
+# скрытый «хвост» задач на функции: проверка вызывает функцию кодом из теста (тест = вызов, который читается из stdin)
+TL = "exec(__import__('sys').stdin.read(), globals())"
+
 EX = []   # примеры из теории: для проверки в Skulpt
 FL = []   # вопросы «что выведет»: для проверки в Skulpt
 TK = []   # задачи: для проверки в Skulpt
@@ -162,17 +165,20 @@ def _norm_out(o, strict):
     return '\n'.join(ls).strip('\n')
 
 
-def _exfmt(inputs, out):
+def _exfmt(inputs, out, tail=False):
+    if tail:
+        return 'Проверка запустит:\n' + inputs + '\nВывод:\n' + out
     li = _inp(inputs)
     if len(li) <= 1 and '\n' not in out:
         return ('Вход: ' + inputs + '\n' if inputs else '') + 'Вывод: ' + out
     return ('Вход:\n' + '\n'.join(li) + '\n' if li else '') + 'Вывод:\n' + out
 
 
-def _tests(sol, inputs, exp, where, files=None):
+def _tests(sol, inputs, exp, where, files=None, tail=None):
     tests = []
+    full = sol + '\n' + tail if tail else sol
     for inp in inputs:
-        plain, _ = run(sol, _inp(inp), files)
+        plain, _ = run(full, _inp(inp), files)
         out = _norm_out(plain, False)
         if exp and inp in exp:
             assert out == exp[inp], (where, inp, out, exp[inp])
@@ -180,15 +186,19 @@ def _tests(sol, inputs, exp, where, files=None):
     return tests
 
 
-def task(q_, h, sol, inputs, strict=False, exp=None, ex_=None, files=None):
+def task(q_, h, sol, inputs, strict=False, exp=None, ex_=None, files=None, tail=None, starter=None):
     sol = sol.strip('\n')
-    tests = _tests(sol, inputs, exp, q_, _fd(files))
-    TK.append(dict(where=q_, sol=sol, tests=tests, strict=strict, files=_fd(files)))
-    d = {'q': q_, 'ex': ex_ if ex_ is not None else _exfmt(inputs[0], tests[0][1]), 'h': h, 'tests': tests, 'sol': sol}
+    tests = _tests(sol, inputs, exp, q_, _fd(files), tail)
+    TK.append(dict(where=q_, sol=sol, tests=tests, strict=strict, files=_fd(files), tail=tail))
+    d = {'q': q_, 'ex': ex_ if ex_ is not None else _exfmt(inputs[0], tests[0][1], bool(tail)), 'h': h, 'tests': tests, 'sol': sol}
     if strict:
         d['strict'] = 1
     if files:
         d['f'] = files
+    if tail:
+        d['tail'] = tail
+    if starter:
+        d['starter'] = starter.strip('\n') + '\n'
     return d
 
 
@@ -197,11 +207,11 @@ def ts(name, tasks):
     return {'t': 'test', 'n': name, 'tasks': tasks}
 
 
-def pj(name, q_, h, sol, inputs, strict=False, exp=None, bonus=None, ex_=None, files=None):
+def pj(name, q_, h, sol, inputs, strict=False, exp=None, bonus=None, ex_=None, files=None, tail=None, starter=None):
     sol = sol.strip('\n')
-    tests = _tests(sol, inputs, exp, name, _fd(files))
-    TK.append(dict(where=name, sol=sol, tests=tests, strict=strict, files=_fd(files)))
-    d = {'t': 'project', 'n': name, 'q': q_, 'h': h, 'ex': ex_ if ex_ is not None else _exfmt(inputs[0], tests[0][1]), 'tests': tests}
+    tests = _tests(sol, inputs, exp, name, _fd(files), tail)
+    TK.append(dict(where=name, sol=sol, tests=tests, strict=strict, files=_fd(files), tail=tail))
+    d = {'t': 'project', 'n': name, 'q': q_, 'h': h, 'ex': ex_ if ex_ is not None else _exfmt(inputs[0], tests[0][1], bool(tail)), 'tests': tests}
     if bonus:
         d['bonus'] = bonus
     d['sol'] = sol
@@ -209,6 +219,10 @@ def pj(name, q_, h, sol, inputs, strict=False, exp=None, bonus=None, ex_=None, f
         d['strict'] = 1
     if files:
         d['f'] = files
+    if tail:
+        d['tail'] = tail
+    if starter:
+        d['starter'] = starter.strip('\n') + '\n'
     return d
 
 
