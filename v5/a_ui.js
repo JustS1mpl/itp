@@ -241,7 +241,9 @@ function islandPop(b){
   o.style.top=(w.offsetTop+w.offsetHeight+10)+'px';
   pa.appendChild(o);b.classList.add('sel');app.classList.add('pk');
   /* стрелка карточки смотрит точно на остров, даже если карточка уже ширины дорожки */
-  var orc=o.getBoundingClientRect();o.style.setProperty('--ax',Math.max(24,Math.min(orc.width-24,br.left+br.width/2-orc.left))+'px');
+  /* считаем по раскладке, а не по getBoundingClientRect: карточка в момент замера ещё «въезжает» (scale/translate) и стрелка съезжала */
+  var ix=w.offsetLeft+lkX(w)+b.offsetLeft+b.offsetWidth/2;
+  o.style.setProperty('--ax',Math.max(24,Math.min(o.offsetWidth-24,ix-o.offsetLeft))+'px');
   var g=$('ipg');if(g)g.onclick=function(){BACK=home;popClose();go(i,j)};
   var s=$('ips');if(s)s.onclick=function(){popClose();projSkip(i,j)};
   var cc=$('ipc');if(cc)cc.onclick=function(){popClose();toCur()};

@@ -6,7 +6,7 @@
 
 1. Скачать ядро Pyodide 0.29.3 (`pyodide-core-0.29.3.tar.bz2` со страницы релизов github.com/pyodide/pyodide) и распаковать так, чтобы получилась папка `pyo/pyodide/` (в ней `pyodide.asm.wasm`, `pyodide.asm.js`, `python_stdlib.zip`, `pyodide-lock.json`, `pyodide.js`). Папка `pyo/` в git не хранится.
 2. Запустить `./mk.sh`. Он делает три шага: `python3 build.py` (темы → `out.html`), `cp out.html base43.html` (обязательно, иначе `build5.py` возьмёт устаревшую базу), `python3 build5.py` (интерфейс v6, Pyodide → `out5.html`).
-3. Номер версии задаётся переменной `VER` в `build5.py` (сейчас 6.3.0). Готовый файл переименовать в `ИТП.v<версия>.html`.
+3. Номер версии задаётся переменной `VER` в `build5.py` (сейчас 6.3.1). Готовый файл переименовать в `ИТП.v<версия>.html`.
 
 ## Что где лежит
 

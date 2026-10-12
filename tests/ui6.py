@@ -59,6 +59,9 @@ def run(theme='light', w=390):
         tap(pg, '.topic.intro .isl')
         ok(pg.locator('.ipop').count() == 1, 'нажатие на островок открывает карточку')
         snap(pg, '03_intro_pop_' + theme)
+        pg.wait_for_timeout(500)
+        ar = pg.evaluate("(function(){var o=document.querySelector('.ipop'),i=document.querySelector('.isl.sel');var r=i.getBoundingClientRect(),q=o.getBoundingClientRect();return Math.abs(q.left+parseFloat(getComputedStyle(o).getPropertyValue('--ax'))-(r.left+r.width/2))})()")
+        ok(ar < 1, 'стрелка карточки точно на центр островка (отклонение %.1f px)' % ar)
         tap(pg, '#ipg')
         ok('И так, программирование' in pg.inner_text('#tb') or pg.evaluate("S.set.ty"), 'теория введения открыта')
         pg.evaluate("var e=document.getElementById('tb');e&&e.click()")  # показать текст сразу
