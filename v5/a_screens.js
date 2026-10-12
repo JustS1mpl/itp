@@ -11,6 +11,8 @@ function show(h,tab){
   if(k&&PSKEY){
     if(k===PSKEY)d=/^(quiz|task|askq|rcode)$/.test(k)?'nx':'same';
     else{var a=SDEP[PSKEY],b=SDEP[k];if(a!==undefined&&b!==undefined)d=a===0&&b===0?'tab':b<a?'back':'fwd'}}
+  /* звук перехода: вглубь и назад, без шума на соседних разделах и вопросах подряд */
+  if(d==='fwd'&&k!=='done')snd('go');else if(d==='back')snd('back');
   PSKEY=k;
   document.querySelectorAll('body>.dock,body>.jump').forEach(function(x){x.remove()});
   app.innerHTML=h;app.className='';void app.offsetWidth;
@@ -24,8 +26,9 @@ function setNav(t){CURTAB=t||null;NAV.classList.toggle('on',!!t);NAV.inert=!t;NA
 NAV.innerHTML=[['home','path','Путь'],['pr','prac','Практика'],['ed','code','Код'],['prof','bun','Профиль']].map(function(t){return'<button data-t="'+t[0]+'"><span class="ni">'+ico(t[1])+'</span>'+t[2]+'</button>'}).join('');
 
 /* --- окна: лист снизу на телефоне, карточка по центру на компьютере --- */
+var MSIL=0;
 function modal(h,btns){
-  var prev=document.activeElement,o=document.createElement('div');o.className='modal';
+  var prev=document.activeElement,o=document.createElement('div');o.className='modal';if(!MSIL)snd('open');MSIL=0;
   o.innerHTML='<div class="mc" role="dialog" aria-modal="true" tabindex="-1">'+h+'<div class="mb"></div></div>';
   var mc=o.querySelector('.mc'),r=o.querySelector('.mb'),t=mc.querySelector('h2');
   if(t){t.id=t.id||'mh'+Date.now();mc.setAttribute('aria-labelledby',t.id)}
@@ -33,7 +36,7 @@ function modal(h,btns){
   if(!r.children.length)r.remove();
   var gone=false;
   /* закрытие с анимацией: и кнопкой, и Esc, и «назад» на Android (они вызывают .remove()) */
-  o.remove=function(){if(gone)return;gone=true;o.classList.replace('modal','sheet-out');if(prev&&prev.focus&&document.body.contains(prev))try{prev.focus({preventScroll:true})}catch(e){}
+  o.remove=function(){if(gone)return;gone=true;snd('close');o.classList.replace('modal','sheet-out');if(prev&&prev.focus&&document.body.contains(prev))try{prev.focus({preventScroll:true})}catch(e){}
     setTimeout(function(){Element.prototype.remove.call(o)},RM()?0:190)};
   o.onclick=function(e){if(e.target===o)o.remove()};
   o.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target.tagName==='INPUT'){e.preventDefault();var f=r.querySelector('button');if(f)f.click()}
@@ -84,7 +87,7 @@ var OL='1234';
 function optsHtml(q,ord){return'<div class="opts" role="group" aria-label="Варианты ответа">'+ord.map(function(k,n){return'<button class="opt" data-k="'+k+'" aria-pressed="false"><span class="ol" aria-hidden="true">'+(OL[n]||'')+'</span><span class="ot">'+esc(q.o[k])+'</span></button>'}).join('')+'</div>'}
 /* выбор варианта: нажатием или цифрой на клавиатуре; Enter жмёт главную кнопку */
 var OPTK=null;
-function optKeys(os,sel){os.forEach(function(b){b.onclick=function(){sel(b)}});OPTK=function(n){var b=os[n];if(b&&!b.disabled&&b.isConnected)sel(b)}}
+function optKeys(os,sel){os.forEach(function(b){b.onclick=function(){sel(b)}});OPTK=function(n){var b=os[n];if(b&&!b.disabled&&b.isConnected){snd('tap');sel(b)}}}
 document.addEventListener('keydown',function(e){
   if(e.ctrlKey||e.metaKey||e.altKey||document.querySelector('.modal'))return;
   var ty=/^(INPUT|TEXTAREA)$/.test((e.target&&e.target.tagName)||'');if(ty)return;
@@ -134,9 +137,14 @@ function doneScreen(o){
    (o.tj?'<div class="tj">🎉 Тема «'+esc(o.tj)+'» пройдена!</div>':'')+(o.lv?'<div><span class="lvup">⬆️ Новый уровень: '+o.lv+'</span></div>':'')+
    xpStrip(o.x)+'</div>';
   scr('done',h+dockHtml(o.btns,1));
+  /* звук в такт анимации: «пройдено» в момент появления экрана, искорка опыта в момент, когда число начинает расти;
+     тема пройдена или новый уровень звучат через конфетти (там нужный звук выбирает SX.cs) */
+  SX.cs=o.tj?'fanfare':(o.lv?'level':'');setTimeout(function(){SX.cs=''},1500);
+  if(!o.tj&&!o.lv&&!sndRecent('fanfare',600))snd('done');
+  setTimeout(function(){if(o.x>0)snd('xp')},260);
   /* опыт «набегает» числом, потом заполняется полоса уровня */
   var n=$('xpn'),t=$('xpt'),x=o.x||0;
-  if(RM()||!x){n.textContent='+'+x}else{var t0=0;setTimeout(function(){t.classList.add('pp');snd('ok');requestAnimationFrame(function st(ts){if(!t0)t0=ts;var k=Math.min(1,(ts-t0)/650);n.textContent='+'+Math.round(x*(1-Math.pow(1-k,3)));if(k<1&&n.isConnected)requestAnimationFrame(st)});sparks(t)},260)}
+  if(RM()||!x){n.textContent='+'+x}else{var t0=0;setTimeout(function(){t.classList.add('pp');requestAnimationFrame(function st(ts){if(!t0)t0=ts;var k=Math.min(1,(ts-t0)/650);n.textContent='+'+Math.round(x*(1-Math.pow(1-k,3)));if(k<1&&n.isConnected)requestAnimationFrame(st)});sparks(t)},260)}
   xpStripRun();
   var b=document.querySelector('#dock .btn');if(b)setTimeout(function(){b.focus({preventScroll:true})},60)}
 function sparks(el){
@@ -191,7 +199,7 @@ function quiz(i,j){
     scr('quiz',h+dockHtml('<button class="btn" id="go" disabled>Проверить</button>',0,1));if(q.v)imgZoom(app);
     $('x').onclick=goBack;
     var g=$('go'),os=app.querySelectorAll('.opt');
-    optKeys(os,function(b){if(ch)return;sel=+b.dataset.k;os.forEach(function(o){o.classList.remove('sel');o.setAttribute('aria-pressed','false')});b.classList.add('sel');b.setAttribute('aria-pressed','true');g.disabled=false;snd('click')});
+    optKeys(os,function(b){if(ch)return;sel=+b.dataset.k;os.forEach(function(o){o.classList.remove('sel');o.setAttribute('aria-pressed','false')});b.classList.add('sel');b.setAttribute('aria-pressed','true');g.disabled=false});
     g.onclick=function(){
       if(ch){idx.shift();return nextq()}
       ch=true;right=sel===q.a;
@@ -218,7 +226,7 @@ function task(i,j,k){
     if(HINT)showHint();
     $('hb').onclick=function(){
       if(HINT){showHint();$('hint').scrollIntoView({block:'nearest',behavior:RM()?'auto':'smooth'});return}
-      var use=function(){S.hc=1;S.hu[i]=1;HINT=1;drc(i,j,k);save();showHint();$('hint').scrollIntoView({block:'nearest',behavior:RM()?'auto':'smooth'})};
+      var use=function(){S.hc=1;S.hu[i]=1;HINT=1;snd('hint');drc(i,j,k);save();showHint();$('hint').scrollIntoView({block:'nearest',behavior:RM()?'auto':'smooth'})};
       if(S.hc)use();else modal('<h2>Взять подсказку?</h2><p>С подсказкой опыт за это задание будет вдвое меньше.</p><p class="mu">Больше спрашивать не будем. Вернуть вопрос можно в настройках.</p>',[['Взять подсказку',use],['Отмена',null,1]])}}
   skReady();chkPulse();runBind(c);
   $('chk').onclick=async function(){

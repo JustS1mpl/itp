@@ -142,7 +142,7 @@ function links0(){
     fresh.forEach(function(f,n){
       var L=f[0].getTotalLength();f[0].style.strokeDasharray=L;f[0].style.strokeDashoffset=L;f[0].getBoundingClientRect();
       f[0].style.transition='stroke-dashoffset .9s cubic-bezier(.4,0,.2,1) '+(n*.9)+'s';f[0].style.strokeDashoffset=0;
-      setTimeout(function(){f[1].classList.remove('wait');if(!RM()){var ic=f[1].querySelector('.isl');if(ic)f[1].style.setProperty('--ti',getComputedStyle(ic).getPropertyValue('--ti'));f[1].classList.add('unl');snd('tick');setTimeout(function(){f[1].classList.remove('unl')},950)}},900*(n+1)+60);
+      setTimeout(function(){f[1].classList.remove('wait');if(!RM()){var ic=f[1].querySelector('.isl');if(ic)f[1].style.setProperty('--ti',getComputedStyle(ic).getPropertyValue('--ti'));f[1].classList.add('unl');snd('unlock');setTimeout(function(){f[1].classList.remove('unl')},950)}},900*(n+1)+60);
     });
   });
   linksWatch();
@@ -237,7 +237,7 @@ function islandPop(b){
   var o=document.createElement('div');o.className='ipop ty-'+ty[0];o.setAttribute('role','dialog');o.setAttribute('aria-label',ty[2]+': '+(it.n||''));
   o.innerHTML='<div class="ipk"><span class="tg"><i></i>'+ty[2]+'</span><span class="mu">'+(d?'✓ пройдено':meta)+'</span></div><h3>'+esc(it.n||ty[2])+'</h3><p>'+txt+'</p><div class="row">'+btn+sk+'</div>';
   o.style.top=(w.offsetTop+w.offsetHeight+10)+'px';
-  pa.appendChild(o);b.classList.add('sel');app.classList.add('pk');snd('click');
+  pa.appendChild(o);b.classList.add('sel');app.classList.add('pk');
   /* стрелка карточки смотрит точно на остров, даже если карточка уже ширины дорожки */
   var orc=o.getBoundingClientRect();o.style.setProperty('--ax',Math.max(24,Math.min(orc.width-24,br.left+br.width/2-orc.left))+'px');
   var g=$('ipg');if(g)g.onclick=function(){BACK=home;popClose();go(i,j)};
@@ -284,7 +284,7 @@ function askQ(q,o){
   scr('askq',h+dockHtml('<button class="btn" id="go" disabled>Проверить</button>',0,1));if(q.v)imgZoom(app);
   $('x').onclick=o.exit;
   var g=$('go'),os=app.querySelectorAll('.opt');
-  optKeys(os,function(b){if(ch)return;sel=+b.dataset.k;os.forEach(function(x){x.classList.remove('sel');x.setAttribute('aria-pressed','false')});b.classList.add('sel');b.setAttribute('aria-pressed','true');g.disabled=false;snd('click')});
+  optKeys(os,function(b){if(ch)return;sel=+b.dataset.k;os.forEach(function(x){x.classList.remove('sel');x.setAttribute('aria-pressed','false')});b.classList.add('sel');b.setAttribute('aria-pressed','true');g.disabled=false});
   g.onclick=function(){
     if(ch){o.next();return}
     ch=true;right=sel===q.a;fx(right);
@@ -309,7 +309,7 @@ function repeat3(){
     if(n>=Q.length){
       var all=ok===Q.length;
       scr('done','<div class="fin">'+rabbit(all?'happy':'eat')+'<h1>Повторено: '+ok+' из '+Q.length+'</h1><p class="lead">'+(all?'Всё помнишь. Отлично.':'Ничего страшного, это просто разминка.')+'</p></div>'+dockHtml('<button class="btn" id="go">Готово</button><button class="btn t" id="rp">Ещё раз</button>',1));
-      $('go').onclick=home;$('rp').onclick=repeat3;if(all){snd('chord');ach('rep1')}return}
+      $('go').onclick=home;$('rp').onclick=repeat3;if(all){snd('solve');ach('rep1')}return}
     askQ(Q[n].q,{mid:bar(),exit:home,last:function(){return n===Q.length-1},next:function(){n++;step()},done:function(r){st[n]=r?1:2;if(r)ok++;var sb=app.querySelector('.sbar');if(sb)sb.outerHTML=bar()}})}
   step()}
 function rndCode(){
@@ -322,7 +322,7 @@ function rcNext(){
   scr('rcode','<h1 class="sr-only">Случайный код</h1><div class="top ls"><button class="icon" id="x" aria-label="Выйти">'+ico('x')+'</button><span class="lstep grow">🎲 Случайный код</span>'+(q.h?'<button class="icon" id="hb" aria-label="Подсказка">'+ico('bulb')+'</button>':'')+'</div>'+taskCard(q)+'<div id="hint"></div>'+edCard('Решение','# Пиши код здесь\n'+(q.starter||''))+conHtml()+'<div id="fb"></div>'+dockHtml('<button class="btn" id="chk">Проверить</button>'));
   $('x').onclick=practice;
   var c=$('code'),sync=initEd(c,function(){});sync();
-  if(q.h)$('hb').onclick=function(){$('hb').classList.add('on');$('hint').innerHTML='<div class="fb"><b>Подсказка</b>'+esc(q.h).replace(/\n/g,'<br>')+'</div>';$('hint').scrollIntoView({block:'nearest',behavior:RM()?'auto':'smooth'})};
+  if(q.h)$('hb').onclick=function(){snd('hint');$('hb').classList.add('on');$('hint').innerHTML='<div class="fb"><b>Подсказка</b>'+esc(q.h).replace(/\n/g,'<br>')+'</div>';$('hint').scrollIntoView({block:'nearest',behavior:RM()?'auto':'smooth'})};
   skReady();chkPulse();runBind(c);
   $('chk').onclick=async function(){
     var b=$('chk');if(!SKOK)fbSet('<div class="fb"><b>Загружаю среду Python…</b></div>');
@@ -355,7 +355,7 @@ function shelf(){
   return h+'</div>'}
 function fdOpen(btn){
   var a=achDef(btn.dataset.id);if(!a||btn.dataset.busy)return;btn.dataset.busy=1;
-  snd('disk');vib(12);
+  snd('disk');vib(12);MSIL=1;
   var an=RM()?null:btn.animate([{transform:'translateY(0)'},{transform:'translateY(-30px) rotate(-3deg)'}],{duration:260,easing:'cubic-bezier(.2,.9,.3,1.2)',fill:'forwards'});
   setTimeout(function(){
     var m=modal('<div class="fwin">'+floppyFace(a)+'<h2>'+esc(a.n)+'</h2><p class="fd2">'+esc(a.d)+'</p><p class="mu">Получено '+fdate(S.ach[a.id])+'</p></div>',[['Закрыть',null,1]]);
@@ -384,7 +384,7 @@ function profile(){BACK=profile;
   bindHead(profile);calBind();var csc=app.querySelector('.csc');if(csc){csc.tabIndex=0;csc.setAttribute('aria-label','Календарь активности, листается вбок')}
   var vr=$('vr'),vt;vr.onclick=function(){vr.classList.add('on');clearTimeout(vt);vt=setTimeout(function(){vr.classList.remove('on')},2500)};
   var pr=$('pr'),tm;
-  function love(){var rw=pr.firstChild;rw.classList.add('love');snd([659,784]);var hr=document.createElement('i');hr.className='hrt';hr.textContent='💗';hr.style.left=(30+Math.random()*40)+'%';pr.appendChild(hr);setTimeout(function(){hr.remove()},1300);clearTimeout(tm);tm=setTimeout(function(){rw.classList.remove('love')},1400)}
+  function love(){var rw=pr.firstChild;rw.classList.add('love');snd('pet');var hr=document.createElement('i');hr.className='hrt';hr.textContent='💗';hr.style.left=(30+Math.random()*40)+'%';pr.appendChild(hr);setTimeout(function(){hr.remove()},1300);clearTimeout(tm);tm=setTimeout(function(){rw.classList.remove('love')},1400)}
   pr.onclick=love;
   $('tst').onclick=streakSheet;$('txp').onclick=levelSheet;$('gset').onclick=goalSheet;
   if($('emr'))$('emr').onclick=function(){app.querySelectorAll('.eg2[hidden]').forEach(function(x){x.hidden=false});this.remove()};
@@ -416,9 +416,9 @@ function settings(){
    SR('🗄️','Когда дискет много','',SG('sh',[['v','Вторая полка ниже'],['h','Листать вбок']],ST('sh')))+
    SR('💾','Вид дискет','',SG('fl',[['tilt','Объёмные'],['flat','Плоские']],ST('fl')))+'</div>';
   h+='<div class="sec">Звук и отклик</div><div class="lst">'+
-   SR('🔊','Звук','Главный выключатель всех звуков',SW('mute',!S.mute))+
+   SR('🔊','Звук','Главный выключатель: выкл — полная тишина',SW('mute',!S.mute))+
    SR('🎚️','Громкость','','<input type="range" min="0" max="100" step="5" value="'+ST('vol')+'" id="vol" aria-label="Громкость">')+
-   SR('👆','Звуки нажатий','Тихий щелчок по кнопкам',SW('sfx',ST('sfx')))+
+   SR('👆','Звуки интерфейса','Касания, переходы и окна. Ответы, опыт и награды звучат всегда',SW('sfx',ST('sfx')))+
    SR('📳','Вибрация','При ошибке и успехе',SW('vib',ST('vib')))+'</div>';
   h+='<div class="sec">Обучение</div><div class="lst">'+
    SR('🎯','Цель дня','Сколько островков в день',SG('goal',[[1,'1'],[2,'2'],[3,'3']],S.goal))+
@@ -473,6 +473,7 @@ var LSK=null,LXP=null;
 function chipFx(){
   var hs=$('hs'),hx=$('hx');if(!hs||!hx)return;
   var s=streakNow(),x=S.xp;
+  if(LSK!==null&&s>LSK)snd('streak');
   if(LSK!==null&&s>LSK&&!RM())hs.animate([{transform:'scale(1)'},{transform:'scale(1.25) rotate(-4deg)'},{transform:'scale(1)'}],{duration:520,easing:'cubic-bezier(.3,1.6,.5,1)'});
   if(LXP!==null&&x>LXP){
     var el=hx.querySelector('span:last-child'),a=LXP,t0=performance.now();

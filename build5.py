@@ -1,6 +1,6 @@
 import re, sys, json
 sys.path.insert(0, '.')
-VER = '6.0.0'
+VER = '6.1.0'
 s = open('base43.html', encoding='utf-8').read()
 
 def rep(a, b, n=1):
@@ -27,6 +27,8 @@ rep("esc(q.e||'')", "esc(q.e||'')+xm(q)", 3)
 rep("(String(it.html).match(/\\[\\[([^\\]|]+)/g)||[])", "(String(it.html).replace(/<pre>[\\s\\S]*?<\\/pre>/g,'').match(/\\[\\[([^\\]|]+)/g)||[])")
 rep("it.html.split(/(<pre>[\\s\\S]*?<\\/pre>)/).map(function(p){return /^<pre>/.test(p)?", "it.html.split(/(<pre[^>]*>[\\s\\S]*?<\\/pre>)/).map(function(p){return /^<pre /.test(p)?p:/^<pre>/.test(p)?")
 rep("replace(/<pre>[\\s\\S]*?<\\/pre>/g,'').match", "replace(/<pre[^>]*>[\\s\\S]*?<\\/pre>/g,'').match")
+# --- звук касаний теперь делает v5/a_sound.js (после обработчиков события, чтобы не дублировать другие звуки)
+rep("document.addEventListener('click',function(e){if(e.target.closest('button'))snd([600])});", "")
 # --- версия
 s = s.replace('4.3.0', VER)
 
@@ -155,7 +157,7 @@ rep('g[0]=g[0].replace(/\\B(?=(\\d{3})+(?!\\d))/g,",")', 'g[0]=g[0].replace(/\\B
 
 exec(open('msgs.py',encoding='utf-8').read())
 # --- вставка ядра и интерфейса
-core = open('v5/a_core.js', encoding='utf-8').read() + '\n' + open('v5/a_ui.js', encoding='utf-8').read()
+core = open('v5/a_core.js', encoding='utf-8').read() + '\n' + open('v5/a_sound.js', encoding='utf-8').read() + '\n' + open('v5/a_ui.js', encoding='utf-8').read()
 for extra in ('v5/a_fix.js','v5/a_fix2.js','v5/a_fix3.js','v5/a_fix4.js','v5/a_more.js','v5/a_dev.js','v5/a_img.js','v5/a_py.js','v5/a_ux.js','v5/a_screens.js'):
     try: core += '\n' + open(extra, encoding='utf-8').read()
     except FileNotFoundError: pass
