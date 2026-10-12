@@ -483,18 +483,17 @@ html.noln .gt{display:none}
 .path{position:relative;align-self:stretch;width:100%;display:flex;flex-direction:column;align-items:center;gap:30px;padding-top:26px}
 .ilw{position:relative;z-index:1;text-align:center;transition:transform var(--d2)}
 .ilw.cu{margin-top:30px}
-.ilw>.mu{max-width:156px;margin:2px auto 0;font-size:.8125rem;font-weight:700;line-height:1.25}
+.ilw>.mu{max-width:156px;margin:0 auto;font-size:.8125rem;font-weight:700;line-height:1.25}
 .ilw>.mu small{font-size:.75rem;font-weight:700;color:var(--muted)}
 .ilw.cu>.mu{color:var(--ink);font-weight:800}
 .flag{position:absolute;left:50%;top:-34px;z-index:2;will-change:transform;transform:translateX(-50%);display:inline-flex;align-items:center;height:28px;padding:0 12px;border-radius:var(--pill);background:var(--card);color:var(--accent-ink);border:2px solid var(--line);font-size:.8125rem;font-weight:900;letter-spacing:.02em;white-space:nowrap;box-shadow:var(--sh1);animation:bob 2.6s ease-in-out infinite;transition:opacity var(--d4)}
 .flag::after{content:'';position:absolute;left:50%;bottom:-7px;width:10px;height:10px;margin-left:-5px;background:var(--card);border:solid var(--line);border-width:0 2px 2px 0;transform:rotate(45deg);border-bottom-right-radius:3px}
 .ilw.wait .flag{opacity:0}
 .ty-t{--ti:var(--t-theory)}.ty-f{--ti:var(--t-flash)}.ty-c{--ti:var(--t-code)}.ty-p{--ti:var(--t-project)}.ty-a{--ti:var(--violet)}
-.isl{position:relative;z-index:0;display:block;width:118px;height:92px;margin:0 auto;padding:0;border:0;background:none;transition:transform var(--d2) var(--e-out)}
+.isl{position:relative;z-index:0;display:block;width:118px;height:80px;margin:0 auto;padding:0;border:0;background:none;transition:transform var(--d2) var(--e-out)}
 .isl:active{transform:translateY(3px) scale(.97);transition-duration:var(--d1)}
 .isl .hx{display:block;overflow:visible}
-.isl::after{content:'';position:absolute;left:14px;right:14px;bottom:0;height:12px;border-radius:50%;background:color-mix(in srgb,var(--ink) 8%,transparent);z-index:-1}
-@supports not (background:color-mix(in srgb,red,blue)){.isl::after{background:rgba(0,0,0,.07)}}
+/* под островами теней нет: форма держится на боковой грани и цвете */
 .isl .hx path{fill:var(--card3);stroke:var(--card3);stroke-width:6;stroke-linejoin:round;transition:fill var(--d4),stroke var(--d4)}
 .isl .hx path.sd{filter:brightness(.8)}
 :root[data-theme=dark] .isl .hx path.sd{filter:brightness(.62)}
