@@ -11,7 +11,7 @@ function drawCard(cb){
       g.fillStyle=V('--bg');g.fillRect(0,0,CW,CH);
       g.fillStyle=V('--card');rr(g,50,50,980,1400,56);g.fill();g.lineWidth=3;g.strokeStyle=V('--line');g.stroke();
       g.textBaseline='alphabetic';g.fillStyle=V('--accent');g.font='900 64px '+F;g.textAlign='left';g.fillText('ИТП',110,150);
-      g.fillStyle=V('--muted');g.font='700 32px '+F;g.textAlign='right';g.fillText('И так Пайтон',970,148);
+      g.fillStyle=V('--muted');g.font='700 32px '+F;g.textAlign='right';g.fillText('И так, программирование',970,148);
       if(rb&&rb.width){var bs=380,sc=Math.min(bs/rb.width,bs/rb.height),w=rb.width*sc,h=rb.height*sc;g.drawImage(rb,540-w/2,190+(bs-h)/2,w,h)}
       var nm=String(S.nick);g.font='900 80px '+F;
       if(isRb(nm)){var A=Array.from(nm),ws=A.map(function(ch){return g.measureText(ch).width}),tot=ws.reduce(function(a,b){return a+b},0),x0=540-tot/2;g.textAlign='left';A.forEach(function(ch,k){g.fillStyle='hsl('+(k*47%360)+',85%,58%)';g.fillText(ch,x0,650);x0+=ws[k]})}
@@ -29,6 +29,6 @@ function drawCard(cb){
       if(earned.length){g.fillStyle=V('--muted');g.font='700 26px '+F;g.textAlign='center';g.fillText('Достижения: '+earned.length,540,1318);
         var m=Math.min(8,earned.length),x1=540-(m*54-8)/2;
         earned.slice(0,8).forEach(function(a,k){g.fillStyle=a.c;rr(g,x1+k*54,1334,46,50,7);g.fill();g.fillStyle='rgba(255,255,255,.85)';rr(g,x1+k*54+6,1360,34,20,3);g.fill();g.fillStyle='rgba(255,255,255,.55)';rr(g,x1+k*54+10,1334,24,16,3);g.fill();var ei=em[4+k];if(ei)g.drawImage(ei,x1+k*54+14,1362,18,18)})}
-      g.fillStyle=V('--muted');g.font='700 26px '+F;g.textAlign='center';g.fillText('Попробуй и ты! ИТП v5.1.3',540,(earned.length?1432:1330));
+      g.fillStyle=V('--muted');g.font='700 26px '+F;g.textAlign='center';g.fillText('Попробуй и ты! ИТП '+ITPV,540,(earned.length?1432:1330));
       cb(cv)}
     if(src){im.onload=function(){body(im)};im.onerror=function(){body(null)};im.src=src}else body(null)})}

@@ -1,6 +1,6 @@
 import re, sys, json
 sys.path.insert(0, '.')
-VER = '5.7.2'
+VER = '6.0.0'
 s = open('base43.html', encoding='utf-8').read()
 
 def rep(a, b, n=1):
@@ -33,17 +33,14 @@ s = s.replace('4.3.0', VER)
 # --- шрифт Nunito встроен
 FONT = open('assets/nunito.b64').read()
 rep("var l=document.createElement('link');l.rel='stylesheet';l.href='https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&display=swap';document.head.appendChild(l)", "")
-# --- замена CSS целиком
-css = open('v5/v5.css', encoding='utf-8').read() + '\n' + open('v5/v5b.css', encoding='utf-8').read()
+# --- замена CSS целиком: v6 — одна дизайн-система для обеих тем (v5.css, v5b.css, v5c.css больше не нужны)
+css = open('v5/v6.css', encoding='utf-8').read()
 rep("""'<div class="q">'+esc(q.q)+'</div>'+(q.c?'<pre>'+hl(q.c)+'</pre>':'');
     ord.forEach(function(k){h+='<button class="opt" data-k="'+k+'">'+esc(q.o[k])+'</button>'});
     show(h+'<div id="fb"></div><button class="btn" id="go" disabled>Проверить</button>');""",
 """'<div class="q">'+esc(q.q)+'</div>'+(q.v||'')+(q.c?'<pre>'+hl(q.c)+'</pre>':'');
     ord.forEach(function(k){h+='<button class="opt" data-k="'+k+'">'+esc(q.o[k])+'</button>'});
     show(h+'<div id="fb"></div><button class="btn" id="go" disabled>Проверить</button>');if(q.v)imgZoom(app);""")
-for extra in ('v5/v5c.css',):
-    try: css += '\n' + open(extra, encoding='utf-8').read()
-    except FileNotFoundError: pass
 css = "@font-face{font-family:'Nunito';font-style:normal;font-weight:200 1000;font-display:swap;src:url(data:font/woff;base64," + FONT + ") format('woff')}\n" + css
 a = s.index('<style>'); b = s.index('</style>')
 s = s[:a] + '<style>\n' + css + '\n' + s[b:]
@@ -122,7 +119,6 @@ rep("function confetti(big){", "function confetti(big){if(!ST('gc')){snd('fanfar
 # --- v5.1: копирование кода, проекты-достижения, введение из настроек, поделиться
 rep("'<pre>'+hl(p.slice(5,-6))+'</pre>'", "'<div class=\"cpw\"><button type=\"button\" class=\"cp\" aria-label=\"Копировать код\"></button><pre>'+hl(p.slice(5,-6))+'</pre></div>'")
 rep("if(TOPICS[i].intro&&S.start>0){goBack();toast('Готово. Эта кнопка больше не нужна и пропала из профиля');return}", "if(TOPICS[i].intro&&(S.start>0||w)){goBack();if(!w)toast('Готово. Эта кнопка больше не нужна и пропала из профиля');return}")
-rep("bump(key);ach('proj');snd('fanfare');", "bump(key);ach('proj');if(!at||at==='skip'){S.cn.pj=Math.min(99999,S.cn.pj+1);save();if(S.cn.pj>=3)ach('pj3')}if(/Анализ качества/.test(it.n||''))ach('pran');if(/Обработка запроса/.test(it.n||''))ach('papi');if(/WSGI/.test(it.n||''))ach('pwsgi');snd('fanfare');")
 rep("saveFile('itp-progress.png',BLOB);toast('Картинка сохранена');return false", "saveFile('itp-progress.png',BLOB);ach('share');toast('Картинка сохранена');return false")
 
 
@@ -160,13 +156,16 @@ rep('g[0]=g[0].replace(/\\B(?=(\\d{3})+(?!\\d))/g,",")', 'g[0]=g[0].replace(/\\B
 exec(open('msgs.py',encoding='utf-8').read())
 # --- вставка ядра и интерфейса
 core = open('v5/a_core.js', encoding='utf-8').read() + '\n' + open('v5/a_ui.js', encoding='utf-8').read()
-for extra in ('v5/a_fix.js','v5/a_fix2.js','v5/a_fix3.js','v5/a_fix4.js','v5/a_more.js','v5/a_dev.js','v5/a_img.js','v5/a_py.js','v5/a_ux.js'):
+for extra in ('v5/a_fix.js','v5/a_fix2.js','v5/a_fix3.js','v5/a_fix4.js','v5/a_more.js','v5/a_dev.js','v5/a_img.js','v5/a_py.js','v5/a_ux.js','v5/a_screens.js'):
     try: core += '\n' + open(extra, encoding='utf-8').read()
     except FileNotFoundError: pass
 anchor = "seedLit();window.addEventListener('resize',function(){if(app.querySelector('.path'))links()});\napplyTheme();"
 core = 'var EXIMG=' + EXIMG + ';\n' + core
 core = core.replace('/*ITPY*/{}', _json.dumps(_py, ensure_ascii=False))
 rep(anchor, core + "\nseedLit();window.addEventListener('resize',function(){if(app.querySelector('.path'))links()});\napplyTheme();if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',emoLoad);else emoLoad();")
+# --- достижения за проекты (по названию острова project). Правило действует и в старом projEnd базы,
+#     и в новом projEnd из v5/a_screens.js, поэтому якорь встречается 2 раза.
+rep("bump(key);ach('proj');snd('fanfare');", "bump(key);ach('proj');if(!at||at==='skip'){S.cn.pj=Math.min(99999,S.cn.pj+1);save();if(S.cn.pj>=3)ach('pj3')}if(/Анализ качества/.test(it.n||''))ach('pran');if(/Обработка запроса/.test(it.n||''))ach('papi');if(/WSGI/.test(it.n||''))ach('pwsgi');snd('fanfare');", 2)
 
 s=s.replace('.slice(0,16).join(','.slice(0,20).join(').replace('maxlength="16"','maxlength="20"')
 assert '4.3.0' not in s
@@ -183,6 +182,9 @@ _blocks = ''.join('<script type="text/plain" id="%s">%s</script>\n' % (i, t) for
     ('py-glue', open('v5/py/glue.py', encoding='utf-8').read()), ('py-worker', open('v5/py/worker.js', encoding='utf-8').read())))
 assert s.count('</body>') == 1
 s = s.replace('</body>', _blocks + '</body>')
-s = s.replace('v5.1.3', VER)
+s = s.replace('v5.1.3', VER).replace('__VER__', VER)
+# --- полное название приложения: «И так, программирование» (сокращение ИТП прежнее)
+assert 'Пайтон' not in s
+rep('<title>ИТП v' + VER + '</title>', '<title>ИТП — И так, программирование</title>\n<meta name="description" content="ИТП («И так, программирование»): учебное приложение по Python для старшеклассников.">\n<meta name="color-scheme" content="light dark">')
 open('out5.html', 'w', encoding='utf-8').write(s)
 print('ok', len(s))

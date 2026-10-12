@@ -1,4 +1,4 @@
-/* ===================== ИТП v5.1.3 — ядро ===================== */
+/* ===================== ИТП — ядро: настройки, сохранение, звук, серия, цели, достижения ===================== */
 function defset(){return{acc:'',tz:100,anim:'full',vol:70,sfx:1,vib:1,emo:1,ty:1,toc:1,rep:1,ln:1,ac:1,cf:15,gc:1,sh:'v',fl:'tilt'}}
 function ST(k){return S.set&&S.set[k]!==undefined?S.set[k]:defset()[k]}
 function RM(){return ST('anim')==='off'||matchMedia('(prefers-reduced-motion:reduce)').matches}
@@ -131,8 +131,11 @@ function fx(ok,kind){
 function toggleMute(){S.mute=S.mute?0:1;save();if(HRE)HRE();toast(S.mute?'Звук выключен':'Звук включён')}
 /* --- очередь уведомлений --- */
 var TQ=[],TB=false;
-function toast(t,cls){TQ.push([t,cls]);if(!TB)tnext()}
-function tnext(){var x=TQ.shift();if(!x){TB=false;return}TB=true;var o=document.querySelector('.toast');if(o)o.remove();var d=document.createElement('div');d.className='toast'+(x[1]?' '+x[1]:'');d.setAttribute('role','status');d.textContent=x[0];document.body.appendChild(d);setTimeout(function(){d.remove();setTimeout(tnext,80)},x[1]==='ach'?3000:2300)}
+function toast(t,cls,a){TQ.push([t,cls,a]);if(!TB)tnext()}
+/* достижение приходит карточкой с дискетой своего цвета, остальное — короткой строкой сверху */
+function tnext(){var x=TQ.shift();if(!x){TB=false;return}TB=true;var o=document.querySelector('.toast');if(o)o.remove();var d=document.createElement('div');d.className='toast'+(x[1]?' '+x[1]:'');d.setAttribute('role','status');
+  if(x[1]==='ach'&&x[2]){d.innerHTML='<span class="mfd" style="--fc:'+x[2].c+'" aria-hidden="true"><b>'+x[2].e+'</b></span><span><span class="tsm">Новое достижение</span>'+esc(x[2].n)+'</span>'}else d.textContent=x[0];
+  document.body.appendChild(d);setTimeout(function(){d.remove();setTimeout(tnext,80)},x[1]==='ach'?3100:2300)}
 /* --- серия и заморозки --- */
 function streakNow(){var y=day(ago(1));return(S.last===day(new Date())||S.last===y)?S.streak:0}
 function fzApply(){
@@ -198,7 +201,7 @@ function achDef(id){for(var i=0;i<ACH.length;i++)if(ACH[i].id===id)return ACH[i]
 function ach(id){
   if(S.ach[id])return;var d=achDef(id);if(!d)return;
   S.ach[id]=day(new Date());save();
-  toast('🏆 Достижение: '+d.n,'ach');
+  toast('🏆 Достижение: '+d.n,'ach',d);
   snd('ach');vib([30,40,30]);
   if(id!=='all'&&ACH.every(function(a){return a.id==='all'||S.ach[a.id]}))ach('all');
 }
