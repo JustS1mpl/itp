@@ -28,7 +28,7 @@ function ico(n,cls){return'<svg class="'+(cls||'')+'" viewBox="0 0 24 24" width=
 var LOGO='<svg width="28" height="24" viewBox="4 10 84 60" aria-hidden="true" focusable="false"><path d="M9 34 L27 54 L65 54 L83 34 L83 46 L65 66 L27 66 L9 46 Z" fill="var(--accent-d)" stroke="var(--accent-d)" stroke-width="7" stroke-linejoin="round"/><path d="M9 34 L27 14 L65 14 L83 34 L65 54 L27 54 Z" fill="var(--accent)" stroke="var(--accent)" stroke-width="7" stroke-linejoin="round"/><path d="M36 26 L47 34 L36 42 M52 43 H62" fill="none" stroke="var(--on)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
 /* --- кролик (картинка встроена в файл) --- */
-function rabbit(st){var s=IMG[st]||IMG.eat;return'<div class="rw im '+st+'"><img src="'+s+'" alt="" draggable="false"></div>'}
+function rabbit(st){var s=IMG[st]||(st==='rolled'?IMG.grump:IMG.eat);return'<div class="rw im '+st+'"><img src="'+s+'" alt="" draggable="false"></div>'}
 /* окончания по выбранному обращению: m — парень, f — девушка, n — нейтрально (если не указано) */
 function G(m,f,n){return S.g==='f'?f:S.g==='m'?m:(n===undefined?m:n)}
 function tabFn(){return({home:home,pr:practice,ed:editor,prof:profile})[CURTAB]||home}
@@ -179,7 +179,7 @@ function goalCard(all){
   var d=goalDone(),g=S.goal,ok=d>=g,cu=cur(),nx=null;
   if(cu){var p=cu.split('-');nx=IT(+p[0],+p[1])}
   var dots='<span class="gdots" aria-hidden="true">'+Array.apply(null,Array(g)).map(function(_,k){return'<i class="'+(k<d?'on':'')+'"></i>'}).join('')+'</span>';
-  return'<section class="gcard" aria-label="Сегодня"><div class="gtx"><div class="gh">Привет, '+nk(S.nick)+'!</div><div class="gs">'+(all?'Курс пройден. Кролик гордится тобой.':(dots+(ok?'Цель дня выполнена':'Цель дня: '+d+' из '+g)))+'</div>'+(cu&&!all?'<button class="btn" id="gc">'+(d?'Продолжить':'Начать')+'</button><span class="gnx">'+esc(ity(nx)[2]+' · '+(nx.n||''))+'</span>':'')+'</div><button class="grb" id="grb" aria-label="Показать текущий островок на карте">'+rabbit(all?'happy':'eat')+'</button></section>'}
+  return'<section class="gcard" aria-label="Сегодня"><div class="gtx"><div class="gh">Привет, '+nk(S.nick)+'!</div><div class="gs">'+(all?'Курс пройден. Кролик гордится тобой.':(dots+(ok?'Цель дня выполнена':'Цель дня: '+d+' из '+g)))+'</div>'+(cu&&!all?'<button class="btn" id="gc">'+(d?'Продолжить':'Начать')+'</button><span class="gnx">'+esc(ity(nx)[2]+' · '+(nx.n||''))+'</span>':'')+'</div><div class="ring" style="--p:'+Math.min(100,Math.round(d/g*100))+'" role="img" aria-label="Цель дня: '+d+' из '+g+'"><span>'+d+'/'+g+'</span></div></section>'}
 function home(){curOnce(home0)}
 function home0(){BACK=home;fzApply();
   var all=allDone();
@@ -197,7 +197,6 @@ function home0(){BACK=home;fzApply();
   app.querySelectorAll('.isl').forEach(function(b){b.onclick=function(e){e.stopPropagation();islandPop(b)}});
   var c=app.querySelector('.isl.cur');if(c&&!REV)c.scrollIntoView({block:'center'});
   var gc=$('gc');if(gc)gc.onclick=function(){var k=cur();if(!k)return;var p=k.split('-');BACK=home;go(+p[0],+p[1])};
-  var gb=$('grb');if(gb)gb.onclick=toCur;
   jumpWatch();
 }
 function toCur(){var t=app.querySelector('.isl.cur')||app.querySelector('.isl.nx');if(t)t.scrollIntoView({block:'center',behavior:RM()?'auto':'smooth'})}
@@ -255,8 +254,7 @@ function greet(){
   if(S.seen===t)return home();
   var away=S.seen?dnum(t)-dnum(S.seen):0;S.seen=t;save();
   var s=streakNow(),lost=S.streak>=2&&s===0;
-  /* хмурый кролик только здесь: после долгого перерыва или когда серия прервалась (на ошибки он не реагирует) */
-  scr('greet','<div class="onb center">'+rabbit(away>=3||lost?'grump':'eat')+'<h1>Привет, '+nk(S.nick)+'!</h1><p class="lead">'+(lost?'Серия в '+S.streak+' '+pl(S.streak,['день','дня','дней'])+' прервалась'+(away>=3?', тебя не было '+away+' '+pl(away,['день','дня','дней']):'')+'. Не страшно: новая начнётся сегодня.':away>=3?'Тебя не было '+away+' '+pl(away,['день','дня','дней'])+'. Кролик скучал.':s?'Серия: '+s+' '+pl(s,['день','дня','дней'])+'. Не прерывай её сегодня.':'Кролик завтракает и ждёт тебя.')+'</p><button class="btn pulse" id="go">Начать</button></div>');
+  scr('greet','<div class="onb center">'+(s>0&&!lost?rabbit('eat'):'')+'<h1>Привет, '+nk(S.nick)+'!</h1><p class="lead">'+(lost?'Серия в '+S.streak+' '+pl(S.streak,['день','дня','дней'])+' прервалась'+(away>=3?', тебя не было '+away+' '+pl(away,['день','дня','дней']):'')+'. Не страшно: новая начнётся сегодня.':away>=3?'Тебя не было '+away+' '+pl(away,['день','дня','дней'])+'. Кролик скучал.':s?'Серия: '+s+' '+pl(s,['день','дня','дней'])+'. Не прерывай её сегодня.':'Кролик завтракает и ждёт тебя.')+'</p><button class="btn pulse" id="go">Начать</button></div>');
   $('go').onclick=function(){home();if(away>=3)setTimeout(function(){repeatAsk(away)},400)};
 }
 function passed(type){var a=[];TOPICS.forEach(function(t,i){(t.items||[]).forEach(function(x,j){if(x.t===type&&S.d[i+'-'+j])a.push([i,j])})});return a}
@@ -267,7 +265,7 @@ function repeatAsk(away){
 /* --- практика --- */
 function row(ic,t,sub,a,dis,rt){return'<button class="li" data-a="'+a+'"'+(dis?' disabled':'')+'><span class="lic" aria-hidden="true">'+ic+'</span><span class="lt">'+t+(sub?'<small>'+sub+'</small>':'')+'</span>'+(rt?'<span class="lv">'+rt+'</span>':ico('chev','ch'))+'</button>'}
 var DICE='<svg class="pdeco" viewBox="0 0 150 150" aria-hidden="true"><g transform="rotate(-14 75 75)"><rect x="34" y="34" width="82" height="82" rx="20" fill="var(--card)" stroke="var(--line2)" stroke-width="3"/><g fill="var(--accent)"><circle cx="56" cy="56" r="7"/><circle cx="94" cy="56" r="7"/><circle cx="75" cy="75" r="7"/><circle cx="56" cy="94" r="7"/><circle cx="94" cy="94" r="7"/></g></g></svg>';
-function practice(){BACK=practice;
+function practice(){BACK=practice;PRW=0;
   var nf=passed('flash').length,nt=passed('test').length;
   function pc(a,ic,t,s,dis,big,lab){return'<button class="pcard'+(big?' big':'')+'" data-a="'+a+'"'+(dis?' disabled aria-disabled="true"':'')+'>'+(big?DICE:'')+'<span class="pic" aria-hidden="true">'+ic+'</span><b>'+t+'</b><small>'+s+'</small><span class="go">'+(dis?'Сначала пройди островок':lab)+(dis?'':ico('chev'))+'</span></button>'}
   scr('practice',head()+ttl('Практика','Без опыта: прогресс и серия не меняются')+'<div class="prc">'+
@@ -290,7 +288,8 @@ function askQ(q,o){
     if(ch){o.next();return}
     ch=true;right=sel===q.a;fx(right);
     os.forEach(function(x){var k=+x.dataset.k;x.disabled=true;if(k===q.a)x.classList.add('ok');else if(k===sel)x.classList.add('no')});
-    dockState(right,right?'Верно!':'Неверно',esc(q.e||'')+xm(q));
+    if(right)PRW=0;else PRW++;
+    dockState(right,right?'Верно!':'Неверно',esc(q.e||'')+xm(q),right?'':errMood(PRW));
     g.textContent=o.last&&o.last()?'Закончить':'Дальше';o.done(right);g.focus()}}
 var RND={r:0,t:0,last:null};
 function rndWarn(go){if(S.rnd)return go();modal('<h2>Бесконечный режим</h2><p>Задания идут одно за другим, пока не закроешь режим крестиком. Опыт не начисляется, прогресс не меняется.</p>',[['Понятно',function(){S.rnd=1;save();go()}],['Отмена',null,1]])}
@@ -309,7 +308,7 @@ function repeat3(){
   function step(){
     if(n>=Q.length){
       var all=ok===Q.length;
-      scr('done','<div class="fin">'+rabbit(all?'happy':'eat')+'<h1>Повторено: '+ok+' из '+Q.length+'</h1><p class="lead">'+(all?'Всё помнишь. Отлично.':'Ничего страшного, это просто разминка.')+'</p></div>'+dockHtml('<button class="btn" id="go">Готово</button><button class="btn t" id="rp">Ещё раз</button>',1));
+      scr('done','<div class="fin">'+(all?rabbit('happy'):'')+'<h1>Повторено: '+ok+' из '+Q.length+'</h1><p class="lead">'+(all?'Всё помнишь. Отлично.':'Ничего страшного, это просто разминка.')+'</p></div>'+dockHtml('<button class="btn" id="go">Готово</button><button class="btn t" id="rp">Ещё раз</button>',1));
       $('go').onclick=home;$('rp').onclick=repeat3;if(all){snd('solve');ach('rep1')}return}
     askQ(Q[n].q,{mid:bar(),exit:home,last:function(){return n===Q.length-1},next:function(){n++;step()},done:function(r){st[n]=r?1:2;if(r)ok++;var sb=app.querySelector('.sbar');if(sb)sb.outerHTML=bar()}})}
   step()}
@@ -329,8 +328,8 @@ function rcNext(){
     var b=$('chk');if(!SKOK)fbSet('<div class="fb"><b>Загружаю среду Python…</b></div>');
     if(!(await needSk()))return;
     b.disabled=true;var v=await judge(q,c.value);
-    if(!v.ok){fx(false);b.disabled=false;fbSet(v.h);return}
-    fx(true,'test');rcInc();
+    if(!v.ok){fx(false);b.disabled=false;PRW++;fbSet(badFb(v.h,errMood(PRW)));return}
+    PRW=0;fx(true,'test');rcInc();
     fbSet('<div class="fb"><b>Все тесты пройдены!</b>Опыт не начисляется, это тренировка.</div>');
     dockSet('<button class="btn" id="nx">Ещё задание</button>'+(q.sol?'<button class="btn t" id="sl">Посмотреть, как задумано</button>':''),1);
     $('nx').onclick=rcNext;if(q.sol)$('sl').onclick=function(){solModal(q.sol)}}}
@@ -374,7 +373,7 @@ function profile(){BACK=profile;
   var EM=3,more=rows.length>EM;
   function erow(r,k){return'<div class="eg2"'+(k>=EM?' hidden':'')+'><div class="erow"><span>'+esc(r.n)+'</span><div class="bar" aria-hidden="true"><i style="width:'+Math.round(r.c/mx*100)+'%"></i></div><b aria-label="ошибок: '+r.c+'">'+r.c+'</b></div><div class="elist">'+r.l.map(function(x){return'<button class="elink" data-i="'+r.i+'" data-j="'+x.j+'"><span class="et">'+x.ic+' '+esc(x.n)+'<small>ошибок: '+x.e+'</small></span><span class="eg">Отработать</span></button>'}).join('')+'</div></div>'}
   scr('profile',head()+'<h1 class="sr-only">Профиль</h1>'+
-   '<div class="hero"><button class="pav" id="pr" aria-label="Погладить кролика">'+rabbit('lie')+'</button><div class="hn"><b class="nmx">'+nk(S.nick)+'</b><div class="lvp"><span class="pill">Уровень '+LV.l+'</span><span class="mu">до '+(LV.l+1)+': ещё '+LV.left+' ⭐</span></div><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+LV.p+'" aria-label="Прогресс уровня"><i class="grow" style="width:'+LV.p+'%"></i></div></div></div>'+
+   '<div class="hero"><div class="pav" aria-hidden="true"><i class="pi"></i></div><div class="hn"><b class="nmx">'+nk(S.nick)+'</b><div class="lvp"><span class="pill">Уровень '+LV.l+'</span><span class="mu">до '+(LV.l+1)+': ещё '+LV.left+' ⭐</span></div><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+LV.p+'" aria-label="Прогресс уровня"><i class="grow" style="width:'+LV.p+'%"></i></div></div></div>'+
    '<div class="tiles"><button class="tile" id="tst"><span aria-hidden="true">🥕</span><span><b>'+s+'</b><small>'+pl(s,['день','дня','дней'])+' подряд</small></span>'+(f.n?'<i class="fzm" aria-label="заморозок: '+f.n+'">❄️'+f.n+'</i>':'')+'</button><div class="tile"><span aria-hidden="true">🏆</span><span><b>'+Math.max(S.max,s)+'</b><small>рекорд серии</small></span></div><button class="tile" id="txp"><span aria-hidden="true">⭐</span><span><b>'+S.xp+'</b><small>опыта</small></span></button><div class="tile"><span aria-hidden="true">📚</span><span><b>'+n+' из '+NT()+'</b><small>тем пройдено</small></span></div></div>'+
    '<div class="card"><div class="ch2"><b>Цель дня</b><button class="btn t" id="gset">'+g+' '+pl(g,['островок','островка','островков'])+' ›</button></div><div class="bar" style="margin:10px 0 12px" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+gp+'" aria-label="Цель дня: '+d+' из '+g+'"><i class="grow" style="width:'+gp+'%"></i></div>'+weekRow('g')+'<p class="mu gnote">Цель в 5 днях недели даёт +50 ⭐. Сейчас: '+wkCount()+' из 5.</p></div>'+
    shelf()+
@@ -384,9 +383,6 @@ function profile(){BACK=profile;
    '<p class="pfoot"><button class="ver" id="vr" aria-label="ИТП '+ITPV+'. ИТП означает: И так, программирование"><u>ИТП '+ITPV+'</u><span class="vt" role="tooltip">ИТП — «И так, программирование»</span></button></p>','prof');
   bindHead(profile);calBind();var csc=app.querySelector('.csc');if(csc){csc.tabIndex=0;csc.setAttribute('aria-label','Календарь активности, листается вбок')}
   var vr=$('vr'),vt;vr.onclick=function(){vr.classList.add('on');clearTimeout(vt);vt=setTimeout(function(){vr.classList.remove('on')},2500)};
-  var pr=$('pr'),tm;
-  function love(){var rw=pr.firstChild;rw.classList.add('love');snd('pet');var hr=document.createElement('i');hr.className='hrt';hr.textContent='💗';hr.style.left=(30+Math.random()*40)+'%';pr.appendChild(hr);setTimeout(function(){hr.remove()},1300);clearTimeout(tm);tm=setTimeout(function(){rw.classList.remove('love')},1400)}
-  pr.onclick=love;
   $('tst').onclick=streakSheet;$('txp').onclick=levelSheet;$('gset').onclick=goalSheet;
   if($('emr'))$('emr').onclick=function(){app.querySelectorAll('.eg2[hidden]').forEach(function(x){x.hidden=false});this.remove()};
   app.querySelectorAll('.fd').forEach(function(b){b.onclick=function(){fdOpen(b)}});

@@ -1,6 +1,6 @@
-import re, sys, json
+import re, sys, json, os
 sys.path.insert(0, '.')
-VER = '6.2.0'
+VER = '6.3.0'
 s = open('base43.html', encoding='utf-8').read()
 
 def rep(a, b, n=1):
@@ -37,6 +37,9 @@ FONT = open('assets/nunito.b64').read()
 rep("var l=document.createElement('link');l.rel='stylesheet';l.href='https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&display=swap';document.head.appendChild(l)", "")
 # --- замена CSS целиком: v6 — одна дизайн-система для обеих тем (v5.css, v5b.css, v5c.css больше не нужны)
 css = open('v5/v6.css', encoding='utf-8').read()
+import base64 as _pb
+_pi = lambda f: 'url(data:image/png;base64,' + _pb.b64encode(open('assets/mascot/' + f, 'rb').read()).decode() + ')'
+css = ':root{--pi-o:' + _pi('profile_icon.png') + ';--pi-f:' + _pi('profile_fill.png') + '}\n' + css
 rep("""'<div class="q">'+esc(q.q)+'</div>'+(q.c?'<pre>'+hl(q.c)+'</pre>':'');
     ord.forEach(function(k){h+='<button class="opt" data-k="'+k+'">'+esc(q.o[k])+'</button>'});
     show(h+'<div id="fb"></div><button class="btn" id="go" disabled>Проверить</button>');""",
@@ -164,7 +167,7 @@ for extra in ('v5/a_fix.js','v5/a_fix2.js','v5/a_fix3.js','v5/a_fix4.js','v5/a_m
 anchor = "seedLit();window.addEventListener('resize',function(){if(app.querySelector('.path'))links()});\napplyTheme();"
 # --- настроения кролика: ликующий (состояние happy: итоги, курс пройден, карточка «Поделиться») и хмурый (grump: приветствие после перерыва или потерянной серии)
 import base64 as _mb
-_mood = ''.join("IMG.%s='data:image/webp;base64,%s';\n" % (k, _mb.b64encode(open('assets/mascot/%s.webp' % f, 'rb').read()).decode()) for k, f in (('happy', 'cheer'), ('grump', 'grump')))
+_mood = ''.join("IMG.%s='data:image/webp;base64,%s';\n" % (k, _mb.b64encode(open('assets/mascot/%s.webp' % f, 'rb').read()).decode()) for k, f in (('eat', 'lovecarrot'), ('happy', 'cheer'), ('grump', 'grump'), ('rolled', 'rolled')) if os.path.exists('assets/mascot/%s.webp' % f))
 core = 'var EXIMG=' + EXIMG + ';\n' + _mood + core
 core = core.replace('/*ITPY*/{}', _json.dumps(_py, ensure_ascii=False))
 rep(anchor, core + "\nseedLit();window.addEventListener('resize',function(){if(app.querySelector('.path'))links()});\napplyTheme();if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',emoLoad);else emoLoad();")

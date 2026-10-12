@@ -5,7 +5,7 @@
 /* --- переходы между экранами: направление объясняет, куда ты попал --- */
 var SDEP={home:0,practice:0,editor:0,profile:0,greet:0,nick:0,place:0,settings:1,dict:1,codes:1,theory:1,quiz:1,task:1,project:1,askq:1,rcode:1,done:2},PSKEY='';
 function show(h,tab){
-  cancelAnimationFrame(TYR);HRE=null;tocKill();
+  cancelAnimationFrame(TYR);HRE=null;tocKill();CERR=0;
   document.removeEventListener('click',popOut,true);if(JIO){JIO.disconnect();JIO=null}
   var k=SKEY,d='';SKEY='';
   if(k&&PSKEY){
@@ -23,7 +23,7 @@ function show(h,tab){
   setNav(tab||null)}
 function setNav(t){CURTAB=t||null;NAV.classList.toggle('on',!!t);NAV.inert=!t;NAV.querySelectorAll('button').forEach(function(b){var on=b.dataset.t===t;b.classList.toggle('act',on);if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')})}
 /* нижняя панель: те же четыре раздела, значки нарисованы кодом */
-NAV.innerHTML=[['home','path','Путь'],['pr','prac','Практика'],['ed','code','Код'],['prof','bun','Профиль']].map(function(t){return'<button data-t="'+t[0]+'"><span class="ni">'+ico(t[1])+'</span>'+t[2]+'</button>'}).join('');
+NAV.innerHTML=[['home','path','Путь'],['pr','prac','Практика'],['ed','code','Код'],['prof','bun','Профиль']].map(function(t){return'<button data-t="'+t[0]+'"><span class="ni">'+(t[1]==='bun'?'<i class="pi" aria-hidden="true"></i>':ico(t[1]))+'</span>'+t[2]+'</button>'}).join('');
 
 /* --- окна: лист снизу на телефоне, карточка по центру на компьютере --- */
 var MSIL=0;
@@ -81,7 +81,7 @@ function lessonTop(mid,right){return'<div class="top ls"><button class="icon" id
 /* главная кнопка урока живёт внизу, в зоне большого пальца */
 function dockHtml(btns,inFlow,fb){return'<div class="dock" id="dock" role="region" aria-label="Действия"><div class="dki">'+(fb?'<div id="fb" class="fbx" aria-live="polite"></div>':'')+'<div class="dkb">'+btns+'</div></div></div>'}
 function dockSet(btns){var b=document.querySelector('#dock .dkb');if(b){b.innerHTML=btns;var f=b.querySelector('button');if(f)setTimeout(function(){f.focus({preventScroll:true})},50)}}
-function dockState(ok,title,html){var d=$('dock'),f=$('fb');if(!d||!f)return;d.classList.remove('ok','bad');d.classList.add(ok?'ok':'bad');f.innerHTML='<div class="fh"><i aria-hidden="true">'+(ok?ico('check'):ico('x'))+'</i>'+title+'</div>'+(html?'<p>'+html+'</p>':'')}
+function dockState(ok,title,html,mood){var d=$('dock'),f=$('fb');if(!d||!f)return;d.classList.remove('ok','bad');d.classList.add(ok?'ok':'bad');f.innerHTML='<div class="fh">'+(!ok&&mood?moodBox(mood):'<i aria-hidden="true">'+(ok?ico('check'):ico('x'))+'</i>')+title+'</div>'+(html?'<p>'+html+'</p>':'')+(!ok&&mood?'<p class="mq">'+moodLine(mood)+'</p>':'')}
 function fbSet(h){var f=$('fb');if(!f)return;f.innerHTML=h;if(h)requestAnimationFrame(function(){var r=f.getBoundingClientRect(),lim=innerHeight-110;if(r.top>lim-60||r.bottom>lim)f.scrollIntoView({block:'nearest',behavior:RM()?'auto':'smooth'})})}
 var OL='1234';
 function optsHtml(q,ord){return'<div class="opts" role="group" aria-label="Варианты ответа">'+ord.map(function(k,n){return'<button class="opt" data-k="'+k+'" aria-pressed="false"><span class="ol" aria-hidden="true">'+(OL[n]||'')+'</span><span class="ot">'+esc(q.o[k])+'</span></button>'}).join('')+'</div>'}
@@ -97,10 +97,10 @@ function taskCard(q,lab){return'<section class="tcard"><span class="ov">'+(lab||
 function edHtml(dc){return'<div class="ed"><div class="gt" aria-hidden="true"></div><div class="ew"><pre id="hl" aria-hidden="true"></pre><textarea id="code" wrap="off" spellcheck="false" autocapitalize="off" autocorrect="off" autocomplete="off" aria-label="Код"'+(KBD?' aria-describedby="edk"':'')+'>'+esc(dc)+'</textarea></div></div>'}
 function runBtn(pri){return'<button class="btn s'+(pri?'':' g')+'" id="run" aria-keyshortcuts="Control+Enter">'+ico('play')+'Запустить</button>'}
 function edCard(lab,dc,headL){return'<div class="edc"><div class="edh">'+(headL||'<span class="ov">'+lab+'</span>')+runBtn()+'</div>'+edHtml(dc)+'</div>'+(KBD?'<p class="mu hint0" id="edk">Ctrl + Enter запускает код.</p>':'')}
-function conHtml(){return'<section class="cons" id="cons" hidden aria-label="Вывод программы"><div class="csh"><span class="ov">Вывод</span><p class="mu rst" id="rst" hidden aria-live="polite"></p></div><pre class="out" id="o"></pre>'+'<form class="inrow" id="ir" autocomplete="off"><input class="f" id="ii" placeholder="Ответ программе" aria-label="Ввод для программы" autocomplete="off" enterkeyhint="send"><button class="btn" id="ib" type="submit">Ввод</button></form></section>'}
+function conHtml(){return'<section class="cons" id="cons" hidden aria-label="Вывод программы"><div class="csh"><span class="ov">Вывод</span><p class="mu rst" id="rst" hidden aria-live="polite"></p></div><pre class="out" id="o"></pre><div class="cmq" id="cmq" hidden></div>'+'<form class="inrow" id="ir" autocomplete="off"><input class="f" id="ii" placeholder="Ответ программе" aria-label="Ввод для программы" autocomplete="off" enterkeyhint="send"><button class="btn" id="ib" type="submit">Ввод</button></form></section>'}
 var IOHTML=conHtml();
 /* консоль показывается при первом запуске, пока её нет — не занимает место */
-(function(){var lr=liveRun;liveRun=function(code){var c=$('cons');if(c)c.hidden=false;return lr(code)}})();
+(function(){var lr=liveRun;liveRun=function(code){var c=$('cons');if(c)c.hidden=false;var q=$('cmq');if(q)q.hidden=true;var r=lr(code);consWatch();return r}})();
 function runBind(c){
   $('run').onclick=function(){var o=$('o'),cs=$('cons');if(cs)cs.hidden=false;if(!SKOK){o.textContent='Загружаю среду Python…'}needSk().then(function(ok){if(ok)liveRun(c.value)})}}
 /* редактор растёт вместе с кодом: внутри нет второй прокрутки, только у страницы */
@@ -131,7 +131,8 @@ function initEd(c,cb){
 
 /* --- итог островка: что получил, сколько опыта, куда дальше --- */
 function doneScreen(o){
-  var h='<div class="fin">'+rabbit('happy')+'<h1>'+o.title+'</h1>'+(o.lead?'<p class="lead">'+o.lead+'</p>':'')+
+  var many=o.err>=ROLL_AT;
+  var h='<div class="fin">'+rabbit(many?'rolled':'happy')+'<h1>'+o.title+'</h1>'+(many?'<p class="lead">Непростой островок: ошибок было много. Но он пройден, а ошибки разобраны.</p>':o.lead?'<p class="lead">'+o.lead+'</p>':'')+
    '<div class="xpr">'+(o.err!==undefined?'<div class="xpt"><small>Ошибок</small><b>'+o.err+'</b></div>':'')+'<div class="xpt x" id="xpt"><small>Опыт</small><b>⭐ <span id="xpn">+0</span></b></div></div>'+
    (o.bonus?'<p class="note2">'+o.bonus+'</p>':'')+(o.note?'<p class="note2">'+esc(o.note)+'</p>':'')+
    (o.tj?'<div class="tj">🎉 Тема «'+esc(o.tj)+'» пройдена!</div>':'')+(o.lv?'<div><span class="lvup">⬆️ Новый уровень: '+o.lv+'</span></div>':'')+
@@ -208,7 +209,7 @@ function quiz(i,j){
       os.forEach(function(o){var k=+o.dataset.k;o.disabled=true;if(right&&k===q.a)o.classList.add('ok');else if(k===sel&&!right)o.classList.add('no');else if(!right&&k===q.a)o.classList.add('ok')});
       if(right)dockState(true,'Верно!',esc(q.e||'')+xm(q));
       else if(ph)dockState(false,'Снова неверно',esc(q.e||'')+xm(q)+'<br><span class="mu">За этот островок будет только +2 опыта. Потренироваться можно и позже, но опыт даётся один раз.</span>');
-      else dockState(false,'Неверно',esc(q.e||'')+xm(q)+'<br><span class="mu">Этот вопрос вернётся в конце островка.</span>');
+      else dockState(false,'Неверно',esc(q.e||'')+xm(q)+'<br><span class="mu">Этот вопрос вернётся в конце островка.</span>',errMood(er));
       if(right&&cb>=5){if(first&&!nx)bon+=2;popup(first&&!nx?'+2 ⭐ опыта':'Серия ×'+cb)}
       g.textContent='Дальше';g.focus({preventScroll:true})}}
   nextq()}
@@ -234,7 +235,7 @@ function task(i,j,k){
     if(!(await needSk()))return;
     var b=$('chk');b.disabled=true;
     var v=await judge(q,c.value);
-    if(!v.ok){ERR++;drc(i,j,k);save();fx(false);b.disabled=false;fbSet(v.h);return}
+    if(!v.ok){ERR++;drc(i,j,k);save();fx(false);b.disabled=false;fbSet(badFb(v.h,errMood(ERR)));return}
     fx(true,'test');
     if(!S.tk[tk]){S.tk[tk]=1;save()}
     var last=k+1>=T.length;
@@ -252,6 +253,7 @@ function end(i,j){
 
 /* --- мини-проект --- */
 function project(i,j){
+  var PF=0;
   var it=IT(i,j),key=i+'-'+j,done=S.d[key],sk=S.at[key]==='skip',bonus=it.bonus>0?it.bonus|0:40;
   var dc=((S.dr[key]||{}).codes||{})[0]||'# Пиши код здесь\n'+(it.starter||''),hs=String(it.h||'').split('\n').filter(Boolean);
   scr('project',lessonTop('<span class="lstep">🚀 Мини-проект · по желанию</span>',done?'':'<button class="btn t" id="sk" style="margin:0">Пропустить</button>')+'<div class="pj"><h1>'+esc(it.n)+'</h1><div class="card"><b>Цель</b><p>'+esc(it.q).replace(/\n/g,'</p><p>')+'</p>'+(hs.length?'<b>Что пригодится</b><p>'+hs.map(esc).join('<br>')+'</p>':'')+(it.ex?'<b>Пример</b>'+(it.strict?'<pre class="cmp">'+esc(it.ex)+'</pre>':'<p style="margin-bottom:0">'+esc(it.ex).replace(/\n/g,'<br>')+'</p>'):'')+'</div><p class="mu" style="margin:0 4px 14px">'+(sk?'Этот проект пропущен. Сделай его сейчас и получи бонус +'+bonus+' ⭐.':done?'Проект уже выполнен, бонус за него получен.':'Проект можно пропустить, тема всё равно засчитается. За выполнение бонус +'+bonus+' ⭐.')+'</p></div>'+edCard('Решение',dc)+conHtml()+'<div id="fb" aria-live="polite"></div>'+dockHtml('<button class="btn" id="chk">Проверить</button>'));
@@ -263,7 +265,7 @@ function project(i,j){
     if(!(await needSk()))return;
     var b=$('chk');b.disabled=true;
     var v=await judge(it,c.value);
-    if(!v.ok){fx(false);b.disabled=false;fbSet(v.h);return}
+    if(!v.ok){fx(false);b.disabled=false;PF++;fbSet(badFb(v.h,errMood(PF)));return}
     fx(true,'none');projEnd(i,j)};
   if($('sk'))$('sk').onclick=function(){projSkip(i,j)}}
 function projEnd(i,j){
@@ -399,3 +401,33 @@ function fcol(n){if(n==='print')return'var(--bi)';var h=FH[n];if(h===undefined){
 
 /* --- доступность: основная область страницы для экранных чтецов --- */
 app.setAttribute('role','main');
+
+
+/* ===== настроения кролика =====
+   Спрайты показываются только в настоящих событиях, без реакций на нажатия и без фонового движения:
+   • grump (хмурый): первая ошибка в серии (неверный ответ, непрошедший тест, ошибка в программе), статичный;
+   • rolled (закатил глаза): один раз, на итоге островка, где ошибок было ROLL_AT и больше;
+   • happy (ликующий): итог островка, проекта, уровня, курса; eat (с морковкой): знакомство и приветствие при идущей серии.
+   Не больше одного спрайта на момент. Если файла rolled нет в сборке, на его месте стоит grump. */
+var PRW=0,CERR=0;
+var MOODL={grump:['Хм. Не совсем.','Кролик приподнял бровь.','Почти, но нет.','Бывает. Кролик не в обиде.'],
+ rolled:['Кролик закатил глаза, но верит в тебя.','Ну вот опять. Зато теперь запомнишь.','Глубокий вдох. Ещё раз.','Кролик вздохнул. Ты справишься.']};
+var MOODI={grump:Math.floor(Math.random()*4),rolled:Math.floor(Math.random()*4)};
+function moodLine(k){var a=MOODL[k]||MOODL.grump;return a[MOODI[k]++%a.length]}
+/* закатил глаза: только на итоге островка, если на нём ошибок ROLL_AT и больше; хмурый: только первая ошибка в серии */
+var ROLL_AT=4;
+function errMood(n){return n===1?'grump':''}
+function moodBox(k,sz){var s=IMG[k]||IMG.grump;return s?'<span class="mood '+k+(sz?' '+sz:'')+'" aria-hidden="true"><img src="'+s+'" alt="" draggable="false"></span>':''}
+function badFb(h,k){return k?h.replace('<div class="fb bad">','<div class="fb bad">'+moodBox(k,'fl')).replace(/<\/div>\s*$/,'<p class="mq">'+moodLine(k)+'</p></div>'):h}
+/* консоль: следим за строкой состояния, не трогая движок запуска */
+function consWatch(){
+  var r=$('rst');if(!r||r._w)return;r._w=1;r._s='';
+  new MutationObserver(function(){
+    var t=r.textContent;
+    if(/выполняется|ждёт ввод/.test(t)){r._s='';return}
+    if(/ошибк|не запущена/.test(t)&&r._s!=='e'){
+      r._s='e';CERR++;var k=errMood(CERR),q=$('cmq');
+      if(q&&k){q.innerHTML=moodBox(k,'sm')+'<span>'+moodLine(k)+' '+(k==='grump'?'Прочитай последнюю строку сообщения: там сказано, что не так.':'Проверь номер строки из сообщения.')+'</span>';q.hidden=false}
+      else if(q)q.hidden=true}
+    else if(/завершена/.test(t)){CERR=0;r._s='';var q2=$('cmq');if(q2)q2.hidden=true}
+  }).observe(r,{childList:true,characterData:true,subtree:true,attributes:true})}
