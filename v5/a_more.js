@@ -13,9 +13,12 @@ function drawCard(cb){
       g.textBaseline='alphabetic';g.fillStyle=V('--accent');g.font='900 64px '+F;g.textAlign='left';g.fillText('ИТП',110,150);
       g.fillStyle=V('--muted');g.font='700 32px '+F;g.textAlign='right';g.fillText('И так, программирование',970,148);
       if(rb&&rb.width){var bs=380,sc=Math.min(bs/rb.width,bs/rb.height),w=rb.width*sc,h=rb.height*sc,lt=!isDark();
-        /* светлая тема: мягкое пятно и тень, чтобы светлый мех не растворялся в карточке */
-        if(lt){var cx=540,cy=190+bs/2+10,gr=g.createRadialGradient(cx,cy,20,cx,cy,250);gr.addColorStop(0,V('--blob2'));gr.addColorStop(1,V('--blob'));g.fillStyle=gr;g.beginPath();g.ellipse(cx,cy,250,215,0,0,6.283);g.fill()}
-        g.save();if(lt){g.shadowColor='rgba(120,70,50,.3)';g.shadowBlur=26;g.shadowOffsetY=10}g.drawImage(rb,540-w/2,190+(bs-h)/2,w,h);g.restore()}
+        /* светлая тема: тонкий контур по силуэту и контактная тень под лапами (без круга за кроликом) */
+        var bx=540-w/2,by=190+(bs-h)/2;
+        if(lt){var cy=by+h-4,gr=g.createRadialGradient(540,cy,2,540,cy,w*.3);gr.addColorStop(0,'rgba(110,70,50,.34)');gr.addColorStop(1,'rgba(110,70,50,0)');
+          g.save();g.translate(540,cy);g.scale(1,.2);g.translate(-540,-cy);g.fillStyle=gr;g.beginPath();g.arc(540,cy,w*.3,0,6.283);g.fill();g.restore();
+          [[2,0],[-2,0],[0,2],[0,-2]].forEach(function(o){g.save();g.shadowColor=V('--fur-edge');g.shadowBlur=0;g.shadowOffsetX=o[0];g.shadowOffsetY=o[1];g.drawImage(rb,bx,by,w,h);g.restore()})}
+        g.drawImage(rb,bx,by,w,h)}
       var nm=String(S.nick);g.font='900 80px '+F;
       if(isRb(nm)){var A=Array.from(nm),ws=A.map(function(ch){return g.measureText(ch).width}),tot=ws.reduce(function(a,b){return a+b},0),x0=540-tot/2;g.textAlign='left';A.forEach(function(ch,k){g.fillStyle='hsl('+(k*47%360)+',85%,58%)';g.fillText(ch,x0,650);x0+=ws[k]})}
       else{g.textAlign='center';g.fillStyle=V('--ink');g.fillText(nm,540,650)}
