@@ -87,7 +87,10 @@ function reveal(){
     A(intro,[{opacity:1},{opacity:0}],{duration:400,fill:'forwards'});
     rest.forEach(function(e,k){A(e,[{opacity:0},{opacity:1}],{duration:500,delay:400+k*120,fill:'both'})});
     T(end,1300);return}
-  var ib=intro.querySelector('.isl'),ir=ib.getBoundingClientRect(),cx=ir.left+ir.width/2,cy=ir.top+ir.height/2;
+  var ib=intro.querySelector('.isl');
+  /* центр считаем по раскладке (offset*), а не по getBoundingClientRect: при переходе экрана #app ещё едет (transform), и вспышка стартовала не из центра */
+  var lx=0,ly=0,le=ib;while(le){lx+=le.offsetLeft;ly+=le.offsetTop;le=le.offsetParent}
+  var cx=lx+ib.offsetWidth/2-window.pageXOffset,cy=ly+ib.offsetHeight/2-window.pageYOffset;
   var rc=getComputedStyle(ib).getPropertyValue('--ti').trim()||'#3D7FEA';
   var cols=[rc,rc,'var(--gold)','var(--carrot)','#fff'];
   ov=document.createElement('div');ov.id='rvfx';ov.style.setProperty('--rc',rc);
@@ -254,7 +257,7 @@ function greet(){
   if(S.seen===t)return home();
   var away=S.seen?dnum(t)-dnum(S.seen):0;S.seen=t;save();
   var s=streakNow(),lost=S.streak>=2&&s===0;
-  scr('greet','<div class="onb center">'+(s>0&&!lost?rabbit('eat'):'')+'<h1>Привет, '+nk(S.nick)+'!</h1><p class="lead">'+(lost?'Серия в '+S.streak+' '+pl(S.streak,['день','дня','дней'])+' прервалась'+(away>=3?', тебя не было '+away+' '+pl(away,['день','дня','дней']):'')+'. Не страшно: новая начнётся сегодня.':away>=3?'Тебя не было '+away+' '+pl(away,['день','дня','дней'])+'. Кролик скучал.':s?'Серия: '+s+' '+pl(s,['день','дня','дней'])+'. Не прерывай её сегодня.':'Кролик завтракает и ждёт тебя.')+'</p><button class="btn pulse" id="go">Начать</button></div>');
+  scr('greet','<div class="onb center gr">'+rabbit('eat')+'<h1>Привет, '+nk(S.nick)+'!</h1><p class="lead">'+(lost?'Серия в '+S.streak+' '+pl(S.streak,['день','дня','дней'])+' прервалась'+(away>=3?', тебя не было '+away+' '+pl(away,['день','дня','дней']):'')+'. Не страшно: новая начнётся сегодня.':away>=3?'Тебя не было '+away+' '+pl(away,['день','дня','дней'])+'. Кролик скучал.':s?'Серия: '+s+' '+pl(s,['день','дня','дней'])+'. Не прерывай её сегодня.':'Кролик завтракает и ждёт тебя.')+'</p><button class="btn pulse" id="go">Начать</button></div>');
   $('go').onclick=function(){home();if(away>=3)setTimeout(function(){repeatAsk(away)},400)};
 }
 function passed(type){var a=[];TOPICS.forEach(function(t,i){(t.items||[]).forEach(function(x,j){if(x.t===type&&S.d[i+'-'+j])a.push([i,j])})});return a}

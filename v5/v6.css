@@ -434,6 +434,9 @@ html.noln .gt{display:none}
 
 /* приветствие и выбор старта */
 .onb{text-align:center;padding-top:22px}
+/* приветствие: кролик и текст по вертикальной середине экрана */
+.onb.gr{min-height:calc(100vh - 150px);min-height:calc(100dvh - 150px);padding-top:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.onb.gr .btn{align-self:stretch}
 .onb .rw.im{width:min(180px,46vw)}
 .onb h1{font-size:1.75rem;margin:6px 0 4px}
 .onb .lead{color:var(--muted);margin:0 auto 22px;max-width:30ch}
@@ -672,7 +675,7 @@ button.tile:active{transform:scale(.97)}
 .wd i{width:100%;max-width:38px;aspect-ratio:1;border-radius:var(--r-sm);background:var(--card2);display:grid;place-items:center;font-style:normal;font-size:.9rem;color:var(--on)}
 .wd i .em{width:1.05rem;height:1.05rem}
 .wd.on i{background:var(--accent)}.wd.fz i{background:var(--ice-soft);box-shadow:inset 0 0 0 2px var(--ice)}.wd.fu i{opacity:.45}
-.wd.td span{color:var(--ink)}.wd.td i{box-shadow:0 0 0 2px var(--ink)}
+.wd.td span{color:var(--ink)}.wd.td i{box-shadow:0 0 0 2px var(--card),0 0 0 4px color-mix(in srgb,var(--accent) 40%,transparent)}
 .fzr{display:flex;align-items:center;gap:14px;margin:10px 0 12px}
 .fzi{display:flex;gap:6px;flex:none}
 .fzs{width:46px;height:46px;border-radius:var(--r);background:var(--card2);display:grid;place-items:center;font-size:1.5rem;filter:grayscale(1) opacity(.45)}
