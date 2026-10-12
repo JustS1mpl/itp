@@ -123,3 +123,4 @@ textarea:focus-visible,input:focus-visible{outline:none}
 
 /* v5.4.0: условие №5/№6 */
 
+html{scrollbar-gutter:stable}
