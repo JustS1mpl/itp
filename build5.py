@@ -1,6 +1,6 @@
 import re, sys, json
 sys.path.insert(0, '.')
-VER = '6.1.0'
+VER = '6.2.0'
 s = open('base43.html', encoding='utf-8').read()
 
 def rep(a, b, n=1):
@@ -162,7 +162,10 @@ for extra in ('v5/a_fix.js','v5/a_fix2.js','v5/a_fix3.js','v5/a_fix4.js','v5/a_m
     try: core += '\n' + open(extra, encoding='utf-8').read()
     except FileNotFoundError: pass
 anchor = "seedLit();window.addEventListener('resize',function(){if(app.querySelector('.path'))links()});\napplyTheme();"
-core = 'var EXIMG=' + EXIMG + ';\n' + core
+# --- настроения кролика: ликующий (состояние happy: итоги, курс пройден, карточка «Поделиться») и хмурый (grump: приветствие после перерыва или потерянной серии)
+import base64 as _mb
+_mood = ''.join("IMG.%s='data:image/webp;base64,%s';\n" % (k, _mb.b64encode(open('assets/mascot/%s.webp' % f, 'rb').read()).decode()) for k, f in (('happy', 'cheer'), ('grump', 'grump')))
+core = 'var EXIMG=' + EXIMG + ';\n' + _mood + core
 core = core.replace('/*ITPY*/{}', _json.dumps(_py, ensure_ascii=False))
 rep(anchor, core + "\nseedLit();window.addEventListener('resize',function(){if(app.querySelector('.path'))links()});\napplyTheme();if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',emoLoad);else emoLoad();")
 # --- достижения за проекты (по названию острова project). Правило действует и в старом projEnd базы,

@@ -254,8 +254,9 @@ function greet(){
   var t=day(new Date());fzApply();
   if(S.seen===t)return home();
   var away=S.seen?dnum(t)-dnum(S.seen):0;S.seen=t;save();
-  var s=streakNow();
-  scr('greet','<div class="onb center">'+rabbit('eat')+'<h1>Привет, '+nk(S.nick)+'!</h1><p class="lead">'+(away>=3?'Тебя не было '+away+' '+pl(away,['день','дня','дней'])+'. Кролик скучал.':s?'Серия: '+s+' '+pl(s,['день','дня','дней'])+'. Не прерывай её сегодня.':'Кролик завтракает и ждёт тебя.')+'</p><button class="btn pulse" id="go">Начать</button></div>');
+  var s=streakNow(),lost=S.streak>=2&&s===0;
+  /* хмурый кролик только здесь: после долгого перерыва или когда серия прервалась (на ошибки он не реагирует) */
+  scr('greet','<div class="onb center">'+rabbit(away>=3||lost?'grump':'eat')+'<h1>Привет, '+nk(S.nick)+'!</h1><p class="lead">'+(lost?'Серия в '+S.streak+' '+pl(S.streak,['день','дня','дней'])+' прервалась'+(away>=3?', тебя не было '+away+' '+pl(away,['день','дня','дней']):'')+'. Не страшно: новая начнётся сегодня.':away>=3?'Тебя не было '+away+' '+pl(away,['день','дня','дней'])+'. Кролик скучал.':s?'Серия: '+s+' '+pl(s,['день','дня','дней'])+'. Не прерывай её сегодня.':'Кролик завтракает и ждёт тебя.')+'</p><button class="btn pulse" id="go">Начать</button></div>');
   $('go').onclick=function(){home();if(away>=3)setTimeout(function(){repeatAsk(away)},400)};
 }
 function passed(type){var a=[];TOPICS.forEach(function(t,i){(t.items||[]).forEach(function(x,j){if(x.t===type&&S.d[i+'-'+j])a.push([i,j])})});return a}

@@ -413,6 +413,7 @@ html.noln .gt{display:none}
 .im.happy img,.im.run img{animation:hop .6s infinite alternate var(--e-out)}
 .im.love img{animation:hop .35s 5 alternate}
 .im.lie img{animation:float 3.6s ease-in-out infinite}
+.im.grump img{animation:float 4.6s ease-in-out infinite}
 .rbn i{display:inline-block;font-style:normal;animation:rbw 1.4s ease-in-out infinite,rbc 5s linear infinite;animation-delay:calc(var(--i)*-.14s),calc(var(--i)*-.5s)}
 
 /* приветствие и выбор старта */
