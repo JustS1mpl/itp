@@ -65,8 +65,8 @@ function isDark(){return document.documentElement.getAttribute('data-theme')==='
 var EM={map:null,url:Object.create(null),obs:null};
 var EMRX=/(?:[\u{1F000}-\u{1FAFF}←-⯿©®‼⁉™ℹⓂ〰〽㊗㊙])️?(?:‍[\u{1F000}-\u{1FAFF}♀♂⚕⚖✈❤]️?)*/gu,EMT=/[\u{1F000}-\u{1FAFF}←-⯿©®‼⁉™ℹⓂ〰〽㊗㊙]/u;
 function emoKey(g){var a=[];for(var ch of g){var c=ch.codePointAt(0);if(c!==0xFE0F)a.push(c.toString(16))}return a.join('-')}
-function emoSrc(g){var k=emoKey(g);if(!EM.map||!EM.map[k])return'';if(!EM.url[k])EM.url[k]=URL.createObjectURL(new Blob([EM.map[k]],{type:'image/svg+xml'}));return EM.url[k]}
-function emoImg(g){var s=emoSrc(g);if(!s)return null;var i=document.createElement('img');i.className='em';i.alt=g;i.src=s;i.draggable=false;return i}
+function emoSrc(g){var k=emoKey(g);if(!EM.map||!EM.map[k])return'';if(!EM.url[k])EM.url[k]='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(EM.map[k]);return EM.url[k]}
+function emoImg(g){var s=emoSrc(g);if(!s)return null;var i=document.createElement('img');i.className='em';i.alt=g;i.onerror=function(){if(i.parentNode)i.replaceWith(document.createTextNode(g))};i.src=s;i.draggable=false;return i}
 function emoNode(n){
   var t=n.nodeValue;if(!t||!EMT.test(t))return;
   var p=n.parentNode;if(!p||p.closest&&p.closest('pre,code,textarea,input,script,style,.noemo'))return;
