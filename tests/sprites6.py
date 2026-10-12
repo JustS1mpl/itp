@@ -82,6 +82,18 @@ with sync_playwright() as p:
         ok(c[2] == 'none' and (c[1] != 'none') == light, 'тема %s: обводки нет, контактная тень %s' % (th, 'есть' if light else 'не применяется'))
         tr = pg.evaluate("getComputedStyle(document.querySelector('.rw.im.eat')||document.body).transform")
         ok(tr != 'none', 'тема %s: LoveCarrot сдвинут к центру (%s)' % (th, tr))
+    # --- тень стоит под лапами: центр и ширина тени против нижних 10 % строк самого спрайта (светлая тема)
+    from PIL import Image
+    import numpy as np
+    pg.evaluate("S.theme='light';applyPrefs()")
+    for st, fn in (('eat', 'lovecarrot'), ('happy', 'cheer')):
+        a = np.array(Image.open('assets/mascot/%s.webp' % fn).convert('RGBA'))[:, :, 3] > 40
+        H, W = a.shape; y1 = np.nonzero(a)[0].max(); xx = np.nonzero(a[int(y1 - .1 * H):y1 + 1])[1]
+        fc, fw = (xx.min() + xx.max()) / 2 / W, (xx.max() - xx.min()) / W
+        pg.evaluate("document.body.insertAdjacentHTML('beforeend','<div id=\"shx\" style=\"position:absolute;left:0;top:0;width:300px\">'+rabbit('%s')+'</div>')" % st)
+        r = pg.evaluate("(function(){var w=document.querySelector('#shx .rw'),c=getComputedStyle(w,'::after'),W=w.getBoundingClientRect().width;var l=parseFloat(c.left),wd=parseFloat(c.width);return [(l+wd/2)/W,wd/W]})()")
+        pg.evaluate("document.getElementById('shx').remove()")
+        ok(abs(r[0] - fc) < .03 and r[1] >= fw, 'тень под лапами у %s: центр тени %.1f%% против %.1f%% у лап, ширина %.0f%% >= %.0f%%' % (st, r[0] * 100, fc * 100, r[1] * 100, fw * 100))
     ok(not [l for l in logs if 'PAGEERROR' in l], 'ошибок нет ' + str(logs[:2]))
     b.close()
     # --- уменьшить движение
