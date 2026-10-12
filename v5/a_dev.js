@@ -23,7 +23,6 @@ function dvPanel(){
       h+='<button data-a="tp"'+(DVC.k<1?' disabled':'')+'>◀ Задание</button><button data-a="tn"'+(DVC.k>=T.length-1?' disabled':'')+'>Задание ▶</button><button data-a="sol">Вставить решение</button><button data-a="solc">Решение и проверить</button>'}
     if(DVC.t==='project')h+='<button data-a="sol">Вставить решение</button><button data-a="solc">Решение и проверить</button>';
     if(DVC.t==='quiz')h+='<button data-a="ans">Показать верный ответ</button>';
-    if(DVC.t==='ans')h+='<button data-a="atp"'+(DVC.k<1?' disabled':'')+'>◀ Задание</button><button data-a="atn"'+(DVC.k>=it.tasks.length-1?' disabled':'')+'>Задание ▶</button><button data-a="aans">Подставить ответ</button>';
     h+='<button data-a="cur">Отметить островок пройденным</button></div>';
   }
   h+='<div class="dvs">Опыт и уровень</div><div class="dvr"><button data-a="xp50">+50 ⭐</button><button data-a="xp500">+500 ⭐</button><button data-a="lv">+1 уровень</button></div>';
@@ -40,8 +39,6 @@ function dvPanel(){
 }
 function dvAct(a){
   var c=DVC;
-  if(a==='atp'||a==='atn'){dvClose();return ansTask(c.i,c.j,c.k+(a==='atn'?1:-1))}
-  if(a==='aans'){var ai=document.getElementById('ai');if(!ai||ai.disabled)return toast('Поле ответа не открыто');ai.value=IT(c.i,c.j).tasks[c.k].a;dvClose();return}
   if(a==='tp'||a==='tn'){dvClose();return task(c.i,c.j,c.k+(a==='tn'?1:-1))}
   if(a==='sol'||a==='solc'){
     var it=IT(c.i,c.j),sol=c.t==='task'?it.tasks[c.k].sol:it.sol,ed=document.getElementById('code');

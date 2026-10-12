@@ -8,8 +8,25 @@ function dadd(s,n){var p=s.split('-'),d=new Date(Date.UTC(+p[0],p[1]-1,+p[2]+n))
 function vdate(x){if(typeof x!=='string'||!/^\d{4}-\d\d-\d\d$/.test(x))return'';var y=+x.slice(0,4),m=+x.slice(5,7),d=+x.slice(8,10);if(y<2020||y>2100)return'';var t=new Date(Date.UTC(y,m-1,d));return t.getUTCFullYear()===y&&t.getUTCMonth()===m-1&&t.getUTCDate()===d?x:''}
 /* --- проверка новых полей сохранения --- */
 function clean0_(r){return clean0(r)}
+/* v5.7.0: раздел ЕГЭ удалён. В старых сохранениях номера тем 15-20 выбрасываются, 21 и выше сдвигаются на -6.
+   Метка mv=2 (число, а не переменная: clean() вызывается при загрузке раньше, чем выполняются var) нужна, чтобы сдвиг не применился дважды. */
+function migr(r){
+  if(!r||typeof r!=='object'||Array.isArray(r)||r.mv===2)return r;
+  var mp=function(i){return i<15?i:(i>=21?i-6:-1)},o={};
+  for(var k in r)if(Object.prototype.hasOwnProperty.call(r,k))o[k]=r[k];
+  ['d','tk','at','es','dr','hu'].forEach(function(f){
+    var x=r[f];if(!x||typeof x!=='object'||Array.isArray(x))return;
+    var y={};
+    Object.keys(x).forEach(function(key){
+      var p=key.split('-'),n=mp(+p[0]);
+      if(n<0||!/^\d+$/.test(p[0]))return;
+      p[0]=String(n);y[p.join('-')]=x[key]});
+    o[f]=y});
+  if(Number.isInteger(r.start)&&r.start>=0)o.start=r.start<15?r.start:(r.start>=21?r.start-6:15);
+  return o}
 function clean(r){
-  var o=clean0(r);r=(r&&typeof r==='object'&&!Array.isArray(r))?r:{};
+  r=migr(r);
+  var o=clean0(r);o.mv=2;r=(r&&typeof r==='object'&&!Array.isArray(r))?r:{};
   var s=(r.set&&typeof r.set==='object'&&!Array.isArray(r.set))?r.set:{},q={};
   var pick=function(k,list){q[k]=list.indexOf(s[k])>=0?s[k]:defset()[k]},bl=function(k){q[k]=s[k]===0||s[k]===false?0:(s[k]===1||s[k]===true?1:defset()[k])};
   pick('acc',['','carrot','pink','blue','violet']);pick('tz',[90,100,115,130]);pick('anim',['full','less','off']);pick('cf',[13,15,17,19]);pick('sh',['v','h']);pick('fl',['tilt','flat']);
@@ -27,7 +44,7 @@ function clean(r){
   var cnum=function(k){return Number.isInteger(cn[k])&&cn[k]>=0?Math.min(cn[k],99999):0};
   o.cn={ne:cnum('ne'),nn:cnum('nn'),nd:vdate(cn.nd),gn:cnum('gn'),gd:vdate(cn.gd),pf:cnum('pf'),pj:cnum('pj'),rc:cnum('rc')};
   var hu={};if(r.hu&&typeof r.hu==='object'&&!Array.isArray(r.hu))for(var h in r.hu)if(/^\d{1,3}$/.test(h)&&+h<TOPICS.length&&r.hu[h])hu[h]=1;o.hu=hu;
-  o.rp=vdate(r.rp);o.rnd=r.rnd?1:0;o.mode=r.mode==='ex'?'ex':'py';
+  o.rp=vdate(r.rp);o.rnd=r.rnd?1:0;
   return o}
 /* --- тема, акцент, размер текста --- */
 function applyPrefs(){
@@ -186,13 +203,13 @@ function ach(id){
   if(id!=='all'&&ACH.every(function(a){return a.id==='all'||S.ach[a.id]}))ach('all');
 }
 function topicDone(i){
-  var t=TOPICS[i];if(!t||t.ex)return;
+  var t=TOPICS[i];if(!t)return;
   if(t.intro){ach('intro');return}
   var clean_=true,hasTest=false;
   (t.items||[]).forEach(function(x,j){if(x.t==='flash'||x.t==='test'){if(S.es[i+'-'+j]===undefined||S.es[i+'-'+j]>0)clean_=false}if(x.t==='test')hasTest=true});
   if(clean_){ach('perfect');S.cn.pf=Math.min(99999,S.cn.pf+1);if(S.cn.pf>=5)ach('perf5');save()}
   if(hasTest&&!S.hu[i])ach('nohint');
-  var n=0;TOPICS.forEach(function(x,k){if(!x.intro&&!x.ex&&tdone(k)&&(x.items||[]).some(function(y,j){return(y.t==='flash'||y.t==='test')&&S.es[k+'-'+j]!==undefined}))n++});
+  var n=0;TOPICS.forEach(function(x,k){if(!x.intro&&tdone(k)&&(x.items||[]).some(function(y,j){return(y.t==='flash'||y.t==='test')&&S.es[k+'-'+j]!==undefined}))n++});
   if(n>=5)ach('t5');if(n>=10)ach('t10');if(allDone()&&n>=NT())ach('tall');
 }
 function rec(k,e){
