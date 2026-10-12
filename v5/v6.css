@@ -28,8 +28,6 @@
  --b0:#871094;--b1:#0369A1;--b2:#15803D;--b3:#BE185D;--ka:#4F6B00;--fsat:72%;--flit:34%;
  /* календарь */
  --c0:#ECE6DB;--c1:#CDEBC0;--c2:#9DD582;--c3:#5DB43E;--c4:#2E8A22;
- /* кролик на светлой теме: тёплое пятно за ним и краешек по контуру (светлый мех иначе растворяется в фоне) */
- --blob:#F4D3C4;--blob2:#FAE7DD;--fur-edge:#C9A99C;
  /* тени */
  --sh1:0 1px 2px rgba(60,40,20,.06),0 1px 1px rgba(60,40,20,.04);
  --sh2:0 10px 30px -8px rgba(60,40,20,.22),0 2px 6px rgba(60,40,20,.06);
@@ -64,7 +62,6 @@
  --kw:#CC7832;--st:#8FB573;--nm:#6897BB;--cm:#9A8E94;--bi:#9FA0E0;--fs:#FF9E3D;--ms:#4EC9B0;--ml:#E08A6D;--md:#D7BA7D;--mt:#E57CA8;--mf:#8FA1B3;
  --b1:#7DD3FC;--b2:#86EFAC;--b3:#F9A8D4;--ka:#B5D63D;--fsat:68%;--flit:68%;--fl1:0;--fd1:1;
  --c0:#2A2724;--c1:#27412A;--c2:#33683A;--c3:#4A9A4A;--c4:#82D66A;
- --blob:#3B3236;--blob2:#463C41;
  --sh1:0 1px 2px rgba(0,0,0,.35);
  --sh2:0 12px 32px -8px rgba(0,0,0,.6),0 2px 6px rgba(0,0,0,.3);
  --sh3:0 28px 70px -12px rgba(0,0,0,.75);
@@ -411,11 +408,12 @@ html.noln .gt{display:none}
 /* кролик */
 .rw{width:150px;margin:0 auto;position:relative}
 .rw.im{isolation:isolate}
-/* светлая тема: тонкий тёплый контур (четыре сдвига drop-shadow) и контактная тень под лапами.
-   За кроликом нет никакой фигуры. Тёмная тема не затронута. Файлы спрайтов не менялись. */
-:root:not([data-theme=dark]) .rw.im img{filter:drop-shadow(.8px 0 0 var(--fur-edge)) drop-shadow(-.8px 0 0 var(--fur-edge)) drop-shadow(0 .8px 0 var(--fur-edge)) drop-shadow(0 -.8px 0 var(--fur-edge))}
+/* светлая тема: только контактная тень под лапами. Обводки и фигуры за кроликом нет, файлы спрайтов не менялись. */
 :root:not([data-theme=dark]) .rw.im::after{content:'';position:absolute;z-index:-1;left:16%;right:16%;bottom:-3%;height:8%;border-radius:50%;background:radial-gradient(closest-side,rgba(110,70,50,.32),rgba(110,70,50,0));filter:blur(3px)}
 .rw img{display:block;width:100%;height:auto;-webkit-user-drag:none}
+/* LoveCarrot: поза наклонная намеренно; центр массы тела (без сердечка) левее середины листа на ~5 %, сдвигаем сам блок вместе с тенью и тень ставим под лапы */
+.rw.im.eat{transform:translateX(5%)}
+:root:not([data-theme=dark]) .rw.im.eat::after{left:4%;right:30%}
 .center .rw.im{width:min(210px,56vw)}
 /* светлая тема: пятно, контур и мягкая тень только здесь; тёмная тема не меняется */
 .emp-rb{margin:0 auto 6px}.emp-rb .rw{width:min(150px,44vw)}

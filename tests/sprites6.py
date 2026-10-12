@@ -79,7 +79,9 @@ with sync_playwright() as p:
         pg.evaluate("S.theme='%s';applyPrefs();S.seen='';greet()" % th); pg.wait_for_timeout(400)
         c = pg.evaluate("(function(){var r=document.querySelector('.rw.im'),i=getComputedStyle(r.querySelector('img'));return [getComputedStyle(r,'::before').content,getComputedStyle(r,'::after').content,i.filter]})()")
         ok(c[0] == 'none', 'тема %s: за кроликом нет фигуры (::before пуст)' % th)
-        ok((c[2] != 'none') == light and (c[1] != 'none') == light, 'тема %s: контур и контактная тень %s' % (th, 'есть' if light else 'не применяются'))
+        ok(c[2] == 'none' and (c[1] != 'none') == light, 'тема %s: обводки нет, контактная тень %s' % (th, 'есть' if light else 'не применяется'))
+        tr = pg.evaluate("getComputedStyle(document.querySelector('.rw.im.eat')||document.body).transform")
+        ok(tr != 'none', 'тема %s: LoveCarrot сдвинут к центру (%s)' % (th, tr))
     ok(not [l for l in logs if 'PAGEERROR' in l], 'ошибок нет ' + str(logs[:2]))
     b.close()
     # --- уменьшить движение
