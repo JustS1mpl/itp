@@ -86,7 +86,7 @@ function pyExec(code,src){
         used=m.used;over=!!m.over;
         var e=m.fail?'InternalError: '+m.fail:m.err;
         if(e&&!m.fail)e=String(e);
-        finish(result({err:e||null,turtle:m.tu||null}))}}
+        finish(result({err:e||null}))}}
     function attach(rec){job.rec=rec;rec.onmsg=onMsg;rec.onerr=function(){if(done)return;kill(rec);if(PY.act===rec)PY.act=null;ensureAct();finish(result({err:'MemoryError: программа остановлена (не хватило памяти)',killed:1}))}}
     function onNeed(){
       var cur=job.rec;kill(cur);if(PY.act===cur)PY.act=null;

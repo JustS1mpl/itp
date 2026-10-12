@@ -1,6 +1,6 @@
 import re, sys, json
 sys.path.insert(0, '.')
-VER = '5.6.0'
+VER = '5.7.0'
 s = open('base43.html', encoding='utf-8').read()
 
 def rep(a, b, n=1):
@@ -40,7 +40,7 @@ rep("""'<div class="q">'+esc(q.q)+'</div>'+(q.c?'<pre>'+hl(q.c)+'</pre>':'');
     show(h+'<div id="fb"></div><button class="btn" id="go" disabled>Проверить</button>');""",
 """'<div class="q">'+esc(q.q)+'</div>'+(q.v||'')+(q.c?'<pre>'+hl(q.c)+'</pre>':'');
     ord.forEach(function(k){h+='<button class="opt" data-k="'+k+'">'+esc(q.o[k])+'</button>'});
-    show(h+'<div id="fb"></div><button class="btn" id="go" disabled>Проверить</button>');if(q.v&&window.exImgs)exImgs(app);""")
+    show(h+'<div id="fb"></div><button class="btn" id="go" disabled>Проверить</button>');if(q.v)imgZoom(app);""")
 for extra in ('v5/v5c.css',):
     try: css += '\n' + open(extra, encoding='utf-8').read()
     except FileNotFoundError: pass
@@ -60,9 +60,9 @@ n = s.count(mm); s = s.replace(mm, 'RM()'); print('RM заменено', n)
 rep(open('pyold.txt',encoding='utf8').read(), open('pynew.txt',encoding='utf8').read())
 # --- навигация
 rep("[['home','🏠','Главная'],['oge','📚','ОГЭ/ЕГЭ'],['ed','⌨️','Компилятор'],['prof','🐇','Профиль']]",
-    "[['home','🗺️','Путь'],['pr','🎯','Практика'],['ed','💻','Код'],['mx','🎓','ЕГЭ'],['prof','🐰','Профиль']]")
-rep("({home:home,oge:oge,ed:editor,prof:profile})[b.dataset.t]()", "({home:function(){EXOPEN=-1;home()},pr:practice,ed:editor,mx:modeSwap,prof:profile})[b.dataset.t]()")
-rep("'Главная, ОГЭ/ЕГЭ, Компилятор, Профиль'", "'Путь, Практика, Код, ЕГЭ, Профиль'")
+    "[['home','🗺️','Путь'],['pr','🎯','Практика'],['ed','💻','Код'],['prof','🐰','Профиль']]")
+rep("({home:home,oge:oge,ed:editor,prof:profile})[b.dataset.t]()", "({home:home,pr:practice,ed:editor,prof:profile})[b.dataset.t]()")
+rep("'Главная, ОГЭ/ЕГЭ, Компилятор, Профиль'", "'Путь, Практика, Код, Профиль'")
 
 # --- clean
 rep('function clean(r){if(!r||typeof r', 'function clean0(r){if(!r||typeof r')
@@ -127,16 +127,10 @@ rep("saveFile('itp-progress.png',BLOB);toast('Картинка сохранен�
 
 
 
-# --- v5.1.3: ЕГЭ
-rep("['theory','flash','test','project'].indexOf(it.t)<0){e.push(q+'t должен быть theory, flash, test или project')","['theory','flash','test','project','ans'].indexOf(it.t)<0){e.push(q+'t должен быть theory, flash, test, project или ans')")
-rep("if(it.t==='theory')theory(i,j);\n  else if(it.t==='test'){","if(it.t==='theory')theory(i,j);\n  else if(it.t==='test'||it.t==='ans'){")
-rep("var k=0;while(k<it.tasks.length-1&&S.tk[key+'-'+k])k++;task(i,j,k);","var k=0;while(k<it.tasks.length-1&&S.tk[key+'-'+k])k++;(it.t==='ans'?ansTask:task)(i,j,k);")
-rep("TOPICS.forEach(function(t,i){if(t.intro)return;h+='<button class=\"lesson\"","TOPICS.forEach(function(t,i){if(t.intro||t.ex)return;h+='<button class=\"lesson\"")
 import json as _j2
-EXIMG = open('exam/eximg.json', encoding='utf-8').read()
 # --- v5.5.0: картинки к новым темам (assets/img/*.webp) и скрытый «хвост» у задач на функции
 import base64 as _b64, glob as _glob, os as _os
-_im = _j2.loads(EXIMG)
+_im = {}
 for _f in sorted(_glob.glob('assets/img/*.webp')):
     _im['p-' + _os.path.basename(_f)[:-5]] = 'data:image/webp;base64,' + _b64.b64encode(open(_f, 'rb').read()).decode()
 EXIMG = _j2.dumps(_im, ensure_ascii=False)
@@ -166,11 +160,11 @@ rep('g[0]=g[0].replace(/\\B(?=(\\d{3})+(?!\\d))/g,",")', 'g[0]=g[0].replace(/\\B
 exec(open('msgs.py',encoding='utf-8').read())
 # --- вставка ядра и интерфейса
 core = open('v5/a_core.js', encoding='utf-8').read() + '\n' + open('v5/a_ui.js', encoding='utf-8').read()
-for extra in ('v5/a_fix.js','v5/a_fix2.js','v5/a_fix3.js','v5/a_fix4.js','v5/a_more.js','v5/a_dev.js','v5/a_gen.js','v5/a_gen2.js','v5/a_gen4.js','v5/a_gen3.js','v5/a_gen5.js','v5/a_gen6.js','v5/a_sheet.js','v5/a_exam.js','v5/a_py.js','v5/a_turtle.js','v5/a_ux.js'):
+for extra in ('v5/a_fix.js','v5/a_fix2.js','v5/a_fix3.js','v5/a_fix4.js','v5/a_more.js','v5/a_dev.js','v5/a_img.js','v5/a_py.js','v5/a_ux.js'):
     try: core += '\n' + open(extra, encoding='utf-8').read()
     except FileNotFoundError: pass
 anchor = "seedLit();window.addEventListener('resize',function(){if(app.querySelector('.path'))links()});\napplyTheme();"
-core = 'var EXIMG=' + EXIMG + ';\nvar EX2D=' + open('exam/ex2d.json', encoding='utf-8').read() + ';\n' + core
+core = 'var EXIMG=' + EXIMG + ';\n' + core
 core = core.replace('/*ITPY*/{}', _json.dumps(_py, ensure_ascii=False))
 rep(anchor, core + "\nseedLit();window.addEventListener('resize',function(){if(app.querySelector('.path'))links()});\napplyTheme();if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',emoLoad);else emoLoad();")
 
@@ -186,7 +180,7 @@ _blocks = ''.join('<script type="text/plain" id="%s">%s</script>\n' % (i, t) for
     ('py-wasm', _b(_P + 'pyodide.asm.wasm', 1)), ('py-asm', _b(_P + 'pyodide.asm.js', 1)), ('py-zip', _b(_P + 'python_stdlib.zip')),
     ('py-lock', open(_P + 'pyodide-lock.json', encoding='utf-8').read().replace('</', '<\\/')),
     ('py-loader', open(_P + 'pyodide.js', encoding='utf-8').read().replace('</script', '<\\/script')),
-    ('py-glue', open('v5/py/glue.py', encoding='utf-8').read() + '\n_TURTLE_SRC = ' + repr(open('v5/py/turtle_shim.py', encoding='utf-8').read()) + '\n'), ('py-worker', open('v5/py/worker.js', encoding='utf-8').read())))
+    ('py-glue', open('v5/py/glue.py', encoding='utf-8').read()), ('py-worker', open('v5/py/worker.js', encoding='utf-8').read())))
 assert s.count('</body>') == 1
 s = s.replace('</body>', _blocks + '</body>')
 s = s.replace('v5.1.3', VER)

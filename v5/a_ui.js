@@ -119,7 +119,7 @@ function linksWatch(){
 /* --- островки и главная --- */
 function island(i,j,n){
   var k=i+'-'+j,it=IT(i,j),d=S.d[k],op=isOpen(i,j),c=cur()===k,nx=!c&&!d&&nxI(i,j),wt=j>0&&S.d[i+'-'+(j-1)]&&!LIT[i+'-'+(j-1)];
-  var ty={theory:['t','📖','Теория'],flash:['f','✏️','Вопросы'],test:['c','💻','Код'],project:['p','🚀','Мини-проект'],ans:['a','🎓','Задание ЕГЭ']}[it.t],lb=it.n||'',off=[0,46,0,-46][j%4];
+  var ty={theory:['t','📖','Теория'],flash:['f','✏️','Вопросы'],test:['c','💻','Код'],project:['p','🚀','Мини-проект']}[it.t],lb=it.n||'',off=[0,46,0,-46][j%4];
   return'<div class="ilw'+(wt?' wait':'')+'" style="--n:'+Math.min(n||0,9)+';transform:translateX('+off+'px)">'+(c&&!TOPICS[i].intro?'<div class="flag">🚩 Ты остановился здесь</div>':'')+'<button class="isl ty-'+ty[0]+' '+(d?'dn':(op?'op':'lk'))+(c?' cur':'')+(nx?' nx':'')+'" data-i="'+i+'" data-j="'+j+'" aria-label="'+esc(ty[2]+': '+lb)+(d?' (пройдено)':(op?'':' (закрыто)'))+'">'+PEN+'<span class="ic">'+ty[1]+'</span>'+(d?'<i class="bd ok">✓</i>':(op?'':'<i class="bd">🔒</i>'))+'</button><div class="mu">'+esc(lb)+(it.t==='project'?'<br><small>'+(S.at[k]==='skip'?'пропущен':'по желанию')+'</small>':'')+'</div></div>'}
 function goalCard(all){
   var d=goalDone(),g=S.goal,p=Math.min(100,Math.round(d/g*100)),ok=d>=g,cu=cur(),left=g-d;
@@ -127,16 +127,15 @@ function goalCard(all){
 function home(){BACK=home;fzApply();
   var all=allDone();
   if(PE.length){show(head()+'<div class="fb bad"><b>Ошибка в данных тем</b>'+PE.map(esc).join('<br>')+'</div>','home');bindHead(home);return}
-  var ex=S.mode==='ex',first=!ex&&TOPICS[0]&&TOPICS[0].intro&&S.start===0&&!tdone(0)&&!REV;
-  var h=head()+(first?'':goalCard(all))+(ex?exBar():''),num=0;
+  var first=TOPICS[0]&&TOPICS[0].intro&&S.start===0&&!tdone(0)&&!REV;
+  var h=head()+(first?'':goalCard(all)),num=0;
   TOPICS.forEach(function(t,i){
-    if(ex?!(t.ex&&t.ex===EXK):!!t.ex)return;if(!t.intro)num++;if(!vis(i))return;
+    if(!t.intro)num++;if(!vis(i))return;
     var c=0;(t.items||[]).forEach(function(x,j){if(S.d[i+'-'+j])c++});
     h+='<section class="topic'+(t.intro?' intro':'')+(REV&&!t.intro?' rv':'')+'">'+(t.intro?'<div class="ihead"><h2>'+esc(t.n)+'</h2><p class="mu">'+esc(t.s||'')+'</p></div>':'<div class="thead'+(tdone(i)?' done':'')+'"><div class="tn">'+num+'</div><div class="tt"><h2>'+esc(t.n)+'</h2><div class="mu">'+esc(t.s||'')+(i<S.start&&!tdone(i)?' · пропущено':'')+'</div></div><div class="tp">'+c+'/'+ni(i)+'</div></div>')+'<div class="path'+(RM()?'':' stg')+'" data-i="'+i+'">';
     for(var j=0;j<ni(i);j++)h+=island(i,j,j);
     h+='</div></section>'});
-  if(ex)h+=exTail();
-  show(h,'home');bindHead(home);links();exBind();
+  show(h,'home');bindHead(home);links();
   app.querySelectorAll('.isl').forEach(function(b){b.onclick=function(){go(+b.dataset.i,+b.dataset.j)}});
   var c=app.querySelector('.cur');if(c&&!REV)c.scrollIntoView({block:'center'});
   var gc=$('gc');if(gc)gc.onclick=function(){var k=cur();if(!k)return;var p=k.split('-');BACK=home;go(+p[0],+p[1])};
@@ -158,15 +157,15 @@ function repeatAsk(away){
 function row(ic,t,sub,a,dis,rt){return'<button class="li" data-a="'+a+'"'+(dis?' disabled':'')+'><span class="lic">'+ic+'</span><span class="lt">'+t+'<small>'+sub+'</small></span>'+(rt?'<span class="lv">'+rt+'</span>':'<span class="ch">›</span>')+'</button>'}
 function practice(){BACK=practice;
   var nf=passed('flash').length,nt=passed('test').length;
-  show(head('Практика')+'<p class="mu" style="margin:0 0 14px">Тренировки без опыта: прогресс и серия не меняются. Задания берутся из пройденных островков.</p><div class="lst">'+row('🎲','Случайный вопрос','Бесконечный режим, пока не закроешь','rf',false,nf?'':'нужен островок')+row('💻','Случайный код','Задание из пройденных, без опыта','rc',false,nt?'':'нужен островок')+row('🎓','Тренажёр ЕГЭ','Бесконечные задания по ЕГЭ, без опыта','re',false,'')+row('🔁','Повторить 3 вопроса','Быстрая разминка по пройденному','r3',false,nf?'':'нужен островок')+'</div>','pr');
+  show(head('Практика')+'<p class="mu" style="margin:0 0 14px">Тренировки без опыта: прогресс и серия не меняются. Задания берутся из пройденных островков.</p><div class="lst">'+row('🎲','Случайный вопрос','Бесконечный режим, пока не закроешь','rf',false,nf?'':'нужен островок')+row('💻','Случайный код','Задание из пройденных, без опыта','rc',false,nt?'':'нужен островок')+row('🔁','Повторить 3 вопроса','Быстрая разминка по пройденному','r3',false,nf?'':'нужен островок')+'</div>','pr');
   bindHead(practice);
-  app.querySelectorAll('.li').forEach(function(b){b.onclick=function(){({rf:rndFlash,rc:rndCode,r3:repeat3,re:function(){EXDASH=0;exMenu()}})[b.dataset.a]()}})}
+  app.querySelectorAll('.li').forEach(function(b){b.onclick=function(){({rf:rndFlash,rc:rndCode,r3:repeat3})[b.dataset.a]()}})}
 function oge(){practice()}
 function askQ(q,o){
   var sel=-1,ch=false,right=false,ord=q.o.map(function(x,n){return n}).sort(function(){return Math.random()-.5});
   var h='<div class="top"><button class="icon" id="x" aria-label="Выйти">✕</button>'+o.mid+'<span></span></div><div class="q">'+esc(q.q)+'</div>'+(q.v||'')+(q.c?'<pre>'+hl(q.c)+'</pre>':'');
   ord.forEach(function(k){h+='<button class="opt" data-k="'+k+'">'+esc(q.o[k])+'</button>'});
-  show(h+'<div id="fb"></div><button class="btn" id="go" disabled>Проверить</button>');if(q.v&&window.exImgs)exImgs(app);
+  show(h+'<div id="fb"></div><button class="btn" id="go" disabled>Проверить</button>');if(q.v)imgZoom(app);
   $('x').onclick=o.exit;
   var g=$('go'),os=app.querySelectorAll('.opt'),fb=$('fb');
   os.forEach(function(b){b.onclick=function(){if(ch)return;sel=+b.dataset.k;os.forEach(function(x){x.classList.remove('sel')});b.classList.add('sel');g.disabled=false;snd('click')}});
@@ -241,7 +240,7 @@ function fdOpen(btn){
 /* --- профиль --- */
 function profile(){BACK=profile;
   var n=ND(),pct=Math.round(n/NT()*100),LV=lvlInfo(S.xp),d=goalDone(),g=S.goal,gp=Math.min(100,Math.round(d/g*100)),f=S.fz;
-  var rows=TOPICS.map(function(t,i){var c=0,l=[];(t.items||[]).forEach(function(x,j){var e=S.es[i+'-'+j]||0;c+=e;if(e>0)l.push({j:j,n:x.n,e:e,ic:x.t==='flash'?'✏️':x.t==='test'?'💻':x.t==='ans'?'🎓':'🚀'})});return{i:i,n:t.n,c:c,l:l}}).filter(function(r){return r.c>0}).sort(function(a,b){return b.c-a.c}),mx=rows.length?rows[0].c:1;
+  var rows=TOPICS.map(function(t,i){var c=0,l=[];(t.items||[]).forEach(function(x,j){var e=S.es[i+'-'+j]||0;c+=e;if(e>0)l.push({j:j,n:x.n,e:e,ic:x.t==='flash'?'✏️':x.t==='test'?'💻':'🚀'})});return{i:i,n:t.n,c:c,l:l}}).filter(function(r){return r.c>0}).sort(function(a,b){return b.c-a.c}),mx=rows.length?rows[0].c:1;
   show(head('Профиль')+
    '<div class="hero"><div class="pav" id="pr" role="button" tabindex="0" aria-label="Погладить кролика">'+rabbit('lie')+'</div><div class="hn"><b class="nmx">'+nk(S.nick)+'</b><div class="lvp"><span class="pill">Уровень '+LV.l+'</span><span class="mu">до '+(LV.l+1)+': ещё '+LV.left+' ⭐</span></div><div class="bar"><i class="grow" style="width:'+LV.p+'%"></i></div></div></div>'+
    '<div class="tiles"><div class="tile"><span>🥕</span><b>'+streakNow()+'</b><small>серия</small></div><div class="tile"><span>🏆</span><b>'+Math.max(S.max,streakNow())+'</b><small>рекорд</small></div><div class="tile"><span>⭐</span><b>'+S.xp+'</b><small>опыта</small></div></div>'+

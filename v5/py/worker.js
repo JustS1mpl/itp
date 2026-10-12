@@ -38,9 +38,8 @@ self.onmessage=async function(e){var m=e.data;
       var f=py.globals.get('_itp_run');res=f(m.code,!m.ask,String(m.seed));try{f.destroy()}catch(x){}
     }catch(err){fail=String(err&&err.message||err)}
     flush();
-    var tu=null;try{tu=py.runPython('_tdump()')}catch(x){}
     try{py.runPython('_itp_reset()')}catch(x){}
     var o=RUN;RUN=null;
-    postMessage({t:'done',err:res===undefined?null:res,fail:fail,over:o.over,used:o.i,tu:tu||null})
+    postMessage({t:'done',err:res===undefined?null:res,fail:fail,over:o.over,used:o.i})
   }
 };
