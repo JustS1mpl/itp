@@ -7,3 +7,7 @@ checks.json
 pyo/
 *.png
 *.bak
+
+!assets/mascot/*.png
+tests/_wav/
+!tests/sound_spectrograms.png

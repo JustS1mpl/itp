@@ -423,6 +423,7 @@ function settings(){
    SR('🔊','Звук','Главный выключатель: выкл — полная тишина',SW('mute',!S.mute))+
    SR('🎚️','Громкость','','<input type="range" min="0" max="100" step="5" value="'+ST('vol')+'" id="vol" aria-label="Громкость">')+
    SR('👆','Звуки интерфейса','Касания, переходы и окна. Ответы, опыт и награды звучат всегда',SW('sfx',ST('sfx')))+
+   SR('⌨️','Звуки набора кода','Очень тихий щелчок клавиш в редакторе',SW('ks',ST('ks')))+
    SR('📳','Вибрация','При ошибке и успехе',SW('vib',ST('vib')))+'</div>';
   h+='<div class="sec">Обучение</div><div class="lst">'+
    SR('🎯','Цель дня','Сколько островков в день',SG('goal',[[1,'1'],[2,'2'],[3,'3']],S.goal))+
@@ -444,12 +445,12 @@ function settings(){
   scr('settings',h,null);HRE=settings;
   $('x').onclick=function(){(SBACK||profile)()};
   function again(){var yy=window.scrollY;KEEPSCR=1;SKEY='settings';settings();window.scrollTo(0,yy)}
-  app.querySelectorAll('.sw').forEach(function(b){b.onclick=function(e){e.stopPropagation();var on=b.getAttribute('aria-checked')!=='true';var k=b.dataset.k;b.setAttribute('aria-checked',on?'true':'false');setSet(k,on?1:0);if(k==='sfx'||k==='mute')snd('click')}});
+  app.querySelectorAll('.sw').forEach(function(b){b.onclick=function(e){e.stopPropagation();var on=b.getAttribute('aria-checked')!=='true';var k=b.dataset.k;b.setAttribute('aria-checked',on?'true':'false');if(!on)snd('off');setSet(k,on?1:0);if(on)snd('on')}});
   /* строку с выключателем можно нажать целиком: так проще попасть пальцем */
   app.querySelectorAll('.li.tg').forEach(function(r){r.onclick=function(e){if(e.target.closest('.sw'))return;var s=r.querySelector('.sw');if(s)s.click()}});
   app.querySelectorAll('.segc button,.swa button').forEach(function(b){b.onclick=function(){var g=b.parentNode;g.querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x===b);x.setAttribute('aria-checked',x===b?'true':'false')});setSet(b.dataset.k,b.dataset.v);snd('click');if(g.classList.contains('segc'))segPos(g,true)}});
   eggBind();
-  var v=$('vol');v.oninput=function(){S.set.vol=+v.value;save()};v.onchange=function(){snd('ok')};
+  var v=$('vol');v.oninput=function(){S.set.vol=+v.value;save();sxVol(VOLK())};v.onchange=function(){snd('ok')};
   app.querySelectorAll('.lst button.li').forEach(function(b){b.onclick=function(){var a=b.dataset.a;
     if(a==='nick')askName('Никнейм',S.nick,function(n){n=Array.from(n).slice(0,20).join('');S.nick=n;save();again();toast('Никнейм изменён')},20);
     else if(a==='bk')backup();
@@ -481,6 +482,6 @@ function chipFx(){
   if(LSK!==null&&s>LSK&&!RM())hs.animate([{transform:'scale(1)'},{transform:'scale(1.25) rotate(-4deg)'},{transform:'scale(1)'}],{duration:520,easing:'cubic-bezier(.3,1.6,.5,1)'});
   if(LXP!==null&&x>LXP){
     var el=hx.querySelector('span:last-child'),a=LXP,t0=performance.now();
-    if(RM())el.textContent=x;else{hx.animate([{transform:'scale(1)'},{transform:'scale(1.18)'},{transform:'scale(1)'}],{duration:600,easing:'cubic-bezier(.3,1.4,.5,1)'});
-    (function st(t){var k=Math.min(1,(t-t0)/700);el.textContent=Math.round(a+(x-a)*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(st)})(t0)}}
+    if(RM()){el.textContent=x;snd('xpt',{k:0})}else{hx.animate([{transform:'scale(1)'},{transform:'scale(1.18)'},{transform:'scale(1)'}],{duration:600,easing:'cubic-bezier(.3,1.4,.5,1)'});
+    var xt=xpTick();(function st(t){var k=Math.min(1,(t-t0)/700),vv=Math.round(a+(x-a)*(1-Math.pow(1-k,3)));el.textContent=vv;xt(vv-a);if(k<1)requestAnimationFrame(st)})(t0)}}
   LSK=s;LXP=x}

@@ -142,10 +142,10 @@ function doneScreen(o){
      тема пройдена или новый уровень звучат через конфетти (там нужный звук выбирает SX.cs) */
   SX.cs=o.tj?'fanfare':(o.lv?'level':'');setTimeout(function(){SX.cs=''},1500);
   if(!o.tj&&!o.lv&&!sndRecent('fanfare',600))snd('done');
-  setTimeout(function(){if(o.x>0)snd('xp')},260);
+  if(RM()&&o.x>0)setTimeout(function(){snd('xpt',{k:0})},260);
   /* опыт «набегает» числом, потом заполняется полоса уровня */
   var n=$('xpn'),t=$('xpt'),x=o.x||0;
-  if(RM()||!x){n.textContent='+'+x}else{var t0=0;setTimeout(function(){t.classList.add('pp');requestAnimationFrame(function st(ts){if(!t0)t0=ts;var k=Math.min(1,(ts-t0)/650);n.textContent='+'+Math.round(x*(1-Math.pow(1-k,3)));if(k<1&&n.isConnected)requestAnimationFrame(st)});sparks(t)},260)}
+  if(RM()||!x){n.textContent='+'+x}else{var t0=0,xt=xpTick();setTimeout(function(){t.classList.add('pp');requestAnimationFrame(function st(ts){if(!t0)t0=ts;var k=Math.min(1,(ts-t0)/650),vv=Math.round(x*(1-Math.pow(1-k,3)));n.textContent='+'+vv;xt(vv);if(k<1&&n.isConnected)requestAnimationFrame(st)});sparks(t)},260)}
   xpStripRun();
   var b=document.querySelector('#dock .btn');if(b)setTimeout(function(){b.focus({preventScroll:true})},60)}
 function sparks(el){

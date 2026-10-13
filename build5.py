@@ -1,6 +1,6 @@
 import re, sys, json, os
 sys.path.insert(0, '.')
-VER = '6.4.0'
+VER = '6.4.2'
 s = open('base43.html', encoding='utf-8').read()
 
 def rep(a, b, n=1):
@@ -161,7 +161,7 @@ rep('g[0]=g[0].replace(/\\B(?=(\\d{3})+(?!\\d))/g,",")', 'g[0]=g[0].replace(/\\B
 exec(open('msgs.py',encoding='utf-8').read())
 # --- вставка ядра и интерфейса
 core = open('v5/a_core.js', encoding='utf-8').read() + '\n' + open('v5/a_sound.js', encoding='utf-8').read() + '\n' + open('v5/a_ui.js', encoding='utf-8').read()
-for extra in ('v5/a_fix.js','v5/a_fix2.js','v5/a_fix3.js','v5/a_fix4.js','v5/a_more.js','v5/a_dev.js','v5/a_img.js','v5/a_py.js','v5/a_ux.js','v5/a_screens.js'):
+for extra in ('v5/a_fix.js','v5/a_fix2.js','v5/a_fix3.js','v5/a_fix4.js','v5/a_more.js','v5/a_dev.js','v5/a_img.js','v5/a_out.js','v5/a_py.js','v5/a_ux.js','v5/a_screens.js'):
     try: core += '\n' + open(extra, encoding='utf-8').read()
     except FileNotFoundError: pass
 anchor = "seedLit();window.addEventListener('resize',function(){if(app.querySelector('.path'))links()});\napplyTheme();"

@@ -55,7 +55,7 @@ function pyExec(code,src){
     function live(){if(src.live&&!job.dead){var n=Date.now();if(n-lt<30)return;lt=n;try{src.live(raw)}catch(e){}}}
     function addRaw(s){
       if(skip>0){if(s.length<=skip){skip-=s.length;return}s=s.slice(skip);skip=0}
-      D+=s.length;if(cut)return;
+      D+=s.length;if(src.sink){src.sink(s);return}if(cut)return;
       if(raw.length+s.length>CAP){raw+=s.slice(0,CAP-raw.length);cut=true}else raw+=s}
     function result(extra){
       var o=stdout;marks.slice().reverse().forEach(function(m){o=o.slice(0,m[0])+o.slice(m[0]+m[1])});
