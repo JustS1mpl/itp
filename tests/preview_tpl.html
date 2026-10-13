@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ИТП — прослушивание звуков</title>
+<style>
+:root{--bg:#fbf7f5;--fg:#2a2326;--mu:#75686d;--card:#fff;--ln:#e6dcd8;--ac:#2b8420;color-scheme:light dark}
+@media(prefers-color-scheme:dark){:root{--bg:#171315;--fg:#f1e9e6;--mu:#a99ca1;--card:#221c1f;--ln:#372e32;--ac:#6fcf62}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:16px}
+main{max-width:720px;margin:0 auto}
+h1{font-size:22px;margin:8px 0 4px}h2{font-size:15px;margin:22px 0 8px;color:var(--mu);text-transform:uppercase;letter-spacing:.04em}
+p{margin:4px 0;color:var(--mu);font-size:14px}
+.bar{position:sticky;top:0;background:var(--bg);padding:10px 0;border-bottom:1px solid var(--ln);z-index:2;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.bar label{display:flex;align-items:center;gap:8px;font-size:14px}
+input[type=range]{width:180px;accent-color:var(--ac)}
+.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
+button{font:inherit;text-align:left;background:var(--card);color:var(--fg);border:1px solid var(--ln);border-radius:12px;padding:10px 12px;cursor:pointer;min-height:48px}
+button:active{transform:scale(.98)}
+button b{display:block;font-weight:600}button small{color:var(--mu);font-size:12.5px}
+button.d{border-color:var(--ac)}
+</style>
+</head>
+<body>
+<main>
+<h1>Звуки ИТП: прослушивание</h1>
+<p>Только для проверки. Звук синтезируется кодом, тем же, что лежит в приложении (v5/a_sound.js). Под названием: пик в дБ от полной шкалы и длительность до уровня −50 дБ от собственного пика (считаются отрисовкой без динамиков, без случайных вариаций). Громкость 70 % — как у приложения по умолчанию.</p>
+<div class="bar">
+  <label>Громкость <input type="range" id="vol" min="0" max="100" step="5" value="70" aria-label="Громкость"> <span id="vv">70 %</span></label>
+  <label><input type="checkbox" id="det"> без случайных вариаций</label>
+</div>
+<div id="gr"></div>
+</main>
+<script>
+/*@ENGINE@*/
+var GR=[
+ ['Касания и клавиатура',[['tap','Касание кнопки'],['tap','Нижняя панель: раздел 1',{nav:0}],['tap','Нижняя панель: раздел 2',{nav:1}],['tap','Нижняя панель: раздел 3',{nav:2}],['tap','Нижняя панель: раздел 4',{nav:3}],['tick','Лёгкий тик'],['on','Переключатель: включено'],['off','Переключатель: выключено'],['lock','Закрытый островок'],['key','Печать в редакторе (буква)',{k:0}],['key','Печать: пробел, Enter',{k:1}]]],
+ ['Окна и переходы',[['open','Окно открывается'],['close','Окно закрывается'],['go','Переход вперёд'],['back','Переход назад'],['unlock','Островок открылся'],['disk','Дискета достижения']]],
+ ['Ответы и подсказки',[['ok','Верно'],['solve','Все тесты пройдены'],['bad','Неверно'],['hint','Подсказка'],['theory','Теория прочитана']]],
+ ['Опыт, серия, награды',[['xpt','Опыт: шаг 1',{k:0}],['xpt','Опыт: шаг 3',{k:2}],['xpt','Опыт: шаг 6 (предел)',{k:5}],['done','Островок пройден'],['level','Новый уровень'],['fanfare','Тема пройдена'],['streak','Серия продолжается'],['freeze','Заморозка серии'],['ach','Достижение'],['pet','Погладить кролика']]],
+ ['Запуск кода',[['run','Запуск программы'],['err','Ошибка в программе']]]
+];
+var DEMOS=[
+ ['Восемь быстрых касаний подряд',function(){for(var i=0;i<8;i++)(function(i){setTimeout(function(){P('tap')},i*70)})(i)}],
+ ['Нижняя панель: 1 → 2 → 3 → 4',function(){for(var i=0;i<4;i++)(function(i){setTimeout(function(){P('tap',{nav:i})},i*260)})(i)}],
+ ['Счёт опыта, 14 тиков',function(){for(var i=0;i<14;i++)(function(i){setTimeout(function(){P('xpt',{k:i})},i*50)})(i)}],
+ ['Урок: ошибка → подсказка → верно → островок → опыт',function(){var q=[[0,'bad'],[900,'hint'],[1800,'ok'],[2800,'done']];q.forEach(function(e){setTimeout(function(){P(e[1])},e[0])});for(var i=0;i<10;i++)(function(i){setTimeout(function(){P('xpt',{k:i})},3300+i*55)})(i)}],
+ ['Достижение сразу за верным ответом',function(){P('ok');setTimeout(function(){P('ach')},180)}],
+ ['Переключатели: выкл → вкл',function(){P('off');setTimeout(function(){P('on')},400)}]
+];
+var vol=document.getElementById('vol'),vv=document.getElementById('vv'),det=document.getElementById('det');
+function P(n,a){
+  if(!sxEnsure())return;
+  SX.vol=sxGain(+vol.value);sxVol();
+  if(SX.x)SX.x.det=det.checked;
+  sxPlay(n,a)}
+vol.oninput=function(){vv.textContent=vol.value+' %';sxVol(sxGain(+vol.value))};
+function stat(n,a,el){
+  sxRender(n,a,44100).then(function(b){
+    if(!b)return;var pk=0,last=0;
+    for(var i=0;i<b.length;i++){var s=Math.abs(b[i]);if(s>pk)pk=s}
+    for(i=0;i<b.length;i++)if(Math.abs(b[i])>pk*.00316)last=i
+    el.textContent='пик '+(20*Math.log10(pk+1e-9)).toFixed(1)+' дБ · '+Math.round(last/44.1)+' мс'})}
+var h='';
+GR.forEach(function(g,gi){h+='<h2>'+g[0]+'</h2><div class="g">';g[1].forEach(function(s,i){h+='<button data-g="'+gi+'" data-i="'+i+'"><b>'+s[1]+'</b><small></small></button>'});h+='</div>'});
+h+='<h2>Сценарии</h2><div class="g">';DEMOS.forEach(function(d,i){h+='<button class="d" data-d="'+i+'"><b>'+d[0]+'</b></button>'});h+='</div>';
+document.getElementById('gr').innerHTML=h;
+document.querySelectorAll('button[data-g]').forEach(function(b){
+  var s=GR[+b.dataset.g][1][+b.dataset.i];stat(s[0],s[2],b.querySelector('small'));
+  b.onclick=function(){P(s[0],s[2])}});
+document.querySelectorAll('button[data-d]').forEach(function(b){b.onclick=function(){DEMOS[+b.dataset.d][1]()}});
+document.addEventListener('visibilitychange',function(){if(document.hidden)sxHide();else sxShow()});
+</script>
+</body>
+</html>

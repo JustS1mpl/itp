@@ -2,7 +2,7 @@
 liveRun=function(code){
   var o=$('o'),ir=$('ir'),ii=$('ii'),rs=$('rst'),rb=$('run');o.style.display='block';o.textContent='';ir.classList.remove('on');
   function st(t,c){if(rs){rs.hidden=!t;rs.textContent=t||'';rs.className='mu rst'+(c?' '+c:'')}}
-  var le=lint(code);if(le){o.textContent='SyntaxError: '+le;st('✗ Программа не запущена: исправь ошибку в коде','bad');return}
+  var le=lint(code);if(le){o.textContent='SyntaxError: '+le;st('✗ Программа не запущена: исправь ошибку в коде','bad');snd('err');return}
   st('⏳ Программа выполняется…');
   var pend=null,oc=rb?rb.onclick:null,lab=rb?rb.innerHTML:'',myT=TK+1,done=false;
   function restore(){if(rb){rb.innerHTML=lab;rb.classList.remove('stp');rb.onclick=oc}}
@@ -15,6 +15,7 @@ liveRun=function(code){
     ir.onsubmit=function(e){e.preventDefault();if(!ir.classList.contains('on'))return;ir.classList.remove('on');pend=null;st('⏳ Программа выполняется…');r(ii.value)};
   })}}).then(function(r){
     done=true;V.freeze();restore();ir.classList.remove('on');
+    if(r.err&&!r.stopped)snd('err');
     var tail=r.stopped?'⏹ Программа остановлена вручную':(r.err?fixErr(r.err,code):'');
     if(!used&&r.raw)V.push(r.raw);
     var tx=V.text();

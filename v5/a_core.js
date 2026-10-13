@@ -1,5 +1,5 @@
 /* ===================== ИТП — ядро: настройки, сохранение, звук, серия, цели, достижения ===================== */
-function defset(){return{acc:'',tz:100,anim:'full',vol:70,sfx:1,vib:1,emo:1,ty:1,toc:1,rep:1,ln:1,ac:1,cf:15,gc:1,lg:1,bg:1,sh:'v',fl:'tilt'}}
+function defset(){return{acc:'',tz:100,anim:'full',vol:70,sfx:1,vib:1,emo:1,ty:1,toc:1,rep:1,ln:1,ac:1,cf:15,gc:1,lg:1,bg:1,ks:0,sh:'v',fl:'tilt'}}
 function ST(k){return S.set&&S.set[k]!==undefined?S.set[k]:defset()[k]}
 function RM(){return ST('anim')==='off'||matchMedia('(prefers-reduced-motion:reduce)').matches}
 function pad2(n){return(n<10?'0':'')+n}
@@ -31,7 +31,7 @@ function clean(r){
   var pick=function(k,list){q[k]=list.indexOf(s[k])>=0?s[k]:defset()[k]},bl=function(k){q[k]=s[k]===0||s[k]===false?0:(s[k]===1||s[k]===true?1:defset()[k])};
   pick('acc',['','carrot','pink','blue','violet']);pick('tz',[90,100,115,130]);pick('anim',['full','less','off']);pick('cf',[13,15,17,19]);pick('sh',['v','h']);pick('fl',['tilt','flat']);
   q.vol=typeof s.vol==='number'&&s.vol>=0&&s.vol<=100?Math.round(s.vol):defset().vol;
-  ['sfx','vib','emo','ty','toc','rep','ln','ac','gc','lg','bg'].forEach(bl);
+  ['sfx','vib','emo','ty','toc','rep','ln','ac','gc','lg','bg','ks'].forEach(bl);
   o.set=q;
   o.goal=[1,2,3].indexOf(r.goal)>=0?r.goal:1;
   var gm={},c=0,TM=day(ago(-1));if(r.gm&&typeof r.gm==='object'&&!Array.isArray(r.gm))Object.keys(r.gm).sort().reverse().forEach(function(k){if(c<70&&vdate(k)&&k<=TM&&r.gm[k]){gm[k]=1;c++}});o.gm=gm;
@@ -96,7 +96,7 @@ function fx(ok,kind){
   if(!RM())vg.animate([{opacity:0},{opacity:.7},{opacity:0}],{duration:800});
   if(!ok){vib([60,40,60]);if(!RM())app.animate([{transform:'translateX(0)'},{transform:'translateX(-7px)'},{transform:'translateX(6px)'},{transform:'translateX(-4px)'},{transform:'translateX(0)'}],{duration:380})}
 }
-function toggleMute(){S.mute=S.mute?0:1;save();if(HRE)HRE();toast(S.mute?'Звук выключен':'Звук включён');snd('ok')}
+function toggleMute(){if(!S.mute)snd('off');S.mute=S.mute?0:1;save();if(HRE)HRE();toast(S.mute?'Звук выключен':'Звук включён');if(!S.mute)snd('on')}
 /* --- очередь уведомлений --- */
 var TQ=[],TB=false;
 function toast(t,cls,a){TQ.push([t,cls,a]);if(!TB)tnext()}
