@@ -39,7 +39,8 @@ with sync_playwright() as p:
     pg.evaluate(DONE % 4); pg.wait_for_timeout(300)
     ok(pg.locator('.fin .rw.rolled').count() == 1 and pg.locator('.fin .rw').count() == 1, '4 ошибки и больше: один «закатил глаза», ликующего нет')
     pg.evaluate("profile()"); pg.wait_for_timeout(300)
-    ok(pg.locator('.rw').count() == 0 and pg.locator('.pav .pi').count() == 1, 'профиль: вместо кролика иконка профиля, реакции на нажатие нет')
+    ok(pg.locator('.hero .pav .rw.eat').count() == 1 and pg.locator('.hero .pav .pi').count() == 0 and pg.locator('button.pav').count() == 0, 'профиль: кролик в шапке (LoveCarrot), без реакции на нажатие')
+    ok(pg.evaluate("document.documentElement.dataset.ph") == 'card', 'шапка профиля по умолчанию: «Карточка»')
     pg.evaluate("home()"); pg.wait_for_timeout(300)
     ok(pg.locator('.gcard .rw').count() == 0 and pg.locator('.gcard .ring').count() == 1, 'карточка дня: без кролика, кольцо цели')
     # --- хмурый: только первая ошибка в серии, потом без спрайта, без повторных анимаций
