@@ -122,7 +122,6 @@ html.scr .top{box-shadow:0 1px 0 var(--line)}
 .top h1{flex:1 1 auto;min-width:0;font-size:1.1875rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .logo{display:inline-flex;align-items:center;gap:7px;height:44px;margin-left:-8px;padding:0 10px 0 8px;border:0;background:none;border-radius:var(--r-sm);font-weight:900;font-size:1.25rem;letter-spacing:-.02em;color:var(--ink);transition:background var(--d2),transform var(--d1)}
 .logo svg{flex:none;display:block}
-.logo .lgc{width:14px;height:14px;color:var(--muted);transition:transform var(--d3) var(--e-spring)}
 .logo:active{transform:scale(.96)}
 .chips{display:flex;gap:6px;align-items:center;flex:none}
 .chip{position:relative;display:inline-flex;align-items:center;gap:5px;height:36px;padding:0 12px 0 9px;background:var(--card);border:1px solid var(--line);border-radius:var(--pill);font-weight:800;font-size:.9375rem;white-space:nowrap;color:var(--ink);box-shadow:var(--sh1);transition:transform var(--d1),background var(--d2)}
@@ -864,7 +863,6 @@ html.tt *,html.tt *::before,html.tt *::after{transition:background-color .35s,bo
 /* наведение только там, где оно есть: на телефоне после нажатия ничего не «залипает» */
 @media (hover:hover){
 .logo:hover{background:var(--card2)}
-.logo:hover .lgc{transform:rotate(60deg)}
 .nav button:hover .ni{background:var(--card2)}
 .btn:hover{filter:brightness(1.05)}
 .icon:hover{background:var(--card2)}
@@ -898,7 +896,7 @@ button.li:hover{background:var(--card2)}
  .tiles{gap:8px}.tile{padding:10px 12px;gap:10px}
  .q{font-size:1.1875rem}
 }
-@media (max-width:340px){.logo .lgc{display:none}.logo{gap:5px}.chip{font-size:.8125rem;padding:0 8px 0 6px}.chip .fzm{padding-left:5px;margin-left:1px}}
+@media (max-width:340px){.logo{gap:5px}.chip{font-size:.8125rem;padding:0 8px 0 6px}.chip .fzm{padding-left:5px;margin-left:1px}}
 @media (min-width:900px){
  :root{--rail:96px}
  .nav{left:0;right:auto;top:0;bottom:0;width:var(--rail);height:auto;flex-direction:column;justify-content:flex-start;gap:6px;padding:calc(20px + var(--safe-t)) 8px 20px;border-top:0;border-right:1px solid var(--line);transform:translateX(-110%)}
@@ -937,3 +935,6 @@ html.scr .top{box-shadow:inset 0 -1px 0 var(--gl-rim),0 10px 24px -14px var(--gl
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.top,.dock{background:var(--bg)}.nav{background:var(--card)}}
 @supports not (background:color-mix(in srgb,red,blue)){.top,.dock{background:var(--bg)}.nav{background:var(--card)}body::before{display:none}.nav button.act .ni{background:var(--soft)}}
 @media (prefers-reduced-transparency:reduce){.top,.dock{background:var(--bg);-webkit-backdrop-filter:none;backdrop-filter:none}.nav{background:var(--card);-webkit-backdrop-filter:none;backdrop-filter:none}body::before{display:none}}
+/* настройки: логотип в шапке и цветные пятна на фоне */
+html.nolg .logo>svg{display:none}
+html.nobg body::before{display:none}

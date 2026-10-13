@@ -39,7 +39,7 @@ function scr(key,h,tab){SKEY=key;show(h,tab)}
 /* --- шапка: «ИТП» слева открывает настройки, справа серия и опыт --- */
 function head(){
   var f=S.fz.n,s=streakNow();
-  return'<div class="top"><button class="logo" id="ttl" aria-label="ИТП. Открыть настройки">'+LOGO+'<span class="lgw">ИТП</span>'+ico('gear','lgc')+'</button><div class="chips"><button class="chip" id="hs" aria-label="Серия: '+s+' '+pl(s,['день','дня','дней'])+(f?', заморозок: '+f:'')+'">🥕 <span>'+s+'</span>'+(f?'<span class="fzm">❄️'+f+'</span>':'')+'</button><button class="chip" id="hx" aria-label="Опыт: '+S.xp+'">⭐ <span>'+S.xp+'</span></button></div></div>'}
+  return'<div class="top"><button class="logo" id="ttl" aria-label="ИТП. Открыть настройки">'+LOGO+'<span class="lgw">ИТП</span>'+'</button><div class="chips"><button class="chip" id="hs" aria-label="Серия: '+s+' '+pl(s,['день','дня','дней'])+(f?', заморозок: '+f:'')+'">🥕 <span>'+s+'</span>'+(f?'<span class="fzm">❄️'+f+'</span>':'')+'</button><button class="chip" id="hx" aria-label="Опыт: '+S.xp+'">⭐ <span>'+S.xp+'</span></button></div></div>'}
 function ttl(t,sub){return'<div class="ttl"><div><h1>'+esc(t)+'</h1>'+(sub?'<p class="mu">'+sub+'</p>':'')+'</div></div>'}
 function bindHead(re){
   HRE=re;$('hs').onclick=streakSheet;$('hx').onclick=levelSheet;chipFx();
@@ -413,7 +413,9 @@ function settings(){
    SR('🔤','Размер текста','',SG('tz',[[90,'Мелкий'],[100,'Обычный'],[115,'Крупный'],[130,'Огромный']],ST('tz')))+
    SR('✨','Анимации','«Выкл» подойдёт слабым устройствам и тем, кого они отвлекают',SG('anim',[['full','Все'],['less','Меньше'],['off','Выкл']],ST('anim')))+
    SR('😀','Смайлики Windows 11','Встроены и выглядят одинаково на всех устройствах',SW('emo',ST('emo')))+
-   SR('🎉','Конфетти','Салют, когда тема пройдена',SW('gc',ST('gc')))+'</div>';
+   SR('🎉','Конфетти','Салют, когда тема пройдена',SW('gc',ST('gc')))+
+   SR('🏷️','Логотип в шапке','Выкл: останется только надпись ИТП',SW('lg',ST('lg')))+
+   SR('🌈','Цветные пятна на фоне','Мягкая подсветка за интерфейсом. Выкл: ровный фон',SW('bg',ST('bg')))+'</div>';
   h+='<div class="sec">Полка достижений</div><div class="lst">'+
    SR('🗄️','Когда дискет много','',SG('sh',[['v','Вторая полка ниже'],['h','Листать вбок']],ST('sh')))+
    SR('💾','Вид дискет','',SG('fl',[['tilt','Объёмные'],['flat','Плоские']],ST('fl')))+'</div>';
