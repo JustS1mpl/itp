@@ -175,7 +175,7 @@ function ity(it){return ITY[it.t]||['a','⭐','Островок']}
 function island(i,j,n){
   var k=i+'-'+j,it=IT(i,j),d=S.d[k],op=isOpen(i,j),c=cur()===k,nx=!c&&!d&&nxI(i,j),wt=j>0&&S.d[i+'-'+(j-1)]&&!LIT[i+'-'+(j-1)];
   var ty=ity(it),lb=it.n||'',off=[0,46,0,-46][j%4],st=d?'пройдено':(op?(c?'ты здесь':'открыто'):'закрыто');
-  return'<div class="ilw'+(wt?' wait':'')+(c?' cu':'')+'" style="--n:'+Math.min(n||0,9)+';transform:translateX('+off+'px)">'+(c?'<div class="flag" aria-hidden="true">'+(TOPICS[i].intro?'Начни здесь':'Ты здесь')+'</div>':'')+'<button class="isl ty-'+ty[0]+' '+(d?'dn':(op?'op':'lk'))+(c?' cur':'')+(nx?' nx':'')+'" data-i="'+i+'" data-j="'+j+'" aria-label="'+esc(ty[2]+': '+lb+' ('+st+')')+'"'+(c?' aria-current="step"':'')+'>'+HEX+'<span class="ic">'+ty[1]+'</span>'+(d?'<i class="bd ok"></i>':(op?'':'<i class="bd">🔒</i>'))+'</button><div class="mu">'+esc(lb)+(it.t==='project'?'<br><small>'+(S.at[k]==='skip'?'пропущен':'по желанию')+'</small>':'')+'</div></div>'}
+  return'<div class="ilw'+(wt?' wait':'')+(c?' cu':'')+'" style="--n:'+Math.min(n||0,9)+';transform:translateX('+off+'px)">'+(c?'<div class="flag" aria-hidden="true">'+(TOPICS[i].intro?'Начни здесь':'🚩 Ты остановился здесь')+'</div>':'')+'<button class="isl ty-'+ty[0]+' '+(d?'dn':(op?'op':'lk'))+(c?' cur':'')+(nx?' nx':'')+'" data-i="'+i+'" data-j="'+j+'" aria-label="'+esc(ty[2]+': '+lb+' ('+st+')')+'"'+(c?' aria-current="step"':'')+'>'+HEX+'<span class="ic">'+ty[1]+'</span>'+(d?'<i class="bd ok"></i>':(op?'':'<i class="bd">🔒</i>'))+'</button><div class="mu">'+esc(lb)+(it.t==='project'?'<br><small>'+(S.at[k]==='skip'?'пропущен':'по желанию')+'</small>':'')+'</div></div>'}
 /* сколько читать теорию: по объёму текста, примерно 160 слов в минуту */
 function readMin(it){var t=String(it.html||'').replace(/<pre[\s\S]*?<\/pre>/g,' ').replace(/<[^>]+>/g,' '),w=t.split(/\s+/).filter(Boolean).length,c=(String(it.html||'').match(/<pre>/g)||[]).length;return Math.max(1,Math.round(w/160+c*.25))}
 function goalCard(all){
@@ -409,6 +409,7 @@ function settings(){
   var h='<div class="top ls"><button class="icon" id="x" aria-label="Назад">'+ico('back')+'</button><h1>Настройки</h1></div>';
   h+='<div class="sec">Внешний вид</div><div class="lst">'+
    SR('🎨','Тема','',SG('theme',[['','Авто'],['light','Светлая'],['dark','Тёмная']],S.theme))+
+   SR('🤍','Минимализм','Плоский спокойный вид, как в прошлой версии: без стекла, цветных пятен и логотипа',SW('mn',ST('mn')))+
    SR('🖌️','Цвет акцента','Кнопки, полоски, выделение','<div class="swa" role="radiogroup" aria-label="Цвет акцента">'+[['','#2B8420','Зелёный'],['carrot','#F08C1A','Морковный'],['pink','#C73B63','Розовый'],['blue','#2563D0','Синий'],['violet','#6C4BD6','Фиолетовый']].map(function(c){var on=ST('acc')===c[0];return'<button role="radio" aria-checked="'+on+'" data-k="acc" data-v="'+c[0]+'" style="background:'+c[1]+'" class="'+(on?'on':'')+'" aria-label="'+c[2]+'"></button>'}).join('')+'</div>')+
    SR('🔤','Размер текста','',SG('tz',[[90,'Мелкий'],[100,'Обычный'],[115,'Крупный'],[130,'Огромный']],ST('tz')))+
    SR('✨','Анимации','«Выкл» подойдёт слабым устройствам и тем, кого они отвлекают',SG('anim',[['full','Все'],['less','Меньше'],['off','Выкл']],ST('anim')))+

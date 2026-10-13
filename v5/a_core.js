@@ -1,5 +1,5 @@
 /* ===================== ИТП — ядро: настройки, сохранение, звук, серия, цели, достижения ===================== */
-function defset(){return{acc:'',tz:100,anim:'full',vol:70,sfx:1,vib:1,emo:1,ty:1,toc:1,rep:1,ln:1,ac:1,cf:15,gc:1,lg:1,bg:1,ks:0,ph:'card',sh:'v',fl:'tilt'}}
+function defset(){return{acc:'',tz:100,anim:'full',vol:70,sfx:1,vib:1,emo:1,ty:1,toc:1,rep:1,ln:1,ac:1,cf:15,gc:1,lg:1,bg:1,ks:0,mn:0,ph:'card',sh:'v',fl:'tilt'}}
 function ST(k){return S.set&&S.set[k]!==undefined?S.set[k]:defset()[k]}
 function RM(){return ST('anim')==='off'||matchMedia('(prefers-reduced-motion:reduce)').matches}
 function pad2(n){return(n<10?'0':'')+n}
@@ -31,7 +31,7 @@ function clean(r){
   var pick=function(k,list){q[k]=list.indexOf(s[k])>=0?s[k]:defset()[k]},bl=function(k){q[k]=s[k]===0||s[k]===false?0:(s[k]===1||s[k]===true?1:defset()[k])};
   pick('acc',['','carrot','pink','blue','violet']);pick('tz',[90,100,115,130]);pick('anim',['full','less','off']);pick('cf',[13,15,17,19]);pick('sh',['v','h']);pick('ph',['card','corner','pop']);pick('fl',['tilt','flat']);
   q.vol=typeof s.vol==='number'&&s.vol>=0&&s.vol<=100?Math.round(s.vol):defset().vol;
-  ['sfx','vib','emo','ty','toc','rep','ln','ac','gc','lg','bg','ks'].forEach(bl);
+  ['sfx','vib','emo','ty','toc','rep','ln','ac','gc','lg','bg','ks','mn'].forEach(bl);
   o.set=q;
   o.goal=[1,2,3].indexOf(r.goal)>=0?r.goal:1;
   var gm={},c=0,TM=day(ago(-1));if(r.gm&&typeof r.gm==='object'&&!Array.isArray(r.gm))Object.keys(r.gm).sort().reverse().forEach(function(k){if(c<70&&vdate(k)&&k<=TM&&r.gm[k]){gm[k]=1;c++}});o.gm=gm;
@@ -52,7 +52,7 @@ function applyPrefs(){
   r.setAttribute('data-theme',th);
   if(ST('acc'))r.setAttribute('data-acc',ST('acc'));else r.removeAttribute('data-acc');
   r.style.setProperty('--tz',ST('tz')/100);r.style.setProperty('--cf',ST('cf')+'px');
-  r.setAttribute('data-anim',ST('anim'));r.setAttribute('data-fl',ST('fl'));r.classList.toggle('noln',!ST('ln'));r.setAttribute('data-ph',ST('ph'));r.classList.toggle('nolg',!ST('lg'));r.classList.toggle('nobg',!ST('bg'));
+  r.setAttribute('data-anim',ST('anim'));r.setAttribute('data-fl',ST('fl'));r.classList.toggle('noln',!ST('ln'));r.setAttribute('data-ph',ST('ph'));r.classList.toggle('nolg',!ST('lg'));r.classList.toggle('min',!!ST('mn'));r.classList.toggle('nobg',!ST('bg'));
   var m=document.querySelector('meta[name=theme-color]');if(!m){m=document.createElement('meta');m.name='theme-color';document.head.appendChild(m)}
   m.content=th==='dark'?'#171315':'#FBF7F5';
 }

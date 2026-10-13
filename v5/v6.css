@@ -953,3 +953,28 @@ html[data-ph=pop] .hero{margin-top:72px}
 html[data-ph=pop] .pav{width:120px;height:108px;overflow:visible}
 html[data-ph=pop] .pav .rw{position:absolute;left:50%;bottom:5px;width:116px;margin:0 0 0 -58px}
 @media (max-width:360px){html[data-ph=card] .hero{padding-left:122px}html[data-ph=card] .pav{width:110px}html[data-ph=card] .pav .rw{width:106px}html[data-ph=corner] .hero{padding-right:128px}html[data-ph=corner] .pav{width:120px}html[data-ph=corner] .pav .rw{width:114px}}
+/* заголовок темы: плоская строка с цветной полоской слева (одинаково в обычном виде и в минимализме) */
+.thead,.thead.now{background:var(--card);border:0;border-left:4px solid var(--line2);border-radius:var(--r);box-shadow:none}
+.thead.now{border-left-color:var(--accent)}
+.thead.done{border-left-color:var(--accent)}
+.thead .tn,.thead.now .tn,.thead.done .tn{background:none;box-shadow:none;color:var(--muted);width:32px}
+.thead.now .tn{color:var(--ink)}
+.thead .ring::before,.thead.now .ring::before{background:var(--card)}
+/* ---------- Минимализм (настройка «Минимализм»): плоский вид, близкий к прошлой версии. Ничего не удаляет, только перекрывает оформление ---------- */
+html.min body::before,html.min body::after{display:none}
+html.min .top,html.min .nav,html.min .dock{background:var(--bg);-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none}
+html.min .top,html.min .dock{border-bottom:1px solid var(--line)}
+html.min .dock{border-bottom:0;border-top:1px solid var(--line)}
+html.min .nav{background:var(--card);border-top:1px solid var(--line)}
+html.min .logo>svg{display:none}
+html.min .nav button.act .ni{background:none;box-shadow:none}
+html.min .nav button.act::after{content:'';position:absolute;left:50%;bottom:0;width:30px;height:3px;margin-left:-15px;border-radius:2px;background:var(--accent)}
+html.min .isl .bd.ok{background:var(--gold);color:#3A2A00;box-shadow:0 0 0 2.5px var(--bg)}
+html.min .isl.cur::before{opacity:.22;animation:none}
+html.min .gcard,html.min .card,html.min .lst{box-shadow:none}
+/* плашка «Ты остановился здесь»: контрастная (светлая в тёмной теме, тёмная в светлой), с флажком, слегка покачивается */
+.flag{background:var(--ink);color:var(--bg);border:0;gap:6px;padding:0 14px 0 10px;transform-origin:50% 130%;animation:flagsway 3.4s ease-in-out infinite}
+.flag::after{background:var(--ink);border:0;width:10px;height:10px;bottom:-4px}
+.flag .em{width:1rem;height:1rem;flex:none}
+@keyframes flagsway{0%,100%{transform:translateX(-50%) rotate(-2.5deg)}50%{transform:translateX(-50%) rotate(2.5deg) translateY(-2px)}}
+
