@@ -416,6 +416,7 @@ html.noln .gt{display:none}
 /* тень стоит точно под лапами: центр и ширина измерены по нижним 10 % непрозрачных строк каждого спрайта (проверяет tests/sprites6.py) */
 :root:not([data-theme=dark]) .rw.im.eat::after{left:3%;right:33%}
 :root:not([data-theme=dark]) .rw.im.happy::after{left:32%;right:17%}
+:root:not([data-theme=dark]) .rw.im.rolled::after{left:19%;right:21%}
 .center .rw.im{width:min(210px,56vw)}
 /* светлая тема: пятно, контур и мягкая тень только здесь; тёмная тема не меняется */
 .emp-rb{margin:0 auto 6px}.emp-rb .rw{width:min(150px,44vw)}

@@ -28,7 +28,7 @@ function ico(n,cls){return'<svg class="'+(cls||'')+'" viewBox="0 0 24 24" width=
 var LOGO='<svg width="28" height="24" viewBox="4 10 84 60" aria-hidden="true" focusable="false"><path d="M9 34 L27 54 L65 54 L83 34 L83 46 L65 66 L27 66 L9 46 Z" fill="var(--accent-d)" stroke="var(--accent-d)" stroke-width="7" stroke-linejoin="round"/><path d="M9 34 L27 14 L65 14 L83 34 L65 54 L27 54 Z" fill="var(--accent)" stroke="var(--accent)" stroke-width="7" stroke-linejoin="round"/><path d="M36 26 L47 34 L36 42 M52 43 H62" fill="none" stroke="var(--on)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
 /* --- кролик (картинка встроена в файл) --- */
-function rabbit(st){var s=IMG[st]||(st==='rolled'?IMG.grump:IMG.eat);return'<div class="rw im '+st+'"><img src="'+s+'" alt="" draggable="false"></div>'}
+function rabbit(st){var s=IMG[st]||(st==='rolled'?IMG.grumpfull||IMG.grump:IMG.eat);return'<div class="rw im '+st+'"><img src="'+s+'" alt="" draggable="false"></div>'}
 /* окончания по выбранному обращению: m — парень, f — девушка, n — нейтрально (если не указано) */
 function G(m,f,n){return S.g==='f'?f:S.g==='m'?m:(n===undefined?m:n)}
 function tabFn(){return({home:home,pr:practice,ed:editor,prof:profile})[CURTAB]||home}

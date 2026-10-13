@@ -86,7 +86,7 @@ with sync_playwright() as p:
     from PIL import Image
     import numpy as np
     pg.evaluate("S.theme='light';applyPrefs()")
-    for st, fn in (('eat', 'lovecarrot'), ('happy', 'cheer')):
+    for st, fn in (('eat', 'lovecarrot'), ('happy', 'cheer'), ('rolled', 'grump')):
         a = np.array(Image.open('assets/mascot/%s.webp' % fn).convert('RGBA'))[:, :, 3] > 40
         H, W = a.shape; y1 = np.nonzero(a)[0].max(); xx = np.nonzero(a[int(y1 - .1 * H):y1 + 1])[1]
         fc, fw = (xx.min() + xx.max()) / 2 / W, (xx.max() - xx.min()) / W
