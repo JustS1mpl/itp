@@ -7,3 +7,5 @@ checks.json
 pyo/
 *.png
 *.bak
+
+!assets/mascot/*.png
