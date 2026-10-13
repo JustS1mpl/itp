@@ -402,6 +402,9 @@ function SR(ic,t,sub,ctl,a){var blk=ctl&&/segc|swa|type="range"/.test(ctl),sw=ct
 function setSet(k,v){
   if(k==='theme'){themeFx();S.theme=v}else if(k==='mute'){S.mute=v?0:1}else if(k==='goal'){S.goal=+v}else if(k==='g'){S.g=v}else if(k==='hc'){S.hc=v?0:1}
   else{S.set[k]=(typeof v==='number'||typeof v==='boolean')?v:(/^\d+$/.test(v)?+v:v)}
+  if(k==='mn'){/* минимализм при включении выключает логотип и пятна, при выключении возвращает; дальше каждое можно переключить отдельно */
+    S.set.lg=S.set.bg=v?0:1;
+    ['lg','bg'].forEach(function(q){var b=document.querySelector('.sw[data-k="'+q+'"]');if(b)b.setAttribute('aria-checked',v?'false':'true')})}
   save();applyPrefs();
   if(k==='emo'){if(ST('emo')){emoLoad();if(EM.map)emoOn()}else emoOff()}
   if(k==='goal')goalCheck()}
