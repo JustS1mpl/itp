@@ -1,44 +1,39 @@
-/* ===================== ИТП 6.4.2 — звуковой дизайн «тихая клавиатура» =====================
+/* ===================== ИТП 6.4.6 — звуки в стиле Discord и Telegram =====================
    Ни одного звукового файла, сэмпла или модели: всё синтезируется кодом (Web Audio) в этом модуле.
-   Образ: тихая смазанная механическая клавиатура с глушащим корпусом. Короткий круглый «тхок» и совсем мягкий «тик»,
-   без резкого щелчка и без дребезга.
+   Образ: чистые синусы без «стуков» и шума, ноты от соль малой до до третьей октавы, простые интервалы (квинта, кварта, октава),
+   двух-трёхнотные фразы. Вверх — включить, верно, награда; вниз — выключить, ошибка. Основа — замеры настоящих звуков
+   Discord и Telegram (частоты, интервалы, обертоны), но мелодии и ноты свои; записи не используются. Звуки выбраны по оценкам
+   владельца из двух наборов (A Discord, B Telegram); где понравились оба, они ЧЕРЕДУЮТСЯ (случайно, но не один и тот же дважды подряд).
+   Все ноты берутся из одного строя: до-мажорная пентатоника (до, ре, ми, соль, ля), поэтому любые два звука подряд не диссонируют.
+   Переходы между экранами без звука. Одна «нижняя панель» для всех разделов.
 
-   Три «кирпичика», из них собран каждый звук (раздел ENGINE ниже):
-     sxThock  — клавишный щелчок: шумовой всплеск 5–15 мс (полоса 1–3 кГц, потом срез) + затухающий «корпус»
-                (синус и немного треугольника 150–400 Гц, спад 30–80 мс, лёгкое падение тона);
-     sxPluck  — мягкая мелодическая нота (глухая маримба / калимба): синус + тихие обертоны + крошечный «стук молоточка»
-                из того же шума, чтобы мелодии были «из того же материала», что и клавиши;
-     sxAir    — «воздух»: колоколообразный всплеск шума под 200 мс, еле слышный.
-   Все ноты берутся из ОДНОГО строя: до-мажорная пентатоника (до, ре, ми, соль, ля), поэтому любые два звука,
-   сыгранные подряд или вместе, не диссонируют.
-
-   КАК ИЗМЕНИТЬ ЗВУК: все звуки лежат в таблице SXD ниже. У записи есть:
-     fn  — рецепт (времена в секундах, частоты в герцах), ui — относится ли к «Звукам интерфейса», p — приоритет
-     (0 касания, 1 обратная связь, 2 награды: младшие звуки приглушаются старшими), j — разброс высоты (доля, 0,035 = ±3,5 %),
-     min — минимальная пауза между такими звуками (мс), dur — сколько секунд голос считается занятым,
-     w — доля комнаты (0…1), pk — ЦЕЛЕВОЙ пик в дБ от полной шкалы, lv — поправка уровня в дБ.
-   Поправки lv подбирает проверка: python3 tests/sound_wav.py --calibrate (меняет только числа lv). Править рецепт можно
-   вручную, потом запустить проверку и страницу sounds-preview.html (она берёт код из этого файла: python3 tests/mk_preview.py).
+   Как это устроено:
+     SXD   — таблица звуков-вариантов (tap_1, tap_2, correct_1, …). У записи: fn — рецепт (времена в секундах, частоты в герцах),
+             p — приоритет (0 касания, 1 обратная связь, 2 награды: младшие звуки приглушаются старшими), j — разброс высоты
+             (0,035 = ±3,5 %), min — пауза между такими звуками (мс), dur — сколько секунд голос занят, w — доля комнаты (0…1),
+             pk — ЦЕЛЕВОЙ пик в дБ от полной шкалы, lv — поправка уровня в дБ (её подбирает tests/sound_wav.py --calibrate).
+     SXM   — события приложения (tap, ok, bad, …) → список вариантов (чередуются) и флаги: ui — только при включённых «Звуках интерфейса»,
+             win — не накладывать на недавние награды. Вызов snd('ok') сам выбирает вариант (sxPick).
+   КАК ИЗМЕНИТЬ ЗВУК: правьте рецепт fn нужного варианта (ноты из SXN_), потом запустите tests/sound_wav.py --calibrate (меняет только lv),
+   tests/mk_preview.py и откройте sounds-preview.html. Какие события какие варианты играют — таблица SXM.
 
    Правила: AudioContext создаётся только после первого касания; без Web Audio, при выключенном звуке и до первого
    касания все вызовы тихо ничего не делают. Звуки вызываются из тех же событий, что и анимации, и не зависят от
    содержания тем: новая тема и островок получают их автоматически. */
-var SX={c:null,x:null,dead:false,ln:'',lt:0,la:0,lf:0,cs:'',per:{},vol:1,pend:null,hid:false};
+var SX={c:null,x:null,dead:false,ln:'',lt:0,la:0,lf:0,cs:'',per:{},pv:{},vol:1,pend:null,hid:false};
 
 /*==== ENGINE:BEGIN (без зависимостей от приложения; sounds-preview.html копирует этот кусок) ====*/
 /* ноты строя (до-мажорная пентатоника), Гц */
-var SXN_={C3:130.81,D3:146.83,E3:164.81,G3:196,A3:220,C4:261.63,D4:293.66,E4:329.63,G4:392,A4:440,
-  C5:523.25,D5:587.33,E5:659.25,G5:783.99,A5:880,C6:1046.5,E6:1318.5,G6:1568};
+var SXN_={G3:196,C4:261.63,D4:293.66,E4:329.63,G4:392,A4:440,C5:523.25,D5:587.33,E5:659.25,G5:783.99,A5:880,C6:1046.5,D6:1174.7,E6:1318.5,G6:1568};
 function sxDb(d){return Math.pow(10,d/20)}
 /* громкость 0–100 % → усиление. 70 % — опорная точка, на ней пики таблицы SXD совпадают с заданными (pk) */
 function sxGain(v){return v<=0?0:Math.min(1.8,Math.pow(v/70,1.5))}
 /* детерминированный ГСЧ для шума и комнаты: звук в проверках и в приложении одинаковый */
 function sxRng(s){return function(){s|=0;s=s+0x6D2B79F5|0;var t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
-var SXHANN=(function(){var a=new Float32Array(48);for(var i=0;i<48;i++)a[i]=.5-.5*Math.cos(2*Math.PI*i/47);return a})();
 
-/* общая шина: фильтры → громкость → ограничитель; крошечная комната (70 мс) отдельной веткой */
+/* общая шина: фильтры → громкость → ограничитель; крошечная комната (45 мс) отдельной веткой */
 function sxBuild(c,det){
-  var sr=c.sampleRate,R=sxRng(20261013),bus=c.createGain(),hp=c.createBiquadFilter(),lp=c.createBiquadFilter(),mst=c.createGain(),
+  var sr=c.sampleRate,R=sxRng(20261014),bus=c.createGain(),hp=c.createBiquadFilter(),lp=c.createBiquadFilter(),mst=c.createGain(),
       lim=c.createWaveShaper(),conv=c.createConvolver(),rl=c.createBiquadFilter();
   hp.type='highpass';hp.frequency.value=70;hp.Q.value=.5;           /* убираем гул, телефон его всё равно не воспроизводит */
   lp.type='lowpass';lp.frequency.value=6000;lp.Q.value=.5;          /* страховка: выше 6 кГц ничего не звучит */
@@ -46,9 +41,9 @@ function sxBuild(c,det){
      выше плавно сжимается к потолку −1 дБ, клиппинга нет. DynamicsCompressorNode пробовал и убрал: его усиление зависит от истории
      сигнала (замер: один и тот же звук на 11 дБ тише в первые 100 мс жизни контекста) и он добавляет ~6 мс задержки */
   var cv=new Float32Array(2049);for(var j=0;j<2049;j++){var u=j/1024-1,m=Math.abs(u);cv[j]=m<=.5?u:(u<0?-1:1)*(.5+.5*Math.tanh((m-.5)/.5))}lim.curve=cv;
-  var n=Math.round(sr*.07),ir=c.createBuffer(1,n,sr),d=ir.getChannelData(0),p=0;
+  var n=Math.round(sr*.045),ir=c.createBuffer(1,n,sr),d=ir.getChannelData(0),p=0;
   for(var i=0;i<n;i++){p=p*.5+(R()*2-1)*.5;d[i]=p*Math.pow(1-i/n,2.5)}d[n-1]=0;
-  conv.buffer=ir;rl.type='lowpass';rl.frequency.value=3000;rl.Q.value=.4;
+  conv.buffer=ir;rl.type='lowpass';rl.frequency.value=3700;rl.Q.value=.4;
   var nz=c.createBuffer(1,sr,sr),nd=nz.getChannelData(0);for(var k=0;k<sr;k++)nd[k]=R()*2-1;
   bus.connect(hp);hp.connect(lp);lp.connect(mst);mst.connect(lim);lim.connect(c.destination);
   conv.connect(rl);rl.connect(bus);
@@ -60,135 +55,75 @@ function sxEnv(g,T,pk,att,d){
   p.setValueAtTime(0,T);p.linearRampToValueAtTime(pk,T+att);
   p.exponentialRampToValueAtTime(Math.max(pk*.002,1e-5),T+e);p.linearRampToValueAtTime(0,T+d)}
 function sxSrc(v,s,T,E,off){if(off===undefined)s.start(T);else s.start(T,off);s.stop(E);v.srcs.push(s)}
-/* шумовой всплеск: полоса fc (Q), срез lpf */
-function sxNz(v,T,d,amp,fc,q,lpf){
-  var c=v.c,s=c.createBufferSource(),bp=c.createBiquadFilter(),lp=c.createBiquadFilter(),g=c.createGain();
-  s.buffer=v.x.nz;bp.type='bandpass';bp.frequency.value=fc*v.pit;bp.Q.value=q||.9;lp.type='lowpass';lp.frequency.value=lpf||3200;lp.Q.value=.5;
-  sxEnv(g,T,amp,.0012,d);s.connect(bp);bp.connect(lp);lp.connect(g);g.connect(v.mix);
-  sxSrc(v,s,T,T+d+.01,v.x.det?0:Math.random()*.8)}
-/* «корпус» клавиши: затухающий синус (+ треугольник) с лёгким падением тона. dull — глухой вариант без щелчка */
-function sxBody(v,T,f,d,amp,drop,dull){
-  var c=v.c,F=f*v.pit,lp=c.createBiquadFilter(),parts=dull?[['sine',1,1],['sine',2,.5]]:[['sine',1,1],['triangle',1,.3]];
-  lp.type='lowpass';lp.frequency.value=dull?Math.max(520,F*3.4):Math.min(1500,F*5);lp.Q.value=.5;lp.connect(v.mix);
+/* тон из затухающих частичных. o: f (Гц), d (с), amp, att (с), parts=[[кратность,сила,доля длины]…], lpm — срез как кратность f */
+function sxTone(v,t,o){
+  var c=v.c,T=v.t0+t,F=o.f*v.pit,lp=c.createBiquadFilter(),parts=o.parts||[[1,1,1]],att=o.att||.002,amp=o.amp===undefined?1:o.amp;
+  lp.type='lowpass';lp.frequency.value=o.lp||Math.min(5200,F*(o.lpm||6));lp.Q.value=o.q||.5;lp.connect(v.mix);
   parts.forEach(function(q){
-    var o=c.createOscillator(),g=c.createGain();o.type=q[0];
-    o.frequency.setValueAtTime(F*q[1]*(1+drop),T);o.frequency.exponentialRampToValueAtTime(F*q[1],T+Math.min(.03,d*.5));
-    sxEnv(g,T,amp*q[2],.0015,d);o.connect(g);g.connect(lp);sxSrc(v,o,T,T+d+.01)})}
-/* клавишный щелчок. o: f — тон корпуса, d — длина (30–80 мс), amp — сила корпуса, nza — сила шума (0 = без щелчка),
-   nzc — центр полосы шума, nzd — длина шума (5–15 мс), drop — падение тона (отрицательное: подъём), dull — глухой */
-function sxThock(v,t,o){
-  var T=v.t0+t;sxBody(v,T,o.f,o.d||.06,o.amp===undefined?1:o.amp,o.drop===undefined?.07:o.drop,o.dull);
-  if(o.nza!==0)sxNz(v,T,o.nzd||.01,o.nza===undefined?.5:o.nza,o.nzc||1900,.9,3200)}
-/* мягкая нота: синус + тихие обертоны (2f, 4f — «тонк» маримбы) + стук молоточка. sub — тёплый подтон на октаву ниже */
-function sxPluck(v,t,f,d,amp,o){
-  o=o||{};var c=v.c,T=v.t0+t,F=f*v.pit,lp=c.createBiquadFilter(),parts=[[1,1,1],[2,.16,.45]];
-  if(F<1000)parts.push([4,.07,.22]);if(o.sub)parts.push([.5,o.sub,.9]);
-  lp.type='lowpass';lp.frequency.value=Math.min(4200,F*5);lp.Q.value=.4;lp.connect(v.mix);
-  parts.forEach(function(q){
-    var os=c.createOscillator(),g=c.createGain();os.type='sine';os.frequency.value=F*q[0];
-    sxEnv(g,T,amp*q[1],.003,d*q[2]);os.connect(g);g.connect(lp);sxSrc(v,os,T,T+d+.01)});
-  sxNz(v,T,.007,amp*.16,1700,.9,2600)}
-/* «воздух»: колоколообразный всплеск шума, полоса скользит f0 → f1 */
-function sxAir(v,t,d,amp,f0,f1){
-  var c=v.c,T=v.t0+t,s=c.createBufferSource(),bp=c.createBiquadFilter(),lp=c.createBiquadFilter(),lp2=c.createBiquadFilter(),g=c.createGain(),cv=new Float32Array(48);
-  for(var i=0;i<48;i++)cv[i]=SXHANN[i]*amp;
-  s.buffer=v.x.nz;bp.type='bandpass';bp.Q.value=.8;bp.frequency.setValueAtTime(f0,T);bp.frequency.exponentialRampToValueAtTime(f1,T+d);
-  lp.type='lowpass';lp.frequency.value=2200;lp.Q.value=.5;lp2.type='lowpass';lp2.frequency.value=2200;lp2.Q.value=.5;g.gain.value=0;g.gain.setValueCurveAtTime(cv,T,d);
-  s.connect(bp);bp.connect(lp);lp.connect(lp2);lp2.connect(g);g.connect(v.mix);sxSrc(v,s,T,T+d+.01,v.x.det?0:Math.random()*.8)}
-
-/* ступени «опыта»: тик поднимается по строю до до6 и дальше не растёт (не станет пронзительным) */
-var SXXP=[SXN_.C5,SXN_.D5,SXN_.E5,SXN_.G5,SXN_.A5,SXN_.C6];
-var SXNAV=[SXN_.C4,SXN_.D4,SXN_.E4,SXN_.G4];   /* нижняя панель: у каждого раздела своя высота «тхока» */
+    var fr=F*q[0];if(fr>5600)return;
+    var os=c.createOscillator(),g=c.createGain();os.type='sine';os.frequency.value=fr;
+    sxEnv(g,T,amp*q[1],att,o.d*q[2]);os.connect(g);g.connect(lp);sxSrc(v,os,T,T+o.d*q[2]+.01)})}
+/* чистая нота: синус */
+function sxSn(v,t,f,d,amp,att){sxTone(v,t,{f:f,d:d,amp:amp===undefined?1:amp,att:att||.006,parts:[[1,1,1]],lpm:6})}
+/* нота с октавой: «глухие» низкие ноты и короткие блипы (слышны и на телефоне); атака 3 мс (Discord) и 6 мс (Telegram) */
+function sxBk(v,t,f,d,amp,att){sxTone(v,t,{f:f,d:d,amp:amp===undefined?1:amp,att:att||.003,parts:[[1,1,1],[2,.5,.6]],lpm:6})}
+function sxBt(v,t,f,d,amp,att){sxTone(v,t,{f:f,d:d,amp:amp===undefined?1:amp,att:att||.006,parts:[[1,1,1],[2,.45,.6]],lpm:6})}
+/* ступени «опыта»: тик поднимается по строю до ми6 и дальше не растёт (не станет пронзительным) */
+var SXXP=[SXN_.E5,SXN_.G5,SXN_.A5,SXN_.C6,SXN_.D6,SXN_.E6];
 var N_=SXN_;
 
-/* ---- словарь звуков ---- */
+/* ---- словарь звуков-вариантов ---- */
 var SXD={
-  /* --- семейство «клавиша»: касания и переключатели --- */
-  tap:{ui:1,p:0,j:.035,min:55,dur:.1,w:0,pk:-23,lv:-24.92,
-    fn:function(v,a){sxThock(v,0,{f:a&&a.nav>=0?SXNAV[a.nav%4]:N_.A3,d:.075,nza:.35,nzc:1900})}},
-  /* лёгкий «тик»: копирование, запрос ввода */
-  tick:{ui:1,p:0,j:.035,min:60,dur:.07,w:0,pk:-24.1,lv:-22.08,
-    fn:function(v){sxThock(v,0,{f:N_.E4,d:.04,nza:.7,nzc:2300,nzd:.008,amp:.6})}},
-  /* выключатель вверх (включено) и вниз (выключено) */
-  on:{ui:1,p:0,j:.035,min:90,dur:.09,w:0,pk:-23.6,lv:-24.92,
-    fn:function(v){sxThock(v,0,{f:N_.D4,d:.05,drop:-.09,nza:.55,nzc:2500,nzd:.008})}},
-  off:{ui:1,p:0,j:.035,min:90,dur:.1,w:0,pk:-23.6,lv:-25.16,
-    fn:function(v){sxThock(v,0,{f:N_.G3,d:.07,drop:.1,nza:.45,nzc:1400})}},
-  /* закрытый островок: один глухой стук */
-  lock:{ui:1,p:0,j:.035,min:160,dur:.16,w:0,pk:-24.6,lv:-27.24,
-    fn:function(v){sxThock(v,0,{f:N_.D3,d:.11,nza:0,dull:1,drop:.05})}},
-  /* запуск кода: один мягкий тик, чуть светлее касания */
-  run:{ui:1,p:0,j:.035,min:120,dur:.08,w:0,pk:-23.6,lv:-25.37,
-    fn:function(v){sxThock(v,0,{f:N_.E4,d:.045,nza:.6,nzc:2600,nzd:.008})}},
-  /* ошибка в коде: очень тихий низкий звук */
-  err:{ui:0,p:1,j:.035,min:300,dur:.2,w:0,pk:-26.6,lv:-29.49,
-    fn:function(v){sxThock(v,0,{f:N_.C3,d:.13,nza:0,dull:1,drop:.04})}},
-  /* печать в редакторе (отдельный выключатель, по умолчанию выключен): a.k=1 — пробел, Enter, стирание */
-  key:{ui:0,p:0,j:.035,min:28,dur:.05,w:0,pk:-40.6,lv:-39.46,
-    fn:function(v,a){var lo=a&&a.k;sxThock(v,0,{f:lo?N_.G3:[N_.A3,N_.C4,N_.G3][Math.floor((v.x.det?0:Math.random())*3)],d:.03,nza:.8,nzc:2000,nzd:.006,amp:.6})}},
-
-  /* --- окна и переходы: еле слышный «воздух» до 200 мс --- */
-  go:{ui:1,p:0,j:.035,min:160,dur:.19,w:.08,win:1,pk:-34.6,lv:-29.14,fn:function(v){sxAir(v,0,.15,1,420,1500)}},
-  back:{ui:1,p:0,j:.035,min:160,dur:.19,w:.08,win:1,pk:-34.6,lv:-28.34,fn:function(v){sxAir(v,0,.15,1,1400,420)}},
-  open:{ui:1,p:0,j:.035,min:160,dur:.19,w:.08,win:1,pk:-34.6,lv:-30.92,fn:function(v){sxAir(v,0,.17,1,380,1700)}},
-  close:{ui:1,p:0,j:.035,min:160,dur:.19,w:.08,win:1,pk:-34.6,lv:-28.09,fn:function(v){sxAir(v,0,.14,1,1600,380)}},
-  /* новый островок открылся: «воздух» вверх и тихая нота */
-  unlock:{ui:1,p:1,j:.025,min:200,dur:.3,w:.12,pk:-24.6,lv:-22.93,
-    fn:function(v){sxAir(v,0,.12,.8,420,1700);sxPluck(v,.05,N_.E5,.17,.6)}},
-  /* дискета достижения: клавиша и тихая нота */
-  disk:{ui:1,p:1,j:.025,min:160,dur:.25,w:.1,pk:-23.6,lv:-25.57,
-    fn:function(v){sxThock(v,0,{f:N_.C4,d:.06,nza:.45});sxPluck(v,.03,N_.E5,.16,.55)}},
-
-  /* --- обратная связь по ответам --- */
-  /* верно: две мягкие восходящие ноты, до 350 мс */
-  ok:{ui:0,p:1,j:.025,min:90,dur:.34,w:.12,pk:-22.1,lv:-24.81,
-    fn:function(v){sxThock(v,0,{f:N_.G3,d:.05,nza:.35,amp:.5});sxPluck(v,0,N_.G4,.2,1);sxPluck(v,.085,N_.C5,.22,1)}},
-  /* все тесты/вопросы верно: чуть светлее и выше */
-  solve:{ui:0,p:1,j:.025,min:120,dur:.36,w:.12,pk:-21.6,lv:-25.76,
-    fn:function(v){sxThock(v,0,{f:N_.G3,d:.05,nza:.35,amp:.5});sxPluck(v,0,N_.C5,.2,1);sxPluck(v,.085,N_.G5,.22,.95)}},
-  /* неверно: низкий мягкий приглушённый двойной стук, не наказание */
-  bad:{ui:0,p:1,j:.035,min:120,dur:.3,w:0,pk:-22.6,lv:-24.95,
-    fn:function(v){sxThock(v,0,{f:N_.D3,d:.1,nza:0,dull:1,drop:.05});sxThock(v,.095,{f:N_.C3,d:.12,nza:0,dull:1,drop:.05,amp:.85})}},
-  /* подсказка: тик и одна нейтральная нота */
-  hint:{ui:0,p:1,j:.025,min:220,dur:.3,w:.1,pk:-23.6,lv:-22.64,
-    fn:function(v){sxThock(v,0,{f:N_.E4,d:.035,nza:.6,nzc:2400,amp:.5});sxPluck(v,.015,N_.D5,.25,.85)}},
-  /* теория прочитана */
-  theory:{ui:0,p:1,j:.025,min:300,dur:.3,w:.1,pk:-23.6,lv:-25.57,
-    fn:function(v){sxThock(v,0,{f:N_.C4,d:.06,nza:.45});sxPluck(v,.02,N_.G4,.26,.8)}},
-  /* опыт: крошечный тик; a.k — номер шага, высота растёт по строю до до6 и дальше не меняется */
-  xpt:{ui:0,p:0,j:.035,min:40,dur:.07,w:0,pk:-28.6,lv:-26.51,
-    fn:function(v,a){var k=Math.min(5,Math.max(0,a&&a.k||0));
-      sxPluck(v,0,SXXP[k],.04,.8);}},
-
-  /* --- моменты: мотивы --- */
-  /* островок пройден: три ноты вверх, до 700 мс */
-  done:{ui:0,p:2,j:.025,min:400,dur:.6,w:.14,pk:-20.6,lv:-25.26,
-    fn:function(v){sxThock(v,0,{f:N_.C4,d:.07,nza:.4,amp:.7});
-      sxPluck(v,0,N_.C5,.17,1);sxPluck(v,.105,N_.E5,.19,1);sxPluck(v,.21,N_.G5,.36,1,{sub:.22})}},
-  /* новый уровень: те же три шага, но выше и к до6 */
-  level:{ui:0,p:2,j:.025,min:500,dur:.64,w:.14,pk:-20.1,lv:-24.82,
-    fn:function(v){sxThock(v,0,{f:N_.C4,d:.07,nza:.4,amp:.7});
-      sxPluck(v,0,N_.E5,.17,1);sxPluck(v,.1,N_.G5,.19,1);sxPluck(v,.2,N_.C6,.38,.95,{sub:.2})}},
-  /* тема пройдена, проект сделан: мотив из трёх нот с тихой квинтой внизу */
-  fanfare:{ui:0,p:2,j:.025,min:700,dur:.66,w:.14,pk:-20.1,lv:-25.39,
-    fn:function(v){sxThock(v,0,{f:N_.C4,d:.08,nza:.4,amp:.8});
-      sxPluck(v,0,N_.C5,.17,1);sxPluck(v,.11,N_.G5,.2,1);sxPluck(v,.22,N_.C6,.4,.9,{sub:.25});sxPluck(v,.22,N_.E6,.3,.28)}},
-  /* серия продолжается: тёплые две ноты (квинта вверх, с подтоном) */
-  streak:{ui:0,p:2,j:.025,min:450,dur:.48,w:.12,pk:-21.1,lv:-23.12,
-    fn:function(v){sxPluck(v,0,N_.G4,.26,1,{sub:.3});sxPluck(v,.115,N_.D5,.34,1,{sub:.2})}},
-  /* заморозка серии: две мягкие ноты вниз */
-  freeze:{ui:0,p:2,j:.025,min:450,dur:.4,w:.14,pk:-22.6,lv:-23.15,
-    fn:function(v){sxPluck(v,0,N_.A5,.2,.8);sxPluck(v,.09,N_.E5,.3,1)}},
-  /* достижение: самый богатый звук, но мягкий; меньше 1 с */
-  ach:{ui:0,p:2,j:.025,min:450,dur:.92,w:.16,pk:-17.9,lv:-24.12,
-    fn:function(v){sxThock(v,0,{f:N_.C4,d:.09,nza:.4,amp:.9});
-      [N_.C5,N_.E5,N_.G5,N_.C6].forEach(function(f,i){sxPluck(v,i*.085,f,.3,.9);sxPluck(v,i*.085,f*2,.18,.18)});
-      sxPluck(v,.34,N_.C5,.5,.7,{sub:.25});sxPluck(v,.34,N_.G5,.5,.7);sxPluck(v,.34,N_.E6,.46,.5);
-      sxPluck(v,.47,N_.G6,.2,.18);sxPluck(v,.55,N_.E6,.22,.14)}},
-  /* погладить кролика */
-  pet:{ui:0,p:1,j:.025,min:220,dur:.35,w:.1,pk:-23.6,lv:-23.01,
-    fn:function(v){sxPluck(v,0,N_.E5,.18,.9);sxPluck(v,.08,N_.G5,.24,.9)}}
+  tap_1:{p:0,j:.035,min:55,dur:.07,w:.04,pk:-23.8,lv:-23.58,fn:function(v){sxSn(v,0,N_.G5,.045,1,.003)}},
+  tap_2:{p:0,j:.035,min:55,dur:.07,w:.03,pk:-23.8,lv:-23.9,fn:function(v){sxBk(v,0,N_.G3,.05,1)}},
+  nav_1:{p:0,j:.035,min:55,dur:.15,w:.06,pk:-25.7,lv:-25.67,fn:function(v){sxSn(v,0,N_.E5,.08,.9);sxSn(v,.06,N_.D5,.085,1)}},
+  toggle_on_1:{p:0,j:.035,min:90,dur:.15,w:.05,pk:-25.7,lv:-25.92,fn:function(v){sxSn(v,0,N_.C5,.08,.9);sxSn(v,.055,N_.G5,.09,1)}},
+  toggle_off_1:{p:0,j:.035,min:90,dur:.15,w:.05,pk:-25.7,lv:-25.46,fn:function(v){sxSn(v,0,N_.C5,.08,.9);sxSn(v,.055,N_.G4,.09,1)}},
+  sheet_open_1:{p:0,j:.035,min:160,dur:.18,w:.08,pk:-31,lv:-30.26,fn:function(v){sxSn(v,0,N_.A5,.14,.9)}},
+  sheet_close_1:{p:0,j:.035,min:160,dur:.2,w:.08,pk:-30.4,lv:-32.03,fn:function(v){sxSn(v,0,N_.D4,.08,.9);sxBk(v,.07,N_.G3,.11,.9)}},
+  correct_1:{p:1,j:.03,min:90,dur:.34,w:.12,pk:-23,lv:-23.26,fn:function(v){sxSn(v,0,N_.G4,.14,.95);sxSn(v,.1,N_.G5,.26,1)}},
+  correct_2:{p:1,j:.03,min:90,dur:.34,w:.14,pk:-24.5,lv:-24.77,fn:function(v){sxSn(v,0,N_.G5,.28,.9,.008);sxSn(v,.07,N_.C6,.26,.9,.008)}},
+  wrong_1:{p:1,j:.035,min:120,dur:.3,w:0,pk:-22.4,lv:-25.45,fn:function(v){sxBk(v,0,N_.C4,.12,1);sxBk(v,.1,N_.G3,.2,.9)}},
+  wrong_2:{p:1,j:.035,min:120,dur:.3,w:0,pk:-22,lv:-22.72,fn:function(v){sxBt(v,0,N_.C4,.07,1);sxBt(v,.11,N_.C4,.1,.9)}},
+  wrong_3:{p:1,j:.035,min:120,dur:.3,w:0,pk:-23.3,lv:-25.27,fn:function(v){sxBt(v,0,N_.C4,.1,1);sxBt(v,.1,N_.G3,.18,.9)}},
+  hint_1:{p:1,j:.03,min:220,dur:.32,w:.12,pk:-24.5,lv:-24.61,fn:function(v){sxSn(v,0,N_.C5,.28,1)}},
+  hint_2:{p:1,j:.03,min:220,dur:.3,w:.12,pk:-24.5,lv:-24.69,fn:function(v){sxSn(v,0,N_.A5,.26,1)}},
+  xp_1:{p:0,j:.035,min:40,dur:.07,w:0,pk:-29.1,lv:-27.76,fn:function(v,a){sxSn(v,0,SXXP[Math.min(5,a.k||0)],.04,.9,.003)}},
+  xp_2:{p:0,j:.035,min:40,dur:.07,w:0,pk:-30.6,lv:-29.42,fn:function(v,a){sxSn(v,0,SXXP[Math.min(5,a.k||0)],.05,.9,.006)}},
+  complete_1:{p:2,j:.03,min:400,dur:.6,w:.14,pk:-22,lv:-22.39,fn:function(v){sxSn(v,0,N_.C4,.14,.9);sxSn(v,.09,N_.G4,.16,1);sxSn(v,.18,N_.G5,.4,1)}},
+  streak_1:{p:2,j:.03,min:450,dur:.48,w:.12,pk:-22.5,lv:-22.63,fn:function(v){sxSn(v,0,N_.G4,.2,1);sxSn(v,.11,N_.C5,.34,1)}},
+  streak_2:{p:2,j:.03,min:450,dur:.48,w:.14,pk:-23.5,lv:-23.85,fn:function(v){sxSn(v,0,N_.A5,.16,1);sxSn(v,.1,N_.C6,.34,1)}},
+  achievement_1:{p:2,j:.03,min:450,dur:.92,w:.18,pk:-18.3,lv:-24.15,fn:function(v){
+      [N_.C5,N_.D5,N_.G5,N_.C6,N_.D6].forEach(function(f,i){sxSn(v,i*.07,f,.3,.85)});
+      sxSn(v,.38,N_.C5,.5,.75);sxSn(v,.38,N_.G5,.5,.75);sxSn(v,.38,N_.C6,.46,.6);sxSn(v,.45,N_.E6,.3,.18)}},
+  run_1:{p:0,j:.035,min:120,dur:.06,w:0,pk:-22.3,lv:-23.54,fn:function(v){sxBk(v,0,N_.G5,.035,.9)}},
+  run_2:{p:0,j:.035,min:120,dur:.06,w:0,pk:-22.4,lv:-21.63,fn:function(v){sxSn(v,0,N_.C6,.03,.9,.003)}},
+  key_1:{p:0,j:.035,min:28,dur:.04,w:0,pk:-40.4,lv:-38.45,fn:function(v){sxSn(v,0,N_.C6,.02,.8,.003)}},
+  del_1:{p:0,j:.035,min:28,dur:.04,w:0,pk:-40,lv:-37.87,fn:function(v){sxSn(v,0,N_.G5,.02,.8,.003)}},
+  error_1:{p:1,j:.035,min:300,dur:.2,w:0,pk:-28,lv:-28.19,fn:function(v){sxSn(v,0,N_.D5,.08,1,.008);sxSn(v,.07,N_.A4,.13,.95,.008)}},
+  error_2:{p:1,j:.035,min:300,dur:.2,w:0,pk:-24.6,lv:-25.92,fn:function(v){sxBt(v,0,N_.A4,.06,1);sxBt(v,.1,N_.A4,.08,.9)}}
 };
+/* события приложения → варианты (чередуются) */
+var SXM={
+  tap:{v:['tap_1','tap_2'],ui:1},tick:{v:['tap_1','tap_2'],ui:1},
+  on:{v:['toggle_on_1'],ui:1},off:{v:['toggle_off_1'],ui:1},
+  lock:{v:['tap_2'],ui:1},                                  /* закрытый островок: глухая низкая нота */
+  run:{v:['run_1','run_2'],ui:1},err:{v:['error_1','error_2']},key:{v:['key_1']},   /* key: ввод key_1, стирание del_1 */
+  open:{v:['sheet_open_1'],ui:1,win:1},close:{v:['sheet_close_1'],ui:1,win:1},
+  unlock:{v:['correct_2'],ui:1},disk:{v:['toggle_on_1'],ui:1},
+  ok:{v:['correct_1','correct_2']},solve:{v:['correct_1','correct_2']},theory:{v:['correct_1','correct_2']},
+  bad:{v:['wrong_1','wrong_2','wrong_3']},hint:{v:['hint_1','hint_2']},xpt:{v:['xp_1','xp_2']},
+  done:{v:['complete_1']},level:{v:['complete_1']},fanfare:{v:['complete_1']},
+  streak:{v:['streak_1','streak_2']},freeze:{v:['toggle_off_1']},ach:{v:['achievement_1']},pet:{v:['toggle_on_1']}};
+/* какой вариант играть: нижняя панель — один звук; печать и стирание — разные; иначе случайный, но не тот же, что в прошлый раз */
+function sxPick(n,a){
+  var m=SXM[n];if(!m)return null;
+  if(n==='tap'&&a&&a.nav>=0)return 'nav_1';
+  if(n==='key')return a&&a.k===1?'del_1':'key_1';
+  if(n==='xpt'&&a&&SXD[a.v])return a.v;
+  var l=m.v;if(l.length===1)return l[0];
+  var p=SX.pv[n],c,k=0;do{c=l[Math.floor(Math.random()*l.length)]}while(c===p&&++k<8);
+  return c}
 
 /* запуск одного звука на аудио-часах (без задержки): гуманизация, приглушение старых голосов, не более 6 голосов */
 function sxFire(x,n,a){
@@ -278,20 +213,21 @@ function snd(x,a){
     else if(l===3&&x[0]===784){n='xpt';a={k:3}}
     else n='ok'}
   else return;
-  var d=SXD[n];if(!d)return;
-  if(d.ui&&!ST('sfx'))return;
+  var m=SXM[n];if(!m)return;                              /* переходы между экранами (go, back) без звука */
+  if(m.ui&&!ST('sfx'))return;
   if(n==='key'&&!ST('ks'))return;
+  var v=sxPick(n,a),d=SXD[v];if(!d)return;
   var now=performance.now();
   if(n!=='tap'&&n!=='key')SX.la=now;
-  if(!d.ui)SX.lf=now;
-  /* звуки окон и переходов не накладываются на награды, сыгравшие только что */
-  if(d.win&&now-SX.lf<260)return;
+  if(!m.ui)SX.lf=now;
+  /* звуки окон не накладываются на награды, сыгравшие только что */
+  if(m.win&&now-SX.lf<260)return;
   if(SX.per[n]&&now-SX.per[n]<d.min)return;
-  SX.per[n]=now;SX.ln=n;SX.lt=now;
+  SX.per[n]=now;SX.ln=n;SX.lt=now;SX.pv[n]=v;
   if(!SX.c||SX.dead)return;                              /* до первого касания звука нет */
-  try{sxVol(VOLK());sxPlay(n,a)}catch(e){}}
+  try{sxVol(VOLK());sxPlay(v,a)}catch(e){}}
 
-/* касание любой кнопки: тихое «тхок». Другие звуки того же события (ответ, окно, переход, переключатель) его заменяют:
+/* касание любой кнопки: короткий чистый звук (вариант чередуется). Другие звуки того же события (ответ, окно, переход, переключатель) его заменяют:
    проверка отложена на конец события. «Запустить» играет свой тик. */
 document.addEventListener('click',function(e){
   var b=e.target&&e.target.closest&&e.target.closest('button,[role=button],a[href],summary');
@@ -302,15 +238,16 @@ document.addEventListener('click',function(e){
     var a=null;if(nv){var bs=[].slice.call(nv.querySelectorAll('button'));a={nav:bs.indexOf(b)}}
     snd(run?'run':'tap',a)},0)},true);
 
-/* печать в редакторе: очень тихий щелчок, только если включено «Звуки набора кода» (по умолчанию выключено) */
+/* печать в редакторе: ввод — один звук, стирание — другой, очень тихие; только если включено «Звуки набора кода» (по умолчанию выключено) */
 document.addEventListener('beforeinput',function(e){
   var t=e.target;if(!t||t.tagName!=='TEXTAREA'||!t.closest||!t.closest('.ed')||!ST('ks'))return;
   var ty=e.inputType||'';
-  if(ty==='insertText'&&e.data===' '||ty==='insertLineBreak'||ty==='insertParagraph'||/^deleteContent/.test(ty))snd('key',{k:1});
-  else if(ty==='insertText')snd('key',{k:0})},true);
+  if(/^deleteContent/.test(ty))snd('key',{k:1});
+  else if(ty==='insertText'||ty==='insertLineBreak'||ty==='insertParagraph')snd('key',{k:0})},true);
 
-/* счёт опыта: каждый засчитанный пункт даёт тик, высота растёт по ступеням до верхнего предела. Вызывать с текущим числом */
-function xpTick(){var n=0,last=0,lt=0;return function(v){if(v<=last)return;last=v;var t=performance.now();if(t-lt<48)return;lt=t;snd('xpt',{k:n++})}}
+/* счёт опыта: каждый засчитанный пункт даёт тик, высота растёт по ступеням до верхнего предела. Вариант тика выбирается на весь счёт
+   (иначе ступени вверх звучали бы рвано). Вызывать с текущим числом */
+function xpTick(){var n=0,last=0,lt=0,w=sxPick('xpt');return function(v){if(v<=last)return;last=v;var t=performance.now();if(t-lt<48)return;lt=t;snd('xpt',{k:n++,v:w})}}
 
 /* для проверок: отрисовать звук без динамиков и вернуть сэмплы (tests/sound_wav.py, tests/sound6.py) */
 function sndRender(n,a){return sxRender(n,a,44100).then(function(b){return b&&Array.from(b)})}

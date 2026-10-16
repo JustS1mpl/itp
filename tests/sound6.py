@@ -59,12 +59,16 @@ def run():
         pg.wait_for_timeout(1500)
         snames = pg.evaluate("Object.keys(SXD)")
         print('== звуки:', ' '.join(snames))
-        for need in ('tap', 'tick', 'on', 'off', 'lock', 'run', 'err', 'key', 'go', 'back', 'open', 'close', 'ok', 'solve', 'bad', 'hint', 'xpt', 'done', 'level', 'fanfare', 'streak', 'ach', 'freeze', 'unlock', 'disk', 'theory', 'pet'):
+        for need in ('tap_1', 'tap_2', 'nav_1', 'toggle_on_1', 'toggle_off_1', 'sheet_open_1', 'sheet_close_1', 'correct_1', 'correct_2', 'wrong_1', 'wrong_2', 'wrong_3', 'hint_1', 'hint_2', 'xp_1', 'xp_2', 'complete_1', 'streak_1', 'streak_2', 'achievement_1', 'run_1', 'run_2', 'key_1', 'del_1', 'error_1', 'error_2'):
             ok(need in snames, 'есть звук «%s»' % need)
-        for n in snames:
-            a = {'nav': 1} if n == 'tap' else None
-            s = np.array(pg.evaluate("sndRender(%s,%s)" % (json.dumps(n), json.dumps(a))), dtype=float)
-            ok(len(s) > 0 and np.isfinite(s).all() and s[0] == 0 and s[-1] == 0 and np.abs(s).max() < .3, 'звук «%s» отрисован: начало и конец ровно 0, пик %.1f дБ' % (n, 20 * np.log10(np.abs(s).max())))
+        # каждое событие приложения сопоставлено с существующими вариантами; переходы между экранами без звука
+        ev = pg.evaluate("Object.keys(SXM)")
+        for need in ('tap', 'tick', 'on', 'off', 'lock', 'run', 'err', 'key', 'open', 'close', 'ok', 'solve', 'bad', 'hint', 'xpt', 'done', 'level', 'fanfare', 'streak', 'ach', 'freeze', 'unlock', 'disk', 'theory', 'pet'):
+            ok(need in ev and all(v in snames for v in pg.evaluate("SXM[%s].v" % json.dumps(need))), 'событие «%s» играет существующие варианты' % need)
+        ok('go' not in ev and 'back' not in ev, 'переходы между экранами (go, back) без звука')
+        pick = pg.evaluate("(function(){var o=[];for(var i=0;i<40;i++){var c=sxPick('bad');SX.pv.bad=c;o.push(c)};return o})()")
+        ok(len(set(pick)) == 3 and all(pick[i] != pick[i + 1] for i in range(len(pick) - 1)), 'чередование «неверно»: 3 варианта, два подряд не повторяются')
+        ok(pg.evaluate("sxPick('tap',{nav:2})") == 'nav_1' and pg.evaluate("sxPick('key',{k:0})") == 'key_1' and pg.evaluate("sxPick('key',{k:1})") == 'del_1', 'нижняя панель — один звук; ввод и стирание — разные')
         ok(pg.evaluate("typeof sndRender")=='function' and pg.evaluate("S.set.ks")==0, 'по умолчанию «Звуки набора кода» выключены, громкость %d %%' % pg.evaluate("S.set.vol"))
         b.close()
 
@@ -194,12 +198,13 @@ def run():
         pg.evaluate("window.__sl.length=0")
         pg.evaluate("streakSheet()"); pg.wait_for_timeout(300)
         ok(names(pg)[:1] == ['open'], 'открытие окна: звук «open»')
+        ok(pg.evaluate("SX.pv.open") == 'sheet_open_1', 'окно открывается звуком sheet_open_1')
         pg.keyboard.press('Escape'); pg.wait_for_timeout(300)
         ok('close' in names(pg), 'закрытие окна: звук «close»')
         pg.evaluate("home()"); pg.wait_for_timeout(400)
         pg.evaluate("window.__sl.length=0")
         pg.locator('#ttl').click(); pg.wait_for_timeout(400)
-        ok('go' in names(pg), 'вход в настройки: звук перехода «go»')
+        ok(names(pg) == [] or 'go' not in names(pg), 'вход в настройки: перехода со звуком нет (только касание): ' + str(names(pg)))
         # переключатели в настройках: вниз при выключении, вверх при включении
         pg.evaluate("window.__sl.length=0")
         pg.locator('.sw[data-k="gc"]').click(); pg.wait_for_timeout(150)
@@ -221,13 +226,14 @@ def run():
         # выключатель печати есть, по умолчанию выключен
         ok(pg.locator('.sw[data-k="ks"]').get_attribute('aria-checked') == 'false', 'выключатель «Звуки набора кода» есть и выключен')
         pg.locator('#x').click(); pg.wait_for_timeout(400)
-        ok('back' in names(pg), 'выход из настроек: звук «back»')
+        ok('back' not in names(pg), 'выход из настроек: звука перехода нет')
         # нижняя панель: у каждого раздела своя высота, и сработал один звук
         for k, t in enumerate(('home', 'pr', 'ed', 'prof')):
             pg.evaluate("window.__sl.length=0")
             pg.locator('.nav button[data-t="%s"]' % t).click(); pg.wait_for_timeout(200)
             sl = pg.evaluate("window.__sl")
-            ok([n for n, _, _ in sl] == ['tap'] and json.loads(sl[0][2])['nav'] == k, 'раздел «%s»: ровно один звук касания с высотой раздела %d' % (t, k))
+            ok([n for n, _, _ in sl] == ['tap'] and json.loads(sl[0][2])['nav'] == k, 'раздел «%s»: ровно один звук касания (номер %d)' % (t, k))
+            ok(pg.evaluate("SX.pv.tap") == 'nav_1', 'у нижней панели один и тот же звук nav_1')
         # запуск кода и ошибка (редактор)
         pg.locator('.nav button[data-t="ed"]').click(); pg.wait_for_timeout(500)
         pg.evaluate("window.__sl.length=0")
@@ -260,6 +266,8 @@ def run():
         pg.evaluate("window.__sl.length=0;window.__osc=0")
         pg.keyboard.press('Enter'); pg.keyboard.press('Backspace'); pg.wait_for_timeout(120)
         ok(names(pg).count('key') >= 1, 'Enter и стирание тоже')
+        pg.wait_for_timeout(80); pg.keyboard.press('Backspace'); pg.wait_for_timeout(120)
+        ok(pg.evaluate("SX.pv.key") == 'del_1', 'стирание играет другой звук (del_1), ввод — key_1')
         pg.evaluate("S.set.ks=0;save()")
         # итог островка: «пройдено», затем опыт ступенями
         pg.evaluate("home()"); pg.wait_for_timeout(300)
@@ -281,7 +289,7 @@ def run():
         pg.evaluate("delete S.ach.first;ach('first')"); pg.wait_for_timeout(300)
         ok(pg.locator('.toast.ach').count() == 1 and 'ach' in names(pg), 'достижение: карточка и звук «ach» вместе')
         # серия: чип в шапке растёт со звуком
-        pg.evaluate("home();LSK=0;S.last='2026-10-12';S.streak=5;save()")
+        pg.evaluate("home();LSK=0;var y=new Date(Date.now()-864e5);S.last=y.getFullYear()+'-'+('0'+(y.getMonth()+1)).slice(-2)+'-'+('0'+y.getDate()).slice(-2);S.streak=5;save()")
         pg.evaluate("window.__sl.length=0"); pg.evaluate("home()"); pg.wait_for_timeout(300)
         ok('streak' in names(pg), 'серия выросла: звук «streak» вместе с анимацией чипа')
         # подсказка

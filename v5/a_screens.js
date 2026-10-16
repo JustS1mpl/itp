@@ -11,8 +11,7 @@ function show(h,tab){
   if(k&&PSKEY){
     if(k===PSKEY)d=/^(quiz|task|askq|rcode)$/.test(k)?'nx':'same';
     else{var a=SDEP[PSKEY],b=SDEP[k];if(a!==undefined&&b!==undefined)d=a===0&&b===0?'tab':b<a?'back':'fwd'}}
-  /* звук перехода: вглубь и назад, без шума на соседних разделах и вопросах подряд */
-  if(d==='fwd'&&k!=='done')snd('go');else if(d==='back')snd('back');
+  /* переходы между экранами без звука (решение владельца) */
   PSKEY=k;
   document.querySelectorAll('body>.dock,body>.jump').forEach(function(x){x.remove()});
   app.innerHTML=h;app.className='';void app.offsetWidth;
