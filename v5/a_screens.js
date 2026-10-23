@@ -22,7 +22,7 @@ function show(h,tab){
   setNav(tab||null)}
 function setNav(t){CURTAB=t||null;NAV.classList.toggle('on',!!t);NAV.inert=!t;NAV.querySelectorAll('button').forEach(function(b){var on=b.dataset.t===t;b.classList.toggle('act',on);if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')})}
 /* нижняя панель: те же четыре раздела, значки нарисованы кодом */
-NAV.innerHTML=[['home','path','Путь'],['pr','prac','Практика'],['ed','code','Код'],['prof','bun','Профиль']].map(function(t){return'<button data-t="'+t[0]+'"><span class="ni">'+(t[1]==='bun'?'<i class="pi" aria-hidden="true"></i>':ico(t[1]))+'</span>'+t[2]+'</button>'}).join('');
+NAV.innerHTML=[['home','🗺️','Путь'],['pr','🎯','Практика'],['ed','💻','Код'],['prof','🐰','Профиль']].map(function(t){return'<button data-t="'+t[0]+'"><span class="ni" aria-hidden="true">'+t[1]+'</span>'+t[2]+'</button>'}).join('');
 
 /* --- окна: лист снизу на телефоне, карточка по центру на компьютере --- */
 var MSIL=0;
@@ -167,9 +167,9 @@ function theory(i,j){
 var RPS=null;
 function readProg(){
   if(RPS)window.removeEventListener('scroll',RPS);
-  var b=$('rpb');if(!b)return;var bar=b.parentNode,lp=-1;
-  RPS=function(){if(!b.isConnected){window.removeEventListener('scroll',RPS);RPS=null;return}var mx=document.documentElement.scrollHeight-innerHeight,p=mx>8?Math.min(100,Math.round(window.scrollY/mx*100)):100;if(p!==lp){lp=p;b.style.width=p+'%';bar.setAttribute('aria-valuenow',p)}};
-  window.addEventListener('scroll',RPS,{passive:true});setTimeout(RPS,60);setTimeout(RPS,600)}
+  var b=$('rpb');if(!b)return;var bar=b.parentNode,lp=-1,fin=0;
+  RPS=function(){if(!b.isConnected){window.removeEventListener('scroll',RPS);RPS=null;return}var mx=document.documentElement.scrollHeight-innerHeight,p=mx>8?Math.min(100,Math.round(window.scrollY/mx*100)):(fin?100:0);if(p!==lp){lp=p;b.style.width=p+'%';bar.setAttribute('aria-valuenow',p)}};
+  window.addEventListener('scroll',RPS,{passive:true});if(window.ResizeObserver){var ro=new ResizeObserver(function(){if(!b.isConnected||!RPS){ro.disconnect();return}RPS()});ro.observe(document.body)}setTimeout(function(){if(RPS)RPS()},60);setTimeout(function(){fin=1;if(RPS)RPS()},700)}
 
 /* --- вопросы --- */
 function quiz(i,j){

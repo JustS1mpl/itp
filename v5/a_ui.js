@@ -25,7 +25,6 @@ var IC={
 };
 function ico(n,cls){return'<svg class="'+(cls||'')+'" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">'+IC[n]+'</svg>'}
 /* знак приложения: тот же наклонный шестиугольник-остров, что и на Пути */
-var LOGO='<svg width="28" height="24" viewBox="4 10 84 60" aria-hidden="true" focusable="false"><path d="M9 34 L27 54 L65 54 L83 34 L83 46 L65 66 L27 66 L9 46 Z" fill="var(--accent-d)" stroke="var(--accent-d)" stroke-width="7" stroke-linejoin="round"/><path d="M9 34 L27 14 L65 14 L83 34 L65 54 L27 54 Z" fill="var(--accent)" stroke="var(--accent)" stroke-width="7" stroke-linejoin="round"/><path d="M36 26 L47 34 L36 42 M52 43 H62" fill="none" stroke="var(--on)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
 /* --- кролик (картинка встроена в файл) --- */
 function rabbit(st){var s=IMG[st]||(st==='rolled'?IMG.grumpfull||IMG.grump:IMG.eat);return'<div class="rw im '+st+'"><img src="'+s+'" alt="" draggable="false"></div>'}
@@ -39,7 +38,7 @@ function scr(key,h,tab){SKEY=key;show(h,tab)}
 /* --- шапка: «ИТП» слева открывает настройки, справа серия и опыт --- */
 function head(){
   var f=S.fz.n,s=streakNow();
-  return'<div class="top"><button class="logo" id="ttl" aria-label="ИТП. Открыть настройки">'+LOGO+'<span class="lgw">ИТП</span>'+'</button><div class="chips"><button class="chip" id="hs" aria-label="Серия: '+s+' '+pl(s,['день','дня','дней'])+(f?', заморозок: '+f:'')+'">🥕 <span>'+s+'</span>'+(f?'<span class="fzm">❄️'+f+'</span>':'')+'</button><button class="chip" id="hx" aria-label="Опыт: '+S.xp+'">⭐ <span>'+S.xp+'</span></button></div></div>'}
+  return'<div class="top"><button class="logo" id="ttl" aria-label="ИТП. Открыть настройки">'+'<span class="lgw">ИТП</span>'+'</button><div class="chips"><button class="chip" id="hs" aria-label="Серия: '+s+' '+pl(s,['день','дня','дней'])+(f?', заморозок: '+f:'')+'">🥕 <span>'+s+'</span>'+(f?'<span class="fzm">❄️'+f+'</span>':'')+'</button><button class="chip" id="hx" aria-label="Опыт: '+S.xp+'">⭐ <span>'+S.xp+'</span></button></div></div>'}
 function ttl(t,sub){return'<div class="ttl"><div><h1>'+esc(t)+'</h1>'+(sub?'<p class="mu">'+sub+'</p>':'')+'</div></div>'}
 function bindHead(re){
   HRE=re;$('hs').onclick=streakSheet;$('hx').onclick=levelSheet;chipFx();
@@ -383,7 +382,7 @@ function profile(){BACK=profile;
    '<div class="card"><div class="ch2"><b>Цель дня</b><button class="btn t" id="gset">'+g+' '+pl(g,['островок','островка','островков'])+' ›</button></div><div class="bar" style="margin:10px 0 12px" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+gp+'" aria-label="Цель дня: '+d+' из '+g+'"><i class="grow" style="width:'+gp+'%"></i></div>'+weekRow('g')+'<p class="mu gnote">Цель в 5 днях недели даёт +50 ⭐. Сейчас: '+wkCount()+' из 5.</p></div>'+
    shelf()+
    '<div class="card"><b>Активность</b><div style="margin-top:10px">'+calHtml()+'</div></div>'+
-   '<div class="card"><b>Работа над ошибками</b>'+(rows.length?rows.map(erow).join('')+(more?'<button class="btn t emore" id="emr">Показать все темы ('+rows.length+')</button>':'')+'<p class="mu" style="margin:8px 0 0;font-size:.84375rem">Пройди островок без ошибок, и он исчезнет из списка.</p>':'<p style="margin:8px 0 0">Ошибок пока нет. Так держать 👍</p>')+'</div>'+
+   (rows.length?'<div class="card"><b>Работа над ошибками</b>'+rows.map(erow).join('')+(more?'<button class="btn t emore" id="emr">Показать все темы ('+rows.length+')</button>':'')+'<p class="mu" style="margin:8px 0 0;font-size:.84375rem">Пройди островок без ошибок, и он исчезнет из списка.</p></div>':'')+
    '<div class="lst">'+row('📖','Изученные функции','Словарь с твоими заметками','dc')+(TOPICS[0]&&TOPICS[0].intro&&!S.d['0-0']?row('🏝️','Знакомство с ИТП','Как устроено приложение','intr'):'')+row('📤','Поделиться прогрессом','Картинка со статистикой','sh')+row('⚙️','Настройки','Вид, звук, обучение, резервная копия','st')+'</div>'+
    '<p class="pfoot"><button class="ver" id="vr" aria-label="ИТП '+ITPV+'. ИТП означает: И так, программирование"><u>ИТП '+ITPV+'</u><span class="vt" role="tooltip">ИТП — «И так, программирование»</span></button></p>','prof');
   bindHead(profile);calBind();var csc=app.querySelector('.csc');if(csc){csc.tabIndex=0;csc.setAttribute('aria-label','Календарь активности, листается вбок')}
@@ -414,13 +413,12 @@ function settings(){
   var h='<div class="top ls"><button class="icon" id="x" aria-label="Назад">'+ico('back')+'</button><h1>Настройки</h1></div>';
   h+='<div class="sec">Внешний вид</div><div class="lst">'+
    SR('🎨','Тема','',SG('theme',[['','Авто'],['light','Светлая'],['dark','Тёмная']],S.theme))+
-   SR('🤍','Минимализм','Плоский спокойный вид, как в прошлой версии: без стекла, цветных пятен и логотипа',SW('mn',ST('mn')))+
+   SR('🤍','Минимализм','Плоский спокойный вид, как в прошлой версии: без стекла и цветных пятен',SW('mn',ST('mn')))+
    SR('🖌️','Цвет акцента','Кнопки, полоски, выделение','<div class="swa" role="radiogroup" aria-label="Цвет акцента">'+[['','#2B8420','Зелёный'],['carrot','#F08C1A','Морковный'],['pink','#C73B63','Розовый'],['blue','#2563D0','Синий'],['violet','#6C4BD6','Фиолетовый']].map(function(c){var on=ST('acc')===c[0];return'<button role="radio" aria-checked="'+on+'" data-k="acc" data-v="'+c[0]+'" style="background:'+c[1]+'" class="'+(on?'on':'')+'" aria-label="'+c[2]+'"></button>'}).join('')+'</div>')+
    SR('🔤','Размер текста','',SG('tz',[[90,'Мелкий'],[100,'Обычный'],[115,'Крупный'],[130,'Огромный']],ST('tz')))+
    SR('✨','Анимации','«Выкл» подойдёт слабым устройствам и тем, кого они отвлекают',SG('anim',[['full','Все'],['less','Меньше'],['off','Выкл']],ST('anim')))+
    SR('😀','Смайлики Windows 11','Встроены и выглядят одинаково на всех устройствах',SW('emo',ST('emo')))+
    SR('🎉','Конфетти','Салют, когда тема пройдена',SW('gc',ST('gc')))+
-   SR('🏷️','Логотип в шапке','Выкл: останется только надпись ИТП',SW('lg',ST('lg')))+
    SR('🐰','Шапка профиля','Где стоит кролик',SG('ph',[['card','Карточка'],['corner','В углу'],['pop','Из плитки']],ST('ph')))+
    SR('🌈','Цветные пятна на фоне','Мягкая подсветка за интерфейсом. Выкл: ровный фон',SW('bg',ST('bg')))+'</div>';
   h+='<div class="sec">Полка достижений</div><div class="lst">'+
@@ -477,8 +475,8 @@ function tocBuild(){
   document.body.appendChild(a);
   var bs=[].slice.call(a.querySelectorAll('button'));
   bs.forEach(function(b){b.onclick=function(){tb.click();hs[+b.dataset.k].scrollIntoView({behavior:RM()?'auto':'smooth',block:'start'})}});
-  function spy(){var y=innerHeight*.32,c=-1;hs.forEach(function(h,k){if(h.offsetParent&&h.getBoundingClientRect().top<y)c=k});bs.forEach(function(b,k){b.classList.toggle('on',k===c)})}
-  TOCS=spy;window.addEventListener('scroll',spy,{passive:true});setTimeout(spy,50)}
+  function spy(){var y=innerHeight*.32,c=-1;hs.forEach(function(h,k){if(h.offsetParent&&h.getBoundingClientRect().top<y)c=k});if(window.scrollY>0&&window.scrollY+innerHeight>=document.documentElement.scrollHeight-6){for(var q=hs.length-1;q>=0;q--)if(hs[q].offsetParent){c=q;break}}bs.forEach(function(b,k){b.classList.toggle('on',k===c)})}
+  TOCS=spy;window.addEventListener('scroll',spy,{passive:true});if(window.ResizeObserver){var ro=new ResizeObserver(function(){if(!a.isConnected||!TOCS){ro.disconnect();return}TOCS()});ro.observe(document.body)}setTimeout(spy,50)}
 
 /* --- рост серии и опыта в шапке --- */
 var LSK=null,LXP=null;

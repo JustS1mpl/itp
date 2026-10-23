@@ -1,6 +1,6 @@
 import re, sys, json, os
 sys.path.insert(0, '.')
-VER = '6.4.7'
+VER = '6.4.8'
 s = open('base43.html', encoding='utf-8').read()
 
 def rep(a, b, n=1):
@@ -22,7 +22,7 @@ rep("(cut?'\\n…вывод обрезан':'')","(cut?'\\n…вывод обр�
 
 rep("function fixErr(e,code){if(!e)return e;","function fixErr(e,code){if(!e)return e;try{e=itpTrFull(e)}catch(_x){}")
 rep("function fin2(err){","function fin2(err){if(err&&/^SystemExit\\b/.test(err))err=null;")
-rep("function isOpen(i,j){var k=i+'-'+j;", "function isOpen(i,j){if(typeof DEV==='function'&&DEV())return 1;var k=i+'-'+j;")
+rep("function isOpen(i,j){var k=i+'-'+j;", "function isOpen(i,j){if(typeof DEV==='function'&&DEV())return 1;var k=i+'-'+j;if(j===0&&IT(i,0).t==='theory')return 1;")
 rep("esc(q.e||'')", "esc(q.e||'')+xm(q)", 3)
 rep("(String(it.html).match(/\\[\\[([^\\]|]+)/g)||[])", "(String(it.html).replace(/<pre>[\\s\\S]*?<\\/pre>/g,'').match(/\\[\\[([^\\]|]+)/g)||[])")
 rep("it.html.split(/(<pre>[\\s\\S]*?<\\/pre>)/).map(function(p){return /^<pre>/.test(p)?", "it.html.split(/(<pre[^>]*>[\\s\\S]*?<\\/pre>)/).map(function(p){return /^<pre /.test(p)?p:/^<pre>/.test(p)?")
