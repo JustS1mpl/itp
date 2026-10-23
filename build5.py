@@ -1,6 +1,6 @@
 import re, sys, json, os
 sys.path.insert(0, '.')
-VER = '6.5.4'
+VER = '6.5.5'
 s = open('base43.html', encoding='utf-8').read()
 
 def rep(a, b, n=1):
@@ -23,7 +23,7 @@ rep("(cut?'\\n…вывод обрезан':'')","(cut?'\\n…вывод обр�
 rep("function fixErr(e,code){if(!e)return e;","function fixErr(e,code){if(!e)return e;try{e=itpTrFull(e)}catch(_x){}")
 rep("function fin2(err){","function fin2(err){if(err&&/^SystemExit\\b/.test(err))err=null;")
 rep("function isOpen(i,j){var k=i+'-'+j;", "function isOpen(i,j){if(typeof DEV==='function'&&DEV())return 1;var k=i+'-'+j;if(j===0&&IT(i,0).t==='theory')return 1;if(TOPICS[i].opt)return S.d[k]||j===0||S.d[i+'-'+(j-1)]?1:0;")
-rep("function nxI(i,j){if(!(i<S.start)||TOPICS[i].intro)return false;", "function nxI(i,j){if(!(i<S.start||TOPICS[i].opt)||TOPICS[i].intro)return false;")
+rep("function nxI(i,j){if(!(i<S.start)||TOPICS[i].intro)return false;", "function nxI(i,j){if(!(i<S.start||TOPICS[i].opt)||TOPICS[i].intro)return false;if(TOPICS[i].opt){for(var y=0,st=0;y<ni(i);y++)if(S.d[i+'-'+y])st=1;if(!st)return false}")
 rep("(S.d[i+'-'+j]||(i<S.start&&!t.intro))", "(S.d[i+'-'+j]||(i<S.start&&!t.intro&&!t.opt))")
 rep("esc(q.e||'')", "esc(q.e||'')+xm(q)", 3)
 rep("(String(it.html).match(/\\[\\[([^\\]|]+)/g)||[])", "(String(it.html).replace(/<pre>[\\s\\S]*?<\\/pre>/g,'').match(/\\[\\[([^\\]|]+)/g)||[])")
