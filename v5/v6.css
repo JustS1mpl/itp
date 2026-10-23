@@ -468,6 +468,7 @@ html.noln .gt{display:none}
 .topic{position:relative;margin-bottom:28px}
 .thead{position:sticky;top:calc(var(--tbh) + var(--safe-t));z-index:4;display:flex;align-items:center;gap:12px;margin:0 -6px 6px;padding:10px 12px 10px 10px;border-radius:var(--r-lg);background:var(--card);border:1px solid var(--line);box-shadow:var(--sh1);transition:background var(--d3),color var(--d3)}
 .thead .tn svg{width:20px;height:20px}
+.thead .tn .th{font-size:.8125rem;letter-spacing:-.02em}
 .thead .tn{width:40px;height:40px;flex:none;display:grid;place-items:center;border-radius:var(--r-sm);background:var(--card2);color:var(--muted);font-weight:900;font-size:1.0625rem}
 .thead .tt{flex:1;min-width:0}
 .thead h2{font-size:1.0625rem;margin:0;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}

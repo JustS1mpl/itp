@@ -552,4 +552,4 @@ exitonclick()''') + '''
               ['6', '1', '12', '36'], bonus=40)
 
     items = [th1, fl1, th2, fl2, th3, fl3, tasks1, th4, fl4, th5, fl5, tasks2, th6, fl6, tasks3, proj]
-    return topic('Черепаха: рисуем кодом', 'Доп. глава: модуль turtle, фигуры, координаты и несколько черепах', items, opt=True)
+    return topic('Черепаха: рисуем кодом', 'Модуль turtle: фигуры, координаты и несколько черепах', items, opt=True)
