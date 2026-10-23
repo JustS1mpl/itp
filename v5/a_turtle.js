@@ -78,8 +78,8 @@ TW.mount=function(host,D,opt){
     dpr=Math.min(window.devicePixelRatio||1,3);W=Math.round(w*dpr);cv.width=W;cv.height=W;draw()}
   function play(){
     cancelAnimationFrame(raf);
-    if(RM()||N<2){p=1;draw();return}
-    var dur=Math.min(4500,Math.max(700,N*30)),t0=null;p=0;
+    if(RM()||!N){p=1;draw();return}
+    var dur=Math.min(4500,Math.max(760,N*30)),t0=null;p=0;
     function fr(ts){if(!cv.isConnected)return;if(t0===null)t0=ts;p=Math.min(1,(ts-t0)/dur);draw();if(p<1)raf=requestAnimationFrame(fr)}
     raf=requestAnimationFrame(fr)}
   bt.onclick=function(){snd('click');play()};

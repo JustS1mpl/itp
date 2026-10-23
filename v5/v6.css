@@ -646,6 +646,12 @@ html.noln .gt{display:none}
 .pcard[disabled] .go{color:var(--muted)}
 .pcard[disabled] .pic{filter:grayscale(1);opacity:.6}
 .pdeco{position:absolute;right:-18px;bottom:-26px;width:150px;height:150px;opacity:.9;pointer-events:none}
+.pdeco .dt{fill:var(--card);stroke:var(--line2);stroke-width:2.4;stroke-linejoin:round}
+.pdeco .dl,.pdeco .dr{stroke:var(--line2);stroke-width:2.4;stroke-linejoin:round}
+.pdeco .dl{fill:color-mix(in srgb,var(--card) 88%,var(--line2))}
+.pdeco .dr{fill:color-mix(in srgb,var(--card) 70%,var(--line2))}
+.pdeco .dpip{fill:var(--accent)}
+.pdeco .dpip circle{opacity:.92}
 .pnote{margin:14px 4px 0;font-size:.84375rem;color:var(--muted);text-align:center}
 
 /* профиль */

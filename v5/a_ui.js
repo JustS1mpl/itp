@@ -165,12 +165,23 @@ function linksWatch(){
 /* cur() (текущий островок) обходит весь курс; при отрисовке Пути его зовут для каждого острова,
    поэтому на время отрисовки ответ запоминается один раз */
 var CUR1=null;
-function cur(){if(CUR1!==null)return CUR1;for(var i=Math.max(S.start,0);i<TOPICS.length;i++){if(TOPICS[i].opt)continue;for(var j=0;j<ni(i);j++)if(!S.d[i+'-'+j])return i+'-'+j}return''}
+/* «где я остановился» — сразу за самым дальним пройденным островком (доп. главы считаются наравне с темами);
+   всё, что раньше этой точки и не пройдено, считается пропущенным, но остаётся открытым */
+var FRN1=null;
+function FRN(){if(FRN1)return FRN1;var li=-1,lj=-1,i,j,r=null;
+  for(i=0;i<TOPICS.length;i++)for(j=0;j<ni(i);j++)if(S.d[i+'-'+j]){li=i;lj=j}
+  if(li<0)r=[Math.max(S.start,0),0];
+  else{for(i=li,j=lj+1;i<TOPICS.length&&!r;i++,j=0)for(;j<ni(i);j++)if(!S.d[i+'-'+j]){r=[i,j];break}
+    if(!r)r=[TOPICS.length,0]}
+  if(CUR1!==null)FRN1=r;return r}
+function bfr(i,j){var f=FRN();return i<f[0]||(i===f[0]&&j<f[1])}
+function cur(){if(CUR1!==null)return CUR1;var f=FRN();if(f[0]<TOPICS.length)return f[0]+'-'+f[1];
+  for(var i=Math.max(S.start,0);i<TOPICS.length;i++)for(var j=0;j<ni(i);j++)if(!S.d[i+'-'+j])return i+'-'+j;return''}
 /* доп. главы (opt:1) необязательны: путь идёт мимо них, в счёт тем и завершение обучения они не входят */
 function allDone(){return TOPICS.every(function(t,i){return t.intro||t.opt||tdone(i)})}
 function NT(){return TOPICS.filter(function(t){return!t.intro&&!t.opt}).length}
 function ND(){return TOPICS.filter(function(t,i){return!t.intro&&!t.opt&&(tdone(i)||i<S.start)}).length}
-function curOnce(f){var o=CUR1;CUR1=null;CUR1=cur();try{return f()}finally{CUR1=o}}
+function curOnce(f){var o=CUR1,of=FRN1;CUR1=null;FRN1=null;CUR1=cur();try{return f()}finally{CUR1=o;FRN1=of}}
 /* объёмный наклонный шестиугольник: верх, бок, блик, свечение; тень на воде и галочка рисуются в CSS (меньше узлов на длинном Пути) */
 var HEX='<svg class="hx" viewBox="0 8 92 74" width="118" height="92" aria-hidden="true" focusable="false"><path class="gl" d="M9 34 L27 14 L65 14 L83 34 L83 46 L65 66 L27 66 L9 46 Z"/><path class="sd" d="M9 34 L27 54 L65 54 L83 34 L83 46 L65 66 L27 66 L9 46 Z"/><path d="M9 34 L27 14 L65 14 L83 34 L65 54 L27 54 Z"/><path class="sh" d="M13 33 L29 17 L63 17 L57 23 L31 23 L19 33 Z"/></svg>';
 var ITY={theory:['t','📖','Теория'],flash:['f','✏️','Вопросы'],test:['c','💻','Код'],project:['p','🚀','Мини-проект']};
@@ -196,7 +207,7 @@ function home0(){BACK=home;fzApply();
     if(!t.intro&&!t.opt)num++;if(!vis(i))return;
     var c=0;(t.items||[]).forEach(function(x,j){if(S.d[i+'-'+j])c++});
     var pc=Math.round(c/Math.max(1,ni(i))*100),dn=tdone(i);
-    h+='<section class="topic'+(t.intro?' intro':'')+(REV&&!t.intro?' rv':'')+'" aria-label="'+esc(t.intro?t.n:(t.opt?'Доп. глава '+num+'.5: ':'Тема '+num+': ')+t.n)+'">'+(t.intro?'<div class="ihead"><h2>'+esc(t.n)+'</h2><p class="mu">'+esc(t.s||'')+'</p></div>':'<div class="thead'+(dn?' done':'')+(i===ci?' now':'')+'"><div class="tn'+(dn?' ok':'')+'" aria-hidden="true">'+(dn?'':(t.opt?'<span class="th">'+num+'.5</span>':num))+'</div><div class="tt"><h2>'+esc(t.n)+'</h2><div class="mu">'+esc(t.s||'')+(t.opt?' · доп. глава, по желанию':(i<S.start&&!dn?' · пропущено':''))+'</div></div><div class="ring" style="--p:'+pc+'" role="img" aria-label="Пройдено '+c+' из '+ni(i)+'"><span>'+c+'/'+ni(i)+'</span></div></div>')+'<div class="path'+(RM()?'':' stg')+'" data-i="'+i+'">';
+    h+='<section class="topic'+(t.intro?' intro':'')+(REV&&!t.intro?' rv':'')+'" aria-label="'+esc(t.intro?t.n:(t.opt?'Доп. глава '+num+'.5: ':'Тема '+num+': ')+t.n)+'">'+(t.intro?'<div class="ihead"><h2>'+esc(t.n)+'</h2><p class="mu">'+esc(t.s||'')+'</p></div>':'<div class="thead'+(dn?' done':'')+(i===ci?' now':'')+'"><div class="tn'+(dn?' ok':'')+'" aria-hidden="true">'+(dn?'':(t.opt?'<span class="th">'+num+'.5</span>':num))+'</div><div class="tt"><h2>'+esc(t.n)+'</h2><div class="mu">'+esc(t.s||'')+(t.opt?' · доп. глава, по желанию':((i<S.start||i<FRN()[0])&&!dn?' · пропущено':''))+'</div></div><div class="ring" style="--p:'+pc+'" role="img" aria-label="Пройдено '+c+' из '+ni(i)+'"><span>'+c+'/'+ni(i)+'</span></div></div>')+'<div class="path'+(RM()?'':' stg')+'" data-i="'+i+'">';
     for(var j=0;j<ni(i);j++)h+=island(i,j,j);
     h+='</div></section>'});
   scr('home',h+'<aside class="jump" aria-label="Быстрый переход"><button id="jmp" aria-label="К текущему островку">'+ico('arrow')+'</button></aside>','home');bindHead(home);links();
@@ -272,7 +283,13 @@ function repeatAsk(away){
 
 /* --- практика --- */
 function row(ic,t,sub,a,dis,rt){return'<button class="li" data-a="'+a+'"'+(dis?' disabled':'')+'><span class="lic" aria-hidden="true">'+ic+'</span><span class="lt">'+t+(sub?'<small>'+sub+'</small>':'')+'</span>'+(rt?'<span class="lv">'+rt+'</span>':ico('chev','ch'))+'</button>'}
-var DICE='<svg class="pdeco" viewBox="0 0 150 150" aria-hidden="true"><g transform="rotate(-14 75 75)"><rect x="34" y="34" width="82" height="82" rx="20" fill="var(--card)" stroke="var(--line2)" stroke-width="3"/><g fill="var(--accent)"><circle cx="56" cy="56" r="7"/><circle cx="94" cy="56" r="7"/><circle cx="75" cy="75" r="7"/><circle cx="56" cy="94" r="7"/><circle cx="94" cy="94" r="7"/></g></g></svg>';
+var DICE='<svg class="pdeco" viewBox="0 0 150 150" aria-hidden="true" focusable="false"><g transform="rotate(-6 75 70)">'
++'<path class="dl" d="M37 42 L75 64 L75 104 L37 82 Z"/><path class="dr" d="M113 42 L113 82 L75 104 L75 64 Z"/>'
++'<path class="dt" d="M75 20 L113 42 L75 64 L37 42 Z"/>'
++'<g class="dpip"><ellipse cx="75" cy="31" rx="5.6" ry="3.3"/><ellipse cx="94" cy="42" rx="5.6" ry="3.3"/><ellipse cx="56" cy="42" rx="5.6" ry="3.3"/><ellipse cx="75" cy="53" rx="5.6" ry="3.3"/><ellipse cx="75" cy="42" rx="5.6" ry="3.3"/></g>'
++'<g class="dpip" transform="translate(56,73) skewY(30)"><circle cx="-11" cy="-12" r="4.6"/><circle cx="0" cy="0" r="4.6"/><circle cx="11" cy="12" r="4.6"/></g>'
++'<g class="dpip" transform="translate(94,73) skewY(-30)"><circle cx="0" cy="0" r="5.2"/></g>'
++'</g></svg>';
 function practice(){BACK=practice;PRW=0;
   var nf=passed('flash').length,nt=passed('test').length;
   function pc(a,ic,t,s,dis,big,lab){return'<button class="pcard'+(big?' big':'')+'" data-a="'+a+'"'+(dis?' disabled aria-disabled="true"':'')+'>'+(big?DICE:'')+'<span class="pic" aria-hidden="true">'+ic+'</span><b>'+t+'</b><small>'+s+'</small><span class="go">'+(dis?'Сначала пройди островок':lab)+(dis?'':ico('chev'))+'</span></button>'}
