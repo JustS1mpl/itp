@@ -1001,3 +1001,13 @@ html:not(.min) .nav button.act::after{transform:translateX(-50%) scaleX(1);opaci
 .nav button.act .ni .em{transform:translateY(-1px) scale(1.08)}
 .nav button:active .ni .em{transform:scale(.88)}
 html:not(.min) .nav button.act .ni .em{filter:drop-shadow(0 0 5px color-mix(in srgb,var(--accent) 75%,transparent)) drop-shadow(0 0 1.5px var(--accent))}
+
+/* v6.5.0: рисунок черепахи в теории и под выводом программы */
+.tuf{position:relative;width:100%;max-width:380px;margin:10px 0 18px;border:1.5px solid var(--line2);border-radius:18px;background:#fff;overflow:hidden;box-shadow:0 6px 18px -10px rgba(40,50,70,.35)}
+.tuf.run{margin:12px 0 4px}
+.tuf canvas{display:block;width:100%;aspect-ratio:1/1}
+.tuplay{position:absolute;right:6px;top:6px;width:44px;height:44px;border-radius:12px;border:1px solid var(--line2);background:color-mix(in srgb,#fff 88%,transparent);color:#333;font-size:1.25rem;line-height:1;cursor:pointer;transition:transform var(--d2) var(--e-out)}
+.tuplay:active{transform:scale(.92)}
+.tucap{padding:9px 14px 9px 30px;position:relative;border-top:1px solid var(--line2);background:var(--card2);color:var(--muted);font-size:.8125rem}
+
+.tucap:before{content:'';position:absolute;left:14px;top:50%;width:8px;height:8px;margin-top:-4px;border-radius:50%;background:var(--green,#58cc02)}

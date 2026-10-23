@@ -11,3 +11,4 @@ pyo/
 !assets/mascot/*.png
 tests/_wav/
 !tests/sound_spectrograms.png
+.turtle_shim/

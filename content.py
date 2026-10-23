@@ -6,4 +6,5 @@ def build():
         out.append(importlib.import_module(m).build())
     import post
     post.apply(out)
+    out.insert(9, importlib.import_module('c_tur').build())   # доп. глава «Черепаха»: между темами 8 и 9
     return out

@@ -49,7 +49,7 @@ def run(theme='light', w=390):
         tap(pg, '.gb[data-g="f"]')
         snap(pg, '01_nick_' + theme)
         tap(pg, '#go')
-        ok(pg.locator('.plc').count() == pg.evaluate("TOPICS.filter(function(t){return!t.intro}).length"), 'на выборе старта все темы из TOPICS')
+        ok(pg.locator('.plc').count() == pg.evaluate("TOPICS.filter(function(t){return!t.intro&&!t.opt}).length"), 'на выборе старта все темы из TOPICS')
         snap(pg, '02_place_' + theme)
         tap(pg, '.plc.rec')
         ok(pg.evaluate("S.start") == 0 and pg.evaluate("S.g") == 'f', 'старт с нуля, обращение сохранено')

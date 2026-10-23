@@ -165,7 +165,11 @@ function linksWatch(){
 /* cur() (текущий островок) обходит весь курс; при отрисовке Пути его зовут для каждого острова,
    поэтому на время отрисовки ответ запоминается один раз */
 var CUR1=null;
-function cur(){if(CUR1!==null)return CUR1;for(var i=Math.max(S.start,0);i<TOPICS.length;i++)for(var j=0;j<ni(i);j++)if(!S.d[i+'-'+j])return i+'-'+j;return''}
+function cur(){if(CUR1!==null)return CUR1;for(var i=Math.max(S.start,0);i<TOPICS.length;i++){if(TOPICS[i].opt)continue;for(var j=0;j<ni(i);j++)if(!S.d[i+'-'+j])return i+'-'+j}return''}
+/* доп. главы (opt:1) необязательны: путь идёт мимо них, в счёт тем и завершение обучения они не входят */
+function allDone(){return TOPICS.every(function(t,i){return t.intro||t.opt||tdone(i)})}
+function NT(){return TOPICS.filter(function(t){return!t.intro&&!t.opt}).length}
+function ND(){return TOPICS.filter(function(t,i){return!t.intro&&!t.opt&&(tdone(i)||i<S.start)}).length}
 function curOnce(f){var o=CUR1;CUR1=null;CUR1=cur();try{return f()}finally{CUR1=o}}
 /* объёмный наклонный шестиугольник: верх, бок, блик, свечение; тень на воде и галочка рисуются в CSS (меньше узлов на длинном Пути) */
 var HEX='<svg class="hx" viewBox="0 8 92 74" width="118" height="92" aria-hidden="true" focusable="false"><path class="gl" d="M9 34 L27 14 L65 14 L83 34 L83 46 L65 66 L27 66 L9 46 Z"/><path class="sd" d="M9 34 L27 54 L65 54 L83 34 L83 46 L65 66 L27 66 L9 46 Z"/><path d="M9 34 L27 14 L65 14 L83 34 L65 54 L27 54 Z"/><path class="sh" d="M13 33 L29 17 L63 17 L57 23 L31 23 L19 33 Z"/></svg>';
@@ -189,10 +193,10 @@ function home0(){BACK=home;fzApply();
   var first=TOPICS[0]&&TOPICS[0].intro&&S.start===0&&!tdone(0)&&!REV;
   var h=head()+'<h1 class="sr-only">Путь</h1>'+(first?'':goalCard(all)),num=0,cu=cur(),ci=cu?+cu.split('-')[0]:-1;
   TOPICS.forEach(function(t,i){
-    if(!t.intro)num++;if(!vis(i))return;
+    if(!t.intro&&!t.opt)num++;if(!vis(i))return;
     var c=0;(t.items||[]).forEach(function(x,j){if(S.d[i+'-'+j])c++});
     var pc=Math.round(c/Math.max(1,ni(i))*100),dn=tdone(i);
-    h+='<section class="topic'+(t.intro?' intro':'')+(REV&&!t.intro?' rv':'')+'" aria-label="'+esc(t.intro?t.n:'Тема '+num+': '+t.n)+'">'+(t.intro?'<div class="ihead"><h2>'+esc(t.n)+'</h2><p class="mu">'+esc(t.s||'')+'</p></div>':'<div class="thead'+(dn?' done':'')+(i===ci?' now':'')+'"><div class="tn'+(dn?' ok':'')+'" aria-hidden="true">'+(dn?'':num)+'</div><div class="tt"><h2>'+esc(t.n)+'</h2><div class="mu">'+esc(t.s||'')+(i<S.start&&!dn?' · пропущено':'')+'</div></div><div class="ring" style="--p:'+pc+'" role="img" aria-label="Пройдено '+c+' из '+ni(i)+'"><span>'+c+'/'+ni(i)+'</span></div></div>')+'<div class="path'+(RM()?'':' stg')+'" data-i="'+i+'">';
+    h+='<section class="topic'+(t.intro?' intro':'')+(REV&&!t.intro?' rv':'')+'" aria-label="'+esc(t.intro?t.n:(t.opt?'Доп. глава: ':'Тема '+num+': ')+t.n)+'">'+(t.intro?'<div class="ihead"><h2>'+esc(t.n)+'</h2><p class="mu">'+esc(t.s||'')+'</p></div>':'<div class="thead'+(dn?' done':'')+(i===ci?' now':'')+'"><div class="tn'+(dn?' ok':'')+'" aria-hidden="true">'+(dn?'':(t.opt?'+':num))+'</div><div class="tt"><h2>'+esc(t.n)+'</h2><div class="mu">'+esc(t.s||'')+(t.opt?' · доп. глава, по желанию':(i<S.start&&!dn?' · пропущено':''))+'</div></div><div class="ring" style="--p:'+pc+'" role="img" aria-label="Пройдено '+c+' из '+ni(i)+'"><span>'+c+'/'+ni(i)+'</span></div></div>')+'<div class="path'+(RM()?'':' stg')+'" data-i="'+i+'">';
     for(var j=0;j<ni(i);j++)h+=island(i,j,j);
     h+='</div></section>'});
   scr('home',h+'<aside class="jump" aria-label="Быстрый переход"><button id="jmp" aria-label="К текущему островку">'+ico('arrow')+'</button></aside>','home');bindHead(home);links();

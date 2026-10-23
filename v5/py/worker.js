@@ -40,6 +40,7 @@ self.onmessage=async function(e){var m=e.data;
     flush();
     try{py.runPython('_itp_reset()')}catch(x){}
     var o=RUN;RUN=null;
-    postMessage({t:'done',err:res===undefined?null:res,fail:fail,over:o.over,used:o.i})
+    var tu=null;try{tu=py.runPython('_tdump()')}catch(x){}
+    postMessage({t:'done',err:res===undefined?null:res,fail:fail,over:o.over,used:o.i,tu:tu||null})
   }
 };

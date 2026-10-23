@@ -76,7 +76,7 @@ var N_=SXN_;
 var SXD={
   tap_1:{p:0,j:.035,min:55,dur:.07,w:.04,pk:-23.8,lv:-23.58,fn:function(v){sxSn(v,0,N_.G5,.045,1,.003)}},
   tap_2:{p:0,j:.035,min:55,dur:.07,w:.03,pk:-23.8,lv:-23.9,fn:function(v){sxBk(v,0,N_.G3,.05,1)}},
-  nav_1:{p:0,j:.035,min:55,dur:.15,w:.06,pk:-25.7,lv:-25.67,fn:function(v){sxSn(v,0,N_.E5,.08,.9);sxSn(v,.06,N_.D5,.085,1)}},
+  nav_1:{p:0,j:.035,min:55,dur:.1,w:.05,pk:-24,lv:-24.07,fn:function(v){sxSn(v,0,N_.E5,.085,1,.004)}},
   toggle_on_1:{p:0,j:.035,min:90,dur:.15,w:.05,pk:-25.7,lv:-25.92,fn:function(v){sxSn(v,0,N_.C5,.08,.9);sxSn(v,.055,N_.G5,.09,1)}},
   toggle_off_1:{p:0,j:.035,min:90,dur:.15,w:.05,pk:-25.7,lv:-25.46,fn:function(v){sxSn(v,0,N_.C5,.08,.9);sxSn(v,.055,N_.G4,.09,1)}},
   sheet_open_1:{p:0,j:.035,min:160,dur:.18,w:.08,pk:-31,lv:-30.26,fn:function(v){sxSn(v,0,N_.A5,.14,.9)}},

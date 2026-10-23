@@ -1,7 +1,12 @@
 import json, subprocess, html, random, hashlib, re, sys, os
 
 PY = sys.executable
-os.environ['PYTHONPATH'] = os.path.abspath('shim') + os.pathsep + os.environ.get('PYTHONPATH', '')
+# модуль turtle для проверки примеров: tkinter в среде сборки нет, поэтому берём тот же файл, что работает в приложении
+import shutil
+_TS = os.path.abspath('.turtle_shim')
+os.makedirs(_TS, exist_ok=True)
+shutil.copy('v5/py/turtle_shim.py', _TS + '/turtle.py')
+os.environ['PYTHONPATH'] = _TS + os.pathsep + os.path.abspath('shim') + os.pathsep + os.environ.get('PYTHONPATH', '')
 from c_x import XMAP
 USED = set()
 FILESETS = {}
@@ -62,15 +67,35 @@ def ex(code, lines=None, files=None):
     return '<pre>' + code + '</pre><pre class="' + cls + '">' + tr.rstrip('\n') + '</pre>'
 
 
-def tu(code, note=''):
-    """пример с черепахой: код, вывод (если есть) и кнопка «Показать рисунок»"""
+def run_tu(code, lines=None):
+    """запуск с модулем turtle из v5/py/turtle_shim.py: (plain, transcript_html, json_рисунка)"""
+    import tempfile, shutil
+    lines = lines or []
+    d = tempfile.mkdtemp()
+    shutil.copy('v5/py/turtle_shim.py', d + '/turtle.py')
+    prog = WRAP % (lines, code) + "\nimport turtle as _t\nopen('__dump.json', 'w', encoding='utf-8').write(_t._dump() or '')\n"
+    r = subprocess.run([PY, '-c', prog], capture_output=True, text=True, timeout=20, cwd=d)
+    assert r.returncode == 0, (code, r.stderr)
+    raw = r.stdout
+    plain = re.sub(r'\x03.*?\x04', '', raw)
+    plain = re.sub(r'\x01.*?\x02\n', '', plain)
+    tr = esc(raw)
+    tr = re.sub(r'\x03(.*?)\x04', r'\1', tr)
+    tr = re.sub(r'\x01(.*?)\x02', r'<span class="ty">\1</span>', tr)
+    dump = open(d + '/__dump.json', encoding='utf-8').read()
+    assert dump, ('программа ничего не нарисовала', code)
+    return plain, tr, dump
+
+
+def tu(code, lines=None):
+    """пример с черепахой: код, вывод (если есть) и готовый рисунок под ним (рисуется в приложении на холсте)"""
     code = code.strip('\n')
-    plain, tr = run(code)
-    EX.append(dict(code=code, lines=[], out=plain))
+    plain, tr, dump = run_tu(code, lines)
+    EX.append(dict(code=code, lines=lines or [], out=plain))
     h = '<pre>' + code + '</pre>'
     if plain.strip():
-        h += '<pre class="out">' + tr.rstrip('\n') + '</pre>'
-    return h + '<div class="tudemo"><button class="btn g" type="button" data-tu="' + html.escape(code, quote=True).replace('[', '&#91;') + '">🐢 Показать рисунок</button><span class="tumsg" role="status"></span></div>'
+        h += '<pre class="out' + (' con' if lines else '') + '">' + tr.rstrip('\n') + '</pre>'
+    return h + '<div class="tuf" data-td="' + html.escape(dump, quote=True).replace('[', '&#91;') + '"></div>'
 
 
 def exs(code, out):
@@ -226,10 +251,12 @@ def pj(name, q_, h, sol, inputs, strict=False, exp=None, bonus=None, ex_=None, f
     return d
 
 
-def topic(n, s, items, intro=False):
+def topic(n, s, items, intro=False, opt=False):
     d = {'n': n, 's': s}
     if intro:
         d['intro'] = 1
+    if opt:
+        d['opt'] = 1
     d['items'] = items
     return d
 

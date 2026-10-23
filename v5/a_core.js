@@ -11,8 +11,10 @@ function clean0_(r){return clean0(r)}
 /* v5.7.0: раздел ЕГЭ удалён. В старых сохранениях номера тем 15-20 выбрасываются, 21 и выше сдвигаются на -6.
    Метка mv=2 (число, а не переменная: clean() вызывается при загрузке раньше, чем выполняются var) нужна, чтобы сдвиг не применился дважды. */
 function migr(r){
-  if(!r||typeof r!=='object'||Array.isArray(r)||r.mv===2)return r;
-  var mp=function(i){return i<15?i:(i>=21?i-6:-1)},o={};
+  /* mv:2 — удалён раздел ЕГЭ (темы 15–20 выброшены, 21+ сдвинуты на −6); mv:3 — между темами 8 и 9 вставлена доп. глава «Черепаха» (9+ сдвинуты на +1) */
+  if(!r||typeof r!=='object'||Array.isArray(r)||r.mv>=3)return r;
+  var m1=function(i){return i<15?i:(i>=21?i-6:-1)},m2=function(i){return i<9?i:i+1};
+  var mp=r.mv===2?m2:function(i){var a=m1(i);return a<0?-1:m2(a)},o={};
   for(var k in r)if(Object.prototype.hasOwnProperty.call(r,k))o[k]=r[k];
   ['d','tk','at','es','dr','hu'].forEach(function(f){
     var x=r[f];if(!x||typeof x!=='object'||Array.isArray(x))return;
@@ -22,11 +24,11 @@ function migr(r){
       if(n<0||!/^\d+$/.test(p[0]))return;
       p[0]=String(n);y[p.join('-')]=x[key]});
     o[f]=y});
-  if(Number.isInteger(r.start)&&r.start>=0)o.start=r.start<15?r.start:(r.start>=21?r.start-6:15);
+  if(Number.isInteger(r.start)&&r.start>=0){var s=r.start;if(r.mv!==2)s=s<15?s:(s>=21?s-6:15);o.start=m2(s)}
   return o}
 function clean(r){
   r=migr(r);
-  var o=clean0(r);o.mv=2;r=(r&&typeof r==='object'&&!Array.isArray(r))?r:{};
+  var o=clean0(r);o.mv=3;r=(r&&typeof r==='object'&&!Array.isArray(r))?r:{};
   var s=(r.set&&typeof r.set==='object'&&!Array.isArray(r.set))?r.set:{},q={};
   var pick=function(k,list){q[k]=list.indexOf(s[k])>=0?s[k]:defset()[k]},bl=function(k){q[k]=s[k]===0||s[k]===false?0:(s[k]===1||s[k]===true?1:defset()[k])};
   pick('acc',['','carrot','pink','blue','violet']);pick('tz',[90,100,115,130]);pick('anim',['full','less','off']);pick('cf',[13,15,17,19]);pick('sh',['v','h']);pick('ph',['card','corner','pop']);pick('fl',['tilt','flat']);

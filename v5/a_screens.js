@@ -71,7 +71,7 @@ function nick(){
   setTimeout(function(){if(!('ontouchstart' in window))i.focus()},300)}
 function place(){
   var f=TOPICS[0]&&TOPICS[0].intro?1:0,h='<div class="onb" style="padding-top:6px"><h1>С чего начнём?</h1><p class="lead">Выбери первую тему, которую ещё не знаешь. Пропущенные можно пройти потом.</p></div>',n=0;
-  TOPICS.forEach(function(t,i){if(t.intro)return;n++;var z=i===f;h+='<button class="plc'+(z?' rec':'')+'" data-i="'+i+'"><span class="pn" aria-hidden="true">'+n+'</span><span class="pt">'+(z?'С нуля: ':'')+esc(t.n)+'<small>'+esc(t.s)+'</small></span>'+ico('chev','ch')+'</button>'});
+  TOPICS.forEach(function(t,i){if(t.intro||t.opt)return;n++;var z=i===f;h+='<button class="plc'+(z?' rec':'')+'" data-i="'+i+'"><span class="pn" aria-hidden="true">'+n+'</span><span class="pt">'+(z?'С нуля: ':'')+esc(t.n)+'<small>'+esc(t.s)+'</small></span>'+ico('chev','ch')+'</button>'});
   scr('place',h);
   app.querySelectorAll('.plc').forEach(function(b){b.onclick=function(){S.start=(+b.dataset.i===f?0:+b.dataset.i);save();greet()}})}
 
@@ -161,6 +161,7 @@ function theory(i,j){
   $('x').onclick=goBack;
   app.querySelectorAll('.term').forEach(function(b){b.onclick=function(){var x=T[b.dataset.n];sheet(x.n,x.d)}});
   $('go').onclick=function(){var w=tdone(i);if(!S.d[i+'-'+j]){snd('theory');bump(i+'-'+j)}if(TOPICS[i].intro&&!w&&tdone(i)&&S.start===0){reveal();return}if(TOPICS[i].intro&&(S.start>0||w)){goBack();if(!w)toast('Готово. Эта кнопка больше не нужна и пропала из профиля');return}home();if(!w&&tdone(i)){toast('🎉 Тема «'+TOPICS[i].n+'» пройдена!');confetti(allDone()?2:1)}};
+  if(window.TW)TW.scan(app);
   tocBuild();if(fresh&&!rm&&ST('ty'))typeIn($('tb'),$('tm'));
   readProg()}
 /* полоска в шапке теории: сколько уже прочитано */
