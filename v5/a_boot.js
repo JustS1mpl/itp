@@ -320,7 +320,7 @@ function bsCrack(b,T,end){
 /* осыпание: куски не исчезают, а падают за нижний край под действием тяжести — мелкие у удара первыми, крупные по краям позже.
    Каждый кусок сначала чуть проседает, потом срывается; вращение небольшое, как у тяжёлого стекла */
 function bsShatter(b,cells,cx,cy,w,h,D,T,end){
-  var v=b.querySelector('.bsv'),box=document.createElement('div'),last=0,G=2600;box.id='shards';box.onclick=end;
+  var v=b.querySelector('.bsv'),box=document.createElement('div'),last=0,G=4200,an=[];box.id='shards';box.onclick=end;
   cells.forEach(function(pl){
     var xs=pl.map(function(p){return p[0]}),ys=pl.map(function(p){return p[1]});
     var x0=Math.max(0,Math.floor(Math.min.apply(0,xs))),y0=Math.max(0,Math.floor(Math.min.apply(0,ys))),x1=Math.min(w,Math.ceil(Math.max.apply(0,xs))),y1=Math.min(h,Math.ceil(Math.max.apply(0,ys)));
@@ -335,14 +335,17 @@ function bsShatter(b,cells,cx,cy,w,h,D,T,end){
     box.appendChild(d);
     var mx=0,my=0;pl.forEach(function(p){mx+=p[0];my+=p[1]});mx=mx/pl.length;my=my/pl.length;
     var ar=(x1-x0)*(y1-y0)/(w*h),ds=Math.hypot(mx-cx,my-cy)/D,sm=Math.max(.25,1-ar*6);
-    var dy=h-y0+40,du=Math.round(Math.sqrt(2*dy/G)*1000*(.95+Math.random()*.2)),dl=Math.round(ds*2600*(.55+Math.random()*.6)+Math.random()*200);
-    var dx=((mx-cx)/w)*70+(Math.random()-.5)*40,rz=(Math.random()-.5)*44*sm,rx=(Math.random()-.5)*36*sm,sg=2+Math.random()*4;
-    last=Math.max(last,dl+260+du);
-    d.animate([{transform:'none'},{transform:'translateY('+sg.toFixed(1)+'px)',offset:.35},{transform:'translateY('+sg.toFixed(1)+'px) rotate('+(rz*.05).toFixed(1)+'deg)'}],{duration:260,delay:dl,easing:'ease-out',fill:'both'}).onfinish=function(){
-      d.animate([{transform:'translateY('+sg.toFixed(1)+'px) rotate('+(rz*.05).toFixed(1)+'deg)'},
-        {transform:'translate('+dx.toFixed(1)+'px,'+(dy+sg).toFixed(1)+'px) rotateX('+rx.toFixed(0)+'deg) rotate('+rz.toFixed(1)+'deg)'}],
-        {duration:du,easing:'cubic-bezier(.5,0,1,.6)',fill:'both'})}});
+    var dy=h-y0+60,du=Math.round(Math.sqrt(2*dy/G)*1000*(.95+Math.random()*.15)),dl=Math.round(ds*1600*(.55+Math.random()*.6)+Math.random()*150);
+    var dx=((mx-cx)/w)*70+(Math.random()-.5)*40,rz=(Math.random()-.5)*44*sm,rx=(Math.random()-.5)*36*sm,sg=2+Math.random()*4,SG=180,tot=SG+du;
+    last=Math.max(last,dl+tot);
+    /* проседание и падение — одна анимация на общих часах: падение не может отстать от расписания, если страница занята */
+    var st='translateY('+sg.toFixed(1)+'px) rotate('+(rz*.05).toFixed(1)+'deg)';
+    an.push(d.animate([{transform:'none',easing:'ease-out'},{transform:'translateY('+sg.toFixed(1)+'px)',offset:SG*.4/tot},{transform:st,offset:SG/tot,easing:'cubic-bezier(.5,0,1,.6)'},
+      {transform:'translate('+dx.toFixed(1)+'px,'+(dy+sg).toFixed(1)+'px) rotateX('+rx.toFixed(0)+'deg) rotate('+rz.toFixed(1)+'deg)'}],
+      {duration:tot,delay:dl,fill:'both'}))});
   document.body.appendChild(box);b.remove();bx('shatter');document.documentElement.classList.remove('crt-on');
-  app.animate([{filter:'brightness(.45)'},{filter:'brightness(.45)',offset:.25},{filter:'brightness(1)'}],{duration:Math.min(4200,last),easing:'ease-out'});
-  T(function(){snd('level')},Math.min(3200,last*.7));
-  T(end,last+200)}
+  app.animate([{filter:'brightness(.45)'},{filter:'brightness(.45)',offset:.25},{filter:'brightness(1)'}],{duration:Math.min(3000,last),easing:'ease-out'});
+  T(function(){snd('level')},Math.min(2200,last*.7));
+  /* сцена заканчивается, когда упал последний кусок; таймер — только запасной */
+  Promise.all(an.map(function(a){return a.finished})).then(end,end);
+  T(end,last+1500)}
