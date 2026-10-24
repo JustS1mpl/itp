@@ -164,13 +164,18 @@ function theory(i,j){
   if(window.TW)TW.scan(app);
   tocBuild();if(fresh&&!rm&&ST('ty'))typeIn($('tb'),$('tm'));
   readProg()}
-/* полоска в шапке теории: сколько уже прочитано */
+/* полоска в шапке теории: сколько уже прочитано. Короткий урок (страница не прокручивается) считается прочитанным
+   целиком, но только когда текст допечатан: во время печати страница короткая лишь потому, что текста ещё нет
+   (typeIn вешает на #tb класс noemo, пока печатает) */
 var RPS=null;
 function readProg(){
   if(RPS)window.removeEventListener('scroll',RPS);
-  var b=$('rpb');if(!b)return;var bar=b.parentNode,lp=-1,fin=0;
-  RPS=function(){if(!b.isConnected){window.removeEventListener('scroll',RPS);RPS=null;return}var mx=document.documentElement.scrollHeight-innerHeight,p=mx>8?Math.min(100,Math.round(window.scrollY/mx*100)):(fin?100:0);if(p!==lp){lp=p;b.style.width=p+'%';bar.setAttribute('aria-valuenow',p)}};
-  window.addEventListener('scroll',RPS,{passive:true});if(window.ResizeObserver){var ro=new ResizeObserver(function(){if(!b.isConnected||!RPS){ro.disconnect();return}RPS()});ro.observe(document.body)}setTimeout(function(){if(RPS)RPS()},60);setTimeout(function(){fin=1;if(RPS)RPS()},700)}
+  var b=$('rpb');if(!b)return;var bar=b.parentNode,lp=-1,fin=0,tb=$('tb');
+  RPS=function(){if(!b.isConnected){window.removeEventListener('scroll',RPS);RPS=null;return}var ty=tb&&tb.classList.contains('noemo'),mx=document.documentElement.scrollHeight-innerHeight,p=mx>8?Math.min(100,Math.round(window.scrollY/mx*100)):(fin&&!ty?100:0);if(p!==lp){lp=p;b.style.width=p+'%';bar.setAttribute('aria-valuenow',p)}};
+  window.addEventListener('scroll',RPS,{passive:true});if(window.ResizeObserver){var ro=new ResizeObserver(function(){if(!b.isConnected||!RPS){ro.disconnect();return}RPS()});ro.observe(document.body)}
+  /* печать закончилась (или её допечатали касанием) — пересчитать */
+  if(tb&&window.MutationObserver){var mo=new MutationObserver(function(){if(!b.isConnected||!RPS){mo.disconnect();return}if(!tb.classList.contains('noemo')){mo.disconnect();RPS()}});mo.observe(tb,{attributes:true,attributeFilter:['class']})}
+  setTimeout(function(){if(RPS)RPS()},60);setTimeout(function(){fin=1;if(RPS)RPS()},700)}
 
 /* --- вопросы --- */
 function quiz(i,j){
