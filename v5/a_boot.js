@@ -78,7 +78,7 @@ function crtOpen(){
   crtClose();var bx=document.getElementById('shards');if(bx)bx.remove();bx=document.getElementById('bsod');if(bx)bx.remove();
   scr('nick','');window.scrollTo(0,0);
   var full=!S.nick,rm=RM(),o=document.createElement('div');o.id='crt';o.className='crt'+(rm?' rm':'');
-  o.innerHTML='<div class="bz"><div class="sc"><div class="sci"><canvas class="rain" aria-hidden="true"></canvas>'+(full?'<div class="spl" aria-hidden="true"><canvas class="lg"></canvas><i class="sg">▮</i><div class="bl">И&nbsp;ТАК, ПРОГРАММИРОВАНИЕ</div></div>':'')+'<div class="tm" role="log" aria-live="polite" aria-label="Знакомство с ИТП"><div class="tmi"></div></div></div><i class="fx" aria-hidden="true"></i></div></div>';
+  o.innerHTML='<div class="bz"><div class="sc"><div class="sci"><canvas class="rain" aria-hidden="true"></canvas>'+(full?'<div class="spl" aria-hidden="true"><canvas class="lg"></canvas><i class="sg">▮</i><div class="bl">IT&#39;S THE PROGRAMMING</div></div>':'')+'<div class="tm" role="log" aria-live="polite" aria-label="Знакомство с ИТП"><div class="tmi"></div></div></div><i class="fx" aria-hidden="true"></i></div></div>';
   document.body.appendChild(o);document.documentElement.classList.add('crt-on');
   CRT={el:o,tm:o.querySelector('.tm'),log:o.querySelector('.tmi'),tms:[],off:[],fast:0,rm:rm,rain:null,spl:null,touch:'ontouchstart' in window};
   /* касание или клавиша: пропустить заставку, допечатать текущую реплику */
@@ -116,7 +116,7 @@ function crtYou(s){if(!CRT)return;var e=crtRow('','tl you');e.textContent=s}
 
 /* поле ввода: рамка, «…» и мигающий блок-курсор; само поле настоящее (клавиатура телефона, вставка) */
 function crtAsk(max){return new Promise(function(res){
-  var f=crtRow('<label class="tbx"><span class="sr-only">Как тебя зовут?</span><span class="tv" aria-hidden="true"></span><span class="ph" aria-hidden="true">…</span><i class="cu" aria-hidden="true"></i><input id="nk" maxlength="'+max+'" autocomplete="off" autocapitalize="words" autocorrect="off" spellcheck="false" enterkeyhint="done"></label><button class="tgo" id="go" type="submit" disabled aria-label="Дальше">⏎</button>','tin','form');
+  var f=crtRow('<label class="tbx"><span class="sr-only">Как тебя зовут?</span><span class="tvw" aria-hidden="true"><span class="tv"></span></span><span class="ph" aria-hidden="true">…</span><i class="cu" aria-hidden="true"></i><input id="nk" maxlength="'+max+'" autocomplete="off" autocapitalize="words" autocorrect="off" spellcheck="false" enterkeyhint="done"></label><button class="tgo" id="go" type="submit" disabled aria-label="Дальше">⏎</button>','tin','form');
   var i=f.querySelector('input'),tv=f.querySelector('.tv'),g=f.querySelector('#go');
   f.setAttribute('autocomplete','off');
   i.oninput=function(){tv.textContent=i.value;f.classList.toggle('has',!!i.value);g.disabled=!i.value.trim()};
@@ -140,7 +140,7 @@ function crtMenu(items,lab){return new Promise(function(res){
 /* --- разговор --- */
 function crtDialog(full){
   CRT.el.classList.add('live');CRT.rain=rainStart(CRT.el.querySelector('.rain'));
-  var p=full?crtSys(['ITP BIOS v'+ITPV,'(c) «И так, программирование»','Проверка памяти ......... 640K OK','Интерпретатор Python .... найден','Кролик .................. на связи']):Promise.resolve();
+  var p=full?crtSys(['ITP BIOS v'+ITPV,'(c) It\'s The Programming','Проверка памяти ......... 640K OK','Интерпретатор Python .... найден','Кролик .................. на связи']):Promise.resolve();
   if(!S.nick)p=p.then(function(){return crtSay(['Привет.','Как я могу к тебе обращаться?'])}).then(function(){return crtAsk(20)}).then(function(v){
     S.nick=v;return crtSay(['Приятно познакомиться, '+v+'.','Ты парень или девушка? Это нужно, чтобы окончания в тексте были правильными.'])}).then(function(){
     return crtMenu([['m','Парень'],['f','Девушка'],['','Не указывать']].map(function(x,k){return{c:'tgd',a:' data-g="'+x[0]+'"',h:'<span class="tno">['+(k+1)+']</span>'+x[1]}}),'Как к тебе обращаться')}).then(function(k){
