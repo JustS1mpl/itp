@@ -731,10 +731,10 @@ button.tile.tbig:active{transform:scale(.97)}
 .pf .li .lic .em{width:1.5rem;height:1.5rem}
 .pf .pfoot{margin-top:22px}
 /* ошибки */
-.erow{display:flex;align-items:center;gap:10px;margin:12px 0 6px}
+/* тема: название во всю ширину, число ошибок — маленькая таблетка справа (полоски нет, чтобы не сжимать название) */
+.erow{display:flex;align-items:center;gap:10px;margin:14px 0 6px}
 .erow span{flex:1 1 auto;font-size:.9375rem;font-weight:800;min-width:0;overflow-wrap:anywhere}
-.erow .bar{flex:0 0 30%;height:8px}.erow .bar i{background:var(--bad)}
-.erow b{min-width:22px;text-align:right;color:var(--bad)}
+.erow b{flex:none;min-width:26px;height:22px;padding:0 8px;border-radius:var(--pill);background:var(--bad-soft);color:var(--bad);font-size:.8125rem;font-weight:900;line-height:22px;text-align:center;font-variant-numeric:tabular-nums}
 .elist{display:flex;flex-direction:column;gap:6px;margin:0 0 6px}
 .elink{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;min-height:52px;padding:8px 8px 8px 12px;border:0;border-radius:var(--r);background:var(--card2);text-align:left;font-size:.9375rem;font-weight:700;color:var(--ink)}
 .elink:active{background:var(--card3)}
@@ -942,6 +942,7 @@ button.li:hover{background:var(--card2)}
  .gcard{padding:16px}
  .tiles{gap:8px}.tile{padding:10px 12px;gap:10px}.tile.tbig{padding:14px 14px 12px}.tile.tbig b{font-size:2.75rem}
  .pcard.big{min-height:208px;padding:22px 18px 18px}.pcard.big small{max-width:64%}.pdeco{width:128px;height:128px;right:-16px;bottom:-16px}
+ .psf{padding:12px}.elink{gap:8px;padding:8px 6px 8px 10px}.elink{font-size:.875rem}.elink .eg{padding:0 9px;font-size:.75rem}
  .prl .pcard{grid-template-columns:26px minmax(0,1fr) auto;column-gap:12px;padding:12px 12px 12px 14px}.prl .pcard[disabled]{grid-template-columns:26px minmax(0,1fr)}.prl .pcard+.pcard::before{left:52px}.prl .go{font-size:.875rem}.prl .go svg{width:15px;height:15px}
  .q{font-size:1.1875rem}
 }
