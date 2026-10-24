@@ -116,9 +116,10 @@ b,strong{font-weight:800}
 #vg.no{box-shadow:inset 0 0 80px 18px color-mix(in srgb,var(--bad) 70%,transparent)}
 
 /* шапка */
-.top{position:sticky;top:0;z-index:8;display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:calc(var(--tbh) + var(--safe-t));margin:0 calc(-1*var(--gut));padding:var(--safe-t) var(--gut) 0;background:color-mix(in srgb,var(--bg) 84%,transparent);-webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5);transition:box-shadow var(--d2)}
+/* шапка — парящая скруглённая плашка со стенками, а не полоса, обрезанная по краям колонки */
+.top{position:sticky;top:calc(var(--safe-t) + 8px);z-index:8;display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:var(--tbh);margin:calc(var(--safe-t) + 8px) calc(-.5*var(--gut)) 10px;padding:0 calc(var(--gut) - 2px);border-radius:var(--r-lg,20px);background:color-mix(in srgb,var(--bg) 84%,transparent);-webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5);transition:box-shadow var(--d2)}
 @supports not (background:color-mix(in srgb,red,blue)){.top{background:var(--bg)}}
-html.scr .top{box-shadow:0 1px 0 var(--line)}
+html.scr .top{box-shadow:0 0 0 1px var(--line)}
 .top h1{flex:1 1 auto;min-width:0;font-size:1.1875rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .logo{display:inline-flex;align-items:center;gap:7px;height:44px;margin-left:-8px;padding:0 10px 0 8px;border:0;background:none;border-radius:var(--r-sm);font-weight:900;font-size:1.25rem;letter-spacing:-.02em;color:var(--ink);transition:background var(--d2),transform var(--d1)}
 .logo svg{flex:none;display:block}
@@ -975,8 +976,8 @@ button.li:hover{background:var(--card2)}
 :root[data-theme=dark]{--gl-a:68%;--gl-rim:rgba(255,255,255,.2);--gl-sheen:rgba(255,255,255,.07);--gl-drop:rgba(0,0,0,.5)}
 body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(60% 32% at 6% 0,color-mix(in srgb,var(--accent) 12%,transparent),transparent 70%),radial-gradient(50% 30% at 100% 22%,color-mix(in srgb,var(--carrot) 10%,transparent),transparent 70%),radial-gradient(70% 38% at 30% 100%,color-mix(in srgb,var(--blue) 10%,transparent),transparent 72%)}
 .top,.nav,.dock{background:linear-gradient(180deg,var(--gl-sheen),transparent 75%),color-mix(in srgb,var(--bg) var(--gl-a),transparent);-webkit-backdrop-filter:blur(20px) saturate(1.8);backdrop-filter:blur(20px) saturate(1.8)}
-.top{box-shadow:inset 0 -1px 0 var(--gl-rim)}
-html.scr .top{box-shadow:inset 0 -1px 0 var(--gl-rim),0 10px 24px -14px var(--gl-drop)}
+.top{box-shadow:inset 0 0 0 1px var(--gl-rim),0 6px 18px -14px var(--gl-drop)}
+html.scr .top{box-shadow:inset 0 0 0 1px var(--gl-rim),0 12px 28px -14px var(--gl-drop)}
 .nav{border-top:0;box-shadow:inset 0 1px 0 var(--gl-rim),0 -10px 24px -14px var(--gl-drop)}
 .dock{border-top:0;box-shadow:inset 0 1px 0 var(--gl-rim);background:linear-gradient(180deg,var(--gl-sheen),transparent 75%),color-mix(in srgb,var(--bg) 86%,transparent)}
 .nav button:not(.act){color:color-mix(in srgb,var(--ink) 80%,var(--muted))}
@@ -1012,7 +1013,8 @@ html[data-ph=pop] .pav .rw{position:absolute;left:50%;bottom:5px;width:116px;mar
 .thead .ring::before,.thead.now .ring::before{background:var(--card)}
 /* ---------- Минимализм (настройка «Минимализм»): плоский вид, близкий к прошлой версии. Ничего не удаляет, только перекрывает оформление ---------- */
 html.min .top,html.min .nav,html.min .dock{background:var(--bg);-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none}
-html.min .top,html.min .dock{border-bottom:1px solid var(--line)}
+html.min .dock{border-bottom:1px solid var(--line)}
+html.min .top{box-shadow:inset 0 0 0 1px var(--line)}
 html.min .dock{border-bottom:0;border-top:1px solid var(--line)}
 html.min .nav{background:var(--card);border-top:1px solid var(--line)}
 html.min .nav button.act .ni{background:none;box-shadow:none}
