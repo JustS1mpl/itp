@@ -1126,6 +1126,9 @@ html.crt-on{scrollbar-gutter:auto}
 .crt .tl.you{color:#d2ffdf;font-weight:800;margin:.6em 0 .2em 4.6em}
 .crt .tr{display:grid;grid-template-columns:3em auto 1fr;gap:.7em;align-items:start;margin:1.3em 0 .3em}
 .crt .tr p{margin:0 0 .1em}
+/* кролик сердится (неприличный ник): реплика и иконка красные */
+.crt .tr.bad{color:#ff6b5e;--phg:rgba(255,80,60,.45)}
+.crt .tr.bad .rb{filter:drop-shadow(0 0 3px #ff6b5e) drop-shadow(0 0 10px rgba(255,80,60,.5))}
 .crt .rb{display:block;width:3em;aspect-ratio:1;background:currentColor;-webkit-mask:var(--rb,var(--pi-o)) center/contain no-repeat;mask:var(--rb,var(--pi-o)) center/contain no-repeat;
  filter:drop-shadow(0 0 3px var(--ph)) drop-shadow(0 0 10px var(--phg));animation:splIgn .7s both}
 .crt .ds{line-height:1.5}

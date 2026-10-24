@@ -474,7 +474,7 @@ function settings(){
   eggBind();
   var v=$('vol');v.oninput=function(){S.set.vol=+v.value;save();sxVol(VOLK())};v.onchange=function(){snd('ok')};
   app.querySelectorAll('.lst button.li').forEach(function(b){b.onclick=function(){var a=b.dataset.a;
-    if(a==='nick')askName('Никнейм',S.nick,function(n){n=Array.from(n).slice(0,20).join('');S.nick=n;save();again();toast('Никнейм изменён')},20);
+    if(a==='nick')askName('Никнейм',S.nick,function(n){n=Array.from(n).slice(0,20).join('');if(nkBad(n)){snd('bad');toast('🐰 Так ник назвать нельзя');return false}S.nick=n;save();again();toast('Никнейм изменён')},20);
     else if(a==='bk')backup();
     else if(a==='kb')keys();
     else if(a==='intro'){BACK=function(){settings()};theory(0,0)}

@@ -55,7 +55,7 @@ function actionSheet(title,items){
 function sheet(n,d){var c=fcol(n);modal('<h2><code'+(c?' style="color:'+c+'"':'')+'>'+esc(n)+'</code></h2><p style="font-weight:500">'+esc(d).replace(/\n/g,'<br>')+'</p>',[['Понятно']])}
 function solModal(sol){modal('<h2>Как это можно сделать</h2><pre class="cmp">'+hl(sol)+'</pre><p>Это один из вариантов. Если тесты прошли, твоё решение тоже верное.</p><p class="mu">Эталон не влияет на опыт.</p>',[['Закрыть']])}
 function askName(title,val,cb,max){
-  modal('<h2>'+esc(title)+'</h2><input class="f n" id="mi" maxlength="'+(max||40)+'" value="'+esc(val)+'" autocomplete="off" aria-label="'+esc(title)+'">',[['Сохранить',function(o){var i=o.querySelector('#mi'),v=i.value.trim();if(!v){i.focus();return false}cb(v.slice(0,max||40))}],['Отмена',null,1]]);
+  modal('<h2>'+esc(title)+'</h2><input class="f n" id="mi" maxlength="'+(max||40)+'" value="'+esc(val)+'" autocomplete="off" aria-label="'+esc(title)+'">',[['Сохранить',function(o){var i=o.querySelector('#mi'),v=i.value.trim();if(!v){i.focus();return false}if(cb(v.slice(0,max||40))===false){i.focus();i.select();return false}}],['Отмена',null,1]]);
   setTimeout(function(){var i=$('mi');if(i){i.focus();i.select()}},40)}
 function popup(t){var d=document.createElement('div');d.className='pop';d.setAttribute('aria-hidden','true');d.innerHTML='<span>⭐</span><b>'+esc(t)+'</b>';document.body.appendChild(d);snd([784,988,1175]);setTimeout(function(){d.remove()},1250)}
 

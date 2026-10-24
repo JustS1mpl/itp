@@ -15,6 +15,37 @@ var CRTG='01{}[]()<>=+-*/%#:;._$&|λabcdefghijklmnopqrstuvwxyzабвгдежзи
 function nick(){crtOpen()}
 function place(){crtOpen()}
 
+/* --- ник: убрать «я», «меня зовут»… в начале; распознать мат, оскорбления, оскорбительные прозвища и пошлость
+   (по-русски, по-английски и транслитом), в том числе замаскированные: латиница вместо кириллицы (xуй), цифры
+   вместо букв (пи3да), растянутые буквы (хууууй), точки и пробелы между буквами (х.у.й). Обычные имена (Глеб,
+   Хуан, Амандина, Педро, Лохматов, Сосискин, Аналитик…) под проверку не попадают: опасные корни ищутся с учётом
+   начала слова или целиком */
+function nkClean(s){
+  var v=String(s||'').trim(),re=/^(?:я|ну\s+я|меня\s+зовут|зови\s+меня|называй\s+меня|обращайся\s+ко\s+мне|мо[её]\s+имя|мой\s+ник|ник|это|i\s+am|i'?m|my\s+name\s+is|call\s+me)[\s,:—-]+/i,k=0;
+  while(re.test(v)&&k++<3){var w=v.replace(re,'').trim();if(!w)break;v=w}
+  return v.replace(/^[\s«"'„“]+|[\s»"'”.!?,;:]+$/g,'')||String(s||'').trim()}
+var NKG={a:'а',b:'в',c:'с',e:'е',h:'н',k:'к',m:'м',o:'о',p:'р',t:'т',x:'х',y:'у',u:'и',3:'з',0:'о',6:'б',4:'ч','@':'а'};
+/* где угодно в слове (и в строке без пробелов — так ловится «х у й») */
+var NKA=/ху[йеяю]|хуи|пизд|пезд|бляд|блят|пид[оа]р|пидр|педик|педераст|педрил|залуп|г[ао]ндон|шлюх|шалав|проститут|мудак|мудил|мудач|долб[оа]е?б|[её]бан|[её]бал|[её]бат|[её]буч|[её]бну|[её]бл[аоияу]|[её]бис|[её]баш|[её]бет|[её]беш|[её]быр|(?:^|за|на|вы|въ|отъ|подъ|съ|разъ|до|про|при|пере|по|у)[её]б(?!е)|говн|гавн|жоп|срак|засран|обосра|ссыкл|дерьм|минет|отсос|сосат|соси(?!с)|пенис|писюн|письк|сиськ|сисяр|трах(?!т)|секс(?!т)|порн|анал(?!и|ог|оги)|оргазм|вагин|дроч|дебил|идиот|дурак|придур|кретин|имбецил|олигофрен|дегенерат|тупиц|тупорыл|урод|ублюд|выродок|мраз|тварь|скотин|сволоч|падл|гнид|шмар|быдл|чмо|чушпан|лошар|лошок|лошпед|нигер|черномаз|пиндос|хохол|хохл|кацап|москал/;
+/* только целым словом или его началом: у этих корней слишком много честных совпадений внутри имён */
+/* (прозвища для национальностей и «козёл» — только в этих формах: Жидков, Хачатурян, Чуркин, Козлов, Дауни — честные фамилии) */
+var NKW=/^(?:бля|сук[аиуеой]?$|сучк|сучар|сучок|лох$|хер$|херн|херов|херас|дура$|член$|манда$|тупой$|тупая$|тупые$|кончи|[её]б|жид(?!к)|негр(?:$|ы|а$|у$|ов$|ит|ил)|хач(?:$|и$|ик|ей$|у$|а$)|чурк(?:а|и|е|у|ой)?$|коз[её]л$|козл(?:ы|а|у|ом|ина|ище)$|даун(?:$|ы|а$|у$|ом|[её]н|иц))/;
+var NKE=/fuck|fuk|fck|shit|bitch|cunt|dick|cock|puss|ashole|bastard|whore|slut|nig+[ae]|fag+ot|retard|porn|sex|penis|vagin|boob|tits|dildo|wank|twat|moron|idiot|stupid|dumb|loser|huy|hui|huj|xyu|xyi|xuy|xui|pizd|pezd|blyad|blyat|bljad|bljat|eban|ebal|ebat|eblan|yeban|suka|suki|pidor|pidar|pidr|mudak|zalup|gandon|gondon|shly?uh|dolbo|dolba|debil|durak|chmo|lokh|govno|gavno|zhop|jopa|ueban|uebok|nahu[iyj]/;
+function nkBad(s){
+  var low=String(s||'').toLowerCase().replace(/ё/g,'е').replace(/(.)\1+/g,'$1');
+  if(NKE.test(low.replace(/[^a-z]/g,'')))return true;
+  var tk=low.split(/[^a-zа-я0-9@]+/).filter(Boolean).map(function(t){
+    /* в слове есть кириллица: латиницу и цифры читаем как похожие русские буквы (xуй, пи3да) */
+    return /[а-я]/.test(t)?t.replace(/[a-z0-9@]/g,function(c){return NKG[c]||c}).replace(/[^а-я]/g,'').replace(/(.)\1+/g,'$1'):t});
+  if(tk.some(function(t){return/[а-я]/.test(t)&&(NKA.test(t)||NKW.test(t))}))return true;
+  /* буквы, разделённые точками и пробелами: «х у й», «п.и.з.д.а», «С у к а». Склеиваем только если слово и правда
+     разбито на буквы (иначе «Сукачёв Ан…» склеилось бы в «сука…»); латиница в таких буквах читается как кириллица */
+  var one=tk.filter(function(t){return t.length<=2}).length;
+  if(tk.length>=3&&one>=tk.length-1){var j=tk.map(function(t){return t.replace(/[a-z0-9@]/g,function(c){return NKG[c]||c})}).join('').replace(/[^а-я]/g,'').replace(/(.)+/g,'$1');if(NKA.test(j)||NKW.test(j))return true}
+  var jj=tk.filter(function(t){return/[а-я]/.test(t)}).join('');
+  return /ху[йея]|пизд|пезд|бляд|блят|пид[оа]р|залуп|[её]бан|[её]бал|[её]блан|долб[оа]е?б|мудак|г[ао]ндон|шлюх|уебан|нахуй/.test(jj)}
+var NKBAD=0;   /* сколько раз за этот запуск ник оказался неприличным: первый — перезагрузка, второй — «Морковка» */
+
 /* --- звуки вступления. Свой набор (шум, «железо», стекло, гул), а не короткие ноты интерфейса, но идут через общую шину
    a_sound.js: та же громкость, «без звука» и тишина в скрытой вкладке. До первого касания звука нет (поэтому включатель). --- */
 var BXG=.25,BXK=0;
@@ -159,10 +190,13 @@ function crtClose(keep){
   if(!CRT)return;var c=CRT;CRT=null;
   c.tms.forEach(clearTimeout);c.off.forEach(function(f){f()});if(c.rain)c.rain.stop();if(c.vhs)c.vhs.stop();if(c.hiss)c.hiss();bxStop(c.lgs);
   c.el.remove();if(!keep)document.documentElement.classList.remove('crt-on')}
-function crtOpen(){
-  crtClose();var bx0=document.getElementById('shards');if(bx0)bx0.remove();bx0=document.getElementById('bsod');if(bx0)bx0.remove();
+/* op.reboot — перезагрузка за неприличный ник: без заставки, сразу BIOS со строкой FAIL */
+function crtOpen(op){
+  op=op||{};crtClose();
+  /* неприличный ник, сохранённый до появления проверки (или в обход неё), не принимаем: спросим заново */
+  if(S.nick&&nkBad(S.nick)){S.nick='';save()}var bx0=document.getElementById('shards');if(bx0)bx0.remove();bx0=document.getElementById('bsod');if(bx0)bx0.remove();
   scr('nick','');window.scrollTo(0,0);
-  var full=!S.nick,rm=RM(),o=document.createElement('div');o.id='crt';o.className='crt on'+(rm?' rm':'');
+  var full=!S.nick&&!op.reboot,rm=RM(),o=document.createElement('div');o.id='crt';o.className='crt on'+(rm?' rm':'');
   o.innerHTML='<div class="sc"><div class="sci"><canvas class="rain" aria-hidden="true"></canvas>'
     +(full?'<div class="spl" aria-hidden="true"><canvas class="lg"></canvas><i class="sg">▮</i><div class="bl">IT&#39;S THE PROGRAMMING</div></div>':'')
     +'<div class="tm" role="log" aria-live="polite" aria-label="Знакомство с ИТП"><div class="tmi"></div></div></div>'
@@ -176,6 +210,7 @@ function crtOpen(){
   o.addEventListener('pointerdown',hurry);document.addEventListener('keydown',hurry,true);
   CRT.off.push(function(){document.removeEventListener('keydown',hurry,true)});
   rbLoad(function(R){if(!CRT||CRT.el!==o)return;if(R)o.style.setProperty('--rb','url('+R.ol+')');var lg=o.querySelector('.lg');if(lg)rbHalftone(lg)});
+  if(op.reboot){bx('power');CRT.hiss=bxHiss();crtDialog(true,1);return}
   if(!full){CRT.hiss=bxHiss();crtDialog(false);return}
   /* звук пробуем включить сразу: браузер разрешает это не всегда (обычно нужен первый жест), тогда заставка начинается тихо */
   try{if(typeof sxEnsure==='function')sxEnsure()}catch(e){}
@@ -202,11 +237,13 @@ function crtType(el,s,ms,soft){return new Promise(function(res){
   (function st(){if(!CRT)return;i=CRT.fast?s.length:i+1;el.textContent=s.slice(0,i);crtScroll();
     if(i>=s.length){el.classList.remove('typ');return res()}
     var c=s[i-1];if(c!==' ')bx('key',soft);crtT(st,(ms||28)*(/[.?!]/.test(c)?8:c===','?4:1)*(.6+Math.random()*.8))})()})}
+/* служебные строки; строка-массив [текст,'err'] печатается красным */
 function crtSys(lines){var p=Promise.resolve();
-  lines.forEach(function(s){p=p.then(function(){if(!CRT)return;var e=crtRow('','tl sys');return crtType(e,s,7,1).then(function(){return crtW(110)})})});
+  lines.forEach(function(s){p=p.then(function(){if(!CRT)return;var er=Array.isArray(s),e=crtRow('','tl '+(er?'err':'sys'));if(er)bx('fatal');return crtType(e,er?s[0]:s,7,1).then(function(){return crtW(er?600:110)})})});
   return p}
-function crtSay(lines){
-  var r=crtRow('<i class="rb" aria-hidden="true"></i><span class="ds" aria-hidden="true">—</span><div class="tx"></div>','tr'),tx=r.querySelector('.tx'),p=crtW(260);bx('beep');
+/* реплика кролика; bad — кролик сердится: красный, с гудком вместо «бипа» */
+function crtSay(lines,bad){
+  var r=crtRow('<i class="rb" aria-hidden="true"></i><span class="ds" aria-hidden="true">—</span><div class="tx"></div>','tr'+(bad?' bad':'')),tx=r.querySelector('.tx'),p=crtW(260);bx(bad?'fatal':'beep');
   lines.forEach(function(s,k){p=p.then(function(){if(!CRT)return;var e=document.createElement('p');tx.appendChild(e);return crtType(e,s).then(function(){return crtW(k<lines.length-1?380:220)})})});
   return p.then(function(){if(CRT)CRT.fast=0})}
 function crtYou(s){if(!CRT)return;var e=crtRow('','tl you');e.textContent=s}
@@ -234,14 +271,26 @@ function crtMenu(items,lab){return new Promise(function(res){
   document.addEventListener('keydown',kd,true);CRT.off.push(function(){document.removeEventListener('keydown',kd,true)});
   hi(0,1);if(!CRT.touch)bs[0].focus({preventScroll:true})})}
 
+/* --- ник: спросить; неприличный в первый раз — перезагрузка, во второй — кролик сам называет ученика Морковкой.
+   Неприличный ник нигде не сохраняется; промис перезагрузки не разрешается, поэтому прежний разговор дальше не идёт --- */
+function crtName(){return crtAsk(20).then(function(v){
+  v=nkClean(v);if(!nkBad(v))return v;
+  if(++NKBAD<2)return crtSay(['Ну всё. Перезагружаю.'],1).then(function(){if(!CRT)return;CRT.el.classList.add('gl','snow');bx('glitch');crtT(function(){crtClose(1);crtOpen({reboot:1})},1050);return new Promise(function(){})});
+  return crtSay(['Всё, решено: будешь Морковкой.','Поменять ник можно в настройках.'],1).then(function(){return'Морковка'})})}
+
 /* --- разговор --- */
-function crtDialog(full){
+function crtDialog(full,reboot){
   CRT.el.classList.add('live');CRT.rain=rainStart(CRT.el.querySelector('.rain'));
-  var p=full?crtSys(['ITP BIOS v'+ITPV,'(c) It\'s The Programming','Проверка памяти ......... 640K OK','Интерпретатор Python .... найден','Кролик .................. на связи']):Promise.resolve();
-  if(!S.nick)p=p.then(function(){return crtSay(['Привет.','Как я могу к тебе обращаться?'])}).then(function(){return crtAsk(20)}).then(function(v){
-    S.nick=v;return crtSay(['Приятно познакомиться, '+v+'.','Ты парень или девушка? Это нужно, чтобы окончания в тексте были правильными.'])}).then(function(){
+  var bios=['ITP BIOS v'+ITPV,'(c) It\'s The Programming','Проверка памяти ......... 640K OK','Интерпретатор Python .... найден'];
+  if(reboot)bios.push(['Проверка воспитанности .. FAIL']);
+  bios.push('Кролик .................. на связи');
+  var p=full?crtSys(bios):Promise.resolve(),NK='';
+  /* ник и обращение сохраняются вместе, после ответа про обращение: иначе, уйдя со страницы между вопросами (приложение
+     сохраняет прогресс при уходе), ученик возвращался «с ником», и вопрос про обращение пропускался */
+  if(!S.nick)p=p.then(function(){return crtSay(reboot?['Привет ещё раз.','Как я могу к тебе обращаться? Только нормально.']:['Привет.','Как я могу к тебе обращаться?'])}).then(crtName).then(function(v){
+    NK=v;return crtSay((v==='Морковка'&&NKBAD>1?[]:['Приятно познакомиться, '+v+'.']).concat(['Ты парень или девушка? Это нужно, чтобы окончания в тексте были правильными.']))}).then(function(){
     return crtMenu([['m','Парень'],['f','Девушка'],['','Не указывать']].map(function(x,k){return{c:'tgd',a:' data-g="'+x[0]+'"',h:'<span class="tno">['+(k+1)+']</span>'+x[1]}}),'Как к тебе обращаться')}).then(function(k){
-    S.g=['m','f',''][k];if(!S.reg)S.reg=day(new Date());save();crtYou('> '+['Парень','Девушка','Не указывать'][k])});
+    S.nick=NK;S.g=['m','f',''][k];if(!S.reg)S.reg=day(new Date());save();crtYou('> '+['Парень','Девушка','Не указывать'][k])});
   else p=p.then(function(){return crtSay(['С возвращением, '+S.nick+'.'])});
   p.then(function(){if(CRT)return crtSay(['С чего начнём?','Выбери первую тему, которую ещё не знаешь. Пропущенные можно пройти потом.'])}).then(function(){
     if(!CRT)return;
