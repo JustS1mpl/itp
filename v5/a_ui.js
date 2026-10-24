@@ -287,12 +287,13 @@ function row(ic,t,sub,a,dis,rt){return'<button class="li" data-a="'+a+'"'+(dis?'
 var DICE='<svg class="pdeco" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect width="12" height="12" x="2" y="10" rx="2" ry="2"/><path d="m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3l-5-4.92a2.24 2.24 0 0 0-3 0L10 6"/><path class="dpp" d="M6 18h.01M10 14h.01M15 6h.01M18 9h.01"/></svg>';
 function practice(){BACK=practice;PRW=0;
   var nf=passed('flash').length,nt=passed('test').length;
-  function pc(a,ic,t,s,dis,big,lab){return'<button class="pcard'+(big?' big':'')+'" data-a="'+a+'"'+(dis?' disabled aria-disabled="true"':'')+'>'+(big?DICE:'')+'<span class="pic" aria-hidden="true">'+ic+'</span><b>'+t+'</b><small>'+s+'</small><span class="go">'+(dis?'Сначала пройди островок':lab)+(dis?'':ico('chev'))+'</span></button>'}
+  /* главный режим — крупная карточка с кубиками вместо значка; два других — тихие строки под ней */
+  function pc(a,ic,t,s,dis,big,lab){return'<button class="pcard'+(big?' big':'')+'" data-a="'+a+'"'+(dis?' disabled aria-disabled="true"':'')+'>'+(big?DICE:'<span class="pic" aria-hidden="true">'+ic+'</span>')+'<b>'+t+'</b><small>'+s+'</small><span class="go">'+(dis?ico('lock')+'Сначала пройди островок':lab+ico('chev'))+'</span></button>'}
   scr('practice',head()+ttl('Практика','Без опыта: прогресс и серия не меняются')+'<div class="prc">'+
    pc('rf','🎲','Случайный вопрос','Вопросы из пройденных островков, пока не закроешь',!nf,1,'Начать')+
-   pc('rc','💻','Случайный код','Задание из пройденных',!nt,0,'Решить')+
-   pc('r3','🔁','Разминка','3 вопроса по пройденному',!nf,0,'Начать')+'</div>'+
-   (S.cn.rc?'<p class="pnote">Верных ответов в тренировках: '+S.cn.rc+'</p>':''),'pr');
+   '<div class="prl">'+pc('rc','💻','Случайный код','Задание из пройденных',!nt,0,'Решить')+
+   pc('r3','🔁','Разминка','3 вопроса по пройденному',!nf,0,'Начать')+'</div></div>'+
+   (S.cn.rc?'<p class="pnote">Верных ответов в тренировках: <b>'+S.cn.rc+'</b></p>':''),'pr');
   bindHead(practice);
   app.querySelectorAll('.pcard').forEach(function(b){b.onclick=function(){if(b.disabled)return;({rf:rndFlash,rc:rndCode,r3:repeat3})[b.dataset.a]()}})}
 function oge(){practice()}
@@ -392,15 +393,15 @@ function profile(){BACK=profile;
   var rows=TOPICS.map(function(t,i){var c=0,l=[];(t.items||[]).forEach(function(x,j){var e=S.es[i+'-'+j]||0;c+=e;if(e>0)l.push({j:j,n:x.n,e:e,ic:ity(x)[1]})});return{i:i,n:t.n,c:c,l:l}}).filter(function(r){return r.c>0}).sort(function(a,b){return b.c-a.c}),mx=rows.length?rows[0].c:1;
   var EM=3,more=rows.length>EM;
   function erow(r,k){return'<div class="eg2"'+(k>=EM?' hidden':'')+'><div class="erow"><span>'+esc(r.n)+'</span><div class="bar" aria-hidden="true"><i style="width:'+Math.round(r.c/mx*100)+'%"></i></div><b aria-label="ошибок: '+r.c+'">'+r.c+'</b></div><div class="elist">'+r.l.map(function(x){return'<button class="elink" data-i="'+r.i+'" data-j="'+x.j+'"><span class="et">'+x.ic+' '+esc(x.n)+'<small>ошибок: '+x.e+'</small></span><span class="eg">Отработать</span></button>'}).join('')+'</div></div>'}
-  scr('profile',head()+'<h1 class="sr-only">Профиль</h1>'+
+  scr('profile',head()+'<h1 class="sr-only">Профиль</h1><div class="pf">'+
    '<div class="hero"><div class="pav" aria-hidden="true">'+rabbit('eat')+'</div><div class="hn"><b class="nmx">'+nk(S.nick)+'</b><div class="lvp"><span class="pill">Уровень '+LV.l+'</span><span class="mu">до '+(LV.l+1)+': ещё '+LV.left+' ⭐</span></div><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+LV.p+'" aria-label="Прогресс уровня"><i class="grow" style="width:'+LV.p+'%"></i></div></div></div>'+
-   '<div class="tiles"><button class="tile" id="tst"><span aria-hidden="true">🥕</span><span><b>'+s+'</b><small>'+pl(s,['день','дня','дней'])+' подряд</small></span>'+(f.n?'<i class="fzm" aria-label="заморозок: '+f.n+'">❄️'+f.n+'</i>':'')+'</button><div class="tile"><span aria-hidden="true">🏆</span><span><b>'+Math.max(S.max,s)+'</b><small>рекорд серии</small></span></div><button class="tile" id="txp"><span aria-hidden="true">⭐</span><span><b>'+S.xp+'</b><small>опыта</small></span></button><div class="tile"><span aria-hidden="true">📚</span><span><b>'+n+' из '+NT()+'</b><small>тем пройдено</small></span></div></div>'+
-   '<div class="card"><div class="ch2"><b>Цель дня</b><button class="btn t" id="gset">'+g+' '+pl(g,['островок','островка','островков'])+' ›</button></div><div class="bar" style="margin:10px 0 12px" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+gp+'" aria-label="Цель дня: '+d+' из '+g+'"><i class="grow" style="width:'+gp+'%"></i></div>'+weekRow('g')+'<p class="mu gnote">Цель в 5 днях недели даёт +50 ⭐. Сейчас: '+wkCount()+' из 5.</p></div>'+
+   '<div class="tiles"><button class="tile tbig" id="tst"><span aria-hidden="true">🥕</span><span><b>'+s+'</b><small>'+pl(s,['день','дня','дней'])+' подряд</small></span>'+(f.n?'<i class="fzm" aria-label="заморозок: '+f.n+'">❄️'+f.n+'</i>':'')+'</button><div class="tcol"><div class="tile"><span aria-hidden="true">🏆</span><span><b>'+Math.max(S.max,s)+'</b><small>рекорд серии</small></span></div><button class="tile" id="txp"><span aria-hidden="true">⭐</span><span><b>'+S.xp+'</b><small>опыта</small></span></button><div class="tile"><span aria-hidden="true">📚</span><span><b>'+n+' из '+NT()+'</b><small>тем пройдено</small></span></div></div></div>'+
+   '<section class="psec"><div class="ch2"><b>Цель дня</b><button class="btn t" id="gset">'+g+' '+pl(g,['островок','островка','островков'])+' ›</button></div><div class="psf"><div class="bar gbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+gp+'" aria-label="Цель дня: '+d+' из '+g+'"><i class="grow" style="width:'+gp+'%"></i></div>'+weekRow('g')+'<p class="mu gnote">Цель в 5 днях недели даёт +50 ⭐. Сейчас: '+wkCount()+' из 5.</p></div></section>'+
    shelf()+
-   '<div class="card"><b>Активность</b><div style="margin-top:10px">'+calHtml()+'</div></div>'+
-   (rows.length?'<div class="card"><b>Работа над ошибками</b>'+rows.map(erow).join('')+(more?'<button class="btn t emore" id="emr">Показать все темы ('+rows.length+')</button>':'')+'<p class="mu" style="margin:8px 0 0;font-size:.84375rem">Пройди островок без ошибок, и он исчезнет из списка.</p></div>':'')+
+   '<section class="psec"><div class="ch2"><b>Активность</b></div><div class="psf">'+calHtml()+'</div></section>'+
+   (rows.length?'<section class="psec"><div class="ch2"><b>Работа над ошибками</b></div><div class="psf">'+rows.map(erow).join('')+(more?'<button class="btn t emore" id="emr">Показать все темы ('+rows.length+')</button>':'')+'<p class="mu enote">Пройди островок без ошибок, и он исчезнет из списка.</p></div></section>':'')+
    '<div class="lst">'+row('📖','Изученные функции','Словарь с твоими заметками','dc')+(TOPICS[0]&&TOPICS[0].intro&&!S.d['0-0']?row('🏝️','Знакомство с ИТП','Как устроено приложение','intr'):'')+row('📤','Поделиться прогрессом','Картинка со статистикой','sh')+row('⚙️','Настройки','Вид, звук, обучение, резервная копия','st')+'</div>'+
-   '<p class="pfoot"><button class="ver" id="vr" aria-label="ИТП '+ITPV+'. ИТП означает: И так, программирование"><u>ИТП '+ITPV+'</u><span class="vt" role="tooltip">ИТП — «И так, программирование»</span></button></p>','prof');
+   '<p class="pfoot"><button class="ver" id="vr" aria-label="ИТП '+ITPV+'. ИТП означает: И так, программирование"><u>ИТП '+ITPV+'</u><span class="vt" role="tooltip">ИТП — «И так, программирование»</span></button></p></div>','prof');
   bindHead(profile);calBind();var csc=app.querySelector('.csc');if(csc){csc.tabIndex=0;csc.setAttribute('aria-label','Календарь активности, листается вбок')}
   var vr=$('vr'),vt;vr.onclick=function(){vr.classList.add('on');clearTimeout(vt);vt=setTimeout(function(){vr.classList.remove('on')},2500)};
   $('tst').onclick=streakSheet;$('txp').onclick=levelSheet;$('gset').onclick=goalSheet;
