@@ -1018,3 +1018,136 @@ html:not(.min) .nav button.act .ni .em{filter:drop-shadow(0 0 5px color-mix(in s
 .tucap{padding:9px 14px 9px 30px;position:relative;border-top:1px solid var(--line2);background:var(--card2);color:var(--muted);font-size:.8125rem}
 
 .tucap:before{content:'';position:absolute;left:14px;top:50%;width:8px;height:8px;margin-top:-4px;border-radius:50%;background:var(--green,#58cc02)}
+
+/* v6.6.0: вступление (v5/a_boot.js) — ЭЛТ-монитор с заставкой и терминалом, затем «синий экран» с трещинами.
+   Монитор всегда тёмный, в любой теме: это отдельная «машина», а не экран приложения */
+html.crt-on,html.crt-on body{overflow:hidden}
+.crt{--ph:#62ff8f;--ph2:#2f9d55;--phg:rgba(98,255,143,.42);--am:#ffad3b;
+ --mono:'Cascadia Mono','Cascadia Code',Consolas,'DejaVu Sans Mono','Roboto Mono','Droid Sans Mono',Menlo,ui-monospace,monospace;
+ position:fixed;inset:0;z-index:200;display:flex;color-scheme:dark;
+ padding:max(10px,2vmin,var(--safe-t)) max(10px,2vmin) max(10px,2vmin,var(--safe-b));
+ background:#1c1d1b radial-gradient(120% 90% at 50% 38%,#2b2c2a,#141513 70%);font-family:var(--mono);color:var(--ph)}
+/* корпус: коричневый пластик с рыжим отсветом справа, как у старого телевизора */
+.crt .bz{position:relative;flex:1;display:flex;border-radius:clamp(26px,5vmin,60px);padding:clamp(10px,2.6vmin,34px);
+ background:radial-gradient(40% 55% at 101% 52%,rgba(222,78,44,.5),transparent 70%),radial-gradient(35% 45% at -1% 40%,rgba(160,60,35,.28),transparent 70%),
+  linear-gradient(172deg,#6a432e 0%,#3a2519 22%,#2a1b13 55%,#3d2619 80%,#5c3724 100%);
+ box-shadow:inset 0 1.5px 0 rgba(255,210,170,.22),inset 0 -3px 8px rgba(0,0,0,.55),inset 0 0 0 1px rgba(0,0,0,.45),0 24px 60px -10px rgba(0,0,0,.7)}
+.crt .bz::after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:.35;mix-blend-mode:overlay;
+ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+/* стекло: чёрная кромка, выпуклость (тени внутрь), строки развёртки и виньетка поверх */
+.crt .sc{position:relative;flex:1;overflow:hidden;background:#121410;border-radius:clamp(18px,4vmin,46px)/clamp(20px,4.6vmin,52px);
+ box-shadow:0 0 0 clamp(4px,.9vmin,10px) #0a0705,0 0 0 calc(clamp(4px,.9vmin,10px) + 1.5px) rgba(255,190,150,.12)}
+.crt .sci{position:absolute;inset:0;border-radius:inherit;overflow:hidden;animation:crtOn .6s cubic-bezier(.2,.8,.2,1) both}
+.crt .fx{position:absolute;inset:0;z-index:4;pointer-events:none;border-radius:inherit;
+ background:repeating-linear-gradient(180deg,rgba(0,0,0,.24) 0 1px,transparent 1px 3px),
+  radial-gradient(ellipse 75% 70% at 50% 50%,transparent 55%,rgba(0,0,0,.6) 100%),
+  linear-gradient(165deg,rgba(255,255,255,.07),transparent 32%);
+ box-shadow:inset 0 0 50px 8px rgba(0,0,0,.85),inset 0 0 140px rgba(0,0,0,.45)}
+.crt .rain{position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity 1.6s;font-family:var(--mono)}
+.crt.live .rain{opacity:1}
+
+/* заставка: растровый кролик в янтарном свечении и подпись в скобках */
+.crt .spl{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(12px,2.4vmin,22px);color:var(--am);padding-bottom:4vh}
+.crt .spl::before{content:'';position:absolute;left:50%;top:46%;width:min(80vmin,620px);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;
+ background:radial-gradient(circle,rgba(255,120,30,.16),rgba(255,90,20,.05) 45%,transparent 68%);opacity:0}
+.crt .lg{position:relative;width:min(42vmin,230px);aspect-ratio:1;opacity:0;
+ filter:drop-shadow(0 0 2px rgba(255,190,90,.9)) drop-shadow(0 0 12px rgba(255,110,20,.6)) drop-shadow(0 0 34px rgba(255,80,0,.3))}
+.crt .sg{position:relative;font-style:normal;font-size:12px;opacity:0;text-shadow:0 0 6px var(--am)}
+.crt .bl{position:relative;padding:.55em 1.2em;font-size:clamp(11px,1.5vmin + 4px,16px);font-weight:700;letter-spacing:.34em;text-indent:.34em;white-space:nowrap;opacity:0;
+ text-shadow:0 0 2px #ffd28a,0 0 10px rgba(255,130,30,.8)}
+.crt .bl::before,.crt .bl::after{content:'';position:absolute;top:-.25em;bottom:-.25em;width:.45em;border:2px solid currentColor;box-shadow:0 0 8px rgba(255,130,30,.7)}
+.crt .bl::before{left:0;border-right:0}
+.crt .bl::after{right:0;border-left:0}
+.crt .spl.on::before{animation:splGlow 1.4s .5s ease-out both}
+.crt .spl.on .lg{animation:splIgn 1.2s .45s both}
+.crt .spl.on .sg{animation:splIgn .9s 1.2s both,crtBl 1s 2.1s steps(1) infinite}
+.crt .spl.on .bl{animation:splIgn 1s 1.35s both}
+.crt .spl.out{animation:splOut .65s cubic-bezier(.5,0,.8,.4) both}
+
+/* терминал */
+.crt .tm{position:absolute;inset:0;z-index:2;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;
+ padding:clamp(18px,5vmin,60px) clamp(16px,6vmin,84px) clamp(24px,7vmin,80px);font-size:clamp(14px,1.2vmin + 9px,19px);line-height:1.5;
+ text-shadow:0 0 1.5px currentColor,0 0 10px var(--phg)}
+.crt .tm::-webkit-scrollbar{display:none}
+.crt .tmi{max-width:58em;text-align:left}
+.crt .tl{white-space:pre-wrap;word-break:break-word;min-height:1.5em}
+.crt .tl.sys{color:var(--ph2);font-size:.82em}
+.crt .tl.err{color:#ff6b5e;text-shadow:0 0 2px currentColor,0 0 10px rgba(255,80,60,.5);margin-top:.3em}
+.crt .tl.you{color:#d2ffdf;margin:.6em 0 .2em 4.6em}
+.crt .tr{display:grid;grid-template-columns:3em auto 1fr;gap:.7em;align-items:start;margin:1.3em 0 .3em}
+.crt .tr p{margin:0 0 .1em}
+.crt .rb{display:block;width:3em;aspect-ratio:1;background:currentColor;-webkit-mask:var(--rb,var(--pi-o)) center/contain no-repeat;mask:var(--rb,var(--pi-o)) center/contain no-repeat;
+ filter:drop-shadow(0 0 3px var(--ph)) drop-shadow(0 0 10px var(--phg));animation:splIgn .7s both}
+.crt .ds{line-height:1.5}
+.crt .typ::after,.crt .cu{content:'';display:inline-block;width:.58em;height:1.1em;margin-left:.06em;vertical-align:-.18em;background:currentColor;box-shadow:0 0 8px var(--phg);animation:crtBl 1s steps(1) infinite}
+.crt .tin{display:flex;gap:.6em;margin:.9em 0 .3em 4.6em;max-width:28em;font-size:max(16px,1em)}
+.crt .tbx{position:relative;flex:1;display:flex;align-items:center;min-height:2.7em;padding:0 .9em;border:2px solid var(--ph);border-radius:.7em;cursor:text;white-space:pre;overflow:hidden;
+ box-shadow:0 0 10px var(--phg),inset 0 0 10px rgba(98,255,143,.14)}
+.crt .tbx .cu{animation:none;opacity:.45}
+.crt .tbx:focus-within .cu{animation:crtBl 1s steps(1) infinite;opacity:1}
+.crt .tbx .ph{color:var(--ph2)}
+.crt .tin.has .ph{display:none}
+.crt .tbx input{position:absolute;inset:0;width:100%;height:100%;padding:0 .9em;margin:0;border:0;outline:0;background:transparent;color:transparent;caret-color:transparent;font:inherit;letter-spacing:inherit;-webkit-text-fill-color:transparent;text-shadow:none}
+.crt .tbx input::selection{background:rgba(98,255,143,.3)}
+.crt .tgo{flex:none;width:2.9em;min-height:2.7em;border:2px solid var(--ph);border-radius:.7em;background:transparent;color:var(--ph);font:inherit;font-size:1.1em;cursor:pointer;text-shadow:inherit;box-shadow:0 0 10px var(--phg);transition:opacity .2s,background .2s}
+.crt .tgo:disabled{opacity:.3;box-shadow:none;cursor:default}
+.crt .tgo:not(:disabled):hover,.crt .tgo:focus-visible{background:rgba(98,255,143,.14);outline:0}
+.crt .tmn{display:flex;flex-direction:column;gap:.1em;margin:.7em 0 .3em 4.6em;max-width:40em}
+.crt .tmo{display:flex;gap:.7em;align-items:baseline;width:100%;min-height:44px;padding:.4em .7em;border:0;border-radius:.45em;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer;text-shadow:inherit;transition:background .15s}
+.crt .tmo .mk{flex:none;visibility:hidden;font-size:.7em}
+.crt .tmo.hi{background:rgba(98,255,143,.1)}
+.crt .tmo.hi .mk{visibility:visible}
+.crt .tmo:focus-visible{outline:1.5px dashed var(--ph);outline-offset:1px}
+.crt .tmo .tno{flex:none;color:var(--ph2)}
+.crt .tmo .ct small{display:block;color:var(--ph2);font-size:.8em;line-height:1.35}
+.crt .tmo:disabled{cursor:default;opacity:.32}
+.crt .tmo.pk{opacity:1;background:var(--ph);color:#0b140d;text-shadow:none;box-shadow:0 0 16px var(--phg)}
+.crt .tmo.pk .tno,.crt .tmo.pk small{color:#1d3a24}
+@media (max-width:599px){.crt .tr{grid-template-columns:2.4em auto 1fr;gap:.5em}.crt .rb{width:2.4em}.crt .tin,.crt .tmn,.crt .tl.you{margin-left:0}.crt .tmn{margin-right:-.5em}}
+
+/* сбой терминала: дрожь, разрывы строк, расхождение цветов, экран схлопывается в точку */
+.crt.gl .sci{animation:crtGl .72s steps(1) both}
+.crt.gl .tm{text-shadow:-3px 0 rgba(255,40,80,.85),3px 0 rgba(40,200,255,.85),0 0 10px var(--phg)}
+.crt.fade{transition:opacity .45s;opacity:0}
+.crt.rm *{animation:none!important;transition:none!important}
+.crt.rm .lg,.crt.rm .sg,.crt.rm .bl{opacity:1}
+
+/* синий экран и осколки */
+.bsv{position:absolute;inset:0;background:#0b63ce;color:#fff;font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif;overflow:hidden}
+.bsi{padding:max(12vh,calc(var(--safe-t) + 40px)) clamp(22px,10vw,140px) 0;max-width:980px}
+.bsi .sad{font-size:clamp(84px,15vmin,150px);line-height:1;font-weight:300;margin:0 0 .3em}
+.bsi .bm{font-size:clamp(18px,1.8vmin + 10px,28px);line-height:1.35;font-weight:300;max-width:26em;margin:0}
+.bsi .bp{font-size:clamp(18px,1.8vmin + 10px,28px);font-weight:300;margin:1em 0 1.4em}
+.bsi .bq{display:flex;align-items:center;gap:1em;font-size:clamp(12px,.8vmin + 9px,15px);line-height:1.4}
+.bsi .bq svg{flex:none;width:6.2em;height:6.2em;color:#fff}
+.bsi .bq p{margin:0 0 .5em}
+#bsod{position:fixed;inset:0;z-index:210;cursor:pointer}
+#bsod.hit .bsv{animation:bsHit .22s steps(2) both}
+.ck{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.ck path{fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:calc(var(--l) * 1px);stroke-dashoffset:calc(var(--l) * 1px);animation:ckDraw .32s cubic-bezier(.3,.7,.3,1) forwards}
+.ck .cu2{stroke:rgba(0,20,60,.45);stroke-width:4}
+.ck .cl{stroke:rgba(235,245,255,.95);stroke-width:1.4}
+.ck .imp{fill:#fff;opacity:0;transform-box:fill-box;transform-origin:center;animation:ckImp .45s ease-out both}
+#shards{position:fixed;inset:0;z-index:211;overflow:hidden;perspective:1100px;cursor:pointer}
+.shd{position:absolute;overflow:hidden;will-change:transform,opacity;backface-visibility:hidden}
+.shi{position:absolute}
+
+@keyframes crtOn{0%{clip-path:inset(49.6% 0 49.6% 0);filter:brightness(4)}35%{clip-path:inset(49.6% 0 49.6% 0);filter:brightness(3)}70%{clip-path:inset(0);filter:brightness(1.6)}100%{clip-path:inset(0);filter:none}}
+@keyframes crtBl{50%{opacity:0}}
+@keyframes splIgn{0%{opacity:0}8%{opacity:.75}12%{opacity:.08}20%{opacity:.9}24%{opacity:.2}34%{opacity:1}38%{opacity:.55}46%,100%{opacity:1}}
+@keyframes splGlow{from{opacity:0}to{opacity:1}}
+@keyframes splOut{0%{opacity:1;filter:none}30%{opacity:1;filter:brightness(1.8)}100%{opacity:0;filter:brightness(2.4) blur(3px);transform:scale(1.04)}}
+@keyframes crtGl{0%{transform:none;filter:none}
+ 8%{transform:translate(-8px,2px) skewX(6deg);filter:hue-rotate(60deg) saturate(2.5)}
+ 16%{transform:translate(10px,-3px);clip-path:inset(18% 0 44% 0)}
+ 24%{transform:translate(-4px,0) scaleY(1.04);clip-path:inset(0);filter:brightness(2.2) contrast(1.4)}
+ 32%{transform:translate(14px,4px) skewX(-10deg);clip-path:inset(56% 0 12% 0);filter:hue-rotate(-90deg)}
+ 42%{transform:translate(-12px,-2px);clip-path:inset(0 0 70% 0);filter:invert(1)}
+ 52%{transform:none;clip-path:inset(30% 0 30% 0);filter:brightness(3)}
+ 62%{transform:translate(6px,0) scaleX(1.08);clip-path:inset(0);filter:saturate(3) hue-rotate(140deg)}
+ 74%{transform:scaleY(.06);filter:brightness(5)}
+ 86%{transform:scale(.4,.01);filter:brightness(6)}
+ 100%{transform:scale(0,0);filter:brightness(8)}}
+@keyframes bsHit{0%{transform:translate(-5px,3px)}50%{transform:translate(4px,-3px)}100%{transform:none}}
+@keyframes ckDraw{to{stroke-dashoffset:0}}
+@keyframes ckImp{0%{opacity:.95;transform:scale(.4)}100%{opacity:0;transform:scale(5)}}
