@@ -1067,6 +1067,8 @@ html:not(.min) .nav button.act .ni .em{filter:drop-shadow(0 0 5px color-mix(in s
    Реплики, меню, подпись заставки и синий экран набраны тем же Nunito, что и приложение; моноширинный шрифт только
    у служебных строк терминала, дождя символов и надписей видеомагнитофона */
 html.crt-on,html.crt-on body{overflow:hidden}
+/* место под полосу прокрутки (scrollbar-gutter у html) во вступлении не резервируем, иначе справа светлая полоса; оно вернётся, когда посыплются осколки */
+html.crt-on{scrollbar-gutter:auto}
 .crt{--ph:#62ff8f;--ph2:#3fb766;--phg:rgba(98,255,143,.42);--am:#ffad3b;
  --mono:'Cascadia Mono','Cascadia Code',Consolas,'DejaVu Sans Mono','Roboto Mono','Droid Sans Mono',Menlo,ui-monospace,monospace;
  --nun:'Nunito',system-ui,sans-serif;

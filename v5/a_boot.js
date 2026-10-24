@@ -342,7 +342,7 @@ function bsShatter(b,cells,cx,cy,w,h,D,T,end){
       d.animate([{transform:'translateY('+sg.toFixed(1)+'px) rotate('+(rz*.05).toFixed(1)+'deg)'},
         {transform:'translate('+dx.toFixed(1)+'px,'+(dy+sg).toFixed(1)+'px) rotateX('+rx.toFixed(0)+'deg) rotate('+rz.toFixed(1)+'deg)'}],
         {duration:du,easing:'cubic-bezier(.5,0,1,.6)',fill:'both'})}});
-  document.body.appendChild(box);b.remove();bx('shatter');
+  document.body.appendChild(box);b.remove();bx('shatter');document.documentElement.classList.remove('crt-on');
   app.animate([{filter:'brightness(.45)'},{filter:'brightness(.45)',offset:.25},{filter:'brightness(1)'}],{duration:Math.min(4200,last),easing:'ease-out'});
   T(function(){snd('level')},Math.min(3200,last*.7));
   T(end,last+200)}
