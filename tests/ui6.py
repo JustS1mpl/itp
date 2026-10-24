@@ -42,11 +42,13 @@ def run(theme='light', w=390):
         b, ctx, pg, logs = h.open_page(p, F, None, w, 820, touch=True, color_scheme=theme)
         pg.wait_for_timeout(1800)
         print('== тема', theme, 'ширина', w)
-        # --- знакомство (v5/a_boot.js): заставка, терминал, синий экран; касание пропускает заставку и допечатывает реплики
+        # --- знакомство (v5/a_boot.js): заставка, терминал, синий экран. Касание пропускает заставку (если звук ещё не разрешён,
+        # первое касание только включает его, пропускает второе) и допечатывает реплики
         ok(pg.locator('#crt .spl').count() == 1, 'заставка перед терминалом')
         snap(pg, '00_splash_' + theme)
         tap(pg, '#crt')
-        pg.wait_for_selector('#nk', timeout=15000)
+        tap(pg, '#crt')
+        pg.wait_for_selector('#nk', timeout=20000)
         ok(pg.locator('#go').is_disabled(), '«Дальше» выключено без ника')
         pg.fill('#nk', 'Тестер')
         snap(pg, '01_nick_' + theme)
@@ -58,7 +60,7 @@ def run(theme='light', w=390):
         snap(pg, '02_place_' + theme)
         tap(pg, '.tpc.rec')
         ok(pg.evaluate("S.start") == 0 and pg.evaluate("S.g") == 'f', 'старт с нуля, обращение сохранено')
-        pg.wait_for_selector('#bsod', timeout=15000)
+        pg.wait_for_selector('#bsod:not(.blk)', timeout=15000)
         snap(pg, '03_bsod_' + theme)
         tap(pg, '#bsod')  # касание сразу открывает Путь
         pg.wait_for_function("!document.getElementById('crt')&&!document.getElementById('bsod')&&!document.getElementById('shards')", timeout=10000)

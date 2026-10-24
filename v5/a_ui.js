@@ -283,13 +283,8 @@ function repeatAsk(away){
 
 /* --- практика --- */
 function row(ic,t,sub,a,dis,rt){return'<button class="li" data-a="'+a+'"'+(dis?' disabled':'')+'><span class="lic" aria-hidden="true">'+ic+'</span><span class="lt">'+t+(sub?'<small>'+sub+'</small>':'')+'</span>'+(rt?'<span class="lv">'+rt+'</span>':ico('chev','ch'))+'</button>'}
-var DICE='<svg class="pdeco" viewBox="0 0 150 150" aria-hidden="true" focusable="false"><g transform="rotate(-6 75 70)">'
-+'<path class="dl" d="M37 42 L75 64 L75 104 L37 82 Z"/><path class="dr" d="M113 42 L113 82 L75 104 L75 64 Z"/>'
-+'<path class="dt" d="M75 20 L113 42 L75 64 L37 42 Z"/>'
-+'<g class="dpip"><ellipse cx="75" cy="31" rx="5.6" ry="3.3"/><ellipse cx="94" cy="42" rx="5.6" ry="3.3"/><ellipse cx="56" cy="42" rx="5.6" ry="3.3"/><ellipse cx="75" cy="53" rx="5.6" ry="3.3"/><ellipse cx="75" cy="42" rx="5.6" ry="3.3"/></g>'
-+'<g class="dpip" transform="translate(56,73) skewY(30)"><circle cx="-11" cy="-12" r="4.6"/><circle cx="0" cy="0" r="4.6"/><circle cx="11" cy="12" r="4.6"/></g>'
-+'<g class="dpip" transform="translate(94,73) skewY(-30)"><circle cx="0" cy="0" r="5.2"/></g>'
-+'</g></svg>';
+/* кубики-украшение: только контур, вектор (иконка dices из набора Lucide, лицензия ISC) */
+var DICE='<svg class="pdeco" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect width="12" height="12" x="2" y="10" rx="2" ry="2"/><path d="m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3l-5-4.92a2.24 2.24 0 0 0-3 0L10 6"/><path class="dpp" d="M6 18h.01M10 14h.01M15 6h.01M18 9h.01"/></svg>';
 function practice(){BACK=practice;PRW=0;
   var nf=passed('flash').length,nt=passed('test').length;
   function pc(a,ic,t,s,dis,big,lab){return'<button class="pcard'+(big?' big':'')+'" data-a="'+a+'"'+(dis?' disabled aria-disabled="true"':'')+'>'+(big?DICE:'')+'<span class="pic" aria-hidden="true">'+ic+'</span><b>'+t+'</b><small>'+s+'</small><span class="go">'+(dis?'Сначала пройди островок':lab)+(dis?'':ico('chev'))+'</span></button>'}
