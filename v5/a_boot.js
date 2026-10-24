@@ -267,13 +267,14 @@ function crtCrash(){
   CRT.el.classList.add('gl','snow');bx('glitch');
   crtT(function(){crtClose(1);bsod()},1050)}
 
-/* картинка в духе QR-кода: три «глазка» по углам, остальное — случайные клетки */
+/* пасхалка: настоящий QR-код с текстом «Привет из ИТП!» (UTF-8 с пометкой ECI, версия 2, 25×25, коррекция M). Сетка посчитана заранее
+   библиотекой segno (кодировка задана явно: без этого она выбирает Shift_JIS) и записана построчно: каждое число — строка из 25 клеток, старший бит слева, 1 — тёмная клетка.
+   Рисуется тёмным по белому квадрату с полем в 2 клетки, как на синем экране Windows: так его читают камеры телефонов */
+var BSQR=[33348991,17103425,24417373,24396893,24397917,17134913,33379711,49408,19780512,8041198,30718345,33168294,32999258,9022336,22458798,12289112,30903801,96028,33334103,17131295,24400374,24502820,24397289,17046731,33390023];
 function bsQr(){
-  var d='',N=25,R=sxRng?sxRng(20261024):Math.random;
-  function eye(x,y){d+='M'+x+' '+y+'h7v7h-7zM'+(x+1)+' '+(y+1)+'v5h5v-5zM'+(x+2)+' '+(y+2)+'h3v3h-3z'}
-  for(var y=0;y<N;y++)for(var x=0;x<N;x++){if((x<8&&y<8)||(x>N-9&&y<8)||(x<8&&y>N-9))continue;if(R()<.47)d+='M'+x+' '+y+'h1v1h-1z'}
-  eye(0,0);eye(N-7,0);eye(0,N-7);
-  return'<svg viewBox="-1 -1 27 27" shape-rendering="crispEdges" aria-hidden="true" focusable="false"><path fill="currentColor" fill-rule="evenodd" d="'+d+'"/></svg>'}
+  var d='',N=25;
+  for(var y=0;y<N;y++)for(var x=0;x<N;x++)if((BSQR[y]>>(N-1-x))&1)d+='M'+x+' '+y+'h1v1h-1z';
+  return'<svg viewBox="-2 -2 29 29" shape-rendering="crispEdges" aria-hidden="true" focusable="false"><rect x="-2" y="-2" width="29" height="29" fill="#fff"/><path fill="#0b63ce" d="'+d+'"/></svg>'}
 function bsod(){
   var b=document.createElement('div'),tms=[],gone=0,nm=S.nick||'';b.id='bsod';b.className='blk';b.setAttribute('role','alert');
   b.innerHTML='<div class="bsv"><div class="bsi"><div class="sad" aria-hidden="true">:(</div><p class="bm">В ИТП возникла проблема, и его нужно перезапустить. Мы лишь подготовим островки'+(nm?', '+esc(nm)+',':'')+' и всё заработает.</p><p class="bp"><b>0</b>% выполнено</p><div class="bq">'+bsQr()+'<div><p>Это не настоящая ошибка, а начало курса.</p><p>Код остановки: HELLO_WORLD</p></div></div></div></div>';
