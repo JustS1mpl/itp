@@ -174,13 +174,15 @@ function rainStart(cv){
 
 /* --- плёнка, без перебора: слабое мелкое зерно (небольшой canvas, растянутый на экран) и редкое лёгкое подёргивание кадра --- */
 function vhsStart(o){
-  var cv=o.querySelector('.grn'),sci=o.querySelector('.sci'),x=cv.getContext('2d'),W=256,H=144,im=x.createImageData(W,H),V={on:1,raf:0,last:0,jt:0};
-  cv.width=W;cv.height=H;
+  var cv=o.querySelector('.grn'),sci=o.querySelector('.sci'),x=cv.getContext('2d'),W=0,H=0,im=null,V={on:1,raf:0,last:0,jt:0};
+  /* размер зерна — по пропорциям экрана: точки квадратные (~4 px), а не вытянутые полосы на высоком экране телефона */
+  function fit(){var s=Math.max(3,Math.round(Math.max(innerWidth,innerHeight)/320));W=Math.ceil(innerWidth/s);H=Math.ceil(innerHeight/s);cv.width=W;cv.height=H;im=x.createImageData(W,H)}
+  fit();window.addEventListener('resize',fit);
   function grain(){for(var i=0;i<W*H;i++){var g=Math.random()*255|0;im.data[i*4]=im.data[i*4+1]=im.data[i*4+2]=g;im.data[i*4+3]=255}x.putImageData(im,0,0)}
   grain();
   if(!RM()){(function fr(t){if(!V.on)return;V.raf=requestAnimationFrame(fr);if(t-V.last<80)return;V.last=t;grain()})(0);
     (function jit(){V.jt=setTimeout(function(){if(!V.on)return;sci.classList.add('jt');setTimeout(function(){sci.classList.remove('jt')},80+Math.random()*60);jit()},7000+Math.random()*8000)})()}
-  V.stop=function(){V.on=0;cancelAnimationFrame(V.raf);clearTimeout(V.jt)};
+  V.stop=function(){V.on=0;cancelAnimationFrame(V.raf);clearTimeout(V.jt);window.removeEventListener('resize',fit)};
   return V}
 
 /* --- экран --- */
@@ -354,21 +356,31 @@ function bsCells(w,h,cx,cy){
     pts.forEach(function(q,j){if(i===j||pl.length<3)return;var nx=q[0]-p[0],ny=q[1]-p[1];pl=bsClip(pl,nx,ny,(nx*(p[0]+q[0])+ny*(p[1]+q[1]))/2)});
     return pl}).filter(function(pl){return pl.length>2})}
 
-/* удар: трещины бегут от точки удара по границам осколков, дальние — позже */
+/* удар в три приёма, как будто по стеклу бьют несколько раз: звёздочка у места удара → трещины до середины → до краёв.
+   Каждый удар — со звуком и встряской; внутри этапа трещины прорисовываются по очереди от центра (WAAPI, а не CSS:
+   до своей очереди каждая трещина гарантированно скрыта, и вся сетка не вспыхивает разом) */
 function bsCrack(b,T,end){
-  var w=innerWidth,h=innerHeight,cx=w*(.44+Math.random()*.12),cy=h*(.4+Math.random()*.1),D=Math.hypot(w,h),cells=bsCells(w,h,cx,cy),seen={},sv='',e=.5;
+  var w=innerWidth,h=innerHeight,cx=w*(.44+Math.random()*.12),cy=h*(.4+Math.random()*.1),D=Math.hypot(w,h),cells=bsCells(w,h,cx,cy),seen={},ed=[],e=.5;
   function bd(a,b2){return(Math.abs(a[0])<e&&Math.abs(b2[0])<e)||(Math.abs(a[0]-w)<e&&Math.abs(b2[0]-w)<e)||(Math.abs(a[1])<e&&Math.abs(b2[1])<e)||(Math.abs(a[1]-h)<e&&Math.abs(b2[1]-h)<e)}
   cells.forEach(function(pl){for(var i=0;i<pl.length;i++){var a=pl[i],c=pl[(i+1)%pl.length];if(bd(a,c))continue;
     var ka=Math.round(a[0])+','+Math.round(a[1]),kc=Math.round(c[0])+','+Math.round(c[1]),key=ka<kc?ka+'|'+kc:kc+'|'+ka;if(seen[key])continue;seen[key]=1;
     var d0=Math.hypot(a[0]-cx,a[1]-cy),d1=Math.hypot(c[0]-cx,c[1]-cy);if(d1<d0){var t=a;a=c;c=t;t=d0;d0=d1;d1=t}
-    var L=Math.ceil(Math.hypot(c[0]-a[0],c[1]-a[1])),st=' d="M'+a[0].toFixed(1)+' '+a[1].toFixed(1)+'L'+c[0].toFixed(1)+' '+c[1].toFixed(1)+'" style="--l:'+L+';--t:'+Math.round(80+L*1.1)+'ms;animation-delay:'+Math.round(d0/D*1500+Math.random()*80)+'ms"/>';
-    sv+='<path class="cu2"'+st+'<path class="cl"'+st}});
-  b.querySelector('.bsv').insertAdjacentHTML('beforeend','<svg class="ck" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none" aria-hidden="true"><circle class="imp" cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="10"/>'+sv+'</svg>');
-  b.classList.add('hit');bx('impact');
-  T(function(){bsShatter(b,cells,cx,cy,w,h,D,T,end)},1900)}
+    ed.push({a:a,c:c,d:d0/D,L:Math.ceil(Math.hypot(c[0]-a[0],c[1]-a[1]))})}});
+  var ST=[[0,.09,0],[.09,.26,1150],[.26,9,2300]],sv='';
+  ed.forEach(function(q,k){var p=' d="M'+q.a[0].toFixed(1)+' '+q.a[1].toFixed(1)+'L'+q.c[0].toFixed(1)+' '+q.c[1].toFixed(1)+'" data-k="'+k+'" style="stroke-dasharray:'+q.L+';stroke-dashoffset:'+q.L+'"/>';sv+='<path class="cu2"'+p+'<path class="cl"'+p});
+  var bv=b.querySelector('.bsv');
+  bv.insertAdjacentHTML('beforeend','<svg class="ck" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none" aria-hidden="true">'+sv+'</svg>');
+  var svg=bv.querySelector('.ck'),ps=svg.querySelectorAll('path');
+  [].forEach.call(ps,function(pe){var q=ed[+pe.getAttribute('data-k')],sg=ST[q.d<ST[0][1]?0:q.d<ST[1][1]?1:2],span=Math.min(sg[1],.6)-sg[0];
+    pe.animate([{strokeDashoffset:q.L},{strokeDashoffset:0}],{duration:90+q.L*1.4,delay:sg[2]+70+Math.max(0,q.d-sg[0])/span*650+Math.random()*90,easing:'ease-out',fill:'both'})});
+  ST.forEach(function(sg,k){T(function(){
+    var fl=document.createElementNS('http://www.w3.org/2000/svg','circle');fl.setAttribute('class','imp');fl.setAttribute('cx',cx.toFixed(1));fl.setAttribute('cy',cy.toFixed(1));fl.setAttribute('r',10+k*4);svg.insertBefore(fl,svg.firstChild);
+    bx('impact');bv.animate([{transform:'translate('+(-4-k*2)+'px,'+(2+k)+'px)'},{transform:'translate('+(3+k*2)+'px,'+(-2-k)+'px)'},{transform:'none'}],{duration:220+k*40,easing:'steps(3)'})},sg[2])});
+  T(function(){bsShatter(b,cells,cx,cy,w,h,D,T,end)},ST[2][2]+1700)}
 
-/* осыпание: куски не исчезают, а падают за нижний край под действием тяжести — мелкие у удара первыми, крупные по краям позже.
-   Каждый кусок сначала чуть проседает, потом срывается; вращение небольшое, как у тяжёлого стекла */
+/* осыпание: стекло вываливается из рамки на зрителя. Кусок чуть проседает, отклоняется вперёд вокруг своего верхнего края
+   (низ идёт к зрителю, кусок немного растёт) и падает вниз с ускорением; куски срываются почти одновременно с небольшим
+   разбросом, нижние и ближние к удару — раньше. Ничего не тает: каждый кусок уходит за нижний край */
 function bsShatter(b,cells,cx,cy,w,h,D,T,end){
   var v=b.querySelector('.bsv'),box=document.createElement('div'),last=0,G=4200,an=[];box.id='shards';box.onclick=end;
   cells.forEach(function(pl){
@@ -385,13 +397,15 @@ function bsShatter(b,cells,cx,cy,w,h,D,T,end){
     box.appendChild(d);
     var mx=0,my=0;pl.forEach(function(p){mx+=p[0];my+=p[1]});mx=mx/pl.length;my=my/pl.length;
     var ar=(x1-x0)*(y1-y0)/(w*h),ds=Math.hypot(mx-cx,my-cy)/D,sm=Math.max(.25,1-ar*6);
-    var dy=h-y0+60,du=Math.round(Math.sqrt(2*dy/G)*1000*(.95+Math.random()*.15)),dl=Math.round(ds*1600*(.55+Math.random()*.6)+Math.random()*150);
-    var dx=((mx-cx)/w)*70+(Math.random()-.5)*40,rz=(Math.random()-.5)*44*sm,rx=(Math.random()-.5)*36*sm,sg=2+Math.random()*4,SG=180,tot=SG+du;
+    var dy=h-y0+120,du=Math.round(Math.sqrt(2*dy/G)*1000*(1+Math.random()*.15)),dl=Math.round(Math.random()*420+(1-my/h)*380+ds*260);
+    var dx=((mx-cx)/w)*60+(Math.random()-.5)*30,rz=(Math.random()-.5)*30*sm,rx=-(25+Math.random()*45)*sm,tz=60+Math.random()*160,sg=1.5+Math.random()*3,SG=200,tot=SG+du;
     last=Math.max(last,dl+tot);
-    /* проседание и падение — одна анимация на общих часах: падение не может отстать от расписания, если страница занята */
-    var st='translateY('+sg.toFixed(1)+'px) rotate('+(rz*.05).toFixed(1)+'deg)';
-    an.push(d.animate([{transform:'none',easing:'ease-out'},{transform:'translateY('+sg.toFixed(1)+'px)',offset:SG*.4/tot},{transform:st,offset:SG/tot,easing:'cubic-bezier(.5,0,1,.6)'},
-      {transform:'translate('+dx.toFixed(1)+'px,'+(dy+sg).toFixed(1)+'px) rotateX('+rx.toFixed(0)+'deg) rotate('+rz.toFixed(1)+'deg)'}],
+    d.style.transformOrigin='50% 0';
+    /* одна анимация на общих часах: проседание → отклонение вперёд → падение; отстать от расписания она не может */
+    an.push(d.animate([{transform:'translate3d(0,0,0) rotateX(0deg) rotateZ(0deg)',easing:'ease-out'},
+      {transform:'translate3d(0,'+sg.toFixed(1)+'px,0) rotateX('+(rx*.08).toFixed(1)+'deg) rotateZ('+(rz*.05).toFixed(1)+'deg)',offset:SG/tot,easing:'cubic-bezier(.45,0,.9,.55)'},
+      {transform:'translate3d('+(dx*.3).toFixed(1)+'px,'+(dy*.22).toFixed(1)+'px,'+(tz*.6).toFixed(0)+'px) rotateX('+(rx*.75).toFixed(1)+'deg) rotateZ('+(rz*.45).toFixed(1)+'deg)',offset:(SG+du*.45)/tot,easing:'cubic-bezier(.3,0,1,.7)'},
+      {transform:'translate3d('+dx.toFixed(1)+'px,'+(dy+sg).toFixed(1)+'px,'+tz.toFixed(0)+'px) rotateX('+rx.toFixed(1)+'deg) rotateZ('+rz.toFixed(1)+'deg)'}],
       {duration:tot,delay:dl,fill:'both'}))});
   document.body.appendChild(box);b.remove();bx('shatter');document.documentElement.classList.remove('crt-on');
   app.animate([{filter:'brightness(.45)'},{filter:'brightness(.45)',offset:.25},{filter:'brightness(1)'}],{duration:Math.min(3000,last),easing:'ease-out'});

@@ -82,11 +82,15 @@ function pyExec(code,src){
           addRaw(s)});
         live()}
       else if(m.t==='need'){onNeed()}
+      /* докачка библиотек: пока идёт, лимит времени на программу не тикает, в выводе видно, что происходит */
+      else if(m.t==='pkg'){
+        if(m.n&&m.n.length){clearTimeout(job.tm);if(src.live){try{src.live(raw+(raw?'\n':'')+'⏳ Загружаю библиотеку '+m.n.join(', ')+'…')}catch(e){}}}
+        else{if(!ask){clearTimeout(job.tm);job.tm=setTimeout(job.limit,25000)}live()}}
       else if(m.t==='done'){
         used=m.used;over=!!m.over;
         var e=m.fail?'InternalError: '+m.fail:m.err;
         if(e&&!m.fail)e=String(e);
-        finish(result({err:e||null,turtle:m.tu||null}))}}
+        finish(result({err:e||null,turtle:m.tu||null,imgs:m.im||null}))}}
     function attach(rec){job.rec=rec;rec.onmsg=onMsg;rec.onerr=function(){if(done)return;kill(rec);if(PY.act===rec)PY.act=null;ensureAct();finish(result({err:'MemoryError: программа остановлена (не хватило памяти)',killed:1}))}}
     function onNeed(){
       var cur=job.rec;kill(cur);if(PY.act===cur)PY.act=null;
@@ -104,7 +108,8 @@ function pyExec(code,src){
           attach(nxt);run(nxt)})})}
     function run(rec){
       rec.w.postMessage({t:'run',code:code,lines:lines,ask:ask,files:files,seed:seed})}
-    if(!ask){job.tm=setTimeout(function(){if(done)return;kill(job.rec);if(PY.act===job.rec)PY.act=null;ensureAct();finish(result({err:'TimeLimitError: Program exceeded run-time limit.',killed:1}))},25000)}
+    job.limit=function(){if(done)return;kill(job.rec);if(PY.act===job.rec)PY.act=null;ensureAct();finish(result({err:'TimeLimitError: Program exceeded run-time limit.',killed:1}))};
+    if(!ask){job.tm=setTimeout(job.limit,25000)}
     job.poll=setInterval(function(){
       if(done)return;
       if(STOPT===my){job.stop();return}

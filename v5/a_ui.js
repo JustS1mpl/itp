@@ -28,6 +28,26 @@ function ico(n,cls){return'<svg class="'+(cls||'')+'" viewBox="0 0 24 24" width=
 
 /* --- кролик (картинка встроена в файл) --- */
 function rabbit(st){var s=IMG[st]||(st==='rolled'?IMG.grumpfull||IMG.grump:IMG.eat);return'<div class="rw im '+st+'"><img src="'+s+'" alt="" draggable="false"></div>'}
+/* тень под лапами: где стоят лапы, считается по пикселям каждого спрайта (нижние непрозрачные ряды), а не подгоняется
+   на глаз — так тень всегда ровно под кроликом, и у нового спрайта тоже. FEET[src] = {l, r, y} в долях картинки */
+var FEET={};
+function feetOf(src,cb){
+  if(FEET[src])return cb&&cb(FEET[src]);
+  var im=new Image();im.onload=function(){try{
+    var W=Math.min(240,im.naturalWidth),H=Math.round(W*im.naturalHeight/im.naturalWidth),c=document.createElement('canvas');c.width=W;c.height=H;
+    var x=c.getContext('2d');x.drawImage(im,0,0,W,H);var d=x.getImageData(0,0,W,H).data,yb=-1,X,Y;
+    for(Y=H-1;Y>=0&&yb<0;Y--)for(X=0;X<W;X++)if(d[(Y*W+X)*4+3]>140){yb=Y;break}
+    if(yb<0)return;
+    var l=W,r=0,band=Math.max(2,Math.round(H*.06));
+    for(Y=yb;Y>yb-band&&Y>=0;Y--)for(X=0;X<W;X++)if(d[(Y*W+X)*4+3]>140){if(X<l)l=X;if(X>r)r=X}
+    FEET[src]={l:l/W,r:(r+1)/W,y:(yb+1)/H};if(cb)cb(FEET[src])}catch(e){}};im.src=src}
+function feetCss(){
+  var css='';
+  ['eat','happy','grump','grumpfull','rolled'].forEach(function(st){var s=IMG[st]||(st==='rolled'?IMG.grumpfull||IMG.grump:null);if(!s)return;
+    feetOf(s,function(f){var pad=(f.r-f.l)*.12,L=Math.max(0,f.l-pad),R=Math.max(0,1-f.r-pad);
+      css+=':root:not([data-theme=dark]) .rw.im.'+st+'::after{left:'+(L*100).toFixed(1)+'%;right:'+(R*100).toFixed(1)+'%;bottom:'+((1-f.y)*100-4).toFixed(1)+'%}\n';
+      var el=document.getElementById('feet');if(!el){el=document.createElement('style');el.id='feet';document.head.appendChild(el)}el.textContent=css})})}
+feetCss();
 /* окончания по выбранному обращению: m — парень, f — девушка, n — нейтрально (если не указано) */
 function G(m,f,n){return S.g==='f'?f:S.g==='m'?m:(n===undefined?m:n)}
 function tabFn(){return({home:home,pr:practice,ed:editor,prof:profile})[CURTAB]||home}
@@ -189,7 +209,7 @@ function ity(it){return ITY[it.t]||['a','⭐','Островок']}
 function island(i,j,n){
   var k=i+'-'+j,it=IT(i,j),d=S.d[k],op=isOpen(i,j),c=cur()===k,nx=!c&&!d&&nxI(i,j),wt=j>0&&S.d[i+'-'+(j-1)]&&!LIT[i+'-'+(j-1)];
   var ty=ity(it),lb=it.n||'',off=[0,46,0,-46][j%4],st=d?'пройдено':(op?(c?'ты здесь':'открыто'):'закрыто');
-  return'<div class="ilw'+(wt?' wait':'')+(c?' cu':'')+'" style="--n:'+Math.min(n||0,9)+';transform:translateX('+off+'px)">'+(c?'<div class="flag" aria-hidden="true">'+(TOPICS[i].intro?'Начни здесь':'🚩 Ты остановился здесь')+'</div>':'')+'<button class="isl ty-'+ty[0]+' '+(d?'dn':(op?'op':'lk'))+(c?' cur':'')+(nx?' nx':'')+'" data-i="'+i+'" data-j="'+j+'" aria-label="'+esc(ty[2]+': '+lb+' ('+st+')')+'"'+(c?' aria-current="step"':'')+'>'+HEX+'<span class="ic">'+ty[1]+'</span>'+(d?'<i class="bd ok"></i>':(op?'':'<i class="bd">🔒</i>'))+'</button><div class="mu">'+esc(lb)+(it.t==='project'?'<br><small>'+(S.at[k]==='skip'?'пропущен':'по желанию')+'</small>':'')+'</div></div>'}
+  return'<div class="ilw'+(wt?' wait':'')+(c?' cu':'')+'" style="--n:'+Math.min(n||0,9)+';transform:translateX('+off+'px)">'+(c?'<div class="flag" aria-hidden="true">'+(TOPICS[i].intro?'Начни здесь':'🚩 Ты остановился здесь')+'</div>':'')+'<button class="isl ty-'+ty[0]+' '+(d?'dn':(op?'op':'lk'))+(c?' cur':'')+(nx?' nx':'')+'" data-i="'+i+'" data-j="'+j+'" aria-label="'+esc(ty[2]+': '+lb+' ('+st+')')+'"'+(c?' aria-current="step"':'')+'>'+HEX+'<span class="ic">'+ty[1]+'</span>'+(d?'<i class="bd ok"></i>':(op?'':'<i class="bd">🔒</i>'))+'</button><div class="mu">'+esc(lb)+(it.t==='project'?'<br><small>'+(/^(skip|seen)$/.test(S.at[k])?'пропущен':'по желанию')+'</small>':'')+'</div></div>'}
 /* сколько читать теорию: по объёму текста, примерно 160 слов в минуту */
 function readMin(it){var t=String(it.html||'').replace(/<pre[\s\S]*?<\/pre>/g,' ').replace(/<[^>]+>/g,' '),w=t.split(/\s+/).filter(Boolean).length,c=(String(it.html||'').match(/<pre>/g)||[]).length;return Math.max(1,Math.round(w/160+c*.25))}
 function goalCard(all){
@@ -242,8 +262,8 @@ function islandPop(b){
   var xp=it.t==='flash'?20:it.t==='test'?60:it.t==='project'?(it.bonus>0?it.bonus|0:40):0;
   if(!op){snd('lock');txt='Откроется, когда пройдёшь островки перед ним.';btn='<button class="btn g" id="ipc">К текущему островку</button>'}
   else if(d){
-    txt=S.at[k]==='skip'?'Этот проект пропущен. Сделай его сейчас и получи +'+xp+' ⭐.':(xp?'Пройдено. Опыт за этот островок уже получен, повторять можно сколько угодно.':'Пройдено. Можно перечитать в любой момент.');
-    btn='<button class="btn" id="ipg">'+(S.at[k]==='skip'?'Сделать проект':it.t==='theory'?'Перечитать':'Повторить')+'</button>'}
+    txt=S.at[k]==='seen'?'Проект пропущен, эталон открыт. Решить можно, но уже без опыта.':S.at[k]==='skip'?'Этот проект пропущен. Сделай его сейчас и получи +'+xp+' ⭐.':(xp?'Пройдено. Опыт за этот островок уже получен, повторять можно сколько угодно.':'Пройдено. Можно перечитать в любой момент.');
+    btn='<button class="btn" id="ipg">'+(/^(skip|seen)$/.test(S.at[k])?'Сделать проект':it.t==='theory'?'Перечитать':'Повторить')+'</button>'}
   else{
     txt=it.t==='theory'?'Прочитай и нажми «'+G('Я прочитал','Я прочитала','Прочитано')+'» в конце. Выделенные слова открывают описание.':it.t==='flash'?'Выбирай верный ответ. Ошибки вернутся в конце островка.':it.t==='test'?'Пиши программы, проверка запустит их на тестах.':'Задача покрупнее. Можно пропустить, тема всё равно засчитается.';
     if(xp)txt+=' Награда: до +'+xp+' ⭐.';
@@ -416,7 +436,8 @@ function SW(k,on,lab){return'<button class="sw" role="switch" aria-checked="'+(o
 function SG(k,opts,cur){return'<div class="segc" role="radiogroup">'+opts.map(function(o){var on=String(cur)===String(o[0]);return'<button role="radio" aria-checked="'+on+'" data-k="'+k+'" data-v="'+o[0]+'" class="'+(on?'on':'')+'">'+o[1]+'</button>'}).join('')+'</div>'}
 function SR(ic,t,sub,ctl,a){var blk=ctl&&/segc|swa|type="range"/.test(ctl),sw=ctl&&/class="sw"/.test(ctl);if(sw)ctl=ctl.replace('class="sw"','class="sw" aria-label="'+esc(t)+'"');return(a?'<button class="li" data-a="'+a+'">':'<div class="li static'+(blk?' blk':'')+(sw?' tg':'')+'">')+'<span class="lic" aria-hidden="true">'+ic+'</span><span class="lt">'+t+(sub?'<small>'+sub+'</small>':'')+'</span>'+(ctl||ico('chev','ch'))+(a?'</button>':'</div>')}
 function setSet(k,v){
-  if(k==='theme'){themeFx();S.theme=v}else if(k==='mute'){S.mute=v?0:1}else if(k==='goal'){S.goal=+v}else if(k==='g'){S.g=v}else if(k==='hc'){S.hc=v?0:1}
+  if(k==='theme'){themeSwap(function(){S.theme=v;save();applyPrefs()});return}
+  if(k==='mute'){S.mute=v?0:1}else if(k==='goal'){S.goal=+v}else if(k==='g'){S.g=v}else if(k==='hc'){S.hc=v?0:1}
   else{S.set[k]=(typeof v==='number'||typeof v==='boolean')?v:(/^\d+$/.test(v)?+v:v)}
   if(k==='mn'){/* минимализм при включении выключает логотип и пятна, при выключении возвращает; дальше каждое можно переключить отдельно */
     /* прошлый выбор запоминается: при выходе из минимализма логотип и пятна возвращаются такими, какими их оставил ученик */
@@ -462,7 +483,7 @@ function settings(){
    SR('🙂','Обращение','Для правильных окончаний в тексте',SG('g',[['m','Парень'],['f','Девушка'],['','Не указывать']],S.g||''))+
    SR('💾','Резервная копия','Сохранить или загрузить прогресс','','bk')+
    SR('🧹','Сбросить оформление','Вернуть вид и звук как было','','rs1')+
-   SR('🗑️','Сбросить прогресс','Удалит всё, кроме сохранённых кодов','','rs2')+'</div>';
+   SR('🗑️','Сбросить прогресс','Удалит всё, кроме сохранённых кодов и звука','','rs2')+'</div>';
   h+='<div class="sec">О приложении</div><div class="lst">'+(KBD?SR('⌨️','Горячие клавиши','','','kb'):'')+SR('📖','Прочитать введение','Знакомство с ИТП ещё раз','','intro')+SR('🐇','ИТП '+ITPV,'«И так, программирование»','<span class="lv" id="egv">'+ITPV+'</span>')+'</div><div style="height:24px"></div>';
   scr('settings',h,null);HRE=settings;
   $('x').onclick=function(){(SBACK||profile)()};
@@ -479,7 +500,7 @@ function settings(){
     else if(a==='kb')keys();
     else if(a==='intro'){BACK=function(){settings()};theory(0,0)}
     else if(a==='rs1')modal('<h2>Сбросить оформление?</h2><p>Тема, цвет, размер текста, звук и другие настройки станут как в начале. Прогресс не изменится.</p>',[['Сбросить',function(){S.set=clean({}).set;S.theme='';S.mute=0;save();applyPrefs();emoLoad();again();toast('Настройки сброшены')},0,1],['Отмена',null,1]]);
-    else if(a==='rs2')modal('<h2>Сбросить весь прогресс?</h2><p>Опыт, серия, пройденные островки и достижения удалятся. Сохранённые коды и настройки останутся. Отменить это нельзя.</p>',[['Да, сбросить',function(){S=clean({theme:S.theme,mute:S.mute,sv:S.sv,ec:S.ec,cur:S.cur,set:S.set,nick:''});seedLit();save();nick()},0,1],['Отмена',null,1]])}});
+    else if(a==='rs2')modal('<h2>Сбросить весь прогресс?</h2><p>Опыт, серия, пройденные островки, достижения и настройки оформления удалятся, знакомство начнётся заново. Сохранённые коды и звук останутся. Отменить это нельзя.</p>',[['Да, сбросить',function(){S=clean({mute:S.mute,sv:S.sv,ec:S.ec,cur:S.cur,nick:''});applyTheme();seedLit();save();nick()},0,1],['Отмена',null,1]])}});
 }
 /* --- оглавление теории (широкие экраны) --- */
 var TOCS=null;

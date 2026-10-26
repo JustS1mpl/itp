@@ -95,8 +95,13 @@ TW.scan=function(root){
 var ex0=exec;
 exec=function(code,src){
   var live=src&&src.live;
-  if(live){var old=document.getElementById('tur');if(old)old.remove()}
+  if(live){var old=document.getElementById('tur');if(old)old.remove();old=document.getElementById('pyimg');if(old)old.remove()}
   return ex0(code,src).then(function(r){
+    /* графики matplotlib: plt.show() в Python отдаёт PNG, здесь они встают под вывод */
+    if(live&&r&&r.imgs&&r.imgs.length){var o0=document.getElementById('o');
+      if(o0&&o0.isConnected){var g=document.createElement('div');g.className='pyimg';g.id='pyimg';
+        r.imgs.forEach(function(b,k){var im=new Image();im.alt='График '+(k+1);im.src='data:image/png;base64,'+b;g.appendChild(im)});
+        o0.parentNode.insertBefore(g,o0.nextSibling)}}
     if(live&&r&&r.turtle){
       var o=document.getElementById('o');
       if(o&&o.isConnected){var D=null;try{D=JSON.parse(r.turtle)}catch(e){}

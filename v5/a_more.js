@@ -15,8 +15,10 @@ function drawCard(cb){
       if(rb&&rb.width){var bs=380,sc=Math.min(bs/rb.width,bs/rb.height),w=rb.width*sc,h=rb.height*sc,lt=!isDark();
         /* светлая тема: контактная тень под лапами (без круга и обводки); спрайт «морковка» сдвинут на 5 %, чтобы тело стояло по центру */
         var eat=rb.src===IMG.eat,bx=540-w/2+(eat?w*.05:0),by=190+(bs-h)/2;
-        if(lt){var cy=by+h-4,sx=bx+w*(eat?.37:.5),gr=g.createRadialGradient(sx,cy,2,sx,cy,w*.3);gr.addColorStop(0,'rgba(110,70,50,.34)');gr.addColorStop(1,'rgba(110,70,50,0)');
-          g.save();g.translate(sx,cy);g.scale(1,.2);g.translate(-sx,-cy);g.fillStyle=gr;g.beginPath();g.arc(sx,cy,w*.3,0,6.283);g.fill();g.restore()}
+        /* тень ровно под лапами: место лап посчитано по пикселям спрайта (feetOf в a_ui.js) */
+        var ft=FEET[rb.src],fr=ft?(ft.r-ft.l)/2*1.15:.3;
+        if(lt){var cy=by+h*(ft?ft.y:1)-4,sx=bx+w*(ft?(ft.l+ft.r)/2:(eat?.37:.5)),gr=g.createRadialGradient(sx,cy,2,sx,cy,w*fr);gr.addColorStop(0,'rgba(110,70,50,.34)');gr.addColorStop(1,'rgba(110,70,50,0)');
+          g.save();g.translate(sx,cy);g.scale(1,.2);g.translate(-sx,-cy);g.fillStyle=gr;g.beginPath();g.arc(sx,cy,w*fr,0,6.283);g.fill();g.restore()}
         g.drawImage(rb,bx,by,w,h)}
       var nm=String(S.nick);g.font='900 80px '+F;
       if(isRb(nm)){var A=Array.from(nm),ws=A.map(function(ch){return g.measureText(ch).width}),tot=ws.reduce(function(a,b){return a+b},0),x0=540-tot/2;g.textAlign='left';A.forEach(function(ch,k){g.fillStyle='hsl('+(k*47%360)+',85%,58%)';g.fillText(ch,x0,650);x0+=ws[k]})}

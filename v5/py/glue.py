@@ -76,10 +76,18 @@ def _fixos(e):
 
 
 import errno as _errno
+_ERR0 = [getattr(_errno, _k) for _k in ('ENOENT', 'ENOTDIR', 'EBADF', 'ELOOP') if hasattr(_errno, _k)]
 for _k, _v in (('ENOENT', 2), ('EEXIST', 17), ('EACCES', 13), ('EISDIR', 21), ('ENOTDIR', 20), ('EPERM', 1), ('ENOTEMPTY', 39), ('EINVAL', 22), ('EBADF', 9)):
     setattr(_errno, _k, _v)
 _errno.errorcode.clear()
 _errno.errorcode.update({2: 'ENOENT', 17: 'EEXIST', 13: 'EACCES', 21: 'EISDIR', 20: 'ENOTDIR', 1: 'EPERM', 39: 'ENOTEMPTY', 22: 'EINVAL', 9: 'EBADF'})
+# pathlib запомнил номера ошибок до подмены: без этого Path(...).exists() для несуществующего файла падал с
+# FileNotFoundError вместо False (на этом спотыкался и matplotlib)
+try:
+    import pathlib._abc as _pab
+    _pab._IGNORED_ERRNOS = tuple(set(_ERR0) | {2, 20, 9, 40})
+except Exception:
+    pass
 
 
 def _wrapos(f):
@@ -319,7 +327,7 @@ def _itp_reset():
     except Exception:
         pass
     for m in list(sys.modules):
-        if m not in _BASEMODS:
+        if m not in _BASEMODS and not _itp_keep(m):
             del sys.modules[m]
     if _MAIN0 is not None:
         sys.modules['__main__'] = _MAIN0
@@ -373,6 +381,94 @@ class _TurtleFinder(importlib.abc.MetaPathFinder):
 
 
 sys.meta_path.insert(0, _TurtleFinder())
+
+
+# ---- v6.7.8: сторонние библиотеки (numpy, pandas, matplotlib, …) ----
+# Подкачиваются с CDN Pyodide или с PyPI (micropip), когда программа их импортирует и есть интернет (worker.js).
+# Загруженные пакеты лежат в site-packages и между запусками не выгружаются: модули на C (numpy) нельзя
+# импортировать в одном процессе дважды, а скачивать их заново на каждый запуск долго.
+_SITE = ('site-packages', 'dist-packages')
+
+
+def _itp_keep(name):
+    m = sys.modules.get(name)
+    f = getattr(m, '__file__', None) or ''
+    return any(s in f for s in _SITE)
+
+
+def _itp_missing(code):
+    """Модули верхнего уровня, которые программа импортирует, но которых пока нет."""
+    try:
+        from pyodide.code import find_imports
+        names = find_imports(code)
+    except Exception:
+        return []
+    out = []
+    for n in names:
+        n = n.split('.')[0]
+        if not n or n in out or n == 'turtle' or n in sys.builtin_module_names:
+            continue
+        try:
+            if importlib.util.find_spec(n) is None:
+                out.append(n)
+        except Exception:
+            out.append(n)
+    return out
+
+
+_MAXSIZE_REAL = 2 ** 31 - 1
+
+
+def _itp_preimport(names):
+    """Первый импорт сторонних библиотек — с настоящим sys.maxsize сборки (32 бита). ИТП подменяет его на 64-битный
+    ради привычных чисел в уроках, а numpy и всё, что на нём построено, при загрузке на этом спотыкаются.
+    Дальше модули не выгружаются (_itp_keep), так что повторно импортировать их не нужно."""
+    ms = sys.maxsize
+    sys.maxsize = _MAXSIZE_REAL
+    try:
+        for n in names:
+            try:
+                __import__(n)
+                if n == 'matplotlib':
+                    __import__('matplotlib.pyplot')
+            except Exception:
+                pass
+    finally:
+        sys.maxsize = ms
+
+
+def _itp_mpl():
+    """matplotlib без окон: plt.show() отдаёт каждый рисунок картинкой PNG под выводом программы."""
+    os.environ['MPLBACKEND'] = 'Agg'
+    try:
+        import matplotlib
+        matplotlib.use('Agg')
+        import matplotlib.pyplot as plt
+    except Exception:
+        return
+
+    def _show(*a, **k):
+        import base64
+        for n in plt.get_fignums():
+            b = io.BytesIO()
+            try:
+                plt.figure(n).savefig(b, format='png', dpi=110, bbox_inches='tight')
+                _img(base64.b64encode(b.getvalue()).decode())
+            except Exception:
+                pass
+        plt.close('all')
+    plt.show = _show
+    plt._itp_show = _show
+
+
+def _itp_mpl_flush():
+    """Рисунки, которые программа построила, но не показала через plt.show(), тоже показать."""
+    m = sys.modules.get('matplotlib.pyplot')
+    if m is not None and getattr(m, '_itp_show', None):
+        try:
+            m._itp_show()
+        except Exception:
+            pass
 
 
 def _tdump():

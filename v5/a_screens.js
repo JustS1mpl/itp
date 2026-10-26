@@ -53,7 +53,8 @@ function actionSheet(title,items){
   var o=modal('<h2>'+esc(title)+'</h2><div class="lst acts">'+items.map(function(x,k){return'<button class="li'+(x[3]?' dg':'')+'" data-k="'+k+'"><span class="lic" aria-hidden="true">'+x[0]+'</span><span class="lt">'+esc(x[1])+(x[4]?'<small>'+esc(x[4])+'</small>':'')+'</span></button>'}).join('')+'</div>',[['Отмена',null,1]]);
   o.classList.add('as');o.querySelectorAll('.acts .li').forEach(function(b){b.onclick=function(){o.remove();items[+b.dataset.k][2]()}});return o}
 function sheet(n,d){var c=fcol(n);modal('<h2><code'+(c?' style="color:'+c+'"':'')+'>'+esc(n)+'</code></h2><p style="font-weight:500">'+esc(d).replace(/\n/g,'<br>')+'</p>',[['Понятно']])}
-function solModal(sol){modal('<h2>Как это можно сделать</h2><pre class="cmp">'+hl(sol)+'</pre><p>Это один из вариантов. Если тесты прошли, твоё решение тоже верное.</p><p class="mu">Эталон не влияет на опыт.</p>',[['Закрыть']])}
+/* эталон; why — строки «на чём держится решение» (у проекта это его подсказки), note — своя строка про опыт */
+function solModal(sol,why,note){modal('<h2>Как это можно сделать</h2><pre class="cmp">'+hl(sol)+'</pre>'+(why&&why.length?'<p><b>На чём держится решение</b><br>'+why.map(esc).join('<br>')+'</p>':'')+'<p>Это один из вариантов. Если тесты прошли, твоё решение тоже верное.</p><p class="mu">'+(note||'Эталон не влияет на опыт.')+'</p>',[['Закрыть']])}
 function askName(title,val,cb,max){
   modal('<h2>'+esc(title)+'</h2><input class="f n" id="mi" maxlength="'+(max||40)+'" value="'+esc(val)+'" autocomplete="off" aria-label="'+esc(title)+'">',[['Сохранить',function(o){var i=o.querySelector('#mi'),v=i.value.trim();if(!v){i.focus();return false}if(cb(v.slice(0,max||40))===false){i.focus();i.select();return false}}],['Отмена',null,1]]);
   setTimeout(function(){var i=$('mi');if(i){i.focus();i.select()}},40)}
@@ -223,10 +224,18 @@ function quiz(i,j){
 function task(i,j,k){
   var it=IT(i,j),T=it.tasks,q=T[k],key=i+'-'+j,tk=key+'-'+k;
   var dc=((S.dr[key]||{}).codes||{})[k]||(S.tk[tk]?'':'# Пиши код здесь\n'+(q.starter||''));
-  var dots='<div class="sbar" role="img" aria-label="Задание '+(k+1)+' из '+T.length+'">'+T.map(function(x,n){return'<i class="'+(S.tk[key+'-'+n]?'ok':n===k?'cu':'')+'"></i>'}).join('')+'</div>';
+  /* полоска заданий: на решённое задание (и на первое нерешённое) можно перейти — взять прошлый код или ещё раз
+     посмотреть, как задумано */
+  var fu=T.findIndex(function(x,n){return!S.tk[key+'-'+n]});if(fu<0)fu=T.length-1;
+  var dots='<div class="sbar" role="group" aria-label="Задание '+(k+1)+' из '+T.length+'">'+T.map(function(x,n){var ok=S.tk[key+'-'+n],go=n!==k&&(ok||n===fu);
+    return'<button type="button" class="'+(ok?'ok':'')+(n===k?' cu':'')+'" data-n="'+n+'"'+(go?' title="Задание '+(n+1)+'"':' disabled')+' aria-label="Задание '+(n+1)+(ok?', решено':'')+'"'+(n===k?' aria-current="step"':'')+'></button>'}).join('')+'</div>';
   scr('task',lessonTop(dots,'<span class="lstep" aria-hidden="true">'+(k+1)+' / '+T.length+'</span>'+(q.h?'<button class="icon" id="hb" aria-label="Подсказка (опыт будет вдвое меньше)" aria-keyshortcuts="Control+H">'+ico('bulb')+'</button>':''))+'<h1 class="sr-only">'+esc(it.n||'Задания с кодом')+', задание '+(k+1)+' из '+T.length+'</h1>'+taskCard(q)+'<div id="hint"></div>'+edCard('Решение',dc)+conHtml()+'<div id="fb" aria-live="polite"></div>'+dockHtml('<button class="btn" id="chk">Проверить</button>'));
   $('x').onclick=goBack;
+  app.querySelectorAll('.top .sbar button[data-n]').forEach(function(b){b.onclick=function(){if(!b.disabled)task(i,j,+b.dataset.n)}});
   var c=$('code'),sync=initEd(c,function(){drc(i,j,k).codes[k]=c.value.slice(0,3000);lazySave()});sync();
+  /* вернулись к уже решённому заданию: сразу «дальше» и эталон, проверить заново тоже можно */
+  if(S.tk[tk]){var nl=k+1>=T.length;dockSet('<button class="btn g" id="chk">Проверить</button><button class="btn" id="nx">'+(fu>k&&fu!==k?'К заданию '+(fu+1):nl?'Завершить':'Следующее задание')+'</button>'+(q.sol?'<button class="btn t" id="sl">Посмотреть, как задумано</button>':''));
+    $('nx').onclick=function(){fu>k?task(i,j,fu):nl?end(i,j):task(i,j,k+1)};if(q.sol)$('sl').onclick=function(){solModal(q.sol)}}
   function showHint(){var hb=$('hb');if(hb)hb.classList.add('on');$('hint').innerHTML='<div class="fb"><b>Подсказка</b>'+esc(q.h).replace(/\n/g,'<br>')+'<br><span class="mu">Опыт за это задание: 50% от максимума.</span></div>'}
   if(q.h){
     if(HINT)showHint();
@@ -245,7 +254,7 @@ function task(i,j,k){
     if(!S.tk[tk]){S.tk[tk]=1;save()}
     var last=k+1>=T.length;
     fbSet('<div class="fb"><b>Все тесты пройдены!</b>Кролик получил корм 🥕</div>');
-    var sb=app.querySelector('.top .sbar i:nth-child('+(k+1)+')');if(sb)sb.className='ok';
+    var sb=app.querySelector('.top .sbar [data-n="'+k+'"]');if(sb){sb.className='ok cu';sb.setAttribute('aria-label','Задание '+(k+1)+', решено')}
     dockSet('<button class="btn" id="nx">'+(last?'Завершить':'Следующее задание')+'</button>'+(q.sol?'<button class="btn t" id="sl">Посмотреть, как задумано</button>':''));
     $('nx').onclick=function(){last?end(i,j):task(i,j,k+1)};
     if(q.sol)$('sl').onclick=function(){solModal(q.sol)}}}
@@ -259,9 +268,10 @@ function end(i,j){
 /* --- мини-проект --- */
 function project(i,j){
   var PF=0;
-  var it=IT(i,j),key=i+'-'+j,done=S.d[key],sk=S.at[key]==='skip',bonus=it.bonus>0?it.bonus|0:40;
+  /* at: skip — пропущен; seen — пропущен и эталон открыт: решить можно, но уже без опыта */
+  var it=IT(i,j),key=i+'-'+j,done=S.d[key],seen=S.at[key]==='seen',sk=S.at[key]==='skip'||seen,bonus=it.bonus>0?it.bonus|0:40;
   var dc=((S.dr[key]||{}).codes||{})[0]||'# Пиши код здесь\n'+(it.starter||''),hs=String(it.h||'').split('\n').filter(Boolean);
-  scr('project',lessonTop('<span class="lstep">🚀 Мини-проект · по желанию</span>',done?'':'<button class="btn t" id="sk" style="margin:0">Пропустить</button>')+'<div class="pj"><h1>'+esc(it.n)+'</h1><div class="card"><b>Цель</b><p>'+esc(it.q).replace(/\n/g,'</p><p>')+'</p>'+(hs.length?'<b>Что пригодится</b><p>'+hs.map(esc).join('<br>')+'</p>':'')+(it.ex?'<b>Пример</b>'+(it.strict?'<pre class="cmp">'+esc(it.ex)+'</pre>':'<p style="margin-bottom:0">'+esc(it.ex).replace(/\n/g,'<br>')+'</p>'):'')+'</div><p class="mu" style="margin:0 4px 14px">'+(sk?'Этот проект пропущен. Сделай его сейчас и получи бонус +'+bonus+' ⭐.':done?'Проект уже выполнен, бонус за него получен.':'Проект можно пропустить, тема всё равно засчитается. За выполнение бонус +'+bonus+' ⭐.')+'</p></div>'+edCard('Решение',dc)+conHtml()+'<div id="fb" aria-live="polite"></div>'+dockHtml('<button class="btn" id="chk">Проверить</button>'));
+  scr('project',lessonTop('<span class="lstep">🚀 Мини-проект · по желанию</span>',done?'':'<button class="btn t" id="sk" style="margin:0">Пропустить</button>')+'<div class="pj"><h1>'+esc(it.n)+'</h1><div class="card"><b>Цель</b><p>'+esc(it.q).replace(/\n/g,'</p><p>')+'</p>'+(hs.length?'<b>Что пригодится</b><p>'+hs.map(esc).join('<br>')+'</p>':'')+(it.ex?'<b>Пример</b>'+(it.strict?'<pre class="cmp">'+esc(it.ex)+'</pre>':'<p style="margin-bottom:0">'+esc(it.ex).replace(/\n/g,'<br>')+'</p>'):'')+'</div><p class="mu" style="margin:0 4px 14px">'+(seen?'Эталон открыт, поэтому опыт за проект не начисляется. Решить его всё равно можно.':sk?'Этот проект пропущен. Сделай его сейчас и получи бонус +'+bonus+' ⭐. Или посмотри эталон, но тогда уже без опыта.':done?'Проект уже выполнен, бонус за него получен.':'Проект можно пропустить, тема всё равно засчитается. За выполнение бонус +'+bonus+' ⭐.')+'</p></div>'+edCard('Решение',dc)+conHtml()+'<div id="fb" aria-live="polite"></div>'+dockHtml('<button class="btn" id="chk">Проверить</button>'+(sk&&it.sol?'<button class="btn t" id="pjs">Посмотреть эталон</button>':'')));
   $('x').onclick=home;
   var c=$('code'),ed=c.closest('.ed');ed.dataset.min=300;var sync=initEd(c,function(){drc(i,j,0).codes[0]=c.value.slice(0,3000);lazySave()});sync();
   skReady();chkPulse();runBind(c);
@@ -272,13 +282,19 @@ function project(i,j){
     var v=await judge(it,c.value);
     if(!v.ok){fx(false);b.disabled=false;PF++;fbSet(badFb(v.h,errMood(PF)));return}
     fx(true,'none');projEnd(i,j)};
-  if($('sk'))$('sk').onclick=function(){projSkip(i,j)}}
+  if($('sk'))$('sk').onclick=function(){projSkip(i,j)};
+  if($('pjs'))$('pjs').onclick=function(){
+    var why=String(it.h||'').split('\n').filter(Boolean);
+    function show(){solModal(it.sol,why,'Эталон открыт: опыт за этот проект больше не начисляется.')}
+    if(S.at[key]==='seen')return show();
+    modal('<h2>Открыть эталон?</h2><p>После этого опыт за проект не начислится, даже если решишь его сам. Решить проект всё равно можно.</p>',[['Открыть эталон',function(){S.at[key]='seen';save();setTimeout(function(){project(i,j);show()},200)}],['Отмена',null,1]])}}
 function projEnd(i,j){
   var key=i+'-'+j,it=IT(i,j),tj0=tdone(i),x=0,lv=0,at=S.at[key];
   if(!at||at==='skip'){x=it.bonus>0?it.bonus|0:40;S.at[key]='full';lv=addXp(x)}
+  else if(at==='seen')S.at[key]='full';
   bump(key);ach('proj');snd('fanfare');
   var tj=!tj0&&tdone(i),all=allDone();
-  doneScreen({title:all?'Обучение завершено!':'Проект готов!',lead:all?'Кролик научился программировать и построил автоматическую кормушку 🤖':'Кролик в восторге 🚀',x:x,note:x?'':'Бонус за этот проект уже получен.',tj:tj?TOPICS[i].n:'',lv:lv,btns:'<button class="btn" id="go">К темам</button>'+(it.sol?'<button class="btn t" id="sl">Посмотреть, как задумано</button>':'')});
+  doneScreen({title:all?'Обучение завершено!':'Проект готов!',lead:all?'Кролик научился программировать и построил автоматическую кормушку 🤖':'Кролик в восторге 🚀',x:x,note:x?'':at==='seen'?'Эталон был открыт, поэтому опыт не начислен.':'Бонус за этот проект уже получен.',tj:tj?TOPICS[i].n:'',lv:lv,btns:'<button class="btn" id="go">К темам</button>'+(it.sol?'<button class="btn t" id="sl">Посмотреть, как задумано</button>':'')});
   $('go').onclick=home;if(it.sol)$('sl').onclick=function(){solModal(it.sol)};
   if(tj||lv)confetti(tj&&all?2:1)}
 

@@ -60,8 +60,10 @@ function applyPrefs(){
 }
 function applyTheme(){applyPrefs()}
 try{matchMedia('(prefers-color-scheme:dark)').addEventListener('change',function(){if(!S.theme)applyPrefs()})}catch(e){}
-function themeFx(){var r=document.documentElement;r.classList.add('tt');setTimeout(function(){r.classList.remove('tt')},450)}
-function toggleTheme(){themeFx();S.theme=isDark()?'light':'dark';applyPrefs();save();if(HRE)HRE()}
+/* смена темы: плавный наплыв всей страницы (View Transitions — один снимок «до» и «после»), а не переходы цвета у каждого
+   элемента: их сотни, многие со стеклом и размытием, и на Ctrl+D смена шла рывками. Без поддержки — мгновенно */
+function themeSwap(fn){if(document.startViewTransition&&!RM()&&!document.hidden){try{document.startViewTransition(fn);return}catch(e){}}fn()}
+function toggleTheme(){themeSwap(function(){S.theme=isDark()?'light':'dark';applyPrefs();save();if(HRE)HRE()})}
 function isDark(){return document.documentElement.getAttribute('data-theme')==='dark'||(!document.documentElement.getAttribute('data-theme')&&matchMedia('(prefers-color-scheme:dark)').matches)}
 /* --- смайлики Windows 11 (Fluent Emoji, MIT) --- */
 var EM={map:null,url:Object.create(null),obs:null};
