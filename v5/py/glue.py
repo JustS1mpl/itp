@@ -453,12 +453,31 @@ def _itp_mpl():
             b = io.BytesIO()
             try:
                 plt.figure(n).savefig(b, format='png', dpi=110, bbox_inches='tight')
-                _img(base64.b64encode(b.getvalue()).decode())
+                _img(base64.b64encode(b.getvalue()).decode(), 'mpl')
             except Exception:
                 pass
         plt.close('all')
     plt.show = _show
     plt._itp_show = _show
+
+
+def _itp_pil():
+    """Pillow: Image.show() открывает окно просмотрщика на компьютере; здесь картинка встаёт под вывод программы."""
+    try:
+        from PIL import Image
+    except Exception:
+        return
+    if getattr(Image.Image.show, '_itp', False):
+        return
+
+    def show(self, title=None, **k):
+        import base64
+        b = io.BytesIO()
+        im = self if self.mode in ('RGB', 'RGBA', 'L', 'LA', 'P', '1') else self.convert('RGBA')
+        im.save(b, format='PNG')
+        _img(base64.b64encode(b.getvalue()).decode(), 'pil')
+    show._itp = True
+    Image.Image.show = show
 
 
 def _itp_mpl_flush():

@@ -84,7 +84,7 @@ function pyExec(code,src){
       else if(m.t==='need'){onNeed()}
       /* докачка библиотек: пока идёт, лимит времени на программу не тикает, в выводе видно, что происходит */
       else if(m.t==='pkg'){
-        if(m.n&&m.n.length){clearTimeout(job.tm);if(src.live){try{src.live(raw+(raw?'\n':'')+'⏳ Загружаю библиотеку '+m.n.join(', ')+'…')}catch(e){}}}
+        if(m.n&&m.n.length){clearTimeout(job.tm);if(src.live){try{src.live(raw+(raw?'\n':'')+'⏳ Загружаю '+(m.n.length>1?'библиотеки ':'библиотеку ')+m.n.join(', ')+'…')}catch(e){}}}
         else{if(!ask){clearTimeout(job.tm);job.tm=setTimeout(job.limit,25000)}live()}}
       else if(m.t==='done'){
         /* Python в процессе сломался насовсем (например, pygame пытался открыть окно): процесс — в утиль, следующий запуск на свежем */

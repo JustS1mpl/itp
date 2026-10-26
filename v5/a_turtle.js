@@ -34,8 +34,10 @@ TW.mount=function(host,D,opt){
   var cv=document.createElement('canvas');cv.setAttribute('role','img');
   var last=D.tur&&D.tur.filter(function(t){return t[3]})[0]||(D.tur&&D.tur[0]);
   cv.setAttribute('aria-label','Рисунок черепахи, действий: '+D.ops.length+(last?'. Черепаха остановилась в точке ('+fmt(last[0])+'; '+fmt(last[1])+')':''));
-  host.appendChild(cv);
-  var bt=document.createElement('button');bt.type='button';bt.className='tuplay';bt.setAttribute('aria-label','Нарисовать заново');bt.textContent='↻';host.appendChild(bt);
+  var bt=document.createElement('button');bt.type='button';bt.className='tuplay';bt.setAttribute('aria-label','Нарисовать заново');bt.textContent='↻';
+  /* в компиляторе рисунок — «окно программы»: строка заголовка с кнопкой «заново», холст на всю ширину */
+  if(host.classList.contains('run')){var bar=document.createElement('div');bar.className='tuw';bar.innerHTML='<span class="tuwt"><span aria-hidden="true">🐢</span> Окно черепахи</span>';bt.innerHTML='↻ <span>заново</span>';bar.appendChild(bt);host.appendChild(bar);host.appendChild(cv)}
+  else{host.appendChild(cv);host.appendChild(bt)}
   var cap=document.createElement('div');cap.className='tucap';
   cap.textContent=last?'Черепаха остановилась в точке ('+fmt(last[0])+'; '+fmt(last[1])+')':'Рисунок готов';
   if(D.cut)cap.textContent+=' · рисунок обрезан: слишком много действий';
@@ -95,17 +97,27 @@ TW.scan=function(root){
 var ex0=exec;
 exec=function(code,src){
   var live=src&&src.live;
-  if(live){var old=document.getElementById('tur');if(old)old.remove();old=document.getElementById('pyimg');if(old)old.remove()}
+  if(live){var old=document.getElementById('tur');if(old)old.remove();old=document.getElementById('pyimg');if(old)old.remove();var o1=document.getElementById('o');if(o1)o1.classList.remove('drw')}
   return ex0(code,src).then(function(r){
     /* графики matplotlib: plt.show() в Python отдаёт PNG, здесь они встают под вывод */
+    /* у каждого окна библиотеки — строка заголовка: что за окно и от какой библиотеки (как у окна черепахи) */
     if(live&&r&&r.imgs&&r.imgs.length){var o0=document.getElementById('o');
       if(o0&&o0.isConnected){var g=document.createElement('div');g.className='pyimg';g.id='pyimg';
-        r.imgs.forEach(function(b,k){var im=new Image();im.alt='График '+(k+1);im.src='data:image/png;base64,'+b;g.appendChild(im)});
+        var KD={mpl:['📈','График','matplotlib'],pil:['🖼','Изображение','Pillow']},cnt={};
+        r.imgs.forEach(function(e){var k=Array.isArray(e)?e[0]:'mpl',b=Array.isArray(e)?e[1]:e,d=KD[k]||KD.mpl;cnt[k]=(cnt[k]||0)+1;
+          var w=document.createElement('figure');w.className='pyw';
+          w.innerHTML='<div class="tuw"><span class="tuwt"><span aria-hidden="true">'+d[0]+'</span> '+d[1]+(cnt[k]>1?' '+cnt[k]:'')+' <small>· '+d[2]+'</small></span></div>';
+          var im=new Image();im.alt=d[1]+' ('+d[2]+')';
+          /* маленькую картинку не растягиваем на всё окно (будет «лесенка»): натуральный размер, максимум вдвое, чёткие пиксели */
+          im.onload=function(){if(k==='pil'&&im.naturalWidth<360){im.style.width=Math.min(im.naturalWidth*2,520)+'px';im.style.imageRendering='pixelated';im.classList.add('sm')}};
+          im.src='data:image/png;base64,'+b;w.appendChild(im);g.appendChild(w)});
         o0.parentNode.insertBefore(g,o0.nextSibling)}}
     if(live&&r&&r.turtle){
       var o=document.getElementById('o');
       if(o&&o.isConnected){var D=null;try{D=JSON.parse(r.turtle)}catch(e){}
         if(D){var h=document.createElement('div');h.className='tuf run';h.id='tur';o.parentNode.insertBefore(h,o.nextSibling);TW.mount(h,D,{play:true})}}}
+    /* программа только рисовала: вместо «(программа ничего не вывела)» над окном — ничего */
+    if(live&&r&&(r.turtle||(r.imgs&&r.imgs.length))&&!String(r.out||'').trim()&&!r.err){var o2=document.getElementById('o');if(o2)o2.classList.add('drw')}
     return r})};
 window.TW=TW;
 })();

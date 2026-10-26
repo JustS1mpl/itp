@@ -26,6 +26,7 @@ async function needPkgs(code){
     if(fin.indexOf('tkinter')>=0){fin.splice(fin.indexOf('tkinter'),1);emit(1,'tkinter открывает окна на компьютере, а в браузере их нет, поэтому в ИТП он не работает. Рисовать можно через turtle (рисунок появится под выводом) или matplotlib (график).\n')}
     if(fin.length)emit(1,'Библиотеку '+fin.join(', ')+' не удалось загрузить. Она не встроена в ИТП: чтобы скачать её, нужен интернет (или такой библиотеки нет).\n');
     postMessage({t:'pkg',n:[]})}
+  if(/(^|\n)\s*(import|from)\s+PIL/.test(code)){try{py.runPython('_itp_preimport(["PIL"]);_itp_pil()')}catch(x){}}
   if(/matplotlib/.test(code)){try{py.runPython('_itp_preimport(["matplotlib"]);_itp_mpl()')}catch(x){}}}
 self.onmessage=async function(e){var m=e.data;
   if(m.t==='init'){
@@ -49,7 +50,7 @@ self.onmessage=async function(e){var m=e.data;
         try{var sn=py.makeMemorySnapshot();postMessage({t:'snap',sn:sn},[sn.buffer])}catch(x){postMessage({t:'snap',sn:null})}
       }
       py.globals.set('_mark',function(n){buf.push([2,n]);});
-      py.globals.set('_img',function(b){IMGS.push(String(b))});
+      py.globals.set('_img',function(b,k){IMGS.push([String(k||'mpl'),String(b)])});
       postMessage({t:'ready',v:py.version});
     }catch(err){postMessage({t:'fail',e:String(err&&err.stack||err)})}
   }else if(m.t==='run'){
