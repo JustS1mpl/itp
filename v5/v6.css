@@ -1228,3 +1228,5 @@ html.crt-on{scrollbar-gutter:auto}
 .dvsp{margin:0;width:92px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px;border:1px solid var(--line2);border-radius:var(--r-sm);background:var(--card2)}
 .dvsp img{width:72px;height:72px;object-fit:contain}
 .dvsp figcaption{font-size:11px;color:var(--muted);text-align:center;word-break:break-all}
+
+.dvpx{position:fixed;top:calc(var(--safe-t,0px) + 10px);right:10px;z-index:100000;padding:8px 12px;border-radius:var(--r);border:1px solid rgba(255,255,255,.4);background:rgba(0,0,0,.72);color:#fff;font:600 13px system-ui,sans-serif}
