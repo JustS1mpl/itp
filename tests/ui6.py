@@ -59,6 +59,8 @@ def run(theme='light', w=390):
         ok(pg.locator('.tpc').count() == pg.evaluate("TOPICS.filter(function(t){return!t.intro&&!t.opt}).length"), 'на выборе старта все темы из TOPICS')
         snap(pg, '02_place_' + theme)
         tap(pg, '.tpc.rec')
+        # пункт меню подтверждается с подсветкой 280 мс (crtMenu → pick), поэтому ждём, а не проверяем сразу
+        pg.wait_for_function("S.start>=0", timeout=3000)
         ok(pg.evaluate("S.start") == 0 and pg.evaluate("S.g") == 'f', 'старт с нуля, обращение сохранено')
         pg.wait_for_selector('#bsod:not(.blk)', timeout=15000)
         snap(pg, '03_bsod_' + theme)

@@ -26,7 +26,13 @@ function dvPanel(){
     h+='<button data-a="cur">Отметить островок пройденным</button></div>';
   }
   h+='<div class="dvs">Опыт и уровень</div><div class="dvr"><button data-a="xp50">+50 ⭐</button><button data-a="xp500">+500 ⭐</button><button data-a="lv">+1 уровень</button></div>';
-  h+='<div class="dvs">Серия и заморозки</div><div class="dvr"><button data-a="st">Серия +1</button><button data-a="st0">Серия = 0</button><button data-a="fz">Заморозка +1</button><button data-a="fz0">Заморозки = 0</button></div>';
+  h+='<div class="dvs">Серия и заморозки</div><div class="dvr"><button data-a="st">Серия +1</button><button data-a="st0">Серия = 0</button><button data-a="fz">Заморозка +1</button><button data-a="fzm">Заморозка −1</button><button data-a="fz0">Заморозки = 0</button></div>';
+  h+='<div class="dvs">Спрайты кролика</div><div class="dvr dvim">';
+  Object.keys(IMG).forEach(function(k){h+='<figure class="dvsp"><img src="'+IMG[k]+'" alt="'+k+'"><figcaption>'+k+'</figcaption></figure>'});
+  h+='</div>';
+  h+='<div class="dvs">Звуки (нажми, чтобы послушать)</div><div class="dvr">';
+  Object.keys(SXD).forEach(function(k){h+='<button class="dvk" data-s="'+k+'">▶ '+k+'</button>'});
+  h+='</div>';
   h+='<div class="dvs">Прогресс</div><div class="dvr"><button data-a="all">Все островки пройдены</button><button data-a="none">Сбросить прогресс островков</button><button data-a="gl">Цель дня выполнена</button></div>';
   h+='<div class="dvs">Достижения (нажми, чтобы выдать или забрать)</div><div class="dvr"><button data-a="aa">Выдать все</button><button data-a="an">Забрать все</button></div><div class="dva">';
   ACH.forEach(function(a){h+='<button class="dvk'+(S.ach[a.id]?' on':'')+'" data-id="'+a.id+'" title="'+dvEsc(a.d)+'">'+a.e+' '+dvEsc(a.n)+'</button>'});
@@ -35,6 +41,8 @@ function dvPanel(){
   o.onclick=function(e){if(e.target===o)dvClose()};
   document.getElementById('dvx').onclick=dvClose;
   o.querySelectorAll('.dvk').forEach(function(b){b.onclick=function(){var id=b.dataset.id;if(S.ach[id]){delete S.ach[id];save()}else ach(id);dvPanel()}});
+  o.querySelectorAll('[data-s]').forEach(function(b){b.onclick=function(){
+    try{if(typeof sxShow==='function')sxShow();sxVol(VOLK());sxPlay(b.dataset.s,{k:3})}catch(e){toast('Звук недоступен: коснись экрана и попробуй снова')}}});
   o.querySelectorAll('[data-a]').forEach(function(b){b.onclick=function(){dvAct(b.dataset.a)}});
 }
 function dvAct(a){
@@ -58,6 +66,7 @@ function dvAct(a){
   if(a==='st'){var t=day(new Date());if(S.last!==t){S.last=t;S.streak=(S.streak||0)+1}else S.streak++;if(S.streak>S.max)S.max=S.streak;save();toast('Серия: '+S.streak);return}
   if(a==='st0'){S.streak=0;save();toast('Серия сброшена');return}
   if(a==='fz'){S.fz.n=Math.min(2,S.fz.n+1);save();toast('Заморозок: '+S.fz.n);return}
+  if(a==='fzm'){S.fz.n=Math.max(0,S.fz.n-1);save();toast('Заморозок: '+S.fz.n);return}
   if(a==='fz0'){S.fz.n=0;S.fz.p=0;save();toast('Заморозок: 0');return}
   if(a==='all'){TOPICS.forEach(function(t,i){t.items.forEach(function(x,j){dvDone(i,j)})});toast('Все островки пройдены');dvClose();return home()}
   if(a==='none'){S.d={};S.es={};S.at={};S.dr={};S.tk={};S.hu={};save();toast('Прогресс островков сброшен');dvClose();return home()}
