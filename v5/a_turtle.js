@@ -76,7 +76,7 @@ TW.mount=function(host,D,opt){
     if(p>=1){D.tur.forEach(function(t){if(t[3])tshape(ctx,X(t[0]),Y(t[1]),t[2],t[4],t[5],t[6]||'classic',u)})}
     else if(head){var t0=D.tur.filter(function(t){return t[3]})[0];tshape(ctx,X(head[0]),Y(head[1]),head[2],t0?t0[4]:'#000',t0?t0[5]:'#000',t0?t0[6]||'classic':'classic',u)}}
   function size(){
-    var w=host.clientWidth;if(!w||w===W/dpr)return;
+    var w=host.classList.contains("run")?Math.min(host.clientWidth,innerHeight*.6,560):host.clientWidth;w=Math.round(w);if(!w||w===W/dpr)return;
     dpr=Math.min(window.devicePixelRatio||1,3);W=Math.round(w*dpr);cv.width=W;cv.height=W;draw()}
   function play(){
     cancelAnimationFrame(raf);
@@ -86,6 +86,8 @@ TW.mount=function(host,D,opt){
     raf=requestAnimationFrame(fr)}
   bt.onclick=function(){snd('click');play()};
   if(window.ResizeObserver)new ResizeObserver(function(){if(!cv.isConnected)return;size()}).observe(host);
+  /* размер окна известен только после раскладки: пересчитать в следующем кадре и чуть позже (не ждать наблюдателя) */
+  requestAnimationFrame(function(){if(cv.isConnected)size()});setTimeout(function(){if(cv.isConnected)size()},150);
   requestAnimationFrame(function(){size();if(opt.play)play()});
   return{play:play}};
 /* готовые рисунки в теории: <div class="tuf" data-td="json"> */
