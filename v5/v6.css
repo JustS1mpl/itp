@@ -1162,7 +1162,7 @@ html.crt-on{scrollbar-gutter:auto}
 .crt .tgo{flex:none;width:2.9em;min-height:2.7em;border:2px solid var(--ph);border-radius:.7em;background:transparent;color:var(--ph);font:inherit;font-size:1.1em;cursor:pointer;text-shadow:inherit;box-shadow:0 0 10px var(--phg);transition:opacity .2s,background .2s}
 .crt .tgo{display:flex;align-items:center;justify-content:center}
 .crt .tgo svg{width:1.05em;height:1.05em;filter:drop-shadow(0 0 4px var(--phg))}
-.crt .tgo:disabled{opacity:.3;box-shadow:none;cursor:default}
+.crt .tgo:disabled,.crt .tgo.off{opacity:.3;box-shadow:none}
 .crt .tgo:not(:disabled):hover,.crt .tgo:focus-visible{background:rgba(98,255,143,.14);outline:0}
 .crt .tmn{display:flex;flex-direction:column;gap:.1em;margin:.7em 0 .3em 4.6em;max-width:40em}
 .crt .tmo{display:flex;gap:.7em;align-items:baseline;width:100%;min-height:44px;padding:.4em .7em;border:0;border-radius:.45em;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer;text-shadow:inherit;transition:background .15s}

@@ -252,11 +252,18 @@ function crtYou(s){if(!CRT)return;var e=crtRow('','tl you');e.textContent=s}
 
 /* поле ввода: рамка, «…» и мигающий блок-курсор; само поле настоящее (клавиатура телефона, вставка) */
 function crtAsk(max){return new Promise(function(res){
-  var f=crtRow('<label class="tbx"><span class="sr-only">Как тебя зовут?</span><span class="tvw" aria-hidden="true"><span class="tv"></span></span><span class="ph" aria-hidden="true">…</span><i class="cu" aria-hidden="true"></i><input id="nk" maxlength="'+max+'" autocomplete="off" autocapitalize="words" autocorrect="off" spellcheck="false" enterkeyhint="done"></label><button class="tgo" id="go" type="submit" disabled aria-label="Дальше">'+ico('enter')+'</button>','tin','form');
+  var f=crtRow('<label class="tbx"><span class="sr-only">Как тебя зовут?</span><span class="tvw" aria-hidden="true"><span class="tv"></span></span><span class="ph" aria-hidden="true">…</span><i class="cu" aria-hidden="true"></i><input id="nk" maxlength="'+max+'" autocomplete="off" autocapitalize="words" autocorrect="off" spellcheck="false" enterkeyhint="go"></label><button class="tgo" id="go" type="submit" aria-label="Дальше">'+ico('enter')+'</button>','tin','form');
   var i=f.querySelector('input'),tv=f.querySelector('.tv'),g=f.querySelector('#go');
   f.setAttribute('autocomplete','off');
-  i.oninput=function(){tv.textContent=i.value;f.classList.toggle('has',!!i.value);g.disabled=!i.value.trim();bx('key')};
-  f.onsubmit=function(e){e.preventDefault();var v=i.value.trim();if(!v){i.focus();return}bx('ok');i.blur();f.remove();crtYou('> '+v);res(v.slice(0,max))};
+  /* кнопка всегда активна, значение берётся в момент отправки: экранные клавиатуры Android, пока слово подчёркнуто
+     подсказкой, присылают ввод с опозданием, и кнопка, выключенная до первого символа, могла так и остаться выключенной.
+     Enter (и «Далее» на экранной клавиатуре) обрабатываем сами, не полагаясь на неявную отправку формы */
+  function upd(){tv.textContent=i.value;f.classList.toggle('has',!!i.value);g.classList.toggle('off',!i.value.trim())}
+  i.oninput=function(){upd();bx('key')};i.addEventListener('compositionend',upd);i.addEventListener('change',upd);
+  var sent=0;function send(){if(sent)return;upd();var v=i.value.trim();if(!v){i.focus();f.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(5px)'},{transform:'none'}],{duration:240});return}sent=1;bx('ok');i.blur();f.remove();crtYou('> '+v);res(v.slice(0,max))}
+  f.onsubmit=function(e){e.preventDefault();send()};
+  i.addEventListener('keydown',function(e){if(e.key==='Enter'||e.keyCode===13){e.preventDefault();send()}});
+  upd();
   if(!CRT.touch)setTimeout(function(){i.focus({preventScroll:true})},60)})}
 
 /* меню: стрелки, цифры (если пунктов меньше десяти), Enter или касание */

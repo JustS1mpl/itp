@@ -49,7 +49,7 @@ def run(theme='light', w=390):
         tap(pg, '#crt')
         tap(pg, '#crt')
         pg.wait_for_selector('#nk', timeout=20000)
-        ok(pg.locator('#go').is_disabled(), '«Дальше» выключено без ника')
+        ok('off' in (pg.get_attribute('#go', 'class') or ''), '«Дальше» приглушено без ника (кнопка не выключается: так надёжнее на экранных клавиатурах)')
         pg.fill('#nk', 'Тестер')
         snap(pg, '01_nick_' + theme)
         tap(pg, '#go')

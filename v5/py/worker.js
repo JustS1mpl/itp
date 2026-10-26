@@ -22,6 +22,8 @@ async function needPkgs(code){
     if(left.length){try{await py.loadPackage('micropip',q);var mp=py.pyimport('micropip');for(var i=0;i<left.length;i++){try{await mp.install(left[i])}catch(x){}}}catch(x){}}
     try{var pi=py.globals.get('_itp_preimport');pi(py.toPy(miss));pi.destroy()}catch(x){}
     var fin=missing(code);
+    /* библиотеки окон операционной системы: в браузере окон нет, объясняем по-человечески */
+    if(fin.indexOf('tkinter')>=0){fin.splice(fin.indexOf('tkinter'),1);emit(1,'tkinter открывает окна на компьютере, а в браузере их нет, поэтому в ИТП он не работает. Рисовать можно через turtle (рисунок появится под выводом) или matplotlib (график).\n')}
     if(fin.length)emit(1,'Библиотеку '+fin.join(', ')+' не удалось загрузить. Она не встроена в ИТП: чтобы скачать её, нужен интернет (или такой библиотеки нет).\n');
     postMessage({t:'pkg',n:[]})}
   if(/matplotlib/.test(code)){try{py.runPython('_itp_preimport(["matplotlib"]);_itp_mpl()')}catch(x){}}}
@@ -59,6 +61,11 @@ self.onmessage=async function(e){var m=e.data;
       if(m.files)Object.keys(m.files).forEach(function(n){try{py.FS.writeFile('/home/pyodide/'+n,String(m.files[n]))}catch(x){}});
       var f=py.globals.get('_itp_run');res=f(m.code,!m.ask,String(m.seed));try{f.destroy()}catch(x){}
     }catch(err){fail=String(err&&err.message||err)}
+    /* pygame пытается открыть окно (SDL ищет экран страницы), а в фоновом процессе браузера окна нет */
+    /* после такой ошибки (и любой «fatal») Python в этом процессе мёртв: страница выбросит процесс и запустит свежий (dead) */
+    var dead=!!(fail&&/fatal|screen is not defined/i.test(fail));
+    if(fail&&/screen is not defined|canvas/i.test(fail)&&/pygame/.test(m.code||'')){fail=null;res='RuntimeError: окно pygame в ИТП не открывается: программа работает в браузере без отдельного окна. Вычисления и логику pygame проверить можно, а рисовать лучше через turtle.'}
+    if(dead){postMessage({t:'done',err:res===undefined?null:res,fail:fail,over:false,used:RUN?RUN.i:0,tu:null,im:null,dead:1});RUN=null;return}
     /* рисунок черепахи и графики забираем ДО очистки: _itp_reset выгружает модули, и черепаха исчезала вместе с turtle */
     var tu=null;try{tu=py.runPython('_tdump()')}catch(x){}
     try{py.runPython('_itp_mpl_flush()')}catch(x){}

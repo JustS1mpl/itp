@@ -87,6 +87,8 @@ function pyExec(code,src){
         if(m.n&&m.n.length){clearTimeout(job.tm);if(src.live){try{src.live(raw+(raw?'\n':'')+'⏳ Загружаю библиотеку '+m.n.join(', ')+'…')}catch(e){}}}
         else{if(!ask){clearTimeout(job.tm);job.tm=setTimeout(job.limit,25000)}live()}}
       else if(m.t==='done'){
+        /* Python в процессе сломался насовсем (например, pygame пытался открыть окно): процесс — в утиль, следующий запуск на свежем */
+        if(m.dead){var dr=job.rec;kill(dr);if(PY.act===dr)PY.act=null;ensureAct()}
         used=m.used;over=!!m.over;
         var e=m.fail?'InternalError: '+m.fail:m.err;
         if(e&&!m.fail)e=String(e);
