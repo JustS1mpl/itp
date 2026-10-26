@@ -16,11 +16,11 @@ with sync_playwright() as p:
     S = pg.evaluate("JSON.stringify({d:S.d,tk:S.tk,at:S.at,es:S.es,hu:S.hu,start:S.start,mv:S.mv,mode:S.mode})")
     print('topics', n); print(S)
     s = json.loads(S)
-    assert n == 23, n
-    assert s['d'] == {'0-0': 1, '1-0': 1, '16-0': 1, '16-1': 1, '17-0': 1, '22-2': 1}, s['d']
-    assert s['tk'] == {'16-4-0': 1}, s['tk']
-    assert s['at'] == {'16-1': 'full'} and s['es'] == {'16-1': 0} and s['hu'] == {'16': 1}, s
-    assert s['start'] == 17 and s['mv'] == 3 and 'mode' not in s, s
+    assert n == 24, n
+    assert s['d'] == {'0-0': 1, '1-0': 1, '17-0': 1, '17-1': 1, '18-0': 1, '23-2': 1}, s['d']
+    assert s['tk'] == {'17-4-0': 1}, s['tk']
+    assert s['at'] == {'17-1': 'full'} and s['es'] == {'17-1': 0} and s['hu'] == {'17': 1}, s
+    assert s['start'] == 18 and s['mv'] == 4 and 'mode' not in s, s
     nav = pg.evaluate("[].map.call(document.querySelectorAll('nav button, #nav button'),function(x){return x.textContent.trim()})")
     print('nav', nav)
     assert len(nav) == 4, nav
@@ -28,10 +28,10 @@ with sync_playwright() as p:
     pg.reload(); pg.wait_for_timeout(2500)
     d2 = pg.evaluate("JSON.stringify(S.d)")
     assert json.loads(d2) == s['d'], d2
-    assert pg.evaluate("S.start") == 17
+    assert pg.evaluate("S.start") == 18
     # экспорт-импорт
     ex = pg.evaluate("exportData()")
-    assert json.loads(json.loads(ex)['p'])['data']['mv'] == 3
+    assert json.loads(json.loads(ex)['p'])['data']['mv'] == 4
     # все вкладки открываются без ошибок
     for tab in ['pr', 'ed', 'prof', 'home']:
         pg.evaluate("document.querySelector('[data-t=%s]').click()" % tab); pg.wait_for_timeout(500)

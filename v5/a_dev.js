@@ -26,8 +26,15 @@ function dvPanel(){
     h+='<button data-a="cur">Отметить островок пройденным</button></div>';
   }
   h+='<div class="dvs">Опыт и уровень</div><div class="dvr"><button data-a="xp50">+50 ⭐</button><button data-a="xp500">+500 ⭐</button><button data-a="lv">+1 уровень</button></div>';
-  h+='<div class="dvs">Серия и заморозки</div><div class="dvr"><button data-a="st">Серия +1</button><button data-a="st0">Серия = 0</button><button data-a="fz">Заморозка +1</button><button data-a="fz0">Заморозки = 0</button></div>';
+  h+='<div class="dvs">Серия и заморозки</div><div class="dvr"><button data-a="st">Серия +1</button><button data-a="st0">Серия = 0</button><button data-a="fz">Заморозка +1</button><button data-a="fzm">Заморозка −1</button><button data-a="fz0">Заморозки = 0</button></div>';
+  h+='<div class="dvs">Спрайты кролика</div><div class="dvr dvim">';
+  Object.keys(IMG).forEach(function(k){h+='<figure class="dvsp"><img src="'+IMG[k]+'" alt="'+k+'"><figcaption>'+k+'</figcaption></figure>'});
+  h+='</div>';
+  h+='<div class="dvs">Звуки (нажми, чтобы послушать)</div><div class="dvr">';
+  Object.keys(SXD).forEach(function(k){h+='<button class="dvk" data-s="'+k+'">▶ '+k+'</button>'});
+  h+='</div>';
   h+='<div class="dvs">Прогресс</div><div class="dvr"><button data-a="all">Все островки пройдены</button><button data-a="none">Сбросить прогресс островков</button><button data-a="gl">Цель дня выполнена</button></div>';
+  h+='<div class="dvs">Вступление</div><div class="dvr"><button data-a="intro">▶ Посмотреть вступление</button></div><p class="mu" style="font-size:12px;margin:4px 0 0">Идёт целиком (заставка, знакомство, выбор темы, сбой, синий экран) на копии данных: прогресс, ник и настройки не меняются. Выйти можно кнопкой «✕ Выйти из просмотра».</p>';
   h+='<div class="dvs">Достижения (нажми, чтобы выдать или забрать)</div><div class="dvr"><button data-a="aa">Выдать все</button><button data-a="an">Забрать все</button></div><div class="dva">';
   ACH.forEach(function(a){h+='<button class="dvk'+(S.ach[a.id]?' on':'')+'" data-id="'+a.id+'" title="'+dvEsc(a.d)+'">'+a.e+' '+dvEsc(a.n)+'</button>'});
   h+='</div><p class="mu" style="font-size:12px;margin-top:10px">Режим включён ником «'+DVN+'». Все островки открыты, прогресс и достижения можно менять вручную. Чтобы выключить, смени ник в профиле.</p></div>';
@@ -35,6 +42,8 @@ function dvPanel(){
   o.onclick=function(e){if(e.target===o)dvClose()};
   document.getElementById('dvx').onclick=dvClose;
   o.querySelectorAll('.dvk').forEach(function(b){b.onclick=function(){var id=b.dataset.id;if(S.ach[id]){delete S.ach[id];save()}else ach(id);dvPanel()}});
+  o.querySelectorAll('[data-s]').forEach(function(b){b.onclick=function(){
+    try{if(typeof sxShow==='function')sxShow();sxVol(VOLK());sxPlay(b.dataset.s,{k:3})}catch(e){toast('Звук недоступен: коснись экрана и попробуй снова')}}});
   o.querySelectorAll('[data-a]').forEach(function(b){b.onclick=function(){dvAct(b.dataset.a)}});
 }
 function dvAct(a){
@@ -58,9 +67,11 @@ function dvAct(a){
   if(a==='st'){var t=day(new Date());if(S.last!==t){S.last=t;S.streak=(S.streak||0)+1}else S.streak++;if(S.streak>S.max)S.max=S.streak;save();toast('Серия: '+S.streak);return}
   if(a==='st0'){S.streak=0;save();toast('Серия сброшена');return}
   if(a==='fz'){S.fz.n=Math.min(2,S.fz.n+1);save();toast('Заморозок: '+S.fz.n);return}
+  if(a==='fzm'){S.fz.n=Math.max(0,S.fz.n-1);save();toast('Заморозок: '+S.fz.n);return}
   if(a==='fz0'){S.fz.n=0;S.fz.p=0;save();toast('Заморозок: 0');return}
   if(a==='all'){TOPICS.forEach(function(t,i){t.items.forEach(function(x,j){dvDone(i,j)})});toast('Все островки пройдены');dvClose();return home()}
   if(a==='none'){S.d={};S.es={};S.at={};S.dr={};S.tk={};S.hu={};save();toast('Прогресс островков сброшен');dvClose();return home()}
+  if(a==='intro')return dvIntro();
   if(a==='gl'){var t2=day(new Date());S.hist[t2]=S.hist[t2]||{les:0};S.hist[t2].les=Math.max(S.hist[t2].les||0,S.goal);goalCheck();save();toast('Цель дня засчитана');return}
   if(a==='aa'){ACH.forEach(function(x){if(x.id!=='all'&&!S.ach[x.id])ach(x.id)});return dvPanel()}
   if(a==='an'){S.ach={};save();return dvPanel()}
@@ -69,3 +80,23 @@ function dvAct(a){
   function sync(){var b=document.getElementById('dvb');if(DEV()){if(!b){b=document.createElement('button');b.id='dvb';b.className='dvb';b.setAttribute('aria-label','Режим разработчика');b.textContent='🛠';b.onclick=dvPanel;document.body.appendChild(b)}}else{if(b)b.remove();dvClose()}}
   setInterval(sync,700);
 })();
+
+/* Просмотр вступления для разработчика: настоящее вступление, но на копии данных. Хранилище не пишется (save заглушен),
+   в конце или по кнопке выхода S возвращается из снимка. Прогресс, ник и настройки остаются как были. */
+var DVPV=null;
+function dvIntro(){
+  dvClose();if(DVPV||typeof crtOpen!=='function')return;
+  DVPV={bk:JSON.stringify(S),sv:save,fa:fzApply,cc:crtCrash};
+  save=function(){};S.nick='';
+  crtCrash=function(){
+    var P=DVPV;if(!P)return;
+    S=JSON.parse(P.bk);var seen=S.seen;fzApply=function(){};
+    try{P.cc()}finally{fzApply=P.fa;S.seen=seen}
+    dvIntroEnd(1)};
+  var b=document.createElement('button');b.id='dvpx';b.className='dvpx';b.textContent='✕ Выйти из просмотра';b.onclick=function(){dvIntroEnd()};document.body.appendChild(b);
+  crtOpen()}
+function dvIntroEnd(soft){
+  var P=DVPV;if(!P)return;DVPV=null;
+  save=P.sv;fzApply=P.fa;crtCrash=P.cc;if(!soft)S=JSON.parse(P.bk);
+  var x=document.getElementById('dvpx');if(x)x.remove();
+  if(!soft){crtClose();['shards','bsod'].forEach(function(id){var e=document.getElementById(id);if(e)e.remove()});document.documentElement.classList.remove('crt-on');home();window.scrollTo(0,0)}}

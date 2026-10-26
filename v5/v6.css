@@ -1237,3 +1237,15 @@ html.crt-on{scrollbar-gutter:auto}
 @keyframes bsOn{0%{opacity:0}34%{opacity:.7}67%{opacity:.35}100%{opacity:1}}
 @keyframes bsHit{0%{transform:translate(-6px,3px)}50%{transform:translate(5px,-3px)}100%{transform:none}}
 @keyframes ckImp{0%{opacity:.8;transform:scale(.3)}100%{opacity:0;transform:scale(2.4)}}
+/* окно термина: код с отступами и подпись «Вывод» */
+.mc .cpw{margin:10px 0}
+.mc .cpw>pre,.mc pre.out{max-height:46vh;overflow:auto}
+.mc .tvo{margin:10px 0 4px;color:var(--muted);font-size:.8125rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.mc .tvo+pre.out{margin-top:0}
+/* панель разработчика: спрайты */
+.dvim{display:flex;flex-wrap:wrap;gap:10px}
+.dvsp{margin:0;width:92px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px;border:1px solid var(--line2);border-radius:var(--r-sm);background:var(--card2)}
+.dvsp img{width:72px;height:72px;object-fit:contain}
+.dvsp figcaption{font-size:11px;color:var(--muted);text-align:center;word-break:break-all}
+
+.dvpx{position:fixed;top:calc(var(--safe-t,0px) + 10px);right:10px;z-index:100000;padding:8px 12px;border-radius:var(--r);border:1px solid rgba(255,255,255,.4);background:rgba(0,0,0,.72);color:#fff;font:600 13px system-ui,sans-serif}

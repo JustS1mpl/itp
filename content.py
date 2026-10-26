@@ -7,4 +7,5 @@ def build():
     import post
     post.apply(out)
     out.insert(9, importlib.import_module('c_tur').build())   # доп. глава «Черепаха»: между темами 8 и 9
+    out.insert(11, importlib.import_module('c_base').build())  # доп. глава «Системы счисления»: после темы «Строки, кортежи, списки»
     return out
