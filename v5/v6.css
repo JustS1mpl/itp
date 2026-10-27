@@ -1066,11 +1066,11 @@ html[data-ph=pop] .pav .rw{position:absolute;left:50%;bottom:5px;width:116px;mar
  html[data-ph=card] .pav .rw{width:110px}
  .hn .nmx{font-size:1.75rem}
  .lvp{justify-content:space-between;margin:8px 0 10px}
- .tile.tbig{container-type:inline-size;display:grid;grid-template-columns:auto auto;justify-content:center;align-content:center;align-items:center;column-gap:10px;row-gap:0;padding:20px 18px 18px}
+ .tile.tbig{container-type:inline-size;display:grid;grid-template-columns:auto auto;justify-content:center;align-content:center;align-items:center;column-gap:10px;row-gap:0;padding:24px 18px 14px}
  .tile.tbig>span:last-child{display:contents}
  .tile.tbig b{grid-column:1;grid-row:1;font-size:4.25rem;font-size:clamp(3rem,32cqi,5.75rem)}
  .tile.tbig>span:first-child{grid-column:2;grid-row:1;font-size:4rem}.tile.tbig>span:first-child .em{width:4.5rem;height:4.5rem;width:clamp(3.5rem,34cqi,6rem);height:clamp(3.5rem,34cqi,6rem)}
- .tile.tbig small{grid-column:1/-1;grid-row:2;margin-top:10px;font-size:1.125rem}
+ .tile.tbig small{grid-column:1/-1;grid-row:2;margin-top:10px;font-size:1.125rem;text-align:center}
 }
 /* заголовок темы: плоская строка с цветной полоской слева */
 .thead,.thead.now{background:var(--card);border:0;border-left:4px solid var(--line2);border-radius:var(--r);box-shadow:none}
