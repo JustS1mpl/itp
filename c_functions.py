@@ -57,8 +57,8 @@ def code_def():
              'def countdown(n):\n    for i in range(n, 0, -1):\n        print(i, end=" ")\n    print("Старт!")',
              ['countdown(3)', 'countdown(1)', 'countdown(5)\ncountdown(2)'], tail=TL),
         task('Напиши функцию leaderboard(names, scores), которая получает два списка одинаковой длины и выводит таблицу: '
-             'номер места, точка, имя в поле шириной 12 влево и очки в поле шириной 5 вправо — от лучшего к худшему. '
-             'Пробелы проверяются точно.',
+             'номер места, точка, имя в поле шириной 12 влево и очки в поле шириной 5 вправо — от лучшего к худшему, '
+             'при равных очках — по алфавиту. Пробелы проверяются точно.',
              'Пары (-очки, имя) в список, sorted, затем for place, (s, name) in enumerate(..., 1): print(f"{place}. {name:<12}{-s:>5}").',
              'def leaderboard(names, scores):\n    pairs = []\n    for n, s in zip(names, scores):\n        pairs.append((-s, n))\n'
              '    for place, (s, n) in enumerate(sorted(pairs), 1):\n        print(f"{place}. {n:<12}{-s:>5}")',
@@ -74,7 +74,7 @@ def th_return():
          'Пример:\ndef square(x):\n    return x * x\n\nprint(square(4) + 1)\nВывод:\n17'),
         ('None',
          'Особое значение «ничего». Его возвращает функция без return (или с пустым return). '
-         'Проверяют через is None или == None.\n'
+         'Проверить можно сравнением: r == None.\n'
          'Пример:\ndef hi():\n    print("hi")\n\nr = hi()\nprint(r)\nВывод:\nhi\nNone'),
     ]
     body = (
@@ -205,11 +205,12 @@ def code_final():
         task('Напиши две функции. format_time(seconds: int) -> str возвращает время в виде «ЧЧ:ММ:СС» (с нулями). '
              'race_report(names: list, times: list) -> str возвращает строку «Победил ИМЯ за ЧЧ:ММ:СС» для участника '
              'с наименьшим временем (при равенстве — первый). Вторая функция должна пользоваться первой.',
-             'format_time: h = s // 3600, m = s % 3600 // 60, s % 60, f"{h:02}:{m:02}:{sec:02}". '
-             'race_report: найди индекс минимума times.index(min(times)) и верни f-строку с format_time.',
+             'format_time: h = seconds // 3600, m = seconds % 3600 // 60, s = seconds % 60, return f"{h:02}:{m:02}:{s:02}". '
+             'race_report: индекс победителя i = times.index(min(times)), return f"Победил {names[i]} за {format_time(times[i])}".',
              'def format_time(seconds: int) -> str:\n    h = seconds // 3600\n    m = seconds % 3600 // 60\n    s = seconds % 60\n    return f"{h:02}:{m:02}:{s:02}"\n\n'
              'def race_report(names: list, times: list) -> str:\n    i = times.index(min(times))\n    return f"Победил {names[i]} за {format_time(times[i])}"',
-             ['print(format_time(3725))', 'print(race_report(["Ира", "Ли", "Ким"], [4000, 3725, 5100]))', 'print(format_time(59), format_time(86399))'], tail=TL),
+             ['print(race_report(["Ира", "Ли", "Ким"], [4000, 3725, 5100]))\nprint(format_time(59))', 'print(format_time(3725))',
+              'print(format_time(86399))\nprint(race_report(["Оля", "Макс"], [600, 600]))'], tail=TL),
     ])
 
 
