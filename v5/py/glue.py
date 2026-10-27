@@ -364,23 +364,31 @@ def _itp_reset():
 import importlib.abc, importlib.util
 
 
-class _TurtleLoader(importlib.abc.Loader):
+class _SrcLoader(importlib.abc.Loader):
+    def __init__(self, name, var):
+        self.name = name
+        self.var = var
+
     def create_module(self, spec):
         return None
 
     def exec_module(self, module):
-        module.__file__ = '<turtle>'
-        exec(compile(_TURTLE_SRC, '<turtle>', 'exec'), module.__dict__)
+        module.__file__ = '<%s>' % self.name
+        exec(compile(globals()[self.var], '<%s>' % self.name, 'exec'), module.__dict__)
 
 
-class _TurtleFinder(importlib.abc.MetaPathFinder):
+class _SrcFinder(importlib.abc.MetaPathFinder):
+    """Свои модули ИТП, исходник которых вшит при сборке: turtle (_TURTLE_SRC), requests (_REQUESTS_SRC, учебные серверы)."""
+    MODS = {'turtle': '_TURTLE_SRC', 'requests': '_REQUESTS_SRC'}
+
     def find_spec(self, name, path=None, target=None):
-        if name == 'turtle' and globals().get('_TURTLE_SRC'):
-            return importlib.util.spec_from_loader('turtle', _TurtleLoader())
+        var = self.MODS.get(name)
+        if var and globals().get(var):
+            return importlib.util.spec_from_loader(name, _SrcLoader(name, var))
         return None
 
 
-sys.meta_path.insert(0, _TurtleFinder())
+sys.meta_path.insert(0, _SrcFinder())
 
 
 # ---- v6.7.8: сторонние библиотеки (numpy, pandas, matplotlib, …) ----

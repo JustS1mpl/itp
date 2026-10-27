@@ -11,4 +11,5 @@ def build():
     out.append(importlib.import_module('c_bankpj').build())  # тема «Большой проект: банк»: после «Исключения и модули»
     out.append(importlib.import_module('c_np').build())  # тема «Модули math и numpy»: последняя тема курса (файл Темы_8)
     out.append(importlib.import_module('c_pd').build())  # тема «Модуль pandas»: после numpy (файл Темы_8)
+    out.append(importlib.import_module('c_req').build())  # тема «Модуль requests»: после pandas (файл Темы_9)
     return out

@@ -260,7 +260,7 @@ def request(method, url, params=None, data=None, json=None, headers=None, files=
         raise InvalidURL("Invalid URL '%s': No host supplied" % url)
     q = _parse_qsl(parts.query, keep_blank_values=True)
     if params:
-        q += list(params.items()) if hasattr(params, 'items') else list(params)
+        q += [(str(k), str(v)) for k, v in (params.items() if hasattr(params, 'items') else params)]
     full = '%s://%s%s' % (parts.scheme, parts.netloc, parts.path or '/')
     if q:
         full += '?' + _urlencode(q)
