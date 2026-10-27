@@ -647,6 +647,7 @@ html.noln .gt{display:none}
 .th pre.out,.th pre.pin{position:relative;margin-top:-6px;padding-top:30px;background:transparent;border:1.5px dashed var(--line2)}
 .th pre.out::before,.th pre.pin::before{position:absolute;left:16px;top:9px;font:800 .6875rem/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .th pre.out::before{content:'Вывод'}.th pre.pin::before{content:'Ввод'}.th pre.con::before{content:'Консоль'}
+.th pre.oerr{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 45%,transparent)}.th pre.oerr::before{content:'Вывод с ошибкой';color:var(--bad)}
 .th .cpw+pre.out{margin-top:-6px}
 .term{display:inline;padding:0 5px;border:0;border-radius:6px;background:var(--soft);color:var(--accent-ink);font:inherit;font-weight:800;text-decoration:underline dotted 1.5px;text-underline-offset:3px;transition:filter var(--d2)}
 .th .term.fn{background:color-mix(in srgb,currentColor 13%,transparent);font-family:var(--mono);font-size:.92em;text-decoration-color:currentColor}

@@ -150,8 +150,8 @@ def scan(code):
 
 
 def pre_codes(h):
-    """код примеров из html теории: <pre> без класса out"""
-    return [html.unescape(m.group(1)) for m in re.finditer(r'<pre>([\s\S]*?)</pre>', h)]
+    """код примеров из html теории: <pre> без класса; пример с намеренной ошибкой (exerr, за ним pre.oerr) пропускается"""
+    return [html.unescape(m.group(1)) for m in re.finditer(r'<pre>([\s\S]*?)</pre>(?!\s*<pre class="out oerr">)', h)]
 
 
 # ---------- реестр ----------
@@ -250,7 +250,7 @@ def main():
                     if not q.get('e'):
                         err(where, f'вопрос {qi + 1}: нет пояснения e')
                     for key in ('c', 'x'):
-                        if q.get(key):
+                        if q.get(key) and not (key == 'c' and q.get('cb')):
                             codes.append((f'вопрос {qi + 1}', q[key]))
             elif ty in ('test', 'project'):
                 if ty == 'test' and not re.fullmatch(r'Задачи: (разминка|посложнее|испытание)', it.get('n', '')):
@@ -271,7 +271,7 @@ def main():
                     if scan(full) is None:
                         err(where, f'{wk}: эталон не разбирается Python')
                     codes.append((wk, full))
-                    if tk.get('starter'):
+                    if tk.get('starter') and not tk.get('fix'):
                         codes.append((wk + ', шаблон', tk['starter']))
             else:
                 err(where, f'неизвестный тип островка {ty}')

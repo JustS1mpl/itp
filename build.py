@@ -298,5 +298,5 @@ rep("/* Островки темы (items), порядок и количеств�
     "/* Тема с intro:1 показывается только при «С нуля», стоит первой. Поле s у темы обязательно. strict:1 у задания или проекта: сравнение вывода с учётом пробелов в начале и середине строк. */\n/* Островки темы (items), порядок и количество любые:")
 open('out.html', 'w', encoding='utf-8').write(s)
 import json
-json.dump(dict(EX=dsl.EX, FL=dsl.FL, TK=dsl.TK), open('checks.json', 'w', encoding='utf-8'), ensure_ascii=False)
+json.dump(dict(EX=dsl.EX, FL=dsl.FL, TK=dsl.TK, ER=dsl.ER), open('checks.json', 'w', encoding='utf-8'), ensure_ascii=False)
 print('ok', len(s), 'ex', len(dsl.EX), 'fl', len(dsl.FL), 'tk', len(dsl.TK))

@@ -93,6 +93,25 @@ def run(code, lines=None, files=None):
     return plain, tr
 
 
+ER = []   # примеры с намеренной ошибкой: tests/xc5.py сверяет вывод и текст ошибки с движком приложения
+
+
+def exerr(code):
+    """Пример с ошибкой: код и то, что увидит ученик (вывод до ошибки + текст ошибки), как в приложении.
+    Запускается настоящим Python как файл main.py (так называется программа ученика в приложении)."""
+    import tempfile
+    code = code.strip('\n')
+    d = tempfile.mkdtemp()
+    open(d + '/main.py', 'w', encoding='utf-8').write(code + '\n')
+    r = subprocess.run([PY, 'main.py'], capture_output=True, text=True, timeout=15, cwd=d,
+                       env=dict(os.environ, PYTHONIOENCODING='utf-8', PYTHONUTF8='1'))
+    assert r.returncode != 0, ('пример должен падать с ошибкой', code)
+    err = re.sub(r'File "[^"]*main\.py"', 'File "main.py"', r.stderr.rstrip('\n'))  # в приложении путь просто main.py
+    ER.append(dict(code=code, out=r.stdout, err=err))
+    shown = (r.stdout + err).rstrip('\n')
+    return '<pre>' + code + '</pre><pre class="out oerr">' + esc(shown) + '</pre>'
+
+
 def ex(code, lines=None, files=None):
     code = code.strip('\n')
     plain, tr = run(code, lines, files)
@@ -156,11 +175,14 @@ def _opts(text, c, right, wrongs):
     return opts, pos
 
 
-def q(text, right, wrongs, e, c=None):
+def q(text, right, wrongs, e, c=None, bad=False):
+    """bad=True: код c намеренно с ошибкой (coverage_check его не проверяет)"""
     opts, pos = _opts(text, c, right, wrongs)
     d = {'q': text}
     if c:
         d['c'] = c.strip('\n')
+    if bad:
+        d['cb'] = 1
     d['o'] = opts
     d['a'] = pos
     d['e'] = e
@@ -245,11 +267,15 @@ def _tests(sol, inputs, exp, where, files=None, tail=None):
     return tests
 
 
-def task(q_, h, sol, inputs, strict=False, exp=None, ex_=None, files=None, tail=None, starter=None):
+def task(q_, h, sol, inputs, strict=False, exp=None, ex_=None, files=None, tail=None, starter=None, fix=False):
+    """fix=True: задача «исправь ошибку», шаблон starter намеренно с ошибками (coverage_check его не проверяет)"""
     sol = sol.strip('\n')
     tests = _tests(sol, inputs, exp, q_, _fd(files), tail)
     TK.append(dict(where=q_, sol=sol, tests=tests, strict=strict, files=_fd(files), tail=tail))
     d = {'q': q_, 'ex': ex_ if ex_ is not None else _exfmt(inputs[0], tests[0][1], bool(tail)), 'h': h, 'tests': tests, 'sol': sol}
+    if fix:
+        assert starter, 'у задачи «исправь ошибку» нужен шаблон с ошибками'
+        d['fix'] = 1
     if strict:
         d['strict'] = 1
     if files:
