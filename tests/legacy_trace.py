@@ -17,7 +17,9 @@ for f in files:
     for m in re.finditer(r"[А-Яа-яЁё][^'\"\\\n<>]{29,}", git('show', REF + ':' + f)):
         phr.add(m.group(0).strip())
 out = open(F, encoding='utf-8').read()
-hit = sorted(p for p in phr if p in out)
+# общеизвестные строки, которые совпадают с чем угодно и заимствованием не являются
+ALLOW = {'абвгдеёжзийклмнопрстуфхцчшщъыьэюя'}
+hit = sorted(p for p in phr if p in out and p not in ALLOW)
 print('файлов', len(files), 'фраз', len(phr), 'найдено в сборке', len(hit))
 for p in hit[:40]:
     print(' -', p[:120])

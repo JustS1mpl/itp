@@ -766,36 +766,11 @@
    "s": "super, магические методы, свои исключения"
   },
   {
-   "id": "bigproject",
-   "n": "Итоговый проект",
-   "min": 120,
-   "pre": [
-    "inheritance"
-   ],
-   "about": "авторский проект в 5 шагах: игроки и матчи (dataclass, Enum), таблица очков, проверки и свои ошибки, сохранение в JSON, команды из потока ввода",
-   "introduces": {
-    "f": [
-     "dataclasses.dataclass",
-     "dataclasses.field",
-     "enum.Enum"
-    ],
-    "m": [],
-    "k": [],
-    "mod": [
-     "dataclasses",
-     "enum"
-    ],
-    "err": []
-   },
-   "s": "турнирная таблица в 5 шагов",
-   "project": "Турнирная таблица, 5 шагов"
-  },
-  {
    "id": "numpy",
    "n": "Массивы и математика",
    "min": 55,
    "pre": [
-    "bigproject"
+    "inheritance"
    ],
    "about": "ещё math (comb, perm, gcd, lcm, prod, dist, тригонометрия), массив numpy, форма и оси, действия над целым массивом, срезы и маски, агрегаты",
    "introduces": {
@@ -900,6 +875,31 @@
    },
    "project": "Клиент сервера заметок",
    "s": "HTTP, requests, get, post, JSON"
+  },
+  {
+   "id": "bigproject",
+   "n": "Итоговый проект",
+   "min": 240,
+   "pre": [
+    "requests"
+   ],
+   "about": "итоговый проект в конце курса на всё пройденное: классы и наследование, магические методы, свои исключения, dataclass и Enum, словари и множества, файлы и JSON, разбор команд, проверка шаг за шагом; тема — по выбору владельца",
+   "introduces": {
+    "f": [
+     "dataclasses.dataclass",
+     "dataclasses.field",
+     "enum.Enum"
+    ],
+    "m": [],
+    "k": [],
+    "mod": [
+     "dataclasses",
+     "enum"
+    ],
+    "err": []
+   },
+   "s": "всё вместе: большой проект в 8 шагов",
+   "project": "Итоговый проект, 8 шагов"
   }
  ],
  "holes": [
