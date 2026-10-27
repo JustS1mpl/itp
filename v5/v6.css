@@ -38,7 +38,7 @@
  /* радиусы */
  --r-xs:8px;--r-sm:12px;--r:16px;--r-lg:20px;--r-xl:28px;--pill:999px;
  /* каркас */
- --gut:16px;--tbh:64px;--navh:64px;--nvb:10px;--rail:0px;
+ --gut:16px;--tbh:64px;--pnx:10px;--navh:64px;--nvb:10px;--rail:0px;
  --safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px);
  /* движение */
  --e-out:cubic-bezier(.2,.8,.2,1);--e-in:cubic-bezier(.4,0,1,1);--e-spring:cubic-bezier(.3,1.35,.5,1);
@@ -117,7 +117,7 @@ b,strong{font-weight:800}
 
 /* шапка */
 /* шапка — парящая скруглённая плашка со стенками, а не полоса, обрезанная по краям колонки */
-.top{position:sticky;top:calc(var(--safe-t) + 8px);z-index:8;display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:var(--tbh);margin:calc(var(--safe-t) + 8px) -6px 12px;padding:0 var(--gut);border-radius:var(--r-lg,20px);background:color-mix(in srgb,var(--bg) 84%,transparent);-webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5);transition:box-shadow var(--d2)}
+.top{position:sticky;top:calc(var(--safe-t) + 8px);z-index:8;display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:var(--tbh);margin:calc(var(--safe-t) + 8px) calc(-1*var(--pnx)) 12px;padding:0 var(--gut);border-radius:var(--r-lg,20px);background:color-mix(in srgb,var(--bg) 84%,transparent);-webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5);transition:box-shadow var(--d2)}
 @supports not (background:color-mix(in srgb,red,blue)){.top{background:var(--bg)}}
 html.scr .top{box-shadow:0 0 0 1px var(--line)}
 .top h1{flex:1 1 auto;min-width:0;font-size:1.1875rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -168,7 +168,8 @@ html.kbo #app.dk{padding-bottom:24px}
 :root{--spn:calc(var(--navh) + var(--nvb) + var(--safe-b))}
 html.kbo{scroll-padding-bottom:16px}
 /* нижняя навигация */
-.nav{position:fixed;left:max(12px,calc(50% - 260px));right:max(12px,calc(50% - 260px));bottom:calc(var(--nvb) + var(--safe-b));z-index:7;display:flex;justify-content:center;gap:4px;height:var(--navh);padding:6px 8px;border-radius:var(--r-xl);background:color-mix(in srgb,var(--card) 90%,transparent);-webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5);border-top:1px solid var(--line);transform:translateY(calc(100% + var(--nvb) + var(--safe-b) + 8px));visibility:hidden;transition:transform var(--d3) var(--e-out),visibility 0s var(--d3)}
+/* нижняя панель ровно той же ширины, что шапка: колонка (до 640 px, поля --gut) плюс --pnx с каждой стороны; % — от ширины окна без полосы прокрутки */
+.nav{position:fixed;left:max(calc(var(--gut) - var(--pnx)),calc((100% - 640px)/2 + var(--gut) - var(--pnx)));right:max(calc(var(--gut) - var(--pnx)),calc((100% - 640px)/2 + var(--gut) - var(--pnx)));bottom:calc(var(--nvb) + var(--safe-b));z-index:7;display:flex;justify-content:center;gap:4px;height:var(--navh);padding:6px 8px;border-radius:var(--r-xl);background:color-mix(in srgb,var(--card) 90%,transparent);-webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5);border-top:1px solid var(--line);transform:translateY(calc(100% + var(--nvb) + var(--safe-b) + 8px));visibility:hidden;transition:transform var(--d3) var(--e-out),visibility 0s var(--d3)}
 @supports not (background:color-mix(in srgb,red,blue)){.nav{background:var(--card)}}
 .nav.on{transform:none;visibility:visible;transition-delay:0s}
 .nav button{position:relative;flex:1;max-width:112px;min-height:52px;border:0;background:none;border-radius:var(--r);padding:4px 2px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:.71875rem;font-weight:800;color:var(--muted);transition:color var(--d2)}
