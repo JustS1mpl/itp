@@ -541,10 +541,11 @@ html.noln .gt{display:none}
 
 /* кроличья нора: доп. глава — «вывернутый островок» сбоку от одного из последних островков темы.
    Зелёный бортик — открыта, серый — закрыта; в тёмной теме оба темнее */
-:root{--hlt:#6FB84F;--hw:#4A3322;--hb:#120B06;--sgn:#F4B63F}
-.bur.lk{--hlt:#6E675E;--hw:#2E2925;--hb:#0A0908;--sgn:#A39B90}
-:root[data-theme=dark]{--hlt:#477E33;--hw:#2C1E14;--hb:#070504;--sgn:#D99A2B}
-:root[data-theme=dark] .bur.lk{--hlt:#45403B;--hw:#1D1A17;--hb:#050404;--sgn:#5E5852}
+/* закрытая — в палитре закрытых островков (бортик --card3, всё бледное, без черноты), открытая — зелёная, дно без чистого чёрного */
+:root{--hlt:#6FB84F;--hw:#5A3F28;--hb:#2A1D12;--sgn:#F4B63F;--hsp:#A06D42;--hss:#6E4626;--hsa:#3B2A12}
+.bur.lk{--hlt:var(--card3);--hw:#CFC6B7;--hb:#B9AF9F;--sgn:#DAD2C4;--hsp:#C4B8A5;--hss:#AA9D8A;--hsa:#A1988A}
+:root[data-theme=dark]{--hlt:#477E33;--hw:#2C1E14;--hb:#0E0906;--sgn:#D99A2B}
+:root[data-theme=dark] .bur.lk{--hlt:var(--card3);--hw:#27231F;--hb:#1D1A17;--sgn:#3D3833;--hsp:#4A433C;--hss:#38322C;--hsa:#6E675E}
 .ilw.nhb>.mu{max-width:120px}
 .bur{position:absolute;top:0;left:calc(50% + 86px);z-index:1;width:min(124px,calc(50vw - 64px));padding:0;border:0;background:none;color:var(--ink);text-align:center;transition:opacity var(--d4)}
 .bur.l{left:auto;right:calc(50% + 86px)}
@@ -554,10 +555,10 @@ html.noln .gt{display:none}
 .nsv .rs,.nsv .rt{fill:var(--hlt);stroke:var(--hlt);stroke-width:6;stroke-linejoin:round}
 .nsv .rs{filter:brightness(.8)}
 :root[data-theme=dark] .nsv .rs{filter:brightness(.62)}
-.nsv .sp{fill:#A06D42}.nsv .sps{fill:#6E4626}.nsv .sf{fill:#000;opacity:.25}.nsv .sb{fill:var(--sgn)}.nsv .sbk{fill:var(--sgn);filter:brightness(.72)}
+.nsv .sp{fill:var(--hsp)}.nsv .sps{fill:var(--hss)}.nsv .sf{fill:#000;opacity:.25}.nsv .sb{fill:var(--sgn)}.nsv .sbk{fill:var(--sgn);filter:brightness(.72)}
 .nsv .sb,.nsv .sbk{stroke-width:3;stroke-linejoin:round}.nsv .sb{stroke:var(--sgn)}.nsv .sbk{stroke:var(--sgn)}
-.nsv .sa{fill:none;stroke:#3B2A12;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
-:root[data-theme=dark] .bur.lk .nsv .sa{stroke:#A39B90}
+.nsv .sa{fill:none;stroke:var(--hsa);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.bur.lk .nsv .sf{opacity:.1}
 .nsv .w{fill:var(--hw)}.nsv .wl{filter:brightness(1.35)}.nsv .wr{filter:brightness(.8)}.nsv .b{fill:var(--hb)}
 .bur .ntx{display:block;margin-top:-18px;font-size:.8125rem;font-weight:700;line-height:1.25;color:var(--muted)}
 .bur .ntx small{display:block;font-size:.75rem;font-weight:700;color:var(--muted)}

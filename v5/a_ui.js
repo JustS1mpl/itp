@@ -217,7 +217,7 @@ function ocur(i){for(var j=0;j<ni(i);j++)if(!S.d[i+'-'+j])return i+'-'+j;return'
 function ostarted(i){for(var j=0;j<ni(i);j++)if(S.d[i+'-'+j])return true;return false}
 /* островок темы, рядом с которым нора и после которого глава открывается: after из данных главы, иначе последний */
 function holeAt(i){var p=holePar(i),l=p<0?0:ni(p)-1,a=TOPICS[i].after;return a!=null?Math.min(a,l):l}
-/* нора открыта (зелёная), когда пройден её островок, тема пропущена или глава уже начата; в режиме разработчика — всегда */
+/* нора зелёная, когда пройден её островок, тема пропущена или глава уже начата; в режиме разработчика — всегда */
 function holeVis(i){var p=holePar(i),k=holeAt(i);return p<0||TOPICS[p].intro||(typeof DEV==='function'&&DEV())||!!S.d[p+'-'+k]||p<S.start||bfr(p,k+1)||ostarted(i)}
 function holeName(t){return String(t.n||'').split(':')[0]}
 /* нора — «вывернутый островок»: тот же шестиугольник и ракурс (точки HEX, viewBox), только утопленный в землю.
@@ -227,13 +227,13 @@ var NHN=0;
 /* знак — с внешней стороны, подальше от тропинки: у норы слева он левее ямы, у норы справа (r) — правее, наклон наружу */
 function burrowSvg(r){var id='nh'+(++NHN),I='M18.6 34 L31.9 19.2 L60.1 19.2 L73.4 34 L60.1 48.8 L31.9 48.8 Z';
   return'<svg class="nsv" viewBox="0 8 92 74" aria-hidden="true" focusable="false"><defs><clipPath id="'+id+'"><path d="'+I+'"/></clipPath></defs><g class="npt"><path class="rs" d="M9 34 L27 54 L65 54 L83 34 L83 40 L65 60 L27 60 L9 40 Z"/><path class="rt" d="M9 34 L27 14 L65 14 L83 34 L65 54 L27 54 Z"/><g clip-path="url(#'+id+')"><path class="w" d="'+I+'"/><path class="w wl" d="M18.6 34 L31.9 19.2 L31.9 32.2 L18.6 47 Z"/><path class="w wr" d="M60.1 19.2 L73.4 34 L73.4 47 L60.1 32.2 Z"/><path class="b" d="M18.6 47 L31.9 32.2 L60.1 32.2 L73.4 47 L60.1 61.8 L31.9 61.8 Z"/></g></g><g class="sgw"><g class="sg" transform="'+(r?'translate(44 -5) rotate(9 24 24)':'translate(-16 -5) rotate(-9 24 24)')+'"><ellipse class="sf" cx="24.6" cy="25.2" rx="5" ry="2.7"/><rect class="sp" x="22.3" y="4" width="2.7" height="21.4" rx="1"/><rect class="sps" x="24.6" y="4" width="1.7" height="21.4" rx=".8"/><path class="sbk" d="M8 -6 L16 8 L32 8 L40 -6 L40 -2.5 L32 11.5 L16 11.5 L8 -2.5 Z"/><path class="sb" d="M8 -6 L16 -20 L32 -20 L40 -6 L32 8 L16 8 Z"/><path class="sa" d="M24 -13v12M18.5 -6.5l5.5 5.5 5.5-5.5"/></g></g></svg>'}
-/* серая и закрытая, пока тема не дошла до последнего островка; зелёная, когда открыта */
+/* в нору можно зайти всегда; бледная (lk), пока не пройден её островок темы, потом зелёная */
 /* норы, которые уже видели открытыми: только что открывшаяся нора один раз зеленеет и знак подпрыгивает */
 var HOP=null;
 function burrow(o,side){
   var t=TOPICS[o],m=ni(o),c=0,op=holeVis(o),fr=op&&!HOP[o];for(var j=0;j<m;j++)if(S.d[o+'-'+j])c++;
   if(op)HOP[o]=1;if(fr&&!RM())setTimeout(function(){snd('unlock')},1500);
-  var dn=c===m,st=!op?'закрыта':dn?'пройдена':c?c+' из '+m:'';
+  var dn=c===m,st=dn?'пройдена':c?c+' из '+m:'';
   return'<button class="bur '+side+(op?'':' lk')+(dn?' dn':'')+(fr&&!RM()?' fr':'')+'" data-o="'+o+'" aria-label="'+esc('Доп. глава: '+t.n+' ('+st+')')+'"><span class="nwr">'+burrowSvg(side.charAt(0)==='r')+(dn?'<i class="bd ok"></i>':'')+'</span><span class="ntx">'+esc(holeName(t))+(st?'<small>'+st+'</small>':'')+'</span></button>'}
 function hole(i){HOLE=i;curOnce(function(){hole0(i)})}
 function hole0(i){BACK=home;fzApply();
@@ -291,7 +291,7 @@ function home0(){BACK=home;fzApply();
     h+='</div></section>'});
   scr('home',h+'<aside class="jump" aria-label="Быстрый переход"><button id="jmp" aria-label="К текущему островку">'+ico('arrow')+'</button></aside>','home');bindHead(home);links();
   app.querySelectorAll('.isl').forEach(function(b){b.onclick=function(e){e.stopPropagation();islandPop(b)}});
-  app.querySelectorAll('.bur').forEach(function(b){b.onclick=function(e){e.stopPropagation();popClose();if(b.classList.contains('lk')){snd('lock');toast('Доп. глава откроется, когда дойдёшь до последнего островка темы');return}hole(+b.dataset.o)}});
+  app.querySelectorAll('.bur').forEach(function(b){b.onclick=function(e){e.stopPropagation();popClose();hole(+b.dataset.o)}});
   var c=app.querySelector('.isl.cur');if(c&&!REV)c.scrollIntoView({block:'center'});
   var gc=$('gc');if(gc)gc.onclick=function(){var k=cur();if(!k)return;var p=k.split('-');BACK=home;go(+p[0],+p[1])};
   jumpWatch();
