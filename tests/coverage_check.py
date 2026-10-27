@@ -253,8 +253,8 @@ def main():
                         if q.get(key) and not (key == 'c' and q.get('cb')):
                             codes.append((f'вопрос {qi + 1}', q[key]))
             elif ty in ('test', 'project'):
-                if ty == 'test' and not re.fullmatch(r'Задачи: (разминка|посложнее|испытание)', it.get('n', '')):
-                    err(where, 'задачи называются «Задачи: разминка / посложнее / испытание»')
+                if ty == 'test' and it.get('n') not in theories and it.get('n') != 'Задачи: испытание':
+                    err(where, 'островок «Код» называется как теория выше, к которой он относится, или «Задачи: испытание»')
                 if ty == 'project' and re.match(r'\s*(мини-)?проект', it.get('n', ''), re.I):
                     err(where, 'проект называется тем, что строим, без слова «проект»')
                 tasks = it['tasks'] if ty == 'test' else [it]
@@ -294,6 +294,29 @@ def main():
                     err(where, f'{label}: модуль «{x}» ещё не введён')
                 for x in sorted(errs - ok_err):
                     err(where, f'{label}: ошибка «{x}» ещё не введена')
+        # правило владельца: у каждой теории свои вопросы; островок «Код» (минимум 3 задачи) идёт после каждой теории
+        # или после пары теорий (тогда задачи сочетают обе) и называется по последней теории перед ним
+        if not T.get('intro'):
+            for name in theories:
+                if not any(i.get('t') == 'flash' and i.get('n') == name for i in T['items']):
+                    err(where_t, f'у теории «{name}» нет островка вопросов с тем же названием')
+            pending = []
+            for it in T['items']:
+                if it.get('t') == 'theory':
+                    pending.append(it.get('n'))
+                elif it.get('t') == 'test' and it.get('n') != 'Задачи: испытание':
+                    if len(it.get('tasks', [])) < 3:
+                        err(where_t, f'в островке «Код» «{it.get("n")}» меньше трёх задач')
+                    if pending and it.get('n') != pending[-1]:
+                        err(where_t, f'островок «Код» «{it.get("n")}» должен называться по последней теории перед ним: «{pending[-1]}»')
+                    if len(pending) > 2:
+                        err(where_t, f'перед островком «Код» «{it.get("n")}» больше двух теорий без своих задач')
+                    pending = []
+                if len(pending) > 2:
+                    err(where_t, f'теории {pending[:-1]} остались без островка «Код»')
+                    pending = pending[-1:]
+            if pending:
+                err(where_t, f'после теорий {pending} нет островка «Код»')
         # каждый вводимый в теме объект описан термином
         need = set(own_fm) | own_err | {m.split('.')[0] for m in own_mod}
         for k in own_k:

@@ -8,14 +8,22 @@ only = set(sys.argv[2:])
 
 
 def txt(h):
-    h = re.sub(r'<pre class="out[^"]*">([\s\S]*?)</pre>', lambda m: '\n[ВЫВОД]\n' + m.group(1) + '\n[/ВЫВОД]\n', h)
-    h = re.sub(r'<pre>([\s\S]*?)</pre>', lambda m: '\n[КОД]\n' + m.group(1) + '\n[/КОД]\n', h)
+    # код в <pre> не экранирован (в нём бывают < и >), поэтому блоки кода и вывода прячем до удаления тегов
+    keep = []
+
+    def hold(text):
+        keep.append(text)
+        return f'\x00{len(keep) - 1}\x00'
+    h = re.sub(r'<pre class="out[^"]*">([\s\S]*?)</pre>', lambda m: hold('\n[ВЫВОД]\n' + html.unescape(m.group(1)) + '\n[/ВЫВОД]\n'), h)
+    h = re.sub(r'<pre>([\s\S]*?)</pre>', lambda m: hold('\n[КОД]\n' + m.group(1) + '\n[/КОД]\n'), h)
     h = re.sub(r'\[\[([^\]|]+)\|([^\]]+)\]\]', r'\2', h)
     h = re.sub(r'\[\[([^\]]+)\]\]', r'\1', h)
     h = re.sub(r'<li>', '\n- ', h)
     h = re.sub(r'<h3>', '\n\n## ', h)
-    h = re.sub(r'</?p>', '\n', h)
-    return html.unescape(re.sub(r'<[^>]+>', '', h))
+    h = re.sub(r'</?p>|</tr>', '\n', h)
+    h = re.sub(r'</t[dh]>', ' | ', h)
+    h = html.unescape(re.sub(r'<[^>]+>', '', h))
+    return re.sub(r'\x00(\d+)\x00', lambda m: keep[int(m.group(1))], h)
 
 
 o = []
