@@ -288,7 +288,11 @@ exec(open('p430.py',encoding='utf-8').read())
 m = re.search(r'var TOPICS=\[.*?\n\];\n', s, re.S)
 assert m
 import content
-tj = dsl.topics_js(content.build())
+import json
+_T = content.build()
+# данные тем для tests/coverage_check.py (что где введено и где используется)
+json.dump(dict(topics=_T, filesets=dsl.FILESETS), open('topics.json', 'w', encoding='utf-8'), ensure_ascii=False)
+tj = dsl.topics_js(_T)
 s = s[:m.start()] + tj + '\n' + s[m.end():]
 rep("/* Островки темы (items), порядок и количество любые:",
     "/* Тема с intro:1 показывается только при «С нуля», стоит первой. Поле s у темы обязательно. strict:1 у задания или проекта: сравнение вывода с учётом пробелов в начале и середине строк. */\n/* Островки темы (items), порядок и количество любые:")
