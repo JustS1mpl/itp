@@ -351,8 +351,9 @@ function islandPop(b){
   var cc=$('ipc');if(cc)cc.onclick=function(){popClose();toCur()};
   var tt=$('ipt');if(tt)tt.onclick=function(){BACK=home;popClose();go(i,tp)};
   setTimeout(function(){document.addEventListener('click',popOut,true)},0);
-  /* карточку должно быть видно целиком */
-  requestAnimationFrame(function(){o.scrollIntoView({block:'nearest',behavior:RM()?'auto':'smooth'});var fb=g||cc||tt;if(fb)fb.focus({preventScroll:true})});
+  /* карточку должно быть видно целиком; пока она «въезжает» (scale), она ниже настоящей — после анимации докручиваем */
+  function vis(){if(o.isConnected)o.scrollIntoView({block:'nearest',behavior:RM()?'auto':'smooth'})}
+  requestAnimationFrame(function(){vis();var fb=g||cc||tt;if(fb)fb.focus({preventScroll:true})});o.addEventListener('animationend',vis,{once:true});
 }
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&app.querySelector('.ipop')&&!document.querySelector('.modal')){e.stopImmediatePropagation();e.preventDefault();var b=app.querySelector('.isl.sel');popClose();if(b)b.focus()}},true);
 
@@ -432,7 +433,7 @@ function rcNext(){
   scr('rcode','<h1 class="sr-only">Случайный код</h1><div class="top ls"><button class="icon" id="x" aria-label="Выйти">'+ico('x')+'</button><span class="lstep grow">🎲 Случайный код</span>'+(q.h?'<button class="icon" id="hb" aria-label="Подсказка">'+ico('bulb')+'</button>':'')+'</div>'+taskCard(q)+'<div id="hint"></div>'+edCard('Решение','# Пиши код здесь\n'+(q.starter||''))+conHtml()+'<div id="fb"></div>'+dockHtml('<button class="btn" id="chk">Проверить</button>'));
   $('x').onclick=practice;
   var c=$('code'),sync=initEd(c,function(){});sync();
-  if(q.h)$('hb').onclick=function(){snd('hint');$('hb').classList.add('on');$('hint').innerHTML='<div class="fb"><b>Подсказка</b>'+esc(q.h).replace(/\n/g,'<br>')+'</div>';$('hint').scrollIntoView({block:'nearest',behavior:RM()?'auto':'smooth'})};
+  if(q.h)$('hb').onclick=function(){snd('hint');$('hb').classList.add('on');$('hint').innerHTML='<div class="fb"><b>Подсказка</b>'+hintTx(q.h)+'</div>';$('hint').scrollIntoView({block:'nearest',behavior:RM()?'auto':'smooth'})};
   skReady();chkPulse();runBind(c);
   $('chk').onclick=async function(){
     var b=$('chk');if(!SKOK)fbSet('<div class="fb"><b>Загружаю среду Python…</b></div>');
@@ -491,7 +492,8 @@ function profile(){BACK=profile;
    (rows.length?'<section class="psec"><div class="ch2"><b>Работа над ошибками</b></div><div class="psf">'+rows.map(erow).join('')+(more?'<button class="btn t emore" id="emr">Показать все темы ('+rows.length+')</button>':'')+'<p class="mu enote">Пройди островок без ошибок, и он исчезнет из списка.</p></div></section>':'')+
    '<div class="lst">'+row('📖','Изученные функции','Словарь с твоими заметками','dc')+(TOPICS[0]&&TOPICS[0].intro&&!S.d['0-0']?row('🏝️','Знакомство с ИТП','Как устроено приложение','intr'):'')+row('📤','Поделиться прогрессом','Картинка со статистикой','sh')+row('⚙️','Настройки','Вид, звук, обучение, резервная копия','st')+'</div>'+
    '<p class="pfoot"><button class="ver" id="vr" aria-label="ИТП '+ITPV+'. ИТП означает: И так, программирование"><u>ИТП '+ITPV+'</u><span class="vt" role="tooltip">ИТП — «И так, программирование»</span></button></p></div>','prof');
-  bindHead(profile);calBind();var csc=app.querySelector('.csc');if(csc){csc.tabIndex=0;csc.setAttribute('aria-label','Календарь активности, листается вбок')}
+  /* подпись месяца стоит у его первого дня и часто уезжает влево за край — под лентой сразу сегодняшний день, потом тот, на который нажали */
+  bindHead(profile);calBind();var ci0=$('ci');if(ci0&&!ci0.textContent)ci0.textContent=calText(day(new Date()));var csc=app.querySelector('.csc');if(csc){csc.tabIndex=0;csc.setAttribute('aria-label','Календарь активности, листается вбок')}
   var vr=$('vr'),vt;vr.onclick=function(){vr.classList.add('on');clearTimeout(vt);vt=setTimeout(function(){vr.classList.remove('on')},2500)};
   $('tst').onclick=streakSheet;$('txp').onclick=levelSheet;$('gset').onclick=goalSheet;
   if($('emr'))$('emr').onclick=function(){app.querySelectorAll('.eg2[hidden]').forEach(function(x){x.hidden=false});this.remove()};
@@ -501,6 +503,8 @@ function profile(){BACK=profile;
 }
 
 /* --- настройки (второй уровень: без нижней панели, назад — туда, откуда пришли) --- */
+/* подсказка: строки, которые целиком код (print(...), a = int(input()), for ...), — моноширинным, как в теории */
+function hintTx(h){return String(h||'').split('\n').map(function(l){return/^([A-Za-z_][\w.]*\s*(\(|\[|=|\+=|-=)|(for|if|elif|else|while|def|import|from|return)\b)/.test(l.trim())?'<code class="hcl">'+esc(l)+'</code>':esc(l)}).join('<br>')}
 function SW(k,on,lab){return'<button class="sw" role="switch" aria-checked="'+(on?'true':'false')+'" data-k="'+k+'"'+(lab?' aria-label="'+esc(lab)+'"':'')+'></button>'}
 function SG(k,opts,cur){return'<div class="segc" role="radiogroup">'+opts.map(function(o){var on=String(cur)===String(o[0]);return'<button role="radio" aria-checked="'+on+'" data-k="'+k+'" data-v="'+o[0]+'" class="'+(on?'on':'')+'">'+o[1]+'</button>'}).join('')+'</div>'}
 function SR(ic,t,sub,ctl,a){var blk=ctl&&/segc|swa|type="range"/.test(ctl),sw=ctl&&/class="sw"/.test(ctl);if(sw)ctl=ctl.replace('class="sw"','class="sw" aria-label="'+esc(t)+'"');return(a?'<button class="li" data-a="'+a+'">':'<div class="li static'+(blk?' blk':'')+(sw?' tg':'')+'">')+'<span class="lic" aria-hidden="true">'+ic+'</span><span class="lt">'+t+(sub?'<small>'+sub+'</small>':'')+'</span>'+(ctl||ico('chev','ch'))+(a?'</button>':'</div>')}
@@ -547,7 +551,7 @@ function settings(){
    SR('💾','Резервная копия','Сохранить или загрузить прогресс','','bk')+
    SR('🧹','Сбросить оформление','Вернуть вид и звук как было','','rs1')+
    SR('🗑️','Сбросить прогресс','Удалит всё, кроме сохранённых кодов и звука','','rs2')+'</div>';
-  h+='<div class="sec">О приложении</div><div class="lst">'+(KBD?SR('⌨️','Горячие клавиши','','','kb'):'')+SR('📖','Прочитать введение','Знакомство с ИТП ещё раз','','intro')+SR('🐇','ИТП '+ITPV,'«И так, программирование»','<span class="lv" id="egv">'+ITPV+'</span>')+'</div><div style="height:24px"></div>';
+  h+='<div class="sec">О приложении</div><div class="lst">'+(KBD?SR('⌨️','Горячие клавиши','','','kb'):'')+SR('📖','Прочитать введение','Знакомство с ИТП ещё раз','','intro')+SR('🐇','ИТП','«И так, программирование»','<span class="lv" id="egv">'+ITPV+'</span>')+'</div><div style="height:24px"></div>';
   scr('settings',h,null);HRE=settings;
   $('x').onclick=function(){(SBACK||profile)()};
   function again(){var yy=window.scrollY;KEEPSCR=1;SKEY='settings';settings();window.scrollTo(0,yy)}
