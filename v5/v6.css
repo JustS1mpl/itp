@@ -1384,3 +1384,26 @@ html.crt-on{scrollbar-gutter:auto}
  .dvg.w{grid-column:1/-1}
 }
 @media (min-width:900px){.dvb{bottom:24px;left:calc(var(--rail)/2 - 24px)}}
+
+/* v6.10.1: длинные условия: сворачиваемые разделы и пункты, примеры блоками */
+.qtb{display:flex;gap:8px;margin:2px 0 10px}
+.qtb button{flex:1;min-height:40px;padding:6px 10px;border-radius:var(--r-sm);border:1.5px solid var(--line2);background:var(--card);color:var(--accent-ink);font-weight:700;font-size:.8125rem;line-height:1.2;font-family:inherit;cursor:pointer}
+details.qsec,details.qd{border:1.5px solid var(--line);border-radius:var(--r-sm);background:var(--card);margin:8px 0;overflow:hidden}
+details.qd{margin:6px 0;background:var(--card2)}
+details.qsec>summary,details.qd>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;min-height:46px;padding:10px 14px;font-weight:800;line-height:1.35;-webkit-tap-highlight-color:transparent}
+details.qd>summary{font-weight:700;font-size:.9375rem;min-height:44px;padding:8px 12px}
+details.qsec>summary::-webkit-details-marker,details.qd>summary::-webkit-details-marker{display:none}
+details.qsec>summary::after,details.qd>summary::after{content:"";flex:none;margin-left:auto;width:9px;height:9px;border-right:2.5px solid var(--muted);border-bottom:2.5px solid var(--muted);transform:rotate(45deg);transition:transform var(--d1,.15s)}
+details[open]>summary::after{transform:rotate(-135deg)}
+.qsb{padding:0 14px 12px}
+.qdb{padding:0 12px 10px;line-height:1.5;font-size:.9375rem}
+.qsb p{margin:6px 0;line-height:1.5}
+.qsb p.qh{font-weight:800;margin-top:12px}
+.qsb p.qi,.tqt p.qi{padding-left:2px}
+.qlab{font-size:.75rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:10px 0 2px!important}
+.tcard.lq .tqt{font-size:1rem;line-height:1.5;font-weight:600}
+.tcard.lq .tqt p{margin:6px 0}
+.tcard.lq .tqt p:first-child{margin-top:0}
+.tcard.lq details.qsec{margin-top:12px}
+.pjl{padding-bottom:8px}
+@media (prefers-reduced-motion:reduce){details.qsec>summary::after,details.qd>summary::after{transition:none}}

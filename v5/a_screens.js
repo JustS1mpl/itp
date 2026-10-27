@@ -118,7 +118,37 @@ document.addEventListener('keydown',function(e){
   var ty=/^(INPUT|TEXTAREA)$/.test((e.target&&e.target.tagName)||'');if(ty)return;
   if(/^[1-4]$/.test(e.key)&&OPTK&&app.querySelector('.opts')){e.preventDefault();OPTK(+e.key-1);return}
   if(e.key==='Enter'&&e.target===document.body){var g=document.querySelector('#dock .dkb .btn:not([disabled])');if(g&&app.querySelector('.opts')){e.preventDefault();g.click()}}});
-function taskCard(q,lab){return'<section class="tcard"><span class="ov">'+(lab||'Задание')+'</span><h2>'+esc(q.q)+'</h2>'+(q.ex?'<div class="pyex"><span>Пример</span>'+(q.strict?'<pre class="cmp">'+esc(q.ex)+'</pre>':'<p>'+esc(q.ex).replace(/\n/g,'<br>')+'</p>')+'</div>':'')+'</section>'}
+/* v6.10.1: длинные условия (большие проекты) удобно читать с телефона: пункты разбираются на заголовки, которые можно
+   сворачивать и разворачивать, примеры с кодом показываются блоками, а не текстом в строку */
+var QLONG=700;
+function qTitle(t){var k=t.indexOf(':');if(k>2&&k<=70)return[t.slice(0,k),t.slice(k+1).trim()||t];
+  var d=t.search(/[.!?](\s|$)/);if(d>0&&d<=90&&t.slice(d+1).trim())return[t.slice(0,d+1),t.slice(d+1).trim()];
+  return[t.slice(0,56).replace(/\s+\S*$/,'')+'…',t]}
+function condHtml(text,long){
+  var L=String(text||'').split('\n').filter(function(x){return x.trim()});
+  if(!long)return L.map(function(l){return'<p>'+esc(l)+'</p>'}).join('');
+  var h='';
+  L.forEach(function(l){
+    var m=/^\s*(—\s*|\d+\)\s*)(.*)$/.exec(l);
+    if(!m){h+='<p'+(/:\s*$/.test(l)?' class="qh"':'')+'>'+esc(l)+'</p>';return}
+    var pre=m[1].indexOf(')')>0?m[1].trim()+' ':'',body=m[2];
+    if(body.length<=110){h+='<p class="qi">'+esc(l)+'</p>';return}
+    var t=qTitle(body);
+    h+='<details class="qd"><summary>'+esc(pre+t[0])+'</summary><div class="qdb">'+esc(t[1])+'</div></details>'});
+  return h}
+function exHtml(ex,strict){
+  var m=/^Проверка запустит:\n([\s\S]*?)\nВывод:\n([\s\S]*)$/.exec(String(ex||''));
+  if(m)return'<p class="qlab">Проверка запустит такой код</p><pre class="cmp">'+esc(m[1])+'</pre><p class="qlab">и ждёт такой вывод</p><pre class="cmp">'+esc(m[2])+'</pre>';
+  return strict?'<pre class="cmp">'+esc(ex)+'</pre>':'<p>'+esc(ex).replace(/\n/g,'<br>')+'</p>'}
+function qSec(title,body,open){return'<details class="qsec"'+(open?' open':'')+'><summary>'+title+'</summary><div class="qsb">'+body+'</div></details>'}
+var QTB='<div class="qtb"><button type="button" data-q="1">Развернуть всё</button><button type="button" data-q="0">Свернуть всё</button></div>';
+function qBind(root){(root||document).querySelectorAll('.qtb button').forEach(function(b){b.onclick=function(){
+  var on=b.dataset.q==='1',card=b.closest('.card,.tcard')||root;card.querySelectorAll('details').forEach(function(d){d.open=on});snd('click')}})}
+function taskCard(q,lab){
+  var lg=String(q.q||'').length>QLONG||(String(q.q||'').length>330&&/\n/.test(q.q));
+  var big=String(q.q||'').length>260;
+  if(!big)return'<section class="tcard"><span class="ov">'+(lab||'Задание')+'</span><h2>'+esc(q.q)+'</h2>'+(q.ex?'<div class="pyex"><span>Пример</span>'+exHtml(q.ex,q.strict)+'</div>':'')+'</section>';
+  return'<section class="tcard lq"><span class="ov">'+(lab||'Задание')+'</span>'+(lg?QTB:'')+'<div class="tqt" role="heading" aria-level="2">'+condHtml(q.q,lg)+'</div>'+(q.ex?qSec('Пример',exHtml(q.ex,q.strict),true):'')+'</section>'}
 function edHtml(dc){return'<div class="ed"><div class="gt" aria-hidden="true"></div><div class="ew"><pre id="hl" aria-hidden="true"></pre><textarea id="code" wrap="off" spellcheck="false" autocapitalize="off" autocorrect="off" autocomplete="off" aria-label="Код"'+(KBD?' aria-describedby="edk"':'')+'>'+esc(dc)+'</textarea></div></div>'}
 function runBtn(pri){return'<button class="btn s'+(pri?'':' g')+'" id="run" aria-keyshortcuts="Control+Enter">'+ico('play')+'Запустить</button>'}
 function edCard(lab,dc,headL){return'<div class="edc"><div class="edh">'+(headL||'<span class="ov">'+lab+'</span>')+runBtn()+'</div>'+edHtml(dc)+'</div>'+(KBD?'<p class="mu hint0" id="edk">Ctrl + Enter запускает код.</p>':'')}
@@ -184,7 +214,7 @@ function theory(i,j){
   var it=IT(i,j),T={},fresh=!S.d[i+'-'+j],rm=RM();(it.terms||[]).forEach(function(x){T[x.n]=x});
   var h=it.html.split(/(<pre[^>]*>[\s\S]*?<\/pre>)/).map(function(p){return /^<pre /.test(p)?p:/^<pre>/.test(p)?'<div class="cpw"><button type="button" class="cp" aria-label="Копировать код"></button><pre>'+hl(p.slice(5,-6))+'</pre></div>':p.replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g,function(m,n,l){return T[n]?'<button class="term'+(fcol(n)?' fn':'')+'"'+(fcol(n)?' style="color:'+fcol(n)+'"':'')+' data-n="'+esc(n)+'" aria-haspopup="dialog">'+(l||esc(n))+'</button>':(l||esc(n))})}).join('');
   scr('theory',lessonTop('<div class="rprog" role="progressbar" aria-label="Прочитано" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="rpb"></i></div>','<span class="lstep">≈ '+readMin(it)+' мин</span>')+'<article class="th"><p class="ov tov">'+esc(TOPICS[i].n)+'</p><h1 class="tt">'+esc(it.n)+'</h1><div id="tb">'+h+'</div><p class="mu tm" id="tm">'+(fresh&&!rm&&ST('ty')?TMSK:TMT)+'</p></article><button class="btn" id="go">'+(S.d[i+'-'+j]?'Готово':G('Я прочитал','Я прочитала','Прочитано')+', открыть дальше')+'</button>');
-  $('x').onclick=goBack;
+  $('x').onclick=goBack;qBind(app);
   app.querySelectorAll('.term').forEach(function(b){b.onclick=function(){var x=T[b.dataset.n];sheet(x.n,x.d)}});
   $('go').onclick=function(){var w=tdone(i);if(!S.d[i+'-'+j]){snd('theory');bump(i+'-'+j)}if(TOPICS[i].intro&&!w&&tdone(i)&&S.start===0){reveal();return}if(TOPICS[i].intro&&(S.start>0||w)){goBack();if(!w)toast('Готово. Эта кнопка больше не нужна и пропала из профиля');return}home();if(!w&&tdone(i)){toast('🎉 Тема «'+TOPICS[i].n+'» пройдена!');confetti(allDone()?2:1)}};
   if(window.TW)TW.scan(app);
@@ -297,8 +327,8 @@ function project(i,j){
   /* at: skip — пропущен; seen — пропущен и эталон открыт: решить можно, но уже без опыта */
   var it=IT(i,j),key=i+'-'+j,done=S.d[key],seen=S.at[key]==='seen',sk=S.at[key]==='skip'||seen,bonus=it.bonus>0?it.bonus|0:40;
   var dc=((S.dr[key]||{}).codes||{})[0]||'# Пиши код здесь\n'+(it.starter||''),hs=String(it.h||'').split('\n').filter(Boolean);
-  scr('project',lessonTop('<span class="lstep">🚀 Мини-проект · по желанию</span>',done?'':'<button class="btn t" id="sk" style="margin:0">Пропустить</button>')+'<div class="pj"><h1>'+esc(it.n)+'</h1><div class="card"><b>Цель</b><p>'+esc(it.q).replace(/\n/g,'</p><p>')+'</p>'+(hs.length?'<b>Что пригодится</b><p>'+hs.map(function(l){return hintTx(l)}).join('<br>')+'</p>':'')+(it.ex?'<b>Пример</b>'+(it.strict?'<pre class="cmp">'+esc(it.ex)+'</pre>':'<p style="margin-bottom:0">'+esc(it.ex).replace(/\n/g,'<br>')+'</p>'):'')+'</div><p class="mu" style="margin:0 4px 14px">'+(seen?'Эталон открыт, поэтому опыт за проект не начисляется. Решить его всё равно можно.':sk?'Этот проект пропущен. Сделай его сейчас и получи бонус +'+bonus+' ⭐. Или посмотри эталон, но тогда уже без опыта.':done?'Проект уже выполнен, бонус за него получен.':'Проект можно пропустить, тема всё равно засчитается. За выполнение бонус +'+bonus+' ⭐.')+'</p></div>'+edCard('Решение',dc)+conHtml()+'<div id="fb" aria-live="polite"></div>'+dockHtml('<button class="btn" id="chk">Проверить</button>'+(sk&&it.sol?'<button class="btn t" id="pjs">Посмотреть эталон</button>':'')));
-  $('x').onclick=home;
+  scr('project',lessonTop('<span class="lstep">🚀 Мини-проект · по желанию</span>',done?'':'<button class="btn t" id="sk" style="margin:0">Пропустить</button>')+'<div class="pj"><h1>'+esc(it.n)+'</h1>'+(String(it.q||'').length>QLONG?'<div class="card pjl">'+QTB+qSec('Цель',condHtml(it.q,true),true)+(hs.length?qSec('Что пригодится',hs.map(function(l){return'<p class="qi">'+hintTx(l)+'</p>'}).join(''),false):'')+(it.ex?qSec('Пример',exHtml(it.ex,it.strict),true):'')+'</div>':'<div class="card"><b>Цель</b><p>'+esc(it.q).replace(/\n/g,'</p><p>')+'</p>'+(hs.length?'<b>Что пригодится</b><p>'+hs.map(function(l){return hintTx(l)}).join('<br>')+'</p>':'')+(it.ex?'<b>Пример</b>'+(it.strict?'<pre class="cmp">'+esc(it.ex)+'</pre>':exHtml(it.ex,false)):'')+'</div>')+'<p class="mu" style="margin:0 4px 14px">'+(seen?'Эталон открыт, поэтому опыт за проект не начисляется. Решить его всё равно можно.':sk?'Этот проект пропущен. Сделай его сейчас и получи бонус +'+bonus+' ⭐. Или посмотри эталон, но тогда уже без опыта.':done?'Проект уже выполнен, бонус за него получен.':'Проект можно пропустить, тема всё равно засчитается. За выполнение бонус +'+bonus+' ⭐.')+'</p></div>'+edCard('Решение',dc)+conHtml()+'<div id="fb" aria-live="polite"></div>'+dockHtml('<button class="btn" id="chk">Проверить</button>'+(sk&&it.sol?'<button class="btn t" id="pjs">Посмотреть эталон</button>':'')));
+  $('x').onclick=home;qBind(app);
   var c=$('code'),ed=c.closest('.ed');ed.dataset.min=300;var sync=initEd(c,function(){drc(i,j,0).codes[0]=c.value.slice(0,3000);lazySave()});sync();
   skReady();chkPulse();runBind(c);
   $('chk').onclick=async function(){
