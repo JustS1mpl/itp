@@ -49,20 +49,20 @@ def fl_random():
 
 def code_random():
     return ts('import … as и random', [
-        task('Кубики. На вход подаются seed и сколько раз бросить два кубика, каждое в отдельной строке ввода. Выведи суммы бросков '
+        task('Кубики. На вход подаются seed (целое число) и сколько раз бросить два кубика, каждое в отдельной строке ввода. Выведи суммы бросков '
              'через пробел, а следующей строкой — «Дублей: N» (сколько раз выпали одинаковые числа). В каждом броске сначала '
              'первый кубик, потом второй — randint(1, 6).',
              'random.seed(s); в цикле a = random.randint(1, 6), b = random.randint(1, 6); копи суммы в список, считай a == b.',
              'import random\nrandom.seed(int(input()))\nn = int(input())\nsums = []\ndoubles = 0\nfor i in range(n):\n    a = random.randint(1, 6)\n'
              '    b = random.randint(1, 6)\n    sums.append(a + b)\n    if a == b:\n        doubles += 1\nprint(*sums)\nprint(f"Дублей: {doubles}")',
              ['1\n5', '42\n10', '7\n1']),
-        task('Жеребьёвка. На вход подаются seed и имена игроков через пробел. Перемешай список shuffle и раздели: первая половина '
+        task('Жеребьёвка. На вход подаются seed (целое число) и имена игроков через пробел, игроков не меньше двух. Перемешай список shuffle и раздели: первая половина '
              '(при нечётном числе — на одного меньше) — «Синие: ...», остальные — «Красные: ...».',
              'random.seed(s); names = input().split(); random.shuffle(names); k = len(names) // 2; срезы names[:k] и names[k:].',
              'import random\nrandom.seed(int(input()))\nnames = input().split()\nrandom.shuffle(names)\nk = len(names) // 2\n'
              'print("Синие:", " ".join(names[:k]))\nprint("Красные:", " ".join(names[k:]))',
              ['3\nИра Ли Ким Оля', '10\nА Б В Г Д', '1\nсоло пара']),
-        task('Камень-ножницы-бумага. На вход подаются seed и ход игрока («камень», «ножницы» или «бумага»). Компьютер выбирает '
+        task('Камень-ножницы-бумага. На вход подаются seed (целое число) и ход игрока («камень», «ножницы» или «бумага»). Компьютер выбирает '
              'random.choice из ["камень", "ножницы", "бумага"]. Выведи «Компьютер: ХОД» и «Победа», «Поражение» или «Ничья».',
              'Словарь «кто кого бьёт»: beats = {"камень": "ножницы", "ножницы": "бумага", "бумага": "камень"}. '
              'Победа, если beats[игрок] == компьютер.',
@@ -103,7 +103,8 @@ def th_datetime():
         '<code>%d</code> — день, <code>%m</code> — месяц, <code>%Y</code> — год, <code>%H</code> и <code>%M</code> — часы и минуты:</p>'
         + ex('from datetime import datetime\nlesson = datetime(2026, 10, 27, 14, 5)\nprint(lesson.strftime("%d.%m.%Y %H:%M"))\n'
              'd = datetime.strptime("31.12.2026", "%d.%m.%Y")\nprint(d.date(), d.month)') +
-        '<p>Если строка не подходит под шаблон (например, «31.02.2026» или «вчера»), <code>strptime</code> выдаст ValueError — '
+        '<p><code>strptime</code> возвращает дату со временем (datetime); если нужна только дата, у неё есть метод <code>.date()</code>. '
+        'Если строка не подходит под шаблон (например, «31.02.2026» или «вчера»), <code>strptime</code> выдаст ValueError — '
         'его ловят, как любую ошибку ввода.</p>'
     )
     return th('Дата и время', terms, body)
@@ -189,7 +190,7 @@ def fl_own():
 
 def code_own():
     return ts('Свои модули', [
-        task('Рядом с программой лежит модуль grades.py с функцией to_word(mark), которая возвращает оценку словом. '
+        task('Рядом с программой лежит модуль grades.py с функцией to_word(mark), которая принимает оценку-число и возвращает её словом. '
              'На вход подаются оценки через пробел. Выведи каждую словом через запятую с пробелом, пользуясь этой функцией.',
              'from grades import to_word; print(", ".join(to_word(int(m)) for m in input().split())).',
              'from grades import to_word\nprint(", ".join(to_word(int(m)) for m in input().split()))',
@@ -201,7 +202,7 @@ def code_own():
              'import string\nprint("-".join(str(string.ascii_lowercase.index(c) + 1) for c in input()))', ['abc', 'python', 'z']),
         task('Рядом с программой лежит модуль units.py с функциями km_to_miles(km) и c_to_f(c) — они возвращают числа. '
              'На вход подаются строки «число единица», где единица — km или C, последняя строка — «стоп». Для каждой выведи '
-             'перевод с одним знаком после точки: «5.0 km = 3.1 mi» или «20.0 C = 68.0 F».',
+             'перевод, где оба числа — с одним знаком после точки: «5.0 km = 3.1 mi» или «20.0 C = 68.0 F».',
              'import units; для km — units.km_to_miles(x), для C — units.c_to_f(x). Число и единицу раздели split, число — float.',
              'import units\nwhile True:\n    s = input()\n    if s == "стоп":\n        break\n    num, unit = s.split()\n    x = float(num)\n'
              '    if unit == "km":\n        print(f"{x:.1f} km = {units.km_to_miles(x):.1f} mi")\n    else:\n        print(f"{x:.1f} C = {units.c_to_f(x):.1f} F")',
@@ -213,7 +214,7 @@ def code_own():
 
 def code_final():
     return ts('Задачи: испытание', [
-        task('Генератор паролей. На вход подаются seed, длина пароля и строка-требование: «буквы», «буквы+цифры» или «всё» '
+        task('Генератор паролей. На вход подаются seed (целое число), длина пароля и строка-требование: «буквы», «буквы+цифры» или «всё» '
              '(буквы, цифры и знаки string.punctuation). Сгенерируй пароль: каждый символ — random.choice из нужного набора, '
              'наборы склеены в порядке буквы (string.ascii_letters), цифры, знаки. Выведи пароль.',
              'Набор: chars = string.ascii_letters, затем при необходимости += string.digits и += string.punctuation. '

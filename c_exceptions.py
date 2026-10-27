@@ -9,7 +9,7 @@ def th_try():
         ('try', 'Блок, в котором ожидают возможную ошибку. Если в нём случилось исключение, Python прыгает в подходящий except, '
                 'остаток блока try не выполняется.\nПример:\ntry:\n    n = int("abc")\nexcept ValueError:\n    print("не число")\nВывод:\nне число'),
         ('except', 'Ловит ошибку указанного типа (или нескольких — кортежем). except ValueError as e: — e хранит саму ошибку, '
-                   'str(e) — её текст.\nПример:\ntry:\n    print(10 // 0)\nexcept ZeroDivisionError as e:\n    print("ошибка:", e)\nВывод:\nошибка: integer division or modulo by zero'),
+                   'str(e) — её текст.\nПример:\ntry:\n    print(10 / 0)\nexcept ZeroDivisionError as e:\n    print("ошибка:", e)\nВывод:\nошибка: division by zero'),
         ('Exception', 'Общий тип почти всех ошибок. except Exception ловит любую из них — удобно, но опасно: так легко спрятать настоящую ошибку в коде.'),
     ]
     body = (
@@ -58,8 +58,8 @@ def code_try():
              'def safe_div(a, b):\n    try:\n        return round(a / b, 2)\n    except ZeroDivisionError:\n        return "на ноль делить нельзя"',
              ['print(safe_div(10, 4))', 'print(safe_div(1, 0))', 'print(safe_div(-7, 3))'], tail=TL),
         task('Справочник цен задан словарём. На вход подаются товар и количество, каждое в отдельной строке ввода. Выведи стоимость, '
-             'а если товара нет — «Нет товара: ...», если количество не число — «Количество — целое число». Используй try/except, '
-             'а не in и isdigit.',
+             'а если товара нет — «Нет товара: ...», если количество не целое число — «Количество — целое число» '
+             '(если неверно и то, и другое, — сообщение про товар). Используй try/except, а не in и isdigit.',
              'try: total = prices[item] * int(count) — две возможные ошибки: KeyError и ValueError, по отдельному except на каждую.',
              'prices = {"тетрадь": 45, "ручка": 30, "пенал": 350}\nitem = input()\ncount = input()\ntry:\n    print(prices[item] * int(count))\n'
              'except KeyError:\n    print(f"Нет товара: {item}")\nexcept ValueError:\n    print("Количество — целое число")',
@@ -103,15 +103,16 @@ def fl_finally():
            ['AC', 'C', 'ABC'], 'Ошибки нет: else и finally — BC.'),
         qo('Что выведет программа?', 'try:\n    [1, 2][5]\nexcept LookupError:\n    print("поиск")\nexcept IndexError:\n    print("индекс")',
            ['индекс', 'поиск индекс', 'Ошибка'], 'IndexError — потомок LookupError, сработал первый подходящий: поиск.'),
-        qo('Что выведет программа?', 'print(isinstance(True, int), isinstance("1", int))', ['False False', 'True True', 'False True'],
-           'bool — разновидность int, а строка — нет: True False.'),
+        qo('Что выведет программа?', 'print(isinstance(2, int), isinstance("2", int))', ['False False', 'True True', 'False True'],
+           '2 — целое число, а "2" — строка: True False.'),
     ])
 
 
 def code_finally():
     return ts('else, finally и иерархия ошибок', [
-        task('Импорт оценок. На вход подаются строки «Фамилия оценка» до слова «стоп». Строки, где оценка не число или '
-             'нет второй части, пропускай. Выведи «Принято: N, ошибок: M» и среднее принятых с двумя знаками.',
+        task('Импорт оценок. На вход подаются строки «Фамилия оценка» до слова «стоп». Оценка должна быть целым числом; строки, '
+             'где это не так или нет второй части, считай ошибками. Выведи «Принято: N, ошибок: M», а следующей строкой — '
+             'среднее принятых с двумя знаками (если принятых нет, вторую строку не выводи).',
              'try: name, mark = s.split(); m = int(mark) — ошибки распаковки и int обе ValueError. else: добавь m в список. '
              'Среднее — через формат :.2f; если принятых нет, среднее не выводи.',
              'marks = []\nbad = 0\nwhile True:\n    s = input()\n    if s == "стоп":\n        break\n    try:\n        name, mark = s.split()\n        m = int(mark)\n'
@@ -187,7 +188,8 @@ def code_raise():
              ['print(withdraw(500, 120))', 'for a in [0, 900]:\n    try:\n        withdraw(500, a)\n    except ValueError as e:\n        print(e)'], tail=TL),
         task('В программе функция и три проверки assert, но одна функция работает неверно — проверка падает. Исправь функцию '
              '(а не проверки), чтобы программа вывела «Все проверки пройдены».',
-             'Прочитай сообщение AssertionError: на каком примере функция ошибается? Последнее слово должно браться через [-1], а не [1].',
+             'Прочитай последнюю строку Traceback: на первой же проверке функция падает с IndexError — у слова «кот» нет второго '
+             'элемента. Последнее слово берут через [-1], а не [1].',
              'def last_word(s):\n    return s.split()[-1]\n\nassert last_word("кот") == "кот"\nassert last_word("я люблю Python") == "Python"\n'
              'assert last_word("раз два") == "два"\nprint("Все проверки пройдены")', [''],
              starter='def last_word(s):\n    return s.split()[1]\n\nassert last_word("кот") == "кот", "одно слово"\nassert last_word("я люблю Python") == "Python", "три слова"\n'
@@ -198,12 +200,13 @@ def code_raise():
 def code_final():
     return ts('Задачи: испытание', [
         task('Калькулятор, который не падает. На вход подаются выражения вида «a оп b» через пробелы (оп — + - * /), '
-             'последняя строка — «стоп». Для каждого выведи результат (деление — с двумя знаками после точки через round) '
-             'или сообщение: «Ошибка: деление на ноль», «Ошибка: не число», «Ошибка: неизвестная операция», '
-             '«Ошибка: нужно a оп b» (если частей не три).',
-             'Функция calc(a, op, b) с match по op; в case _ вызови ошибку другого типа, чем ValueError (тот уже значит «не число»), '
-             'например raise LookupError(op). В цикле: parts = s.split(), если частей не три — сообщение и continue; '
-             'затем try: print(calc(float(parts[0]), parts[1], float(parts[2]))) и три except: ZeroDivisionError, ValueError, LookupError.',
+             'последняя строка — «стоп». Числа читай как дробные (float), поэтому результат 2 + 3 — это 5.0; деление округляй '
+             'через round(…, 2). Вместо результата выводи сообщение: «Ошибка: нужно a оп b», если частей не три; '
+             '«Ошибка: не число», если число неверное (даже если и операция неизвестна); «Ошибка: неизвестная операция»; '
+             '«Ошибка: деление на ноль».',
+             'В цикле: parts = s.split(); если частей не три — сообщение и continue. Затем try: a = float(parts[0]), b = float(parts[2]) — '
+             'неверное число даст ValueError раньше всего остального; дальше выбор операции через match или if/elif, для неизвестной — '
+             'своё сообщение. Отдельные except для ValueError и ZeroDivisionError.',
              'def calc(a, op, b):\n    match op:\n        case "+":\n            return a + b\n        case "-":\n            return a - b\n        case "*":\n            return a * b\n'
              '        case "/":\n            return round(a / b, 2)\n        case _:\n            raise LookupError(op)\n\n\nwhile True:\n    s = input()\n    if s == "стоп":\n        break\n'
              '    parts = s.split()\n    if len(parts) != 3:\n        print("Ошибка: нужно a оп b")\n        continue\n    try:\n        print(calc(float(parts[0]), parts[1], float(parts[2])))\n'

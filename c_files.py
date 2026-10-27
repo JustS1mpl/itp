@@ -91,7 +91,7 @@ def code_files():
              'with open("poem.txt", encoding="utf-8") as f:\n    lines = [s.rstrip("\\n") for s in f]\nwords = sum(len(s.split()) for s in lines)\n'
              'print(f"Строк: {len(lines)}, слов: {words}, самая длинная строка: {max(len(s) for s in lines)} символов")',
              [''], files={'poem.txt': POEM}),
-        task('Ввод — числа по одному в строке, сколько угодно, без стоп-слова. Выведи количество, сумму и максимум: '
+        task('Ввод — целые числа по одному в строке, хотя бы одно, без стоп-слова. Выведи количество, сумму и максимум: '
              '«N чисел, сумма S, максимум M».',
              'import sys; nums = [int(line) for line in sys.stdin].',
              'import sys\nnums = [int(line) for line in sys.stdin]\nprint(f"{len(nums)} чисел, сумма {sum(nums)}, максимум {max(nums)}")',
@@ -134,9 +134,9 @@ def th_csv():
              files={'grades.csv': GRADES}) +
         '<p>Все значения из CSV — строки, числа превращают вручную. Записывают таблицу через [[writer]] и [[writerow]]; '
         'файл для записи CSV открывают с <code>newline=""</code>, иначе в Windows появятся пустые строки:</p>'
-        + ex('import csv\nrows = [["день", "шаги"], ["пн", 8200], ["вт", 10450]]\nwith open("steps.csv", "w", encoding="utf-8", newline="") as f:\n'
-             '    w = csv.writer(f)\n    for r in rows:\n        w.writerow(r)\nprint(open("steps.csv", encoding="utf-8").read(), end="")') +
-        '<p>В последней строке файл открыт без <code>with</code> — для быстрого чтения в одну строку так можно, Python закроет его сам.</p>'
+        + ex('import csv\nfrom pathlib import Path\nrows = [["день", "шаги"], ["пн", 8200], ["вт", 10450]]\nwith open("steps.csv", "w", encoding="utf-8", newline="") as f:\n'
+             '    w = csv.writer(f)\n    for r in rows:\n        w.writerow(r)\nprint(Path("steps.csv").read_text(encoding="utf-8"), end="")') +
+        '<p>Прочитать файл целиком для проверки удобнее всего через <code>Path(...).read_text()</code> — он сам откроет и закроет файл.</p>'
     )
     return th('pathlib и CSV', terms, body)
 
@@ -160,11 +160,11 @@ def code_csv():
              '        if all(row[s] == "5" for s in ("математика", "физика", "информатика")):\n            best.append(row["фамилия"])\nprint("\\n".join(best) if best else "Отличников нет")',
              [''], files={'grades.csv': GRADES}),
         task('По файлу grades.csv выведи средний балл класса по предмету, название которого подаётся на вход, с двумя знаками: '
-             '«ПРЕДМЕТ: X». Если такого предмета нет в таблице — «Нет предмета: ...».',
-             'Прочитай строки DictReader в список. Предмет есть, если он в rows[0] (ключи словаря). Среднее — sum(int(r[p]) ...) / len(rows).',
-             'import csv\nsubj = input()\nwith open("grades.csv", encoding="utf-8") as f:\n    rows = list(csv.DictReader(f))\nif subj not in rows[0]:\n'
+             '«ПРЕДМЕТ: X». Если это не одна из колонок математика, физика, информатика (в том числе «фамилия»), — «Нет предмета: ...».',
+             'Прочитай строки DictReader в список. Проверь предмет по кортежу («математика», «физика», «информатика»). Среднее — sum(int(r[p]) ...) / len(rows).',
+             'import csv\nsubj = input()\nwith open("grades.csv", encoding="utf-8") as f:\n    rows = list(csv.DictReader(f))\nif subj not in ("математика", "физика", "информатика"):\n'
              '    print(f"Нет предмета: {subj}")\nelse:\n    print(f"{subj}: {sum(int(r[subj]) for r in rows) / len(rows):.2f}")',
-             ['математика', 'информатика', 'химия'], files={'grades.csv': GRADES}),
+             ['математика', 'информатика', 'химия', 'фамилия'], files={'grades.csv': GRADES}),
         task('Заметки. На вход подаются имя файла и текст заметки. Если такой файл уже есть рядом с программой, выведи '
              '«Файл занят: ИМЯ», иначе запиши текст через Path.write_text и выведи «Сохранено, символов: N». '
              'Рядом лежит только файл grades.csv.',
@@ -195,9 +195,9 @@ def th_json():
         'буквы как есть (иначе будут коды вида <code>\\u041a</code>), <code>indent=2</code> добавляет отступы для чтения человеком.</p>'
         '<h3>Файлы JSON</h3>'
         '<p>Для файлов — [[dump]] (записать) и [[load]] (прочитать), без «s» на конце:</p>'
-        + ex('import json\nsettings = {"theme": "тёмная", "sound": False, "volume": 70}\nwith open("settings.json", "w", encoding="utf-8") as f:\n'
+        + ex('import json\nfrom pathlib import Path\nsettings = {"theme": "тёмная", "sound": False, "volume": 70}\nwith open("settings.json", "w", encoding="utf-8") as f:\n'
              '    json.dump(settings, f, ensure_ascii=False, indent=2)\nwith open("settings.json", encoding="utf-8") as f:\n    loaded = json.load(f)\n'
-             'loaded["volume"] += 10\nprint(loaded)\nprint(open("settings.json", encoding="utf-8").read())') +
+             'loaded["volume"] += 10\nprint(loaded)\nprint(Path("settings.json").read_text(encoding="utf-8"))') +
         '<p>Если строка — не JSON, <code>loads</code> и <code>load</code> выдают <code>json.JSONDecodeError</code>; это разновидность '
         'ValueError, поэтому её ловят <code>except ValueError</code>.</p>'
     )
@@ -221,11 +221,11 @@ def code_json():
              'import json\ntry:\n    d = json.loads(input())\nexcept ValueError:\n    print("Сохранение повреждено")\nelse:\n'
              '    print(f"{d[\'nick\']}, уровень {d[\'level\']}, предметов: {len(d[\'items\'])}")',
              ['{"nick": "Кира", "level": 7, "items": ["меч", "щит"]}', '{"nick": "Zed", "level": 1, "items": []}', '{nick: Zed}']),
-        task('Рядом лежит settings.json. На вход подаются ключ и новое значение-число. Обнови настройку (или добавь новую), '
+        task('Рядом лежит settings.json. На вход подаются ключ и новое значение — целое число. Обнови настройку (или добавь новую), '
              'сохрани файл обратно с ensure_ascii=False и indent=2 и выведи его содержимое.',
-             'load → d[key] = int(value) → dump в тот же файл → print(open(...).read()).',
+             'load → d[key] = int(value) → dump в тот же файл → print(Path("settings.json").read_text(encoding="utf-8")).',
              'import json\nkey = input()\nvalue = int(input())\nwith open("settings.json", encoding="utf-8") as f:\n    d = json.load(f)\nd[key] = value\n'
-             'with open("settings.json", "w", encoding="utf-8") as f:\n    json.dump(d, f, ensure_ascii=False, indent=2)\nprint(open("settings.json", encoding="utf-8").read())',
+             'with open("settings.json", "w", encoding="utf-8") as f:\n    json.dump(d, f, ensure_ascii=False, indent=2)\nfrom pathlib import Path\nprint(Path("settings.json").read_text(encoding="utf-8"))',
              ['volume\n35', 'fps\n60'], files={'settings.json': '{"theme": "тёмная", "volume": 70}'}),
         task('Таблица в JSON. Превращи grades.csv в список словарей, где оценки — числа, и выведи его через json.dumps с '
              'ensure_ascii=False (без отступов).',
@@ -238,7 +238,7 @@ def code_json():
 
 def project():
     return pj('Дневник расходов',
-              'Рядом с программой лежит expenses.csv — дневник расходов с колонками дата (ГГГГ-ММ-ДД), категория и сумма в рублях.\n'
+              'Рядом с программой лежит expenses.csv — дневник расходов с колонками дата (ГГГГ-ММ-ДД), категория и сумма — целое число рублей.\n'
               'Вход: месяц в виде «ГГГГ-ММ».\n'
               'Что сделать:\n'
               '1) выбрать записи за этот месяц;\n'
@@ -246,19 +246,20 @@ def project():
               'в поле шириной 7 вправо — по убыванию суммы, при равенстве по алфавиту;\n'
               '3) вывести «Всего: N» и «Больше всего на: КАТЕГОРИЯ»;\n'
               '4) сохранить итоги в файл summary.json: {"month": ..., "total": ..., "by_category": {категория: сумма}} '
+              '(категории в том же порядке, что и в выводе) '
               'с ensure_ascii=False и indent=2, и вывести этот файл.\n'
               'Если записей за месяц нет — вывести только «Нет записей за ГГГГ-ММ».',
               'Чтение: csv.DictReader, отбор по row["дата"].startswith(month).\n'
               'Суммы по категориям: defaultdict(int) или словарь с get.\n'
               'Сортировка: sorted(totals.items(), key=lambda p: (-p[1], p[0])).\n'
               'Сохранение: json.dump({"month": month, "total": total, "by_category": dict(...)}, f, ensure_ascii=False, indent=2).',
-              'import csv\nimport json\nfrom collections import defaultdict\n\nmonth = input()\ntotals = defaultdict(int)\n'
+              'import csv\nimport json\nfrom collections import defaultdict\nfrom pathlib import Path\n\nmonth = input()\ntotals = defaultdict(int)\n'
               'with open("expenses.csv", encoding="utf-8") as f:\n    for row in csv.DictReader(f):\n        if row["дата"].startswith(month):\n'
               '            totals[row["категория"]] += int(row["сумма"])\nif not totals:\n    print(f"Нет записей за {month}")\nelse:\n'
               '    ranked = sorted(totals.items(), key=lambda p: (-p[1], p[0]))\n    total = sum(totals.values())\n    print(f"Расходы за {month}")\n'
               '    for cat, s in ranked:\n        print(f"{cat:<14}{s:>7}")\n    print(f"Всего: {total}")\n    print(f"Больше всего на: {ranked[0][0]}")\n'
               '    summary = {"month": month, "total": total, "by_category": dict(ranked)}\n    with open("summary.json", "w", encoding="utf-8") as f:\n'
-              '        json.dump(summary, f, ensure_ascii=False, indent=2)\n    print(open("summary.json", encoding="utf-8").read())',
+              '        json.dump(summary, f, ensure_ascii=False, indent=2)\n    print(Path("summary.json").read_text(encoding="utf-8"))',
               ['2026-10', '2026-09', '2026-11'], strict=True, files={'expenses.csv': EXPENSES})
 
 
