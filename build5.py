@@ -1,6 +1,6 @@
 import re, sys, json, os
 sys.path.insert(0, '.')
-VER = '6.12.1'
+VER = '7.0.0-dev.1'
 s = open('base43.html', encoding='utf-8').read()
 
 def rep(a, b, n=1):
@@ -199,5 +199,8 @@ s = s.replace('v5.1.3', VER).replace('__VER__', VER)
 # --- полное название приложения: «И так, программирование» (сокращение ИТП прежнее)
 assert 'Пайтон' not in s
 rep('<title>ИТП v' + VER + '</title>', '<title>ИТП — И так, программирование</title>\n<meta name="description" content="ИТП («И так, программирование»): учебное приложение по Python для старшеклассников.">\n<meta name="color-scheme" content="light dark">')
+# пробные сборки 7.0 хранят сохранения под своим ключом: не портят настоящий прогресс 6.x и не берут его себе
+if '-dev' in VER:
+    rep("var KEY='pyshag2',", "var KEY='pyshag7dev',")
 open('out5.html', 'w', encoding='utf-8').write(s)
 print('ok', len(s))
