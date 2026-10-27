@@ -1,6 +1,6 @@
 import re, sys, json, os
 sys.path.insert(0, '.')
-VER = '6.8.7'
+VER = '6.8.8'
 s = open('base43.html', encoding='utf-8').read()
 
 def rep(a, b, n=1):
@@ -168,9 +168,9 @@ for extra in ('v5/a_fix.js','v5/a_fix2.js','v5/a_fix3.js','v5/a_fix4.js','v5/a_m
     try: core += '\n' + open(extra, encoding='utf-8').read()
     except FileNotFoundError: pass
 anchor = "seedLit();window.addEventListener('resize',function(){if(app.querySelector('.path'))links()});\napplyTheme();"
-# --- настроения кролика: ликующий (состояние happy: итоги, курс пройден, карточка «Поделиться») и хмурый (grump: приветствие после перерыва или потерянной серии)
+# --- настроения кролика: ликующий (состояние happy: итоги, курс пройден, карточка «Поделиться») и хмурый: grump — целиком, grumphead — голова (реакция на первую ошибку); по аналогии с wow и wowhead
 import base64 as _mb
-_mood = ''.join("IMG.%s='data:image/webp;base64,%s';\n" % (k, _mb.b64encode(open('assets/mascot/%s.webp' % f, 'rb').read()).decode()) for k, f in (('eat', 'lovecarrot'), ('happy', 'cheer'), ('grump', 'grump_head'), ('grumpfull', 'grump'), ('rolled', 'rolled'), ('wow', 'wow'), ('cool', 'cool'), ('wowhead', 'wow_head')) if os.path.exists('assets/mascot/%s.webp' % f))
+_mood = ''.join("IMG.%s='data:image/webp;base64,%s';\n" % (k, _mb.b64encode(open('assets/mascot/%s.webp' % f, 'rb').read()).decode()) for k, f in (('eat', 'lovecarrot'), ('happy', 'cheer'), ('grumphead', 'grump_head'), ('grump', 'grump'), ('rolled', 'rolled'), ('wow', 'wow'), ('cool', 'cool'), ('wowhead', 'wow_head')) if os.path.exists('assets/mascot/%s.webp' % f))
 core = 'var EXIMG=' + EXIMG + ';\n' + _mood + core
 core = core.replace('/*ITPY*/{}', _json.dumps(_py, ensure_ascii=False))
 rep(anchor, core + "\nseedLit();window.addEventListener('resize',function(){if(app.querySelector('.path'))links()});\napplyTheme();if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',emoLoad);else emoLoad();")

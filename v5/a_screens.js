@@ -447,19 +447,19 @@ app.setAttribute('role','main');
 
 /* ===== настроения кролика =====
    Спрайты показываются только в настоящих событиях, без реакций на нажатия и без фонового движения:
-   • grump (хмурый): первая ошибка в серии (неверный ответ, непрошедший тест, ошибка в программе), статичный;
+   • grumphead (хмурая голова): первая ошибка в серии (неверный ответ, непрошедший тест, ошибка в программе), статичный;
    • rolled (закатил глаза): один раз, на итоге островка, где ошибок было ROLL_AT и больше;
    • happy (ликующий): итог островка, проекта, уровня, курса; eat (с морковкой): знакомство и приветствие при идущей серии.
-   Не больше одного спрайта на момент. Если файла rolled нет в сборке, на его месте стоит grump. */
+   Не больше одного спрайта на момент. Если файла rolled нет в сборке, на его месте стоит grump (хмурый целиком). */
 var PRW=0,CERR=0;
-var MOODL={grump:['Хм. Не совсем.','Кролик приподнял бровь.','Почти, но нет.','Бывает. Кролик не в обиде.'],
+var MOODL={grumphead:['Хм. Не совсем.','Кролик приподнял бровь.','Почти, но нет.','Бывает. Кролик не в обиде.'],
  rolled:['Кролик закатил глаза, но верит в тебя.','Ну вот опять. Зато теперь запомнишь.','Глубокий вдох. Ещё раз.','Кролик вздохнул. Ты справишься.']};
-var MOODI={grump:Math.floor(Math.random()*4),rolled:Math.floor(Math.random()*4)};
-function moodLine(k){var a=MOODL[k]||MOODL.grump;return a[MOODI[k]++%a.length]}
+var MOODI={grumphead:Math.floor(Math.random()*4),rolled:Math.floor(Math.random()*4)};
+function moodLine(k){var a=MOODL[k]||MOODL.grumphead;return a[MOODI[k]++%a.length]}
 /* закатил глаза: только на итоге островка, если на нём ошибок ROLL_AT и больше; хмурый: только первая ошибка в серии */
 var ROLL_AT=4;
-function errMood(n){return n===1?'grump':''}
-function moodBox(k,sz){var s=IMG[k]||IMG.grump;return s?'<span class="mood '+k+(sz?' '+sz:'')+'" aria-hidden="true"><img src="'+s+'" alt="" draggable="false"></span>':''}
+function errMood(n){return n===1?'grumphead':''}
+function moodBox(k,sz){var s=IMG[k]||IMG.grumphead;return s?'<span class="mood '+k+(sz?' '+sz:'')+'" aria-hidden="true"><img src="'+s+'" alt="" draggable="false"></span>':''}
 function badFb(h,k){return k?h.replace('<div class="fb bad">','<div class="fb bad">'+moodBox(k,'fl')).replace(/<\/div>\s*$/,'<p class="mq">'+moodLine(k)+'</p></div>'):h}
 /* консоль: следим за строкой состояния, не трогая движок запуска */
 function consWatch(){
@@ -469,7 +469,7 @@ function consWatch(){
     if(/выполняется|ждёт ввод/.test(t)){r._s='';return}
     if(/ошибк|не запущена/.test(t)&&r._s!=='e'){
       r._s='e';CERR++;var k=errMood(CERR),q=$('cmq');
-      if(q&&k){q.innerHTML=moodBox(k,'sm')+'<span>'+moodLine(k)+' '+(k==='grump'?'Прочитай последнюю строку сообщения: там сказано, что не так.':'Проверь номер строки из сообщения.')+'</span>';q.hidden=false}
+      if(q&&k){q.innerHTML=moodBox(k,'sm')+'<span>'+moodLine(k)+' '+(k==='grumphead'?'Прочитай последнюю строку сообщения: там сказано, что не так.':'Проверь номер строки из сообщения.')+'</span>';q.hidden=false}
       else if(q)q.hidden=true}
     else if(/завершена/.test(t)){CERR=0;r._s='';var q2=$('cmq');if(q2)q2.hidden=true}
   }).observe(r,{childList:true,characterData:true,subtree:true,attributes:true})}

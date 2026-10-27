@@ -27,7 +27,7 @@ function ico(n,cls){return'<svg class="'+(cls||'')+'" viewBox="0 0 24 24" width=
 /* знак приложения: тот же наклонный шестиугольник-остров, что и на Пути */
 
 /* --- кролик (картинка встроена в файл) --- */
-function rabbit(st){var s=IMG[st]||(st==='rolled'?IMG.grumpfull||IMG.grump:IMG.eat);return'<div class="rw im '+st+'"><img src="'+s+'" alt="" draggable="false"></div>'}
+function rabbit(st){var s=IMG[st]||(st==='rolled'?IMG.grump||IMG.grumphead:IMG.eat);return'<div class="rw im '+st+'"><img src="'+s+'" alt="" draggable="false"></div>'}
 /* тень под лапами: где стоят лапы, считается по пикселям каждого спрайта (нижние непрозрачные ряды), а не подгоняется
    на глаз — так тень всегда ровно под кроликом, и у нового спрайта тоже. FEET[src] = {l, r, y} в долях картинки */
 var FEET={};
@@ -43,7 +43,7 @@ function feetOf(src,cb){
     FEET[src]={l:l/W,r:(r+1)/W,y:(yb+1)/H};if(cb)cb(FEET[src])}catch(e){}};im.src=src}
 function feetCss(){
   var css='';
-  ['eat','happy','grump','grumpfull','rolled'].forEach(function(st){var s=IMG[st]||(st==='rolled'?IMG.grumpfull||IMG.grump:null);if(!s)return;
+  ['eat','happy','grump','rolled','wow','cool'].forEach(function(st){var s=IMG[st]||(st==='rolled'?IMG.grump||IMG.grumphead:null);if(!s)return;
     feetOf(s,function(f){var pad=(f.r-f.l)*.12,L=Math.max(0,f.l-pad),R=Math.max(0,1-f.r-pad);
       css+=':root:not([data-theme=dark]) .rw.im.'+st+'::after{left:'+(L*100).toFixed(1)+'%;right:'+(R*100).toFixed(1)+'%;bottom:'+((1-f.y)*100-4).toFixed(1)+'%}\n';
       var el=document.getElementById('feet');if(!el){el=document.createElement('style');el.id='feet';document.head.appendChild(el)}el.textContent=css})})}

@@ -17,7 +17,7 @@ def ok(c, m):
 
 
 def mood(pg):
-    return pg.evaluate("(function(){var m=document.querySelector('#fb .mood');return m?(m.classList.contains('rolled')?'rolled':'grump'):''})()")
+    return pg.evaluate("(function(){var m=document.querySelector('#fb .mood');return m?(m.classList.contains('rolled')?'rolled':'grumphead'):''})()")
 
 
 def sprite_anims(pg):
@@ -57,17 +57,17 @@ with sync_playwright() as p:
             ok(anim[1] == '1' and float(anim[2].rstrip('s')) <= .2, 'хмурый: короткое появление, один раз: ' + str(anim))
         pg.locator('#go').click(); pg.wait_for_timeout(250)
     print('  последовательность спрайта:', seq)
-    ok(seq[0] == 'grump' and seq[1] == '' and seq[2] == '' and seq[3] == '', 'неверно, неверно, неверно, верно: хмурый только на первом')
+    ok(seq[0] == 'grumphead' and seq[1] == '' and seq[2] == '' and seq[3] == '', 'неверно, неверно, неверно, верно: хмурый только на первом')
     # --- консоль
     pg.evaluate("editor()"); pg.wait_for_timeout(300)
     def run(code):
         pg.evaluate("var c=document.getElementById('code');c.value=%r;c.dispatchEvent(new Event('input',{bubbles:true}));document.getElementById('run').click()" % code)
         pg.wait_for_function("/завершил|не запущена|завершена/.test((document.getElementById('rst')||{}).textContent||'')&&!/выполняется/.test(document.getElementById('rst').textContent)", timeout=60000)
         pg.wait_for_timeout(250)
-        return pg.evaluate("(function(){var q=document.getElementById('cmq');if(!q||q.hidden)return '';return q.querySelector('.mood')?'grump':''})()")
+        return pg.evaluate("(function(){var q=document.getElementById('cmq');if(!q||q.hidden)return '';return q.querySelector('.mood')?'grumphead':''})()")
     r = [run(c) for c in ('print(1/0)', 'print(1/0)', 'print(1/0)', 'print("ок")', 'print(1/0)')]
     print('  консоль:', r)
-    ok(r == ['grump', '', '', '', 'grump'], 'код с ошибкой: хмурый на первой ошибке, дальше текст; успех сбрасывает серию')
+    ok(r == ['grumphead', '', '', '', 'grumphead'], 'код с ошибкой: хмурый на первой ошибке, дальше текст; успех сбрасывает серию')
     # --- иконка профиля в нижней панели: маска и два состояния
     pg.evaluate("home()"); pg.wait_for_timeout(400)
     m = pg.evaluate("(function(){var i=document.querySelector('.nav .pi'),a=getComputedStyle(i,'::after'),f=getComputedStyle(i,'::before');return [a.maskImage||a.webkitMaskImage,f.opacity,a.backgroundColor]})()")
