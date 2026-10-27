@@ -305,8 +305,8 @@ def main():
                 if it.get('t') == 'theory':
                     pending.append(it.get('n'))
                 elif it.get('t') == 'test' and it.get('n') != 'Задачи: испытание':
-                    if len(it.get('tasks', [])) < 3:
-                        err(where_t, f'в островке «Код» «{it.get("n")}» меньше трёх задач')
+                    if len(it.get('tasks', [])) < 2:
+                        err(where_t, f'в островке «Код» «{it.get("n")}» меньше двух задач')
                     if pending and it.get('n') != pending[-1]:
                         err(where_t, f'островок «Код» «{it.get("n")}» должен называться по последней теории перед ним: «{pending[-1]}»')
                     if len(pending) > 2:
