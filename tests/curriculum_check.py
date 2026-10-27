@@ -53,14 +53,15 @@ RUN = {'native': 'обычный Python', 'native-vfs': 'виртуальная 
 for h in H:
     holes.append(f"| {h['n']} | {num[h['after']]} {T[num[h['after']]]['n']} | {RUN[h['run']]} | {h['min']} |")
 
-md = open('docs/CURRICULUM.md', encoding='utf-8').read()
+md = old_md = open('docs/CURRICULUM.md', encoding='utf-8').read()
 for tag, body in (('TOPICS', rows), ('HOLES', holes)):
     a, b = f'<!-- {tag}:начало -->', f'<!-- {tag}:конец -->'
     if a not in md:
         bad.append(f'в docs/CURRICULUM.md нет метки {a}')
         continue
     md = md[:md.index(a) + len(a)] + '\n' + '\n'.join(body) + '\n' + md[md.index(b):]
-open('docs/CURRICULUM.md', 'w', encoding='utf-8', newline='\n').write(md)
+if md != old_md:  # перезаписываем, только если таблицы изменились (файл может быть открыт в редакторе)
+    open('docs/CURRICULUM.md', 'w', encoding='utf-8', newline='\n').write(md)
 
 print('тем', len(T), 'нор', len(H), 'минут', tot, 'нарушений', len(bad))
 for x in bad:
