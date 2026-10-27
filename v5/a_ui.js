@@ -219,8 +219,9 @@ function ocur(i){for(var j=0;j<ni(i);j++)if(!S.d[i+'-'+j])return i+'-'+j;return'
 function ostarted(i){for(var j=0;j<ni(i);j++)if(S.d[i+'-'+j])return true;return false}
 /* островок темы, рядом с которым нора и после которого глава открывается: after из данных главы, иначе последний */
 function holeAt(i){var p=holePar(i),l=p<0?0:ni(p)-1,a=TOPICS[i].after;return a!=null?Math.min(a,l):l}
-/* нора зелёная, когда пройден её островок, тема пропущена или глава уже начата; в режиме разработчика — всегда */
-function holeVis(i){var p=holePar(i),k=holeAt(i);return p<0||TOPICS[p].intro||(typeof DEV==='function'&&DEV())||!!S.d[p+'-'+k]||p<S.start||bfr(p,k+1)||ostarted(i)}
+/* нора зелёная, когда пройден её островок, тема пропущена при выборе старта или глава уже начата; в режиме разработчика — всегда.
+   То, что островок остался позади на карте (bfr), не в счёт: ученик мог уйти вперёд, не пройдя его, и нора зеленела зря */
+function holeVis(i){var p=holePar(i),k=holeAt(i);return p<0||TOPICS[p].intro||(typeof DEV==='function'&&DEV())||!!S.d[p+'-'+k]||p<S.start||ostarted(i)}
 function holeName(t){return String(t.n||'').split(':')[0]}
 /* нора — «вывернутый островок»: тот же шестиугольник и ракурс (точки HEX, viewBox), только утопленный в землю.
    Сверху бортик с низкой боковой гранью, внутри видны три дальние стенки (опущенные на глубину верхние рёбра
