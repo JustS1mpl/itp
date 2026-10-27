@@ -265,10 +265,12 @@ function readMin(it){var t=String(it.html||'').replace(/<pre[\s\S]*?<\/pre>/g,' 
 function goalCard(all){
   var d=goalDone(),g=S.goal,ok=d>=g,cu=cur(),nx=null;
   if(cu){var p=cu.split('-');nx=IT(+p[0],+p[1])}
-  /* сверху тихо: приветствие и плашка цели с маленьким кольцом; в центре крупно — что дальше; внизу кнопка во всю ширину */
+  /* сверху приветствие во всю ширину (ник до 20 символов помещается целиком); в центре крупно — что дальше;
+     кнопка во всю ширину; под ней тихая строка цели с маленьким кольцом */
   var ty=nx?ity(nx):null,mt=ty?ty[2]+(nx.t==='theory'?' · ≈ '+readMin(nx)+' мин':''):'';
-  return'<section class="gcard" aria-label="Сегодня"><div class="ghd"><span class="gh">Привет, '+nk(S.nick)+'!</span><span class="gg'+(ok?' ok':'')+'"><span class="ring" style="--p:'+Math.min(100,Math.round(d/g*100))+'" role="img" aria-label="Цель дня: '+d+' из '+g+'"></span>'+(ok?'Цель выполнена':'Цель '+d+' из '+g)+'</span></div>'+
-   (all?'<p class="gall">Курс пройден. Кролик гордится тобой.</p>':cu?'<div class="gnx ty-'+ty[0]+'"><span class="gic" aria-hidden="true">'+ty[1]+'</span><span class="gnt"><small>'+esc(mt)+'</small><b>'+esc(nx.n||'')+'</b></span></div><button class="btn" id="gc">'+(d?'Продолжить':'Начать')+'</button>':'')+'</section>'}
+  return'<section class="gcard" aria-label="Сегодня"><div class="gh">Привет, <b>'+nk(S.nick)+'</b>!</div>'+
+   (all?'<p class="gall">Курс пройден. Кролик гордится тобой.</p>':cu?'<div class="gnx ty-'+ty[0]+'"><span class="gic" aria-hidden="true">'+ty[1]+'</span><span class="gnt"><small>'+esc(mt)+'</small><b>'+esc(nx.n||'')+'</b></span></div><button class="btn" id="gc">'+(d?'Продолжить':'Начать')+'</button>':'')+
+   '<div class="gg'+(ok?' ok':'')+'"><span class="ring" style="--p:'+Math.min(100,Math.round(d/g*100))+'" role="img" aria-label="Цель дня: '+d+' из '+g+'"></span>'+(ok?'Цель дня выполнена':'Цель дня: '+d+' из '+g)+'</div></section>'}
 function home(){if(HOLE>=0&&TOPICS[HOLE]&&TOPICS[HOLE].opt)return hole(HOLE);HOLE=-1;curOnce(home0)}
 function home0(){BACK=home;fzApply();
   var all=allDone();
@@ -501,11 +503,6 @@ function setSet(k,v){
   if(k==='theme'){themeSwap(function(){S.theme=v;save();applyPrefs()});return}
   if(k==='mute'){S.mute=v?0:1}else if(k==='goal'){S.goal=+v}else if(k==='g'){S.g=v}else if(k==='hc'){S.hc=v?0:1}
   else{S.set[k]=(typeof v==='number'||typeof v==='boolean')?v:(/^\d+$/.test(v)?+v:v)}
-  if(k==='mn'){/* минимализм при включении выключает узор на фоне, при выключении возвращает; дальше его можно переключить отдельно */
-    /* прошлый выбор запоминается: при выходе из минимализма узор возвращается таким, каким его оставил ученик */
-    if(v){S.set.mb=ST('bg')?1:0;S.set.bg=0}
-    else{S.set.bg=ST('mb')?1:0}
-    var b=document.querySelector('.sw[data-k="bg"]');if(b)b.setAttribute('aria-checked',ST('bg')?'true':'false')}
   save();applyPrefs();
   if(k==='emo'){if(ST('emo')){emoLoad();if(EM.map)emoOn()}else emoOff()}
   if(k==='goal')goalCheck()}
@@ -513,7 +510,6 @@ function settings(){
   var h='<div class="top ls"><button class="icon" id="x" aria-label="Назад">'+ico('back')+'</button><h1>Настройки</h1></div>';
   h+='<div class="sec">Внешний вид</div><div class="lst">'+
    SR('🎨','Тема','',SG('theme',[['','Авто'],['light','Светлая'],['dark','Тёмная']],S.theme))+
-   SR('🤍','Минимализм','Плоский спокойный вид, как в прошлой версии: сплошные панели, ровный фон',SW('mn',ST('mn')))+
    SR('🖌️','Цвет акцента','Кнопки, полоски, выделение','<div class="swa" role="radiogroup" aria-label="Цвет акцента">'+[['','#2B8420','Зелёный'],['carrot','#F08C1A','Морковный'],['pink','#C73B63','Розовый'],['blue','#2563D0','Синий'],['violet','#6C4BD6','Фиолетовый']].map(function(c){var on=ST('acc')===c[0];return'<button role="radio" aria-checked="'+on+'" data-k="acc" data-v="'+c[0]+'" style="background:'+c[1]+';color:'+c[1]+'" class="'+(on?'on':'')+'" aria-label="'+c[2]+'"></button>'}).join('')+'</div>')+
    SR('🔤','Размер текста','',SG('tz',[[90,'Мелкий'],[100,'Обычный'],[115,'Крупный'],[130,'Огромный']],ST('tz')))+
    SR('✨','Анимации','«Выкл» подойдёт слабым устройствам и тем, кого они отвлекают',SG('anim',[['full','Все'],['less','Меньше'],['off','Выкл']],ST('anim')))+
