@@ -265,8 +265,10 @@ function readMin(it){var t=String(it.html||'').replace(/<pre[\s\S]*?<\/pre>/g,' 
 function goalCard(all){
   var d=goalDone(),g=S.goal,ok=d>=g,cu=cur(),nx=null;
   if(cu){var p=cu.split('-');nx=IT(+p[0],+p[1])}
-  var dots='<span class="gdots" aria-hidden="true">'+Array.apply(null,Array(g)).map(function(_,k){return'<i class="'+(k<d?'on':'')+'"></i>'}).join('')+'</span>';
-  return'<section class="gcard" aria-label="Сегодня"><div class="gtx"><div class="gh">Привет, '+nk(S.nick)+'!</div><div class="gs">'+(all?'Курс пройден. Кролик гордится тобой.':(dots+(ok?'Цель дня выполнена':'Цель дня: '+d+' из '+g)))+'</div>'+(cu&&!all?'<button class="btn" id="gc">'+(d?'Продолжить':'Начать')+'</button><span class="gnx">'+esc(ity(nx)[2]+' · '+(nx.n||''))+'</span>':'')+'</div><div class="ring" style="--p:'+Math.min(100,Math.round(d/g*100))+'" role="img" aria-label="Цель дня: '+d+' из '+g+'"><span>'+d+'/'+g+'</span></div></section>'}
+  /* сверху тихо: приветствие и плашка цели с маленьким кольцом; в центре крупно — что дальше; внизу кнопка во всю ширину */
+  var ty=nx?ity(nx):null,mt=ty?ty[2]+(nx.t==='theory'?' · ≈ '+readMin(nx)+' мин':''):'';
+  return'<section class="gcard" aria-label="Сегодня"><div class="ghd"><span class="gh">Привет, '+nk(S.nick)+'!</span><span class="gg'+(ok?' ok':'')+'"><span class="ring" style="--p:'+Math.min(100,Math.round(d/g*100))+'" role="img" aria-label="Цель дня: '+d+' из '+g+'"></span>'+(ok?'Цель выполнена':'Цель '+d+' из '+g)+'</span></div>'+
+   (all?'<p class="gall">Курс пройден. Кролик гордится тобой.</p>':cu?'<div class="gnx ty-'+ty[0]+'"><span class="gic" aria-hidden="true">'+ty[1]+'</span><span class="gnt"><small>'+esc(mt)+'</small><b>'+esc(nx.n||'')+'</b></span></div><button class="btn" id="gc">'+(d?'Продолжить':'Начать')+'</button>':'')+'</section>'}
 function home(){if(HOLE>=0&&TOPICS[HOLE]&&TOPICS[HOLE].opt)return hole(HOLE);HOLE=-1;curOnce(home0)}
 function home0(){BACK=home;fzApply();
   var all=allDone();
