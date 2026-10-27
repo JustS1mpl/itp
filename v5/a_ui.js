@@ -205,6 +205,8 @@ function FRN(){if(FRN1)return FRN1;var li=-1,lj=-1,i,j,r=null;
     if(!r)r=[TOPICS.length,0]}
   if(CUR1!==null)FRN1=r;return r}
 function bfr(i,j){var f=FRN();return i<f[0]||(i===f[0]&&j<f[1])}
+/* ближайшая теория перед островком в его теме (-1, если её нет): без неё пропущенный островок не открывается */
+function thPrev(i,j){for(var x=j-1;x>=0;x--)if(IT(i,x).t==='theory')return x;return -1}
 function cur(){if(CUR1!==null)return CUR1;var f=FRN();if(f[0]<TOPICS.length)return f[0]+'-'+f[1];
   for(var i=Math.max(S.start,0);i<TOPICS.length;i++)if(!TOPICS[i].opt)for(var j=0;j<ni(i);j++)if(!S.d[i+'-'+j])return i+'-'+j;return''}
 /* доп. главы (opt:1) необязательны: путь идёт мимо них, в счёт тем и завершение обучения они не входят */
@@ -324,7 +326,9 @@ function islandPop(b){
   else if(it.t==='test')meta=it.tasks.length+' '+pl(it.tasks.length,['задание','задания','заданий']);
   else if(it.t==='project')meta='по желанию';
   var xp=it.t==='flash'?20:it.t==='test'?60:it.t==='project'?(it.bonus>0?it.bonus|0:40):0;
-  if(!op){snd('lock');txt='Откроется, когда пройдёшь островки перед ним.';btn='<button class="btn g" id="ipc">К текущему островку</button>'}
+  var tp=!op&&!TOPICS[i].opt&&(i<S.start||bfr(i,j))?thPrev(i,j):-1;
+  if(tp>=0){snd('lock');txt='Сначала прочитай теорию «'+esc(IT(i,tp).n||'')+'»: этот островок по ней.';btn='<button class="btn" id="ipt">Читать теорию</button>'}
+  else if(!op){snd('lock');txt='Откроется, когда пройдёшь островки перед ним.';btn='<button class="btn g" id="ipc">К текущему островку</button>'}
   else if(d){
     txt=S.at[k]==='seen'?'Проект пропущен, эталон открыт. Решить можно, но уже без опыта.':S.at[k]==='skip'?'Этот проект пропущен. Сделай его сейчас и получи +'+xp+' ⭐.':(xp?'Пройдено. Опыт за этот островок уже получен, повторять можно сколько угодно.':'Пройдено. Можно перечитать в любой момент.');
     btn='<button class="btn" id="ipg">'+(/^(skip|seen)$/.test(S.at[k])?'Сделать проект':it.t==='theory'?'Перечитать':'Повторить')+'</button>'}
@@ -345,9 +349,10 @@ function islandPop(b){
   var g=$('ipg');if(g)g.onclick=function(){BACK=home;popClose();go(i,j)};
   var s=$('ips');if(s)s.onclick=function(){popClose();projSkip(i,j)};
   var cc=$('ipc');if(cc)cc.onclick=function(){popClose();toCur()};
+  var tt=$('ipt');if(tt)tt.onclick=function(){BACK=home;popClose();go(i,tp)};
   setTimeout(function(){document.addEventListener('click',popOut,true)},0);
   /* карточку должно быть видно целиком */
-  requestAnimationFrame(function(){o.scrollIntoView({block:'nearest',behavior:RM()?'auto':'smooth'});(g||cc).focus({preventScroll:true})});
+  requestAnimationFrame(function(){o.scrollIntoView({block:'nearest',behavior:RM()?'auto':'smooth'});var fb=g||cc||tt;if(fb)fb.focus({preventScroll:true})});
 }
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&app.querySelector('.ipop')&&!document.querySelector('.modal')){e.stopImmediatePropagation();e.preventDefault();var b=app.querySelector('.isl.sel');popClose();if(b)b.focus()}},true);
 
