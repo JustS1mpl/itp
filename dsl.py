@@ -8,7 +8,7 @@ os.makedirs(_TS, exist_ok=True)
 shutil.copy('v5/py/turtle_shim.py', _TS + '/turtle.py')
 shutil.copy('v5/py/requests_shim.py', _TS + '/requests.py')  # учебный requests с виртуальными серверами: тот же файл, что в приложении
 os.environ['PYTHONPATH'] = _TS + os.pathsep + os.path.abspath('shim') + os.pathsep + os.environ.get('PYTHONPATH', '')
-from c_x import XMAP
+XMAP = {}  # примеры к объяснениям вопросов: ключ = начало текста вопроса, значение = (код, ввод[, вывод])
 USED = set()
 FILESETS = {}
 

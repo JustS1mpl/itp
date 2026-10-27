@@ -1,8 +1,9 @@
-import json, sys, os
+import json, sys, os, pathlib
 from playwright.sync_api import sync_playwright
 W=os.path.dirname(os.path.abspath(__file__))
 SK=W+'/sk/'
-PK=os.environ.get('PYODIDE_PKGS','/tmp/pyfull/x/pyodide/').rstrip('/')+'/'  # локальная копия пакетов Pyodide (CDN из песочницы недоступен)
+# локальная копия пакетов Pyodide (CDN из песочницы недоступен); по умолчанию pyo/pyodide в корне репозитория
+PK=os.environ.get('PYODIDE_PKGS',os.path.join(os.path.dirname(W),'pyo','pyodide')).replace('\\','/').rstrip('/')+'/'
 def route(r):
     u=r.request.url
     if 'skulpt@1.2.0/dist/' in u:
@@ -11,7 +12,8 @@ def route(r):
     elif 'cdn.jsdelivr.net/pyodide/' in u and os.path.isdir(PK):
         f=u.split('/full/')[1].split('?')[0]
         if os.path.exists(PK+f): r.fulfill(path=PK+f, headers={'access-control-allow-origin':'*'})
-        else: r.abort()
+        elif os.environ.get('PYODIDE_OFFLINE'): r.abort()
+        else: r.continue_()  # пакета нет локально (numpy, pandas…): докачать с CDN
     elif 'fonts.googleapis' in u or 'gstatic' in u:
         r.fulfill(status=200, body='', content_type='text/css')
     else:
@@ -26,5 +28,5 @@ def open_page(p, path, state=None, w=420, h=860, touch=False, **kw):
     pg.on('pageerror', lambda e: logs.append('PAGEERROR: '+str(e)))
     if state is not None:
         ctx.add_init_script("if(!sessionStorage.__seeded){sessionStorage.__seeded=1;localStorage.setItem('pyshag2',%s)}"%json.dumps(json.dumps(state)))
-    pg.goto('file://'+path)
+    pg.goto(pathlib.Path(path).resolve().as_uri())
     return b,ctx,pg,logs
