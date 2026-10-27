@@ -80,7 +80,7 @@ def run(theme='light', w=390):
         ok('И так, программирование' in pg.inner_text('#tb'), 'во введении новое название')
         tap(pg, '#go')
         pg.wait_for_timeout(5500)  # эффект «введение → курс»
-        ok(pg.locator('.topic:not(.intro)').count() == pg.evaluate("TOPICS.filter(function(t){return!t.intro}).length"), 'после введения появились все темы')
+        ok(pg.locator('.topic:not(.intro)').count() == pg.evaluate("TOPICS.filter(function(t){return!t.intro&&!t.opt}).length"), 'после введения появились все темы (доп. главы это отдельные кнопки .bur)')
         ok(pg.locator('.isl.cur').count() == 1, 'есть текущий островок')
         ok(pg.locator('.gcard #gc').count() == 1, 'на карточке дня есть «Начать»')
         snap(pg, '04_home_' + theme)

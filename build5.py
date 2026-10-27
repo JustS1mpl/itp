@@ -1,6 +1,6 @@
 import re, sys, json, os
 sys.path.insert(0, '.')
-VER = '6.9.0'
+VER = '6.10.0'
 s = open('base43.html', encoding='utf-8').read()
 
 def rep(a, b, n=1):
@@ -178,7 +178,7 @@ core = core.replace('/*ITPY*/{}', _json.dumps(_py, ensure_ascii=False))
 rep(anchor, core + "\nseedLit();window.addEventListener('resize',function(){if(app.querySelector('.path'))links()});\napplyTheme();if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',emoLoad);else emoLoad();")
 # --- достижения за проекты (по названию острова project). Правило действует и в старом projEnd базы,
 #     и в новом projEnd из v5/a_screens.js, поэтому якорь встречается 2 раза.
-rep("bump(key);ach('proj');snd('fanfare');", "bump(key);ach('proj');if(!at||at==='skip'){S.cn.pj=Math.min(99999,S.cn.pj+1);save();if(S.cn.pj>=3)ach('pj3')}if(/Анализ качества/.test(it.n||''))ach('pran');if(/Обработка запроса/.test(it.n||''))ach('papi');if(/WSGI/.test(it.n||''))ach('pwsgi');snd('fanfare');", 2)
+rep("bump(key);ach('proj');snd('fanfare');", "bump(key);ach('proj');if(!at||at==='skip'){S.cn.pj=Math.min(99999,S.cn.pj+1);save();if(S.cn.pj>=3)ach('pj3')}if(/Анализ качества/.test(it.n||''))ach('pran');if(/Обработка запроса/.test(it.n||''))ach('papi');if(/WSGI/.test(it.n||''))ach('pwsgi');if(/^Банк, этап/.test(it.n||'')){var bk_=true;TOPICS[i].items.forEach(function(x,k){if(x.t==='project'&&/^Банк, этап/.test(x.n||'')&&!S.d[i+'-'+k])bk_=false});if(bk_)ach('pbank')}snd('fanfare');", 2)
 
 s=s.replace('.slice(0,16).join(','.slice(0,20).join(').replace('maxlength="16"','maxlength="20"')
 assert '4.3.0' not in s
