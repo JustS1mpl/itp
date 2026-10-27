@@ -272,7 +272,7 @@ function goalCard(all){
   var ty=nx?ity(nx):null,mt=ty?ty[2]+(nx.t==='theory'?' · ≈ '+readMin(nx)+' мин':''):'';
   return'<section class="gcard" aria-label="Сегодня"><div class="gh">Привет, <b>'+nk(S.nick)+'</b>!</div>'+
    (all?'<p class="gall">Курс пройден. Кролик гордится тобой.</p>':cu?'<div class="gnx ty-'+ty[0]+'"><span class="gic" aria-hidden="true">'+ty[1]+'</span><span class="gnt"><small>'+esc(mt)+'</small><b>'+esc(nx.n||'')+'</b></span></div><button class="btn" id="gc">'+(d?'Продолжить':'Начать')+'</button>':'')+
-   '<div class="gg'+(ok?' ok':'')+'"><span class="ring" style="--p:'+Math.min(100,Math.round(d/g*100))+'" role="img" aria-label="Цель дня: '+d+' из '+g+'"></span>'+(ok?'Цель дня выполнена':'Цель дня: '+d+' из '+g)+'</div></section>'}
+   '<div class="gg'+(ok?' ok':'')+'"><span class="ring" role="img" aria-label="Цель дня: '+d+' из '+g+'"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8"/><circle class="v" cx="10" cy="10" r="8" pathLength="100"'+(ok?'':' stroke-dasharray="'+Math.round(d/g*100)+' 100"')+'/></svg></span>'+(ok?'Цель дня выполнена':'Цель дня: '+d+' из '+g)+'</div></section>'}
 function home(){if(HOLE>=0&&TOPICS[HOLE]&&TOPICS[HOLE].opt)return hole(HOLE);HOLE=-1;curOnce(home0)}
 function home0(){BACK=home;fzApply();
   var all=allDone();

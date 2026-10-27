@@ -471,7 +471,10 @@ html.noln .gt{display:none}
 .gh b{font-weight:900;color:var(--ink)}
 .gg{display:flex;align-items:center;justify-content:center;gap:8px;margin:12px 0 -2px;color:var(--muted);font-size:.8125rem;font-weight:800;font-variant-numeric:tabular-nums}
 .gg.ok{color:var(--accent-ink)}
-.gcard .ring{width:18px;height:18px;--c:var(--accent)}.gcard .ring::before{inset:3px;background:var(--card)}
+/* маленькое кольцо — SVG-окружность: толщина ровная и без шва (кольцо из conic-gradient и круга поверх на 18 px шло неровно и со щелью) */
+.gcard .ring{width:18px;height:18px;background:none}.gcard .ring::before{display:none}
+.gcard .ring svg{display:block;width:100%;height:100%;transform:rotate(-90deg);fill:none;stroke-width:3}
+.gcard .ring circle{stroke:color-mix(in srgb,var(--ink) 12%,transparent)}.gcard .ring circle.v{stroke:var(--accent)}
 .gnx{--tc:var(--accent);display:flex;align-items:center;gap:14px;margin-bottom:16px}
 .gnx.ty-t{--tc:var(--t-theory)}.gnx.ty-f{--tc:var(--t-flash)}.gnx.ty-c{--tc:var(--t-code)}.gnx.ty-p{--tc:var(--t-project)}
 .gic{width:52px;height:52px;flex:none;display:grid;place-items:center;border-radius:var(--r);background:color-mix(in srgb,var(--tc) 14%,var(--card));font-size:1.6rem;line-height:1}
