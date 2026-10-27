@@ -176,7 +176,7 @@ function rainStart(cv){
 function vhsStart(o){
   var cv=o.querySelector('.grn'),sci=o.querySelector('.sci'),x=cv.getContext('2d'),W=0,H=0,im=null,V={on:1,raf:0,last:0,jt:0};
   /* размер зерна — по пропорциям экрана: точки квадратные (~4 px), а не вытянутые полосы на высоком экране телефона */
-  function fit(){var s=Math.max(3,Math.round(Math.max(innerWidth,innerHeight)/320));W=Math.ceil(innerWidth/s);H=Math.ceil(innerHeight/s);cv.width=W;cv.height=H;im=x.createImageData(W,H)}
+  function fit(){var s=Math.max(3,Math.round(Math.max(innerWidth,innerHeight)/320));W=Math.max(1,Math.ceil(innerWidth/s));H=Math.max(1,Math.ceil(innerHeight/s));cv.width=W;cv.height=H;im=x.createImageData(W,H)}
   fit();window.addEventListener('resize',fit);
   function grain(){for(var i=0;i<W*H;i++){var g=Math.random()*255|0;im.data[i*4]=im.data[i*4+1]=im.data[i*4+2]=g;im.data[i*4+3]=255}x.putImageData(im,0,0)}
   grain();
