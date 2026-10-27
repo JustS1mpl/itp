@@ -476,7 +476,6 @@ html.noln .gt{display:none}
 .topic{position:relative;margin-bottom:28px}
 .thead{position:sticky;top:calc(var(--tbh) + var(--safe-t) + 16px);z-index:4;display:flex;align-items:center;gap:12px;margin:0 -6px 6px;padding:10px 12px 10px 10px;border-radius:var(--r-lg);background:var(--card);border:1px solid var(--line);box-shadow:var(--sh1);transition:background var(--d3),color var(--d3)}
 .thead .tn svg{width:20px;height:20px}
-.thead .tn .th{font:inherit;font-size:.9375rem;font-weight:900;letter-spacing:-.03em;color:inherit}
 .thead .tn{width:40px;height:40px;flex:none;display:grid;place-items:center;border-radius:var(--r-sm);background:var(--card2);color:var(--muted);font-weight:900;font-size:1.0625rem}
 .thead .tt{flex:1;min-width:0}
 .thead h2{font-size:1.0625rem;margin:0;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -539,6 +538,47 @@ html.noln .gt{display:none}
 .topic.intro{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:calc(100vh - 300px);min-height:calc(100dvh - 300px)}
 .rv{opacity:0;pointer-events:none}
 .path.stg .ilw{animation:stg .5s var(--e-out) both;animation-delay:calc(var(--n)*45ms)}
+
+/* кроличья нора: доп. глава — «вывернутый островок» сбоку от одного из последних островков темы.
+   Зелёный бортик — открыта, серый — закрыта; в тёмной теме оба темнее */
+:root{--hlt:#6FB84F;--hw:#4A3322;--hb:#120B06;--sgn:#F4B63F}
+.bur.lk{--hlt:#6E675E;--hw:#2E2925;--hb:#0A0908;--sgn:#A39B90}
+:root[data-theme=dark]{--hlt:#477E33;--hw:#2C1E14;--hb:#070504;--sgn:#D99A2B}
+:root[data-theme=dark] .bur.lk{--hlt:#45403B;--hw:#1D1A17;--hb:#050404;--sgn:#5E5852}
+.ilw.nhb>.mu{max-width:120px}
+.bur{position:absolute;top:0;left:calc(50% + 86px);z-index:1;width:min(124px,calc(50vw - 64px));padding:0;border:0;background:none;color:var(--ink);text-align:center;transition:opacity var(--d4)}
+.bur.l{left:auto;right:calc(50% + 86px)}
+.bur .nwr{position:relative;display:block;width:100%}
+.nsv .npt{transition:transform var(--d2) var(--e-out)}
+.nsv{display:block;width:100%;height:auto;overflow:visible}
+.nsv .rs,.nsv .rt{fill:var(--hlt);stroke:var(--hlt);stroke-width:6;stroke-linejoin:round}
+.nsv .rs{filter:brightness(.8)}
+:root[data-theme=dark] .nsv .rs{filter:brightness(.62)}
+.nsv .sp{fill:#A06D42}.nsv .sps{fill:#6E4626}.nsv .sf{fill:#000;opacity:.25}.nsv .sb{fill:var(--sgn)}.nsv .sbk{fill:var(--sgn);filter:brightness(.72)}
+.nsv .sb,.nsv .sbk{stroke-width:3;stroke-linejoin:round}.nsv .sb{stroke:var(--sgn)}.nsv .sbk{stroke:var(--sgn)}
+.nsv .sa{fill:none;stroke:#3B2A12;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+:root[data-theme=dark] .bur.lk .nsv .sa{stroke:#A39B90}
+.nsv .w{fill:var(--hw)}.nsv .wl{filter:brightness(1.35)}.nsv .wr{filter:brightness(.8)}.nsv .b{fill:var(--hb)}
+.bur .ntx{display:block;margin-top:-18px;font-size:.8125rem;font-weight:700;line-height:1.25;color:var(--muted)}
+.bur .ntx small{display:block;font-size:.75rem;font-weight:700;color:var(--muted)}
+.bur.dn .ntx small{color:var(--accent-ink)}
+.bur .bd{position:absolute;right:0;top:-6px;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--accent);box-shadow:0 0 0 2.5px var(--bg);color:var(--on);font-style:normal}
+.bur .bd.ok::before{content:'';width:5px;height:10px;border:solid currentColor;border-width:0 2.4px 2.4px 0;border-radius:1px;transform:translateY(-1px) rotate(45deg)}
+@media (hover:hover){.bur:hover .npt{transform:translateY(-3px)}}
+.bur:active .npt{transform:translateY(2px);transition-duration:var(--d1)}
+.ilw.wait .bur{opacity:0}
+.bur.fr .nsv{animation:burop .9s ease 1.1s both}
+.bur.fr .sgw{transform-box:fill-box;transform-origin:50% 100%;animation:sgjump .6s var(--e-spring) 1.6s both}
+@keyframes burop{from{filter:grayscale(1) brightness(.7)}to{filter:none}}
+@keyframes sgjump{0%{transform:none}40%{transform:translateY(-7px) rotate(-4deg)}100%{transform:none}}
+/* экран норы */
+.hhd{text-align:center;margin:2px 0 0}
+.hhd .nwr{display:block;width:120px;margin:40px auto 10px}
+.hhd h2{font-size:1.375rem;line-height:1.2;margin:0}
+.hhd .mu{margin:4px 0 0}
+.hhd .hnt{max-width:440px;margin:10px auto 0;font-size:.875rem;line-height:1.4;color:var(--muted)}
+.hpr{display:inline-flex;align-items:center;gap:10px;margin-top:14px;padding:4px 14px 4px 4px;border-radius:var(--pill);background:var(--card);border:1px solid var(--line);font-size:.875rem;font-weight:800}
+.hpr .ring{width:36px;height:36px}
 
 /* карточка островка */
 .ipop{position:absolute;left:0;right:0;z-index:5;max-width:420px;margin:0 auto;scroll-margin:calc(var(--tbh) + var(--safe-t) + 70px) 0 calc(var(--navh) + var(--safe-b) + 16px);padding:16px 16px 14px;border-radius:var(--r-lg);background:var(--card);border:1px solid var(--line);box-shadow:var(--sh3);text-align:left;transform-origin:var(--ax,50%) -10px;animation:ipop var(--d3) var(--e-spring)}

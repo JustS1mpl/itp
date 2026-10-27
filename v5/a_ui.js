@@ -147,6 +147,15 @@ function links0(){
     var it=pa.querySelectorAll('.ilw'),i=pa.dataset.i;
     if(it.length<2)return;
     var pw=pa.offsetWidth,ph=pa.offsetHeight;pa.dataset.lsz=pw+'x'+ph;
+    /* тема с норой: три равных промежутка — край экрана, нора, островок, край; на широком экране промежуток между норой
+       и островком не больше 56 px, а пара стоит по центру колонки (на телефоне это одно и то же).
+       Отходит от норы только её островок: если двигать и соседей, сбивается зигзаг тропинки; считается до линий */
+    var bu=pa.querySelector('.bur');
+    if(bu){var aw=bu.parentNode,L=bu.classList.contains('l'),nw=bu.querySelector('.nwr'),g=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--gut'))||16;
+      var vb=nw.offsetWidth*80/92,G=Math.min(56,(pw+2*g-vb-106)/3),x0=(pw-vb-106-G)/2,c0=aw.offsetLeft+aw.offsetWidth/2+(+aw.dataset.b);
+      var hd=Math.max(-90,Math.min(90,(L?x0+vb+G+53:pw-x0-vb-G-53)-c0));
+      pa.querySelectorAll('.ilw[data-hw]').forEach(function(w){w.style.transform='translateX('+(+w.dataset.b+hd*w.dataset.hw)+'px)'});
+      bu.style.right='auto';bu.style.left=(L?x0:pw-x0-vb)-nw.offsetLeft-nw.offsetWidth*6/92-aw.offsetLeft-lkX(aw)+'px'}
     var sv=document.createElementNS(ns,'svg');sv.setAttribute('class','cn');sv.setAttribute('width',pw);sv.setAttribute('height',ph);sv.setAttribute('aria-hidden','true');
     var fresh=[];
     for(var j=0;j<it.length-1;j++){
@@ -185,19 +194,60 @@ function linksWatch(){
 /* cur() (текущий островок) обходит весь курс; при отрисовке Пути его зовут для каждого острова,
    поэтому на время отрисовки ответ запоминается один раз */
 var CUR1=null;
-/* «где я остановился» — сразу за самым дальним пройденным островком (доп. главы считаются наравне с темами);
-   всё, что раньше этой точки и не пройдено, считается пропущенным, но остаётся открытым */
+/* «где я остановился» — сразу за самым дальним пройденным островком на Пути;
+   всё, что раньше этой точки и не пройдено, считается пропущенным, но остаётся открытым.
+   Доп. главы (кроличьи норы) в расчёте не участвуют: нора — ответвление, флажок на Пути остаётся там, где ученик свернул */
 var FRN1=null;
 function FRN(){if(FRN1)return FRN1;var li=-1,lj=-1,i,j,r=null;
-  for(i=0;i<TOPICS.length;i++)for(j=0;j<ni(i);j++)if(S.d[i+'-'+j]){li=i;lj=j}
+  for(i=0;i<TOPICS.length;i++)if(!TOPICS[i].opt)for(j=0;j<ni(i);j++)if(S.d[i+'-'+j]){li=i;lj=j}
   if(li<0)r=[Math.max(S.start,0),0];
-  else{for(i=li,j=lj+1;i<TOPICS.length&&!r;i++,j=0)for(;j<ni(i);j++)if(!S.d[i+'-'+j]){r=[i,j];break}
+  else{for(i=li,j=lj+1;i<TOPICS.length&&!r;i++,j=0)if(!TOPICS[i].opt)for(;j<ni(i);j++)if(!S.d[i+'-'+j]){r=[i,j];break}
     if(!r)r=[TOPICS.length,0]}
   if(CUR1!==null)FRN1=r;return r}
 function bfr(i,j){var f=FRN();return i<f[0]||(i===f[0]&&j<f[1])}
 function cur(){if(CUR1!==null)return CUR1;var f=FRN();if(f[0]<TOPICS.length)return f[0]+'-'+f[1];
-  for(var i=Math.max(S.start,0);i<TOPICS.length;i++)for(var j=0;j<ni(i);j++)if(!S.d[i+'-'+j])return i+'-'+j;return''}
+  for(var i=Math.max(S.start,0);i<TOPICS.length;i++)if(!TOPICS[i].opt)for(var j=0;j<ni(i);j++)if(!S.d[i+'-'+j])return i+'-'+j;return''}
 /* доп. главы (opt:1) необязательны: путь идёт мимо них, в счёт тем и завершение обучения они не входят */
+/* --- кроличьи норы: доп. глава не стоит в ряду тем, а уходит ответвлением от последнего островка темы перед ней --- */
+var HOLE=-1;
+function holePar(i){for(var p=i-1;p>=0;p--)if(!TOPICS[p].opt)return p;return-1}
+function holesOf(p){var a=[];for(var i=p+1;i<TOPICS.length&&TOPICS[i].opt;i++)a.push(i);return a}
+/* внутри норы островки открываются по порядку; «ты здесь» — первый непройденный */
+function ocur(i){for(var j=0;j<ni(i);j++)if(!S.d[i+'-'+j])return i+'-'+j;return''}
+function ostarted(i){for(var j=0;j<ni(i);j++)if(S.d[i+'-'+j])return true;return false}
+/* островок темы, рядом с которым нора и после которого глава открывается: after из данных главы, иначе последний */
+function holeAt(i){var p=holePar(i),l=p<0?0:ni(p)-1,a=TOPICS[i].after;return a!=null?Math.min(a,l):l}
+/* нора открыта (зелёная), когда пройден её островок, тема пропущена или глава уже начата; в режиме разработчика — всегда */
+function holeVis(i){var p=holePar(i),k=holeAt(i);return p<0||TOPICS[p].intro||(typeof DEV==='function'&&DEV())||!!S.d[p+'-'+k]||p<S.start||bfr(p,k+1)||ostarted(i)}
+function holeName(t){return String(t.n||'').split(':')[0]}
+/* нора — «вывернутый островок»: тот же шестиугольник и ракурс (точки HEX, viewBox), только утопленный в землю.
+   Сверху бортик с низкой боковой гранью, внутри видны три дальние стенки (опущенные на глубину верхние рёбра
+   уменьшенного шестиугольника), ниже дно. Рядом, за дальним углом, — наклонённый знак со стрелкой вниз. Цвета — в CSS (--hlt, --hw, --hb, --sgn) */
+var NHN=0;
+/* знак — с внешней стороны, подальше от тропинки: у норы слева он левее ямы, у норы справа (r) — правее, наклон наружу */
+function burrowSvg(r){var id='nh'+(++NHN),I='M18.6 34 L31.9 19.2 L60.1 19.2 L73.4 34 L60.1 48.8 L31.9 48.8 Z';
+  return'<svg class="nsv" viewBox="0 8 92 74" aria-hidden="true" focusable="false"><defs><clipPath id="'+id+'"><path d="'+I+'"/></clipPath></defs><g class="npt"><path class="rs" d="M9 34 L27 54 L65 54 L83 34 L83 40 L65 60 L27 60 L9 40 Z"/><path class="rt" d="M9 34 L27 14 L65 14 L83 34 L65 54 L27 54 Z"/><g clip-path="url(#'+id+')"><path class="w" d="'+I+'"/><path class="w wl" d="M18.6 34 L31.9 19.2 L31.9 32.2 L18.6 47 Z"/><path class="w wr" d="M60.1 19.2 L73.4 34 L73.4 47 L60.1 32.2 Z"/><path class="b" d="M18.6 47 L31.9 32.2 L60.1 32.2 L73.4 47 L60.1 61.8 L31.9 61.8 Z"/></g></g><g class="sgw"><g class="sg" transform="'+(r?'translate(44 -5) rotate(9 24 24)':'translate(-16 -5) rotate(-9 24 24)')+'"><ellipse class="sf" cx="24.6" cy="25.2" rx="5" ry="2.7"/><rect class="sp" x="22.3" y="4" width="2.7" height="21.4" rx="1"/><rect class="sps" x="24.6" y="4" width="1.7" height="21.4" rx=".8"/><path class="sbk" d="M8 -6 L16 8 L32 8 L40 -6 L40 -2.5 L32 11.5 L16 11.5 L8 -2.5 Z"/><path class="sb" d="M8 -6 L16 -20 L32 -20 L40 -6 L32 8 L16 8 Z"/><path class="sa" d="M24 -13v12M18.5 -6.5l5.5 5.5 5.5-5.5"/></g></g></svg>'}
+/* серая и закрытая, пока тема не дошла до последнего островка; зелёная, когда открыта */
+/* норы, которые уже видели открытыми: только что открывшаяся нора один раз зеленеет и знак подпрыгивает */
+var HOP=null;
+function burrow(o,side){
+  var t=TOPICS[o],m=ni(o),c=0,op=holeVis(o),fr=op&&!HOP[o];for(var j=0;j<m;j++)if(S.d[o+'-'+j])c++;
+  if(op)HOP[o]=1;if(fr&&!RM())setTimeout(function(){snd('unlock')},1500);
+  var dn=c===m,st=!op?'закрыта':dn?'пройдена':c?c+' из '+m:'';
+  return'<button class="bur '+side+(op?'':' lk')+(dn?' dn':'')+(fr&&!RM()?' fr':'')+'" data-o="'+o+'" aria-label="'+esc('Доп. глава: '+t.n+' ('+st+')')+'"><span class="nwr">'+burrowSvg(side.charAt(0)==='r')+(dn?'<i class="bd ok"></i>':'')+'</span><span class="ntx">'+esc(holeName(t))+(st?'<small>'+st+'</small>':'')+'</span></button>'}
+function hole(i){HOLE=i;curOnce(function(){hole0(i)})}
+function hole0(i){BACK=home;fzApply();
+  var t=TOPICS[i],p=holePar(i),n=ni(i),c=0;for(var j=0;j<n;j++)if(S.d[i+'-'+j])c++;
+  var pn=0;for(var x=0;x<=p;x++)if(!TOPICS[x].intro&&!TOPICS[x].opt)pn++;
+  var h='<div class="top ls"><button class="icon" id="x" aria-label="Назад на Путь">'+ico('back')+'</button><h1>'+esc(holeName(t))+'</h1></div>'+
+   '<section class="topic hole" aria-label="'+esc('Доп. глава: '+t.n)+'"><div class="hhd'+(c===n?' dn':'')+'"><span class="nwr">'+burrowSvg()+'</span><h2>'+esc(t.n)+'</h2><p class="mu">'+esc(t.s||'')+'</p><p class="hnt">Доп. глава по желанию, открывается после островка «'+esc(p>=0?IT(p,holeAt(i)).n||'':'')+'» темы '+pn+'. В счёт тем не входит, опыт за островки начисляется как обычно.</p><div class="hpr"><div class="ring" style="--p:'+Math.round(c/Math.max(1,n)*100)+'" role="img" aria-label="Пройдено '+c+' из '+n+'"><span>'+c+'/'+n+'</span></div><span>'+(c===n?'Глава пройдена':c?'Пройдено '+c+' из '+n:'Ещё не начата')+'</span></div></div>'+
+   '<div class="path'+(RM()?'':' stg')+'" data-i="'+i+'">';
+  for(var j2=0;j2<n;j2++)h+=island(i,j2,j2);
+  scr('hole',h+'</div></section>','home');links();
+  $('x').onclick=function(){HOLE=-1;home();var b=app.querySelector('.bur[data-o="'+i+'"]');if(b)b.scrollIntoView({block:'center'})};
+  app.querySelectorAll('.isl').forEach(function(b){b.onclick=function(e){e.stopPropagation();islandPop(b)}});
+  var cu=app.querySelector('.isl.cur');if(cu&&c)cu.scrollIntoView({block:'center'});else window.scrollTo(0,0);
+}
 function allDone(){return TOPICS.every(function(t,i){return t.intro||t.opt||tdone(i)})}
 function NT(){return TOPICS.filter(function(t){return!t.intro&&!t.opt}).length}
 function ND(){return TOPICS.filter(function(t,i){return!t.intro&&!t.opt&&(tdone(i)||i<S.start)}).length}
@@ -206,10 +256,10 @@ function curOnce(f){var o=CUR1,of=FRN1;CUR1=null;FRN1=null;CUR1=cur();try{return
 var HEX='<svg class="hx" viewBox="0 8 92 74" width="118" height="92" aria-hidden="true" focusable="false"><path class="gl" d="M9 34 L27 14 L65 14 L83 34 L83 46 L65 66 L27 66 L9 46 Z"/><path class="sd" d="M9 34 L27 54 L65 54 L83 34 L83 46 L65 66 L27 66 L9 46 Z"/><path d="M9 34 L27 14 L65 14 L83 34 L65 54 L27 54 Z"/><path class="sh" d="M13 33 L29 17 L63 17 L57 23 L31 23 L19 33 Z"/></svg>';
 var ITY={theory:['t','📖','Теория'],flash:['f','✏️','Вопросы'],test:['c','💻','Код'],project:['p','🚀','Мини-проект']};
 function ity(it){return ITY[it.t]||['a','⭐','Островок']}
-function island(i,j,n){
-  var k=i+'-'+j,it=IT(i,j),d=S.d[k],op=isOpen(i,j),c=cur()===k,nx=!c&&!d&&nxI(i,j),wt=j>0&&S.d[i+'-'+(j-1)]&&!LIT[i+'-'+(j-1)];
-  var ty=ity(it),lb=it.n||'',off=[0,46,0,-46][j%4],st=d?'пройдено':(op?(c?'ты здесь':'открыто'):'закрыто');
-  return'<div class="ilw'+(wt?' wait':'')+(c?' cu':'')+'" style="--n:'+Math.min(n||0,9)+';transform:translateX('+off+'px)">'+(c?'<div class="flag" aria-hidden="true">'+(TOPICS[i].intro?'Начни здесь':'🚩 Ты остановился здесь')+'</div>':'')+'<button class="isl ty-'+ty[0]+' '+(d?'dn':(op?'op':'lk'))+(c?' cur':'')+(nx?' nx':'')+'" data-i="'+i+'" data-j="'+j+'" aria-label="'+esc(ty[2]+': '+lb+' ('+st+')')+'"'+(c?' aria-current="step"':'')+'>'+HEX+'<span class="ic">'+ty[1]+'</span>'+(d?'<i class="bd ok"></i>':(op?'':'<i class="bd">🔒</i>'))+'</button><div class="mu">'+esc(lb)+(it.t==='project'?'<br><small>'+(/^(skip|seen)$/.test(S.at[k])?'пропущен':'по желанию')+'</small>':'')+'</div></div>'}
+function island(i,j,n,dx){
+  var o=TOPICS[i].opt,k=i+'-'+j,it=IT(i,j),d=S.d[k],op=isOpen(i,j),c=(o?ocur(i):cur())===k,nx=!c&&!d&&!o&&nxI(i,j),wt=j>0&&S.d[i+'-'+(j-1)]&&!LIT[i+'-'+(j-1)];
+  var ty=ity(it),lb=it.n||'',off=[0,46,0,-46][j%4]+(dx||0),st=d?'пройдено':(op?(c?'ты здесь':'открыто'):'закрыто');
+  return'<div class="ilw'+(wt?' wait':'')+(c?' cu':'')+'" style="--n:'+Math.min(n||0,9)+';transform:translateX('+off+'px)">'+(c?'<div class="flag" aria-hidden="true">'+(TOPICS[i].intro||o&&!ostarted(i)?'Начни здесь':'🚩 Ты остановился здесь')+'</div>':'')+'<button class="isl ty-'+ty[0]+' '+(d?'dn':(op?'op':'lk'))+(c?' cur':'')+(nx?' nx':'')+'" data-i="'+i+'" data-j="'+j+'" aria-label="'+esc(ty[2]+': '+lb+' ('+st+')')+'"'+(c?' aria-current="step"':'')+'>'+HEX+'<span class="ic">'+ty[1]+'</span>'+(d?'<i class="bd ok"></i>':(op?'':'<i class="bd">🔒</i>'))+'</button><div class="mu">'+esc(lb)+(it.t==='project'?'<br><small>'+(/^(skip|seen)$/.test(S.at[k])?'пропущен':'по желанию')+'</small>':'')+'</div></div>'}
 /* сколько читать теорию: по объёму текста, примерно 160 слов в минуту */
 function readMin(it){var t=String(it.html||'').replace(/<pre[\s\S]*?<\/pre>/g,' ').replace(/<[^>]+>/g,' '),w=t.split(/\s+/).filter(Boolean).length,c=(String(it.html||'').match(/<pre>/g)||[]).length;return Math.max(1,Math.round(w/160+c*.25))}
 function goalCard(all){
@@ -217,21 +267,31 @@ function goalCard(all){
   if(cu){var p=cu.split('-');nx=IT(+p[0],+p[1])}
   var dots='<span class="gdots" aria-hidden="true">'+Array.apply(null,Array(g)).map(function(_,k){return'<i class="'+(k<d?'on':'')+'"></i>'}).join('')+'</span>';
   return'<section class="gcard" aria-label="Сегодня"><div class="gtx"><div class="gh">Привет, '+nk(S.nick)+'!</div><div class="gs">'+(all?'Курс пройден. Кролик гордится тобой.':(dots+(ok?'Цель дня выполнена':'Цель дня: '+d+' из '+g)))+'</div>'+(cu&&!all?'<button class="btn" id="gc">'+(d?'Продолжить':'Начать')+'</button><span class="gnx">'+esc(ity(nx)[2]+' · '+(nx.n||''))+'</span>':'')+'</div><div class="ring" style="--p:'+Math.min(100,Math.round(d/g*100))+'" role="img" aria-label="Цель дня: '+d+' из '+g+'"><span>'+d+'/'+g+'</span></div></section>'}
-function home(){curOnce(home0)}
+function home(){if(HOLE>=0&&TOPICS[HOLE]&&TOPICS[HOLE].opt)return hole(HOLE);HOLE=-1;curOnce(home0)}
 function home0(){BACK=home;fzApply();
   var all=allDone();
   if(PE.length){scr('home',head()+'<div class="fb bad"><b>Ошибка в данных тем</b>'+PE.map(esc).join('<br>')+'</div>','home');bindHead(home);return}
   var first=TOPICS[0]&&TOPICS[0].intro&&S.start===0&&!tdone(0)&&!REV;
   var h=head()+'<h1 class="sr-only">Путь</h1>'+(first?'':goalCard(all)),num=0,cu=cur(),ci=cu?+cu.split('-')[0]:-1;
   TOPICS.forEach(function(t,i){
-    if(!t.intro&&!t.opt)num++;if(!vis(i))return;
+    if(t.opt)return;if(!t.intro)num++;if(!vis(i))return;
     var c=0;(t.items||[]).forEach(function(x,j){if(S.d[i+'-'+j])c++});
     var pc=Math.round(c/Math.max(1,ni(i))*100),dn=tdone(i);
-    h+='<section class="topic'+(t.intro?' intro':'')+(REV&&!t.intro?' rv':'')+'" aria-label="'+esc(t.intro?t.n:(t.opt?'Доп. глава '+num+'.5: ':'Тема '+num+': ')+t.n)+'">'+(t.intro?'<div class="ihead"><h2>'+esc(t.n)+'</h2><p class="mu">'+esc(t.s||'')+'</p></div>':'<div class="thead'+(dn?' done':'')+(i===ci?' now':'')+'"><div class="tn'+(dn?' ok':'')+'" aria-hidden="true">'+(dn?'':(t.opt?'<span class="th">'+num+'.5</span>':num))+'</div><div class="tt"><h2>'+esc(t.n)+'</h2><div class="mu">'+esc(t.s||'')+(t.opt?' · доп. глава, по желанию':((i<S.start||i<FRN()[0])&&!dn?' · пропущено':''))+'</div></div><div class="ring" style="--p:'+pc+'" role="img" aria-label="Пройдено '+c+' из '+ni(i)+'"><span>'+c+'/'+ni(i)+'</span></div></div>')+'<div class="path'+(RM()?'':' stg')+'" data-i="'+i+'">';
-    for(var j=0;j<ni(i);j++)h+=island(i,j,j);
+    h+='<section class="topic'+(t.intro?' intro':'')+(REV&&!t.intro?' rv':'')+'" aria-label="'+esc(t.intro?t.n:'Тема '+num+': '+t.n)+'">'+(t.intro?'<div class="ihead"><h2>'+esc(t.n)+'</h2><p class="mu">'+esc(t.s||'')+'</p></div>':'<div class="thead'+(dn?' done':'')+(i===ci?' now':'')+'"><div class="tn'+(dn?' ok':'')+'" aria-hidden="true">'+(dn?'':num)+'</div><div class="tt"><h2>'+esc(t.n)+'</h2><div class="mu">'+esc(t.s||'')+((i<S.start||i<FRN()[0])&&!dn?' · пропущено':'')+'</div></div><div class="ring" style="--p:'+pc+'" role="img" aria-label="Пройдено '+c+' из '+ni(i)+'"><span>'+c+'/'+ni(i)+'</span></div></div>')+'<div class="path'+(RM()?'':' stg')+'" data-i="'+i+'">';
+    /* нора — примерно за пять островков до конца темы, у островка, сдвинутого вбок (нечётный), в свободном месте с другой стороны */
+    if(!HOP){HOP={};TOPICS.forEach(function(x,o){if(x.opt&&holeVis(o))HOP[o]=1})}
+    /* островок посередине тропинки (чётный) места сбоку не оставляет — тогда нора у следующего, сдвинутого вбок; открывается всё равно после своего */
+    var hs=holesOf(i),l=ni(i)-1,an=hs.length?holeAt(hs[0]):-1;if(an>=0&&an%2===0&&an<l)an++;
+    /* островок с норой отходит от неё (точный сдвиг считает links0; здесь — начальный, чтобы не прыгало) */
+    var hd=hs.length?(an%4===1?1:-1)*34:0;
+    for(var j=0;j<ni(i);j++){var dj=Math.abs(j-an),hw=hs.length&&!dj?1:0,w=island(i,j,j,hd*hw);
+      if(hw)w=w.replace('<div class="ilw','<div data-b="'+[0,46,0,-46][j%4]+'" data-hw="'+hw+'" class="ilw');
+      if(j===an&&hs.length)w=w.replace('class="ilw','class="ilw nhb').replace(/<\/div>$/,burrow(hs[0],an%4===1?'l':'r')+'</div>');
+      h+=w}
     h+='</div></section>'});
   scr('home',h+'<aside class="jump" aria-label="Быстрый переход"><button id="jmp" aria-label="К текущему островку">'+ico('arrow')+'</button></aside>','home');bindHead(home);links();
   app.querySelectorAll('.isl').forEach(function(b){b.onclick=function(e){e.stopPropagation();islandPop(b)}});
+  app.querySelectorAll('.bur').forEach(function(b){b.onclick=function(e){e.stopPropagation();popClose();if(b.classList.contains('lk')){snd('lock');toast('Доп. глава откроется, когда дойдёшь до последнего островка темы');return}hole(+b.dataset.o)}});
   var c=app.querySelector('.isl.cur');if(c&&!REV)c.scrollIntoView({block:'center'});
   var gc=$('gc');if(gc)gc.onclick=function(){var k=cur();if(!k)return;var p=k.split('-');BACK=home;go(+p[0],+p[1])};
   jumpWatch();
