@@ -385,12 +385,14 @@ code{background:var(--card2);border-radius:6px;padding:1px 6px;font-family:var(-
 .gt{flex:none;min-width:2.9em;padding:12px 8px 14px 10px;border-right:1px solid var(--line);background:var(--card2);color:var(--muted);font:600 var(--cf,15px)/1.6 var(--mono);text-align:right;white-space:pre;user-select:none;-webkit-user-select:none;overflow:hidden}
 html.noln .gt{display:none}
 /* консоль */
-.cons{margin:0 0 12px;border-radius:var(--r-lg);border:1.5px dashed var(--line2);background:color-mix(in srgb,var(--card) 50%,transparent);animation:fbin var(--d3) var(--e-out)}
+/* вывод — спокойная карточка с тонкой рамкой (не пунктир); окна черепахи и картинок встают в неё вровень, без второй рамки */
+.cons{margin:0 0 12px;border-radius:var(--r-lg);border:1px solid var(--line);background:var(--card);overflow:hidden;animation:fbin var(--d3) var(--e-out)}
 .cons .csh{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:40px;padding:6px 14px 0}
 .cons pre.out{margin:0;border:0;background:none;padding:6px 16px 14px;white-space:pre-wrap;max-height:60vh;overflow:auto}
-.rst{display:flex;align-items:center;gap:6px;margin:0;font-size:.84375rem;font-weight:800;color:var(--muted);text-align:right}
+.rst{display:flex;align-items:center;gap:7px;margin:0;font-size:.84375rem;font-weight:800;color:var(--muted);text-align:right}
 .rst.ok{color:var(--accent-ink)}.rst.bad{color:var(--bad)}.rst.wait{color:var(--ink)}
-.rst.wait .em{animation:kbp 1s ease-in-out infinite}
+.rst::before{content:'';width:8px;height:8px;flex:none;border-radius:50%;background:currentColor}
+.rst.wait::before{animation:kbp 1s ease-in-out infinite}
 .inrow{display:flex;gap:8px;max-height:0;opacity:0;overflow:hidden;visibility:hidden;margin:0 12px;transform:translateY(6px);transition:max-height var(--d3),opacity var(--d3),transform var(--d3),margin var(--d3),visibility 0s var(--d3)}
 .inrow.on{max-height:90px;opacity:1;visibility:visible;transform:none;margin:0 12px 12px;transition-delay:0s;overflow:visible}
 .inrow input{flex:1;min-width:0;min-height:48px;padding:0 14px;font-family:var(--mono)}
@@ -1115,9 +1117,11 @@ html[data-ph=pop] .pav .rw{position:absolute;left:50%;bottom:5px;width:116px;mar
 .tuf{position:relative;width:100%;max-width:380px;margin:10px 0 18px;border:1.5px solid var(--line2);border-radius:18px;background:#fff;overflow:hidden;box-shadow:0 6px 18px -10px rgba(40,50,70,.35)}
 /* окна библиотек в компиляторе (черепаха, графики matplotlib, картинки Pillow): одно оформление — строка заголовка
    с названием и библиотекой, содержимое на всю ширину блока вывода, по центру */
-/* внутри блока вывода окно отступает от пунктирной рамки на 12 px со всех сторон (как текст вывода), между окнами — тоже 12;
-   углы чуть меньше, чем у рамки, чтобы скругления шли параллельно */
-.cons .tuf.run,.cons .pyimg{margin:4px 12px 12px;width:auto;max-width:none}
+/* внутри блока вывода окно встаёт вровень с краями блока: сверху тонкая линия, своей рамки, тени и скруглений нет
+   (окно в окне выглядело неаккуратно, 6.9.0); вне вывода окно — отдельная карточка */
+.cons .tuf.run,.cons .pyimg{margin:4px 0 0;width:auto;max-width:none}
+.cons .tuf.run,.cons .pyw{border:0;border-top:1px solid var(--line);border-radius:0;box-shadow:none}
+.cons .pyimg{gap:0}
 .tuf.run,.pyw{border:1px solid var(--line2);border-radius:12px;overflow:hidden;background:var(--card);box-shadow:0 6px 18px -14px rgba(20,25,40,.45)}
 .pyimg{display:flex;flex-direction:column;gap:12px}
 .pyw{margin:0;padding:0}

@@ -1,7 +1,7 @@
 /* v5.1.1: длинные программы не вешают страницу, есть кнопка «Остановить» */
 liveRun=function(code){
   var o=$('o'),ir=$('ir'),ii=$('ii'),rs=$('rst'),rb=$('run');o.style.display='block';o.textContent='';ir.classList.remove('on');
-  function st(t,c){if(rs){rs.hidden=!t;rs.textContent=t||'';rs.className='mu rst'+(c?' '+c:'')}}
+  function st(t,c){if(rs){t=String(t||'').replace(/^[✓✗⏹⏳]️?\s*/,'');rs.hidden=!t;rs.textContent=t;rs.className='mu rst'+(c?' '+c:'')}}/* значки ✓ ✗ ⏹ ⏳ в начале убираются: состояние показывает цветная точка (.rst::before) */
   var le=lint(code);if(le){o.textContent='SyntaxError: '+le;st('✗ Программа не запущена: исправь ошибку в коде','bad');snd('err');return}
   st('⏳ Программа выполняется…');
   var pend=null,oc=rb?rb.onclick:null,lab=rb?rb.innerHTML:'',myT=TK+1,done=false;
