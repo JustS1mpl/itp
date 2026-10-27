@@ -1,6 +1,6 @@
 import re, sys, json, os
 sys.path.insert(0, '.')
-VER = '6.8.2'
+VER = '6.8.6'
 s = open('base43.html', encoding='utf-8').read()
 
 def rep(a, b, n=1):
@@ -22,7 +22,7 @@ rep("(cut?'\\n…вывод обрезан':'')","(cut?'\\n…вывод обр�
 
 rep("function fixErr(e,code){if(!e)return e;","function fixErr(e,code){if(!e)return e;try{e=itpTrFull(e)}catch(_x){}")
 rep("function fin2(err){","function fin2(err){if(err&&/^SystemExit\\b/.test(err))err=null;")
-rep("function isOpen(i,j){var k=i+'-'+j;", "function isOpen(i,j){if(typeof DEV==='function'&&DEV())return 1;var k=i+'-'+j;if(j===0&&IT(i,0).t==='theory')return 1;")
+rep("function isOpen(i,j){var k=i+'-'+j;", "function isOpen(i,j){if(typeof DEV==='function'&&DEV())return 1;var k=i+'-'+j;if(TOPICS[i].opt)return S.d[k]||ocur(i)===k?1:0;if(j===0&&IT(i,0).t==='theory')return 1;")
 rep("function nxI(i,j){if(!(i<S.start)||TOPICS[i].intro)return false;", "function nxI(i,j){if(!(i<S.start||i<FRN()[0])||TOPICS[i].intro)return false;")
 rep("if(i<S.start){if(IT(i,j).t==='theory')return 1;", "if(i<S.start||bfr(i,j)){if(IT(i,j).t==='theory')return 1;")
 rep("(S.d[i+'-'+j]||(i<S.start&&!t.intro))", "(S.d[i+'-'+j]||(i<S.start&&!t.intro&&!t.opt))")

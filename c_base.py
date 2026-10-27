@@ -342,4 +342,4 @@ print(n)''') + '''
               bonus=40)
 
     items = [th1, fl1, th2, fl2, tasks1, th3, fl3, th4, fl4, tasks2, proj]
-    return topic('Системы счисления: любое основание', 'Перевод в 4-ричную, 42-ричную, 1900-ричную и обратно', items, opt=True)
+    return topic('Системы счисления: любое основание', 'Перевод в 4-ричную, 42-ричную, 1900-ричную и обратно', items, opt=True, after=26)  # после «split, join, print со звёздочкой»: нужны списки, срезы, index и join

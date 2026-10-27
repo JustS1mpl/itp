@@ -3,7 +3,7 @@
    перенесена без изменений, поменялась только раскладка. Ничего о конкретных темах здесь не записано. */
 
 /* --- переходы между экранами: направление объясняет, куда ты попал --- */
-var SDEP={home:0,practice:0,editor:0,profile:0,greet:0,nick:0,place:0,settings:1,dict:1,codes:1,theory:1,quiz:1,task:1,project:1,askq:1,rcode:1,done:2},PSKEY='';
+var SDEP={home:0,practice:0,editor:0,profile:0,greet:0,nick:0,place:0,settings:1,dict:1,codes:1,hole:1,theory:1,quiz:1,task:1,project:1,askq:1,rcode:1,done:2},PSKEY='';
 function show(h,tab){
   cancelAnimationFrame(TYR);HRE=null;tocKill();CERR=0;
   document.removeEventListener('click',popOut,true);if(JIO){JIO.disconnect();JIO=null}
@@ -23,6 +23,8 @@ function show(h,tab){
 function setNav(t){CURTAB=t||null;NAV.classList.toggle('on',!!t);NAV.inert=!t;NAV.querySelectorAll('button').forEach(function(b){var on=b.dataset.t===t;b.classList.toggle('act',on);if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')})}
 /* нижняя панель: те же четыре раздела, значки нарисованы кодом */
 NAV.innerHTML=[['home','🗺️','Путь'],['pr','🎯','Практика'],['ed','💻','Код'],['prof','🐰','Профиль']].map(function(t){return'<button data-t="'+t[0]+'"><span class="ni" aria-hidden="true">'+t[1]+'</span>'+t[2]+'</button>'}).join('');
+/* нажатие на вкладку уводит из кроличьей норы: «Путь» открывает сам Путь */
+NAV.addEventListener('click',function(e){if(e.target.closest('button'))HOLE=-1},true);
 
 /* --- окна: лист снизу на телефоне, карточка по центру на компьютере --- */
 var MSIL=0;

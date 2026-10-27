@@ -251,12 +251,15 @@ def pj(name, q_, h, sol, inputs, strict=False, exp=None, bonus=None, ex_=None, f
     return d
 
 
-def topic(n, s, items, intro=False, opt=False):
+# opt — доп. глава (кроличья нора); after — номер островка темы перед ней (с 0), после которого глава открывается и рядом с которым стоит нора
+def topic(n, s, items, intro=False, opt=False, after=None):
     d = {'n': n, 's': s}
     if intro:
         d['intro'] = 1
     if opt:
         d['opt'] = 1
+    if after is not None:
+        d['after'] = after
     d['items'] = items
     return d
 
