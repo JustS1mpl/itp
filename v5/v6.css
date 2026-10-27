@@ -38,7 +38,7 @@
  /* радиусы */
  --r-xs:8px;--r-sm:12px;--r:16px;--r-lg:20px;--r-xl:28px;--pill:999px;
  /* каркас */
- --gut:16px;--tbh:56px;--navh:64px;--rail:0px;
+ --gut:16px;--tbh:56px;--navh:64px;--nvb:10px;--rail:0px;
  --safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px);
  /* движение */
  --e-out:cubic-bezier(.2,.8,.2,1);--e-in:cubic-bezier(.4,0,1,1);--e-spring:cubic-bezier(.3,1.35,.5,1);
@@ -107,17 +107,17 @@ b,strong{font-weight:800}
 .num,.chip,.tile b,#tm{font-variant-numeric:tabular-nums}
 
 /* ---------- 4. Каркас ---------- */
-#app{max-width:640px;margin:0 auto;padding:0 var(--gut) calc(var(--navh) + var(--safe-b) + 40px);min-height:100vh;min-height:100dvh}
+#app{max-width:640px;margin:0 auto;padding:0 var(--gut) calc(var(--navh) + var(--nvb) + var(--safe-b) + 40px);min-height:100vh;min-height:100dvh}
 #app.dk{padding-bottom:calc(112px + var(--safe-b))}
 /* у последнего островка карточке нужно место снизу, иначе её не прокрутить над панелью */
-#app.pk{padding-bottom:calc(var(--navh) + var(--safe-b) + 280px)}
+#app.pk{padding-bottom:calc(var(--navh) + var(--nvb) + var(--safe-b) + 280px)}
 #vg{position:fixed;inset:0;pointer-events:none;opacity:0;z-index:9}
 #vg.ok{box-shadow:inset 0 0 80px 18px color-mix(in srgb,var(--ok) 70%,transparent)}
 #vg.no{box-shadow:inset 0 0 80px 18px color-mix(in srgb,var(--bad) 70%,transparent)}
 
 /* шапка */
 /* шапка — парящая скруглённая плашка со стенками, а не полоса, обрезанная по краям колонки */
-.top{position:sticky;top:calc(var(--safe-t) + 8px);z-index:8;display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:var(--tbh);margin:calc(var(--safe-t) + 8px) calc(-.5*var(--gut)) 10px;padding:0 calc(var(--gut) - 2px);border-radius:var(--r-lg,20px);background:color-mix(in srgb,var(--bg) 84%,transparent);-webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5);transition:box-shadow var(--d2)}
+.top{position:sticky;top:calc(var(--safe-t) + 8px);z-index:8;display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:var(--tbh);margin:calc(var(--safe-t) + 8px) 0 12px;padding:0 calc(var(--gut) - 2px);border-radius:var(--r-lg,20px);background:color-mix(in srgb,var(--bg) 84%,transparent);-webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5);transition:box-shadow var(--d2)}
 @supports not (background:color-mix(in srgb,red,blue)){.top{background:var(--bg)}}
 html.scr .top{box-shadow:0 0 0 1px var(--line)}
 .top h1{flex:1 1 auto;min-width:0;font-size:1.1875rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -162,7 +162,7 @@ button.chip:active{transform:scale(.94)}
 html.kbo .dock,html.kbo .nav,html.kbo .jump{transform:translateY(120%);visibility:hidden;transition:transform var(--d2) var(--e-out),visibility 0s var(--d2)}
 html.kbo #app.dk{padding-bottom:24px}
 /* нижняя навигация */
-.nav{position:fixed;left:0;right:0;bottom:0;z-index:7;display:flex;justify-content:center;gap:4px;height:calc(var(--navh) + var(--safe-b));padding:6px 8px var(--safe-b);background:color-mix(in srgb,var(--card) 90%,transparent);-webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5);border-top:1px solid var(--line);transform:translateY(110%);visibility:hidden;transition:transform var(--d3) var(--e-out),visibility 0s var(--d3)}
+.nav{position:fixed;left:max(12px,calc(50% - 260px));right:max(12px,calc(50% - 260px));bottom:calc(var(--nvb) + var(--safe-b));z-index:7;display:flex;justify-content:center;gap:4px;height:var(--navh);padding:6px 8px;border-radius:var(--r-xl);background:color-mix(in srgb,var(--card) 90%,transparent);-webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5);border-top:1px solid var(--line);transform:translateY(calc(100% + var(--nvb) + var(--safe-b) + 8px));visibility:hidden;transition:transform var(--d3) var(--e-out),visibility 0s var(--d3)}
 @supports not (background:color-mix(in srgb,red,blue)){.nav{background:var(--card)}}
 .nav.on{transform:none;visibility:visible;transition-delay:0s}
 .nav button{position:relative;flex:1;max-width:112px;min-height:52px;border:0;background:none;border-radius:var(--r);padding:4px 2px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:.71875rem;font-weight:800;color:var(--muted);transition:color var(--d2)}
@@ -244,8 +244,11 @@ button.li:active{background:var(--card3)}
 .segc.nt .segp{transition:none}
 .swa{display:flex;gap:10px;flex:none}
 .swa button::after{content:'';position:absolute;inset:-5px}
-.swa button{position:relative;width:34px;height:34px;border-radius:50%;border:0;padding:0;box-shadow:inset 0 0 0 3px var(--card),0 0 0 2px transparent;transition:transform var(--d2) var(--e-spring),box-shadow var(--d2)}
-.swa button.on{box-shadow:inset 0 0 0 3px var(--card),0 0 0 2px var(--ink);transform:scale(1.08)}
+/* цвет акцента: чистый круг без обводок; выбранный — галочка внутри и мягкое кольцо его же цвета (цвет кнопки — в color) */
+.swa button{position:relative;width:34px;height:34px;border-radius:50%;border:0;padding:0;box-shadow:0 0 0 0 transparent;transition:transform var(--d2) var(--e-spring),box-shadow var(--d2)}
+.swa button::before{content:'';position:absolute;left:50%;top:50%;width:6px;height:11px;margin:-7px 0 0 -3px;border:solid #fff;border-width:0 2.5px 2.5px 0;border-radius:1px;transform:rotate(45deg) scale(.4);opacity:0;transition:opacity var(--d2),transform var(--d2) var(--e-spring)}
+.swa button.on::before{opacity:1;transform:rotate(45deg)}
+.swa button.on{box-shadow:0 0 0 3px var(--card),0 0 0 5px color-mix(in srgb,currentColor 40%,transparent);transform:scale(1.06)}
 input[type=range]{accent-color:var(--accent);width:140px;height:44px}
 .seg2{display:flex;gap:8px;margin:0 0 14px}
 .seg2 button{flex:1 1 0;min-width:0;display:flex;align-items:center;justify-content:center;line-height:1.2;min-height:44px;padding:8px 10px;border-radius:var(--r-sm);border:0;background:var(--card);box-shadow:inset 0 0 0 1.5px var(--line2);font-weight:800;transition:background var(--d2),box-shadow var(--d2),color var(--d2)}
@@ -581,7 +584,7 @@ html.noln .gt{display:none}
 .hpr .ring{width:36px;height:36px}
 
 /* карточка островка */
-.ipop{position:absolute;left:0;right:0;z-index:5;max-width:420px;margin:0 auto;scroll-margin:calc(var(--tbh) + var(--safe-t) + 70px) 0 calc(var(--navh) + var(--safe-b) + 16px);padding:16px 16px 14px;border-radius:var(--r-lg);background:var(--card);border:1px solid var(--line);box-shadow:var(--sh3);text-align:left;transform-origin:var(--ax,50%) -10px;animation:ipop var(--d3) var(--e-spring)}
+.ipop{position:absolute;left:0;right:0;z-index:5;max-width:420px;margin:0 auto;scroll-margin:calc(var(--tbh) + var(--safe-t) + 70px) 0 calc(var(--navh) + var(--nvb) + var(--safe-b) + 16px);padding:16px 16px 14px;border-radius:var(--r-lg);background:var(--card);border:1px solid var(--line);box-shadow:var(--sh3);text-align:left;transform-origin:var(--ax,50%) -10px;animation:ipop var(--d3) var(--e-spring)}
 .ipop::before{content:'';position:absolute;top:-8px;left:calc(var(--ax,50%) - 8px);width:16px;height:16px;background:var(--card);border:solid var(--line);border-width:1px 0 0 1px;border-top-left-radius:4px;transform:rotate(45deg)}
 .ipop.out{animation:ipopout var(--d2) var(--e-in) forwards}
 .ipk{display:flex;align-items:center;gap:8px;margin-bottom:6px}
@@ -594,7 +597,7 @@ html.noln .gt{display:none}
 .ipop .btn{margin:0}
 .ipop .ipx{position:absolute;right:6px;top:6px}
 /* кнопка «к текущему островку» */
-.jump{position:fixed;right:max(var(--gut),calc((100vw - var(--rail) - 640px)/2 + var(--gut)));bottom:calc(var(--navh) + var(--safe-b) + 14px);z-index:6;pointer-events:none}
+.jump{position:fixed;right:max(var(--gut),calc((100vw - var(--rail) - 640px)/2 + var(--gut)));bottom:calc(var(--navh) + var(--nvb) + var(--safe-b) + 14px);z-index:6;pointer-events:none}
 .jump button{width:52px;height:52px;border-radius:50%;border:0;display:grid;place-items:center;background:var(--card);color:var(--accent-ink);box-shadow:inset 0 0 0 1.5px var(--line2),var(--sh2);opacity:0;transform:translateY(12px) scale(.8);pointer-events:none;transition:opacity var(--d2),transform var(--d3) var(--e-spring)}
 .jump button.on{opacity:1;transform:none;pointer-events:auto}
 .jump svg{width:24px;height:24px;transition:transform var(--d3) var(--e-out)}
@@ -987,8 +990,8 @@ button.li:hover{background:var(--card2)}
 @media (max-width:340px){.logo{gap:5px}.chip{font-size:.8125rem;padding:0 8px 0 6px}.chip .fzm{padding-left:5px;margin-left:1px}}
 @media (min-width:900px){
  /* колонку сдвигаем влево на половину боковой панели, чтобы её центр совпал с центром окна, но не ближе 16 px к панели */
- :root{--rail:96px;--cx:min(calc(var(--rail)/2),max(0px,calc((100vw - var(--rail) - 720px)/2 - 16px)))}
- .nav{left:0;right:auto;top:0;bottom:0;width:var(--rail);height:auto;flex-direction:column;justify-content:flex-start;gap:6px;padding:calc(20px + var(--safe-t)) 8px 20px;border-top:0;border-right:1px solid var(--line);transform:translateX(-110%)}
+ :root{--rail:104px;--cx:min(calc(var(--rail)/2),max(0px,calc((100vw - var(--rail) - 720px)/2 - 16px)))}
+ .nav{left:12px;right:auto;top:calc(12px + var(--safe-t));bottom:12px;width:calc(var(--rail) - 24px);height:auto;flex-direction:column;justify-content:flex-start;gap:6px;padding:14px 6px;border-top:0;transform:translateX(calc(-100% - 16px))}
  .nav.on{transform:none}
  .nav button{flex:none;max-width:none;min-height:64px}
  #app{max-width:720px;padding-bottom:64px;position:relative;left:calc(-1*var(--cx))}
@@ -1007,27 +1010,31 @@ button.li:hover{background:var(--card2)}
 }
 @media print{.nav,.top,.dock,.jump,#vg{display:none!important}body{background:#fff}}
 
-/* ---------- 15. Жидкое стекло: верхняя и нижняя панели ----------
-   Полупрозрачная панель с размытием и насыщением того, что под ней, плюс «кромка света» по краю и мягкий блик.
-   Размытых слоёв на экране не больше двух (верх и низ). Запасные варианты: без backdrop-filter, без color-mix
-   и при prefers-reduced-transparency панели становятся сплошными, текст остаётся читаемым. */
-:root{--gl-a:70%;--gl-rim:rgba(255,255,255,.78);--gl-sheen:rgba(255,255,255,.42);--gl-drop:rgba(60,40,20,.16)}
-:root[data-theme=dark]{--gl-a:68%;--gl-rim:rgba(255,255,255,.2);--gl-sheen:rgba(255,255,255,.07);--gl-drop:rgba(0,0,0,.5)}
-body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(60% 32% at 6% 0,color-mix(in srgb,var(--accent) 12%,transparent),transparent 70%),radial-gradient(50% 30% at 100% 22%,color-mix(in srgb,var(--carrot) 10%,transparent),transparent 70%),radial-gradient(70% 38% at 30% 100%,color-mix(in srgb,var(--blue) 10%,transparent),transparent 72%)}
-.top,.nav,.dock{background:linear-gradient(180deg,var(--gl-sheen),transparent 75%),color-mix(in srgb,var(--bg) var(--gl-a),transparent);-webkit-backdrop-filter:blur(20px) saturate(1.8);backdrop-filter:blur(20px) saturate(1.8)}
-.top{box-shadow:inset 0 0 0 1px var(--gl-rim),0 6px 18px -14px var(--gl-drop)}
-html.scr .top{box-shadow:inset 0 0 0 1px var(--gl-rim),0 12px 28px -14px var(--gl-drop)}
-.nav{border-top:0;box-shadow:inset 0 1px 0 var(--gl-rim),0 -10px 24px -14px var(--gl-drop)}
-.dock{border-top:0;box-shadow:inset 0 1px 0 var(--gl-rim);background:linear-gradient(180deg,var(--gl-sheen),transparent 75%),color-mix(in srgb,var(--bg) 86%,transparent)}
+/* ---------- 15. Панели и фон (6.9.0) ----------
+   Шапка и нижняя панель — одна порода: парящие плашки цвета карточки, слегка прозрачные, с мягким размытием,
+   тонкой рамкой и тенью. Шапка ровно по ширине колонки; нижняя панель — плашка с отступом от краёв (на широком
+   экране — такая же вертикальная плашка слева). Блика и усиленной насыщенности нет: под ними просвечивали цветные
+   островки и получались пятна. Без backdrop-filter, без color-mix и при prefers-reduced-transparency — сплошной цвет карточки. */
+:root{--gl-a:80%;--gl-rim:var(--line);--gl-drop:rgba(60,40,20,.28)}
+:root[data-theme=dark]{--gl-a:82%;--gl-rim:var(--line2);--gl-drop:rgba(0,0,0,.7)}
+/* фон — «море» вокруг островков: редкая точечная сетка (как пунктир тропинки между островками) и мягкий свет
+   цвета акцента сверху. Сетка гаснет к низу, чтобы не рябить под текстом. Настройка «Узор на фоне» выключает и то и другое */
+:root{--dot:color-mix(in srgb,var(--ink) 7%,transparent);--glow:color-mix(in srgb,var(--accent) 13%,transparent)}
+:root[data-theme=dark]{--dot:color-mix(in srgb,var(--ink) 6%,transparent);--glow:color-mix(in srgb,var(--accent) 11%,transparent)}
+body::before,body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none}
+body::before{background:radial-gradient(circle,var(--dot) 1.1px,transparent 1.6px) 0 0/24px 24px;-webkit-mask-image:linear-gradient(180deg,#000,rgba(0,0,0,.3) 60%,transparent);mask-image:linear-gradient(180deg,#000,rgba(0,0,0,.3) 60%,transparent)}
+body::after{background:radial-gradient(90% 46% at 50% -8%,var(--glow),transparent 72%)}
+.top,.nav{background:color-mix(in srgb,var(--card) var(--gl-a),transparent);-webkit-backdrop-filter:blur(16px) saturate(1.15);backdrop-filter:blur(16px) saturate(1.15)}
+.top,html.scr .top,.nav{box-shadow:inset 0 0 0 1px var(--gl-rim),0 10px 28px -18px var(--gl-drop)}
+.nav{border-top:0}
+.dock{border-top:0;box-shadow:inset 0 1px 0 var(--line);background:color-mix(in srgb,var(--card) 88%,transparent);-webkit-backdrop-filter:blur(16px) saturate(1.15);backdrop-filter:blur(16px) saturate(1.15)}
 .nav button:not(.act){color:color-mix(in srgb,var(--ink) 80%,var(--muted))}
-.nav button.act .ni{background:color-mix(in srgb,var(--soft) 80%,transparent);box-shadow:inset 0 1px 0 var(--gl-rim),0 4px 12px -5px var(--gl-drop)}
-@media (min-width:900px){.nav{box-shadow:inset -1px 0 0 var(--gl-rim)}}
-@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.top,.dock{background:var(--bg)}.nav{background:var(--card)}}
-@supports not (background:color-mix(in srgb,red,blue)){.top,.dock{background:var(--bg)}.nav{background:var(--card)}body::before{display:none}.nav button.act .ni{background:var(--soft)}}
-@media (prefers-reduced-transparency:reduce){.top,.dock{background:var(--bg);-webkit-backdrop-filter:none;backdrop-filter:none}.nav{background:var(--card);-webkit-backdrop-filter:none;backdrop-filter:none}body::before{display:none}}
-/* настройки: логотип в шапке и цветные пятна на фоне */
-html.nolg .logo>svg{display:none}
-html.nobg body::before{display:none}
+.nav button.act .ni{background:color-mix(in srgb,var(--soft) 80%,transparent)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.top,.dock,.nav{background:var(--card)}}
+@supports not (background:color-mix(in srgb,red,blue)){.top,.dock,.nav{background:var(--card)}body::before,body::after{display:none}.nav button.act .ni{background:var(--soft)}}
+@media (prefers-reduced-transparency:reduce){.top,.dock{background:var(--card);-webkit-backdrop-filter:none;backdrop-filter:none}.nav{background:var(--card);-webkit-backdrop-filter:none;backdrop-filter:none}body::before,body::after{display:none}}
+/* настройка «Узор на фоне» */
+html.nobg body::before,html.nobg body::after{display:none}
 
 /* v6.4.1: виртуальный вывод программы (v5/a_out.js) */
 pre.vo,.cons pre.out.vo{max-height:min(60vh,520px);overflow:auto;position:relative;padding:0;font-size:14px;line-height:21px;white-space:pre;overscroll-behavior:contain}
@@ -1051,11 +1058,13 @@ html[data-ph=pop] .pav .rw{position:absolute;left:50%;bottom:5px;width:116px;mar
 .thead.now .tn{color:var(--ink)}
 .thead .ring::before,.thead.now .ring::before{background:var(--card)}
 /* ---------- Минимализм (настройка «Минимализм»): плоский вид, близкий к прошлой версии. Ничего не удаляет, только перекрывает оформление ---------- */
+html.min{--nvb:0px}
 html.min .top,html.min .nav,html.min .dock{background:var(--bg);-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none}
 html.min .dock{border-bottom:1px solid var(--line)}
 html.min .top{box-shadow:inset 0 0 0 1px var(--line)}
 html.min .dock{border-bottom:0;border-top:1px solid var(--line)}
-html.min .nav{background:var(--card);border-top:1px solid var(--line)}
+html.min .nav{left:0;right:0;height:calc(var(--navh) + var(--safe-b));padding:6px 8px var(--safe-b);border-radius:0;background:var(--card);border-top:1px solid var(--line)}
+@media (min-width:900px){html.min .nav{top:0;bottom:0;left:0;right:auto;width:var(--rail);height:auto;padding:calc(20px + var(--safe-t)) 8px 20px;border-top:0;border-right:1px solid var(--line)}}
 html.min .nav button.act .ni{background:none;box-shadow:none}
 html.min .nav button.act::after{content:'';position:absolute;left:50%;bottom:0;width:30px;height:3px;margin-left:-15px;border-radius:2px;background:var(--accent)}
 html.min .isl .bd.ok{background:var(--gold);color:#3A2A00;box-shadow:0 0 0 2.5px var(--bg)}
@@ -1075,7 +1084,7 @@ html:not(.min) .nav button.act .ni svg,html:not(.min) .nav button.act .ni .pi{fi
 html:not(.min) .nav button::after{content:'';position:absolute;left:50%;bottom:0;width:30px;height:3px;border-radius:3px;background:var(--accent);box-shadow:0 0 8px 1px color-mix(in srgb,var(--accent) 80%,transparent),0 0 2px var(--accent);transform:translateX(-50%) scaleX(0);opacity:0;transition:transform var(--d3) var(--e-spring),opacity var(--d2)}
 html:not(.min) .nav button.act::after{transform:translateX(-50%) scaleX(1);opacity:1}
 @media (min-width:900px){
- html:not(.min) .nav button::after{left:-8px;bottom:auto;top:50%;width:3px;height:30px;transform:translateY(-50%) scaleY(0)}
+ html:not(.min) .nav button::after{left:-6px;bottom:auto;top:50%;width:3px;height:30px;transform:translateY(-50%) scaleY(0)}
  html:not(.min) .nav button.act::after{transform:translateY(-50%) scaleY(1)}
 }
 @media (prefers-reduced-motion:reduce){html:not(.min) .nav button::after{transition:none}}
@@ -1290,7 +1299,7 @@ html.crt-on{scrollbar-gutter:auto}
 
 /* режим разработчика (6.8.3): лист снизу на телефоне, окно по центру на компьютере. Подложка — фон, группы — карточки,
    кнопки — слой card2 без рамок; рамки появляются только в «Минимализме». Значки — контурные Lucide (ISC) */
-.dvb{position:fixed;left:12px;bottom:calc(var(--navh) + var(--safe-b) + 14px);z-index:60;width:48px;height:48px;display:grid;place-items:center;padding:0;border-radius:var(--r);border:0;background:var(--card);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line),var(--sh2);transition:transform var(--d1) var(--e-out),background var(--d2)}
+.dvb{position:fixed;left:12px;bottom:calc(var(--navh) + var(--nvb) + var(--safe-b) + 14px);z-index:60;width:48px;height:48px;display:grid;place-items:center;padding:0;border-radius:var(--r);border:0;background:var(--card);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line),var(--sh2);transition:transform var(--d1) var(--e-out),background var(--d2)}
 .dvb svg{width:22px;height:22px;display:block}
 .dvb:active{transform:scale(.92)}
 .dvp{position:fixed;inset:0;z-index:90;display:flex;align-items:flex-end;justify-content:center;background:var(--scrim);animation:mbg var(--d2) var(--e-out)}
@@ -1342,7 +1351,7 @@ html.crt-on{scrollbar-gutter:auto}
  .dvbd{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:0 16px 20px}
  .dvg.w{grid-column:1/-1}
 }
-@media (min-width:900px){.dvb{bottom:24px}}
+@media (min-width:900px){.dvb{bottom:24px;left:calc(var(--rail)/2 - 24px)}}
 html.min .dvc{box-shadow:inset 0 0 0 1px var(--line)}
 html.min .dvb,html.min .dvg{box-shadow:inset 0 0 0 1px var(--line)}
 html.min .dvg.cur{box-shadow:inset 0 0 0 1.5px var(--accent)}
