@@ -81,7 +81,7 @@
 *,*::before,*::after{box-sizing:border-box}
 *{-webkit-tap-highlight-color:transparent}
 html,body{margin:0;min-height:100%}
-html{font-size:calc(16px*var(--tz));color-scheme:light;-webkit-text-size-adjust:100%;text-size-adjust:100%;scroll-padding-top:calc(var(--tbh) + var(--safe-t) + 88px);scrollbar-gutter:stable}
+html{font-size:calc(16px*var(--tz));color-scheme:light;-webkit-text-size-adjust:100%;text-size-adjust:100%;scroll-padding-top:calc(var(--tbh) + var(--safe-t) + 88px);scroll-padding-bottom:calc(var(--dkh,var(--spn)) + 16px);scrollbar-gutter:stable}
 html[data-theme=dark]{color-scheme:dark}
 body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-weight:600;font-size:1rem;line-height:1.5;overflow-x:hidden;padding-left:var(--rail);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
 button,input,textarea,select{font:inherit;color:inherit;letter-spacing:inherit}
@@ -140,6 +140,9 @@ button.chip:active{transform:scale(.94)}
 /* верхняя панель урока */
 .top.ls{justify-content:flex-start;gap:12px}
 .top.ls .grow{flex:1;min-width:0}
+/* кнопка в шапке урока («Пропустить» у проекта) по размеру текста, а не во всю ширину — иначе она ложилась поверх «Мини-проект · по желанию» */
+.top.ls>.btn{width:auto;flex:none;min-height:44px;padding:8px 14px}
+.top.ls .grow .lstep{display:block;overflow:hidden;text-overflow:ellipsis}
 .lstep{font-size:.875rem;font-weight:800;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
 
 /* док: главная кнопка урока внизу */
@@ -161,6 +164,9 @@ button.chip:active{transform:scale(.94)}
 
 html.kbo .dock,html.kbo .nav,html.kbo .jump{transform:translateY(120%);visibility:hidden;transition:transform var(--d2) var(--e-out),visibility 0s var(--d2)}
 html.kbo #app.dk{padding-bottom:24px}
+/* прокрутка к выводу, итогу проверки, карточке островка останавливается над нижней панелью (--dkh — высота панели урока, ставит a_screens.js) */
+:root{--spn:calc(var(--navh) + var(--nvb) + var(--safe-b))}
+html.kbo{scroll-padding-bottom:16px}
 /* нижняя навигация */
 .nav{position:fixed;left:max(12px,calc(50% - 260px));right:max(12px,calc(50% - 260px));bottom:calc(var(--nvb) + var(--safe-b));z-index:7;display:flex;justify-content:center;gap:4px;height:var(--navh);padding:6px 8px;border-radius:var(--r-xl);background:color-mix(in srgb,var(--card) 90%,transparent);-webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5);border-top:1px solid var(--line);transform:translateY(calc(100% + var(--nvb) + var(--safe-b) + 8px));visibility:hidden;transition:transform var(--d3) var(--e-out),visibility 0s var(--d3)}
 @supports not (background:color-mix(in srgb,red,blue)){.nav{background:var(--card)}}
@@ -402,9 +408,10 @@ html.noln .gt{display:none}
 /* обратная связь (результат проверки) */
 .fb{margin:0 0 12px;border-radius:var(--r-lg);padding:14px 16px;background:var(--soft);border:1.5px solid color-mix(in srgb,var(--accent) 30%,transparent);animation:fbin var(--d3) var(--e-out)}
 .fb.bad{background:var(--bad-soft);border-color:color-mix(in srgb,var(--bad) 40%,transparent)}
-.fb>b:first-child{display:block;font-size:1.0625rem;margin-bottom:4px}
-.fb.bad>b:first-child{color:var(--bad)}.fb:not(.bad)>b:first-child{color:var(--accent-ink)}
+.fb>b:first-child,.fb>.mood+b{display:block;font-size:1.0625rem;margin-bottom:4px}
+.fb.bad>b:first-child{color:var(--bad)}.fb:not(.bad)>b:first-child,.fb:not(.bad)>.mood+b{color:var(--accent-ink)}
 .fb pre.cmp{background:var(--card);margin:4px 0 8px}
+.fb code.hcl{display:inline-block;margin:2px 0;background:var(--card);font-weight:600;white-space:pre-wrap;word-break:break-word}
 .fb .xw{margin-top:10px}
 .xl{font:800 .6875rem/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
 .xw pre{margin:0 0 6px;font-size:.84375rem;white-space:pre-wrap;background:var(--card)}
@@ -435,7 +442,13 @@ html.noln .gt{display:none}
 .mood{--s:52px;position:relative;display:inline-block;flex:none;width:var(--s);height:var(--s);vertical-align:middle;animation:moodin .18s ease-out both}
 .mood img{display:block;width:100%;height:auto}
 .mood.sm{--s:44px}
-.mood.fl{float:right;margin:0 0 6px 10px}
+.mood.fl{float:right;margin:-4px -4px 0 10px}
+/* плашка обнимает кролика справа: при тексте в одну строку он торчал за нижний край */
+.fb{display:flow-root}
+/* кролик в плашке ответа — справа, по центру по высоте стоит его голова (в картинке она на 59 % высоты: сверху уши),
+   текст его не обтекает (без :has остаётся float) */
+.fb:has(>.mood.fl){position:relative;padding-right:80px}
+.fb:has(>.mood.fl)>.mood.fl{position:absolute;right:16px;top:calc(50% - var(--s)*.59);margin:0;float:none}
 
 @keyframes moodin{from{opacity:0}to{opacity:1}}
 .mq{margin:6px 0 0;font-size:.875rem;font-weight:700;color:var(--muted);font-style:italic}
@@ -997,7 +1010,7 @@ button.li:hover{background:var(--card2)}
 @media (max-width:340px){.logo{gap:5px}.chip{font-size:.8125rem;padding:0 8px 0 6px}.chip .fzm{padding-left:5px;margin-left:1px}}
 @media (min-width:900px){
  /* колонку сдвигаем влево на половину боковой панели, чтобы её центр совпал с центром окна, но не ближе 16 px к панели */
- :root{--rail:104px;--cx:min(calc(var(--rail)/2),max(0px,calc((100vw - var(--rail) - 720px)/2 - 16px)))}
+ :root{--spn:0px;--rail:104px;--cx:min(calc(var(--rail)/2),max(0px,calc((100vw - var(--rail) - 720px)/2 - 16px)))}
  .nav{left:12px;right:auto;top:calc(12px + var(--safe-t));bottom:12px;width:calc(var(--rail) - 24px);height:auto;flex-direction:column;justify-content:flex-start;gap:6px;padding:14px 6px;border-top:0;transform:translateX(calc(-100% - 16px))}
  .nav.on{transform:none}
  .nav button{flex:none;max-width:none;min-height:64px}
@@ -1020,10 +1033,11 @@ button.li:hover{background:var(--card2)}
 /* ---------- 15. Панели и фон (6.9.0) ----------
    Шапка и нижняя панель — одна порода: парящие плашки цвета карточки, слегка прозрачные, с мягким размытием,
    тонкой рамкой и тенью. Шапка ровно по ширине колонки; нижняя панель — плашка с отступом от краёв (на широком
-   экране — такая же вертикальная плашка слева). Блика и усиленной насыщенности нет: под ними просвечивали цветные
-   островки и получались пятна. Без backdrop-filter, без color-mix и при prefers-reduced-transparency — сплошной цвет карточки. */
-:root{--gl-a:80%;--gl-rim:var(--line);--gl-drop:rgba(60,40,20,.28)}
-:root[data-theme=dark]{--gl-a:82%;--gl-rim:var(--line2);--gl-drop:rgba(0,0,0,.7)}
+   экране — такая же вертикальная плашка слева). Материал — «жидкое стекло» из 6.8.8 (вернули по просьбе владельца,
+   сплошные плашки 6.9.0 ему понравились меньше): цвет фона на 70 %, размытие 20 px с насыщенностью 1,8, мягкий блик
+   сверху и светлая кромка по краю. Без backdrop-filter, без color-mix и при prefers-reduced-transparency — сплошной цвет. */
+:root{--gl-a:70%;--gl-rim:rgba(255,255,255,.78);--gl-sheen:rgba(255,255,255,.42);--gl-drop:rgba(60,40,20,.16)}
+:root[data-theme=dark]{--gl-a:68%;--gl-rim:rgba(255,255,255,.2);--gl-sheen:rgba(255,255,255,.07);--gl-drop:rgba(0,0,0,.5)}
 /* фон — «море» вокруг островков: редкая точечная сетка (как пунктир тропинки между островками) и мягкий свет
    цвета акцента сверху. Сетка гаснет к низу, чтобы не рябить под текстом. Настройка «Узор на фоне» выключает и то и другое */
 :root{--dot:color-mix(in srgb,var(--ink) 7%,transparent);--glow:color-mix(in srgb,var(--accent) 13%,transparent)}
@@ -1031,12 +1045,13 @@ button.li:hover{background:var(--card2)}
 body::before,body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none}
 body::before{background:radial-gradient(circle,var(--dot) 1.1px,transparent 1.6px) 0 0/24px 24px;-webkit-mask-image:linear-gradient(180deg,#000,rgba(0,0,0,.3) 60%,transparent);mask-image:linear-gradient(180deg,#000,rgba(0,0,0,.3) 60%,transparent)}
 body::after{background:radial-gradient(90% 46% at 50% -8%,var(--glow),transparent 72%)}
-.top,.nav{background:color-mix(in srgb,var(--card) var(--gl-a),transparent);-webkit-backdrop-filter:blur(16px) saturate(1.15);backdrop-filter:blur(16px) saturate(1.15)}
-.top,html.scr .top,.nav{box-shadow:inset 0 0 0 1px var(--gl-rim),0 10px 28px -18px var(--gl-drop)}
-.nav{border-top:0}
-.dock{border-top:0;box-shadow:inset 0 1px 0 var(--line);background:color-mix(in srgb,var(--card) 88%,transparent);-webkit-backdrop-filter:blur(16px) saturate(1.15);backdrop-filter:blur(16px) saturate(1.15)}
+.top,.nav,.dock{background:linear-gradient(180deg,var(--gl-sheen),transparent 75%),color-mix(in srgb,var(--bg) var(--gl-a),transparent);-webkit-backdrop-filter:blur(20px) saturate(1.8);backdrop-filter:blur(20px) saturate(1.8)}
+.top,.nav{box-shadow:inset 0 0 0 1px var(--gl-rim),0 6px 18px -14px var(--gl-drop)}
+html.scr .top{box-shadow:inset 0 0 0 1px var(--gl-rim),0 12px 28px -14px var(--gl-drop)}
+.nav{border-top:0;box-shadow:inset 0 0 0 1px var(--gl-rim),0 10px 24px -14px var(--gl-drop)}
+.dock{border-top:0;box-shadow:inset 0 1px 0 var(--gl-rim);background:linear-gradient(180deg,var(--gl-sheen),transparent 75%),color-mix(in srgb,var(--bg) 86%,transparent)}
 .nav button:not(.act){color:color-mix(in srgb,var(--ink) 80%,var(--muted))}
-.nav button.act .ni{background:color-mix(in srgb,var(--soft) 80%,transparent)}
+.nav button.act .ni{background:color-mix(in srgb,var(--soft) 80%,transparent);box-shadow:inset 0 1px 0 var(--gl-rim),0 4px 12px -5px var(--gl-drop)}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.top,.dock,.nav{background:var(--card)}}
 @supports not (background:color-mix(in srgb,red,blue)){.top,.dock,.nav{background:var(--card)}body::before,body::after{display:none}.nav button.act .ni{background:var(--soft)}}
 @media (prefers-reduced-transparency:reduce){.top,.dock{background:var(--card);-webkit-backdrop-filter:none;backdrop-filter:none}.nav{background:var(--card);-webkit-backdrop-filter:none;backdrop-filter:none}body::before,body::after{display:none}}
