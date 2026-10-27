@@ -230,6 +230,14 @@ def th(name, terms, body):
         assert not re.search(r'\[\[[^\]|]+\]\]', pm.group(1)), ('вывод [[...]] принят за термин', pm.group(1)[:60])
     for m in re.finditer(r'\[\[([^\]|]+)', scan):
         assert m.group(1) in names, ('нет термина', m.group(1), name)
+    # примеры в описаниях терминов: «Пример:\nкод\nВывод:\nтекст» — запускаем код и сверяем, что текст начинается с настоящего вывода
+    for tn, td in terms:
+        m = re.search(r'Пример:\n([\s\S]*?)\nВывод:\n([\s\S]*)$', td)
+        if m and 'input(' not in m.group(1):
+            plain, _ = run(m.group(1))
+            out = _norm_out(plain, False)
+            shown = _norm_out(m.group(2), False)
+            assert shown.startswith(out), ('вывод в примере термина не совпадает', tn, out, m.group(2)[:120])
     d = {'t': 'theory', 'n': name}
     if terms:
         d['terms'] = [{'n': a, 'd': b} for a, b in terms]

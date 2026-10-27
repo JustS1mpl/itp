@@ -106,6 +106,8 @@ def th_elif():
         'хотя бы одно; [[not]] — переворачивает значение.</p>'
         + ex('age = 15\nticket = False\nprint(age >= 14 and age < 18)\nprint(age < 14 or ticket)\nprint(not ticket)') +
         '<p>Сначала выполняется <code>not</code>, потом <code>and</code>, потом <code>or</code>; при сомнениях ставь скобки. '
+        'Python ленив: если ответ ясен по первой части, вторую он не вычисляет. В <code>x != 0 and 10 / x &gt; 2</code> '
+        'при <code>x = 0</code> деления не будет — и ZeroDivisionError тоже. '
         'Проверка «число в промежутке» короче цепочкой: <code>14 &lt;= age &lt;= 17</code>.</p>'
         + ex('year = int(input("Год: "))\nif (year % 4 == 0 and year % 100 != 0) or year % 400 == 0:\n    print("Високосный")\nelse:\n    print("Обычный")', ['2024']) +
         '<p>Блоки можно вкладывать друг в друга: внутри блока <code>if</code> может стоять ещё один <code>if</code> '
