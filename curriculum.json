@@ -2,131 +2,1045 @@
  "version": "7.0.0",
  "note": "Реестр «что где вводится». Порядок тем = порядок прохождения. introduces: f — встроенные функции и функции модулей, m — методы, k — конструкции и ключевые слова (имена как в tests/coverage_check.py), mod — модули, err — типы ошибок, которые тема показывает. Всё, что встречается в коде темы или позже, должно быть введено в этой теме выше по порядку или в предыдущих темах. Норы (holes) опираются на всё до своей точки привязки плюс на себя.",
  "topics": [
-  {"id": "intro", "n": "Знакомство", "min": 10, "intro": true, "pre": [],
+  {
+   "id": "intro",
+   "n": "Знакомство",
+   "min": 10,
+   "intro": true,
+   "pre": [],
    "about": "что такое программа и Python, как устроено приложение, как запускать код, что такое ошибка и почему её не нужно бояться",
-   "introduces": {"f": [], "m": [], "k": [], "mod": [], "err": []}},
-  {"id": "print", "n": "Первая программа", "min": 35, "pre": [],
+   "introduces": {
+    "f": [],
+    "m": [],
+    "k": [],
+    "mod": [],
+    "err": []
+   },
+   "s": "как устроено приложение и как запускать код"
+  },
+  {
+   "id": "print",
+   "n": "Первая программа",
+   "min": 35,
+   "pre": [],
    "about": "команда, вызов функции, строка в кавычках, несколько значений, sep и end, перевод строки, комментарии, первые ошибки",
-   "introduces": {"f": ["print"], "m": [], "k": ["call", "str-literal", "kwarg", "comment", "escape-\\n"], "mod": [], "err": ["SyntaxError", "NameError"]}},
-  {"id": "vars", "n": "Переменные и ввод", "min": 45, "pre": ["print"],
+   "introduces": {
+    "f": [
+     "print"
+    ],
+    "m": [],
+    "k": [
+     "call",
+     "str-literal",
+     "kwarg",
+     "comment",
+     "escape-\\n"
+    ],
+    "mod": [],
+    "err": [
+     "SyntaxError",
+     "NameError"
+    ]
+   },
+   "s": "print, кавычки, sep, end, комментарии"
+  },
+  {
+   "id": "vars",
+   "n": "Переменные и ввод",
+   "min": 45,
+   "pre": [
+    "print"
+   ],
    "about": "переменная как имя для значения, присваивание и перезапись, ввод с клавиатуры, типы str/int/float, преобразование, склейка и повтор строк, простая f-строка",
-   "introduces": {"f": ["input", "int", "float", "str", "type"], "m": [], "k": ["assign", "concat", "str-repeat", "f-string"], "mod": [], "err": ["ValueError", "TypeError"]}},
-  {"id": "numbers", "n": "Числа и арифметика", "min": 45, "pre": ["vars"],
+   "introduces": {
+    "f": [
+     "input",
+     "int",
+     "float",
+     "str",
+     "type"
+    ],
+    "m": [],
+    "k": [
+     "assign",
+     "concat",
+     "str-repeat",
+     "f-string"
+    ],
+    "mod": [],
+    "err": [
+     "ValueError",
+     "TypeError"
+    ]
+   },
+   "s": "=, input, int, float, str, f-строки"
+  },
+  {
+   "id": "numbers",
+   "n": "Числа и вычисления",
+   "min": 45,
+   "pre": [
+    "vars"
+   ],
    "about": "арифметика, приоритет, целое деление и остаток, степень, округление, модуль числа, составное присваивание, первый модуль math",
-   "introduces": {"f": ["round", "abs", "min", "max", "math.sqrt", "math.ceil", "math.floor"], "m": [], "k": ["arith", "//", "%", "**", "+=", "import", "attr-access"], "mod": ["math"], "err": ["ZeroDivisionError"]}},
-  {"id": "format", "n": "Красивый вывод", "min": 30, "pre": ["numbers"],
+   "introduces": {
+    "f": [
+     "round",
+     "abs",
+     "min",
+     "max",
+     "math.sqrt",
+     "math.ceil",
+     "math.floor"
+    ],
+    "m": [],
+    "k": [
+     "arith",
+     "//",
+     "%",
+     "**",
+     "+=",
+     "import",
+     "attr-access"
+    ],
+    "mod": [
+     "math"
+    ],
+    "err": [
+     "ZeroDivisionError"
+    ]
+   },
+   "s": "+ - * /, //, %, **, round, math"
+  },
+  {
+   "id": "format",
+   "n": "Оформление вывода",
+   "min": 30,
+   "pre": [
+    "numbers"
+   ],
    "about": "знаки после запятой, ширина поля, выравнивание, заполнитель, разделитель разрядов, таблички из нескольких строк",
-   "introduces": {"f": [], "m": [], "k": ["format-spec"], "mod": [], "err": []},
-   "project": "мини-проект: квитанция за покупки"},
-  {"id": "if", "n": "Условия", "min": 50, "pre": ["numbers"],
+   "introduces": {
+    "f": [],
+    "m": [],
+    "k": [
+     "format-spec"
+    ],
+    "mod": [],
+    "err": []
+   },
+   "project": "Квитанция за покупки",
+   "s": "знаки после запятой, ширина, выравнивание"
+  },
+  {
+   "id": "if",
+   "n": "Условия",
+   "min": 50,
+   "pre": [
+    "numbers"
+   ],
    "about": "логический тип, сравнения, if/elif/else, отступы, and/or/not, вложенные условия, условное выражение, match/case для выбора из вариантов",
-   "introduces": {"f": ["bool"], "m": [], "k": ["compare", "if", "elif", "else", "and/or", "not", "bool-literal", "ternary", "match"], "mod": [], "err": ["IndentationError"]}},
-  {"id": "strings", "n": "Строки: символы и проверки", "min": 45, "pre": ["if"],
+   "introduces": {
+    "f": [
+     "bool"
+    ],
+    "m": [],
+    "k": [
+     "compare",
+     "if",
+     "elif",
+     "else",
+     "and/or",
+     "not",
+     "bool-literal",
+     "ternary",
+     "match"
+    ],
+    "mod": [],
+    "err": [
+     "IndentationError"
+    ]
+   },
+   "s": "if, elif, else, and, or, not, match"
+  },
+  {
+   "id": "strings",
+   "n": "Символы и строки",
+   "min": 45,
+   "pre": [
+    "if"
+   ],
    "about": "длина, номер символа и отрицательные номера, проверка вхождения, сравнение строк, коды символов, методы-проверки и смена регистра, неизменяемость",
-   "introduces": {"f": ["len", "ord", "chr"], "m": ["upper", "lower", "isdigit", "isalpha", "isupper", "islower", "isspace", "startswith", "endswith"], "k": ["index", "in", "method-call"], "mod": [], "err": ["IndexError"]}},
-  {"id": "while", "n": "Цикл while", "min": 45, "pre": ["strings"],
+   "introduces": {
+    "f": [
+     "len",
+     "ord",
+     "chr"
+    ],
+    "m": [
+     "upper",
+     "lower",
+     "isdigit",
+     "isalpha",
+     "isupper",
+     "islower",
+     "isspace",
+     "startswith",
+     "endswith"
+    ],
+    "k": [
+     "index",
+     "in",
+     "method-call"
+    ],
+    "mod": [],
+    "err": [
+     "IndexError"
+    ]
+   },
+   "s": "len, номера символов, in, ord, chr"
+  },
+  {
+   "id": "while",
+   "n": "Повторение по условию",
+   "min": 45,
+   "pre": [
+    "strings"
+   ],
    "about": "повторение по условию, счётчик и накопитель, цифры числа, бесконечный цикл и кнопка остановки, break, ввод до стоп-слова",
-   "introduces": {"f": [], "m": [], "k": ["while", "break"], "mod": [], "err": []}},
-  {"id": "for", "n": "Цикл for и range", "min": 50, "pre": ["while"],
+   "introduces": {
+    "f": [],
+    "m": [],
+    "k": [
+     "while",
+     "break"
+    ],
+    "mod": [],
+    "err": []
+   },
+   "s": "while, break, счётчик, накопитель"
+  },
+  {
+   "id": "for",
+   "n": "Перебор и диапазоны",
+   "min": 50,
+   "pre": [
+    "while"
+   ],
    "about": "перебор чисел range с одним, двумя и тремя аргументами, перебор строки, суммы, счётчики, поиск максимума, continue, флаг для проверки (простые числа)",
-   "introduces": {"f": ["range"], "m": [], "k": ["for", "continue"], "mod": [], "err": []}},
-  {"id": "nested", "n": "Вложенные циклы", "min": 40, "pre": ["for"],
+   "introduces": {
+    "f": [
+     "range"
+    ],
+    "m": [],
+    "k": [
+     "for",
+     "continue"
+    ],
+    "mod": [],
+    "err": []
+   },
+   "s": "for, range, continue, флаг"
+  },
+  {
+   "id": "nested",
+   "n": "Циклы в циклах",
+   "min": 40,
+   "pre": [
+    "for"
+   ],
    "about": "цикл в цикле, таблицы и узоры, выход из вложенного цикла через флаг, else у цикла",
-   "introduces": {"f": [], "m": [], "k": ["for-else"], "mod": [], "err": []},
-   "project": "мини-проект: игра «угадай число» с заданной последовательностью попыток"},
-  {"id": "lists", "n": "Списки", "min": 55, "pre": ["nested"],
+   "introduces": {
+    "f": [],
+    "m": [],
+    "k": [
+     "for-else"
+    ],
+    "mod": [],
+    "err": []
+   },
+   "project": "Игра «угадай число»",
+   "s": "вложенные циклы, узоры, else у цикла"
+  },
+  {
+   "id": "debug",
+   "n": "Поиск ошибок",
+   "s": "Traceback, трассировка, отладочный print",
+   "min": 35,
+   "pre": [
+    "nested"
+   ],
+   "about": "как читать сообщение об ошибке снизу вверх, ошибки синтаксиса и ошибки во время работы, логические ошибки, таблица трассировки, отладочный print, проверка на маленьких входах и граничных значениях",
+   "introduces": {
+    "f": [],
+    "m": [],
+    "k": [],
+    "mod": [],
+    "err": [
+     "Traceback"
+    ]
+   }
+  },
+  {
+   "id": "lists",
+   "n": "Списки",
+   "min": 55,
+   "pre": [
+    "debug"
+   ],
    "about": "список как ряд значений, номера, изменение элементов, добавление и удаление, длина, перебор, сумма/минимум/максимум, сортировка, строка в список и обратно, map(int, ...) как готовый приём",
-   "introduces": {"f": ["list", "sum", "sorted", "map"], "m": ["append", "insert", "pop", "remove", "index", "count", "sort", "reverse", "extend", "clear", "split", "join"], "k": ["list-literal", "del"], "mod": [], "err": []}},
-  {"id": "slices", "n": "Срезы, строки и кортежи", "min": 50, "pre": ["lists"],
+   "introduces": {
+    "f": [
+     "list",
+     "sum",
+     "sorted",
+     "map"
+    ],
+    "m": [
+     "append",
+     "insert",
+     "pop",
+     "remove",
+     "index",
+     "count",
+     "sort",
+     "reverse",
+     "extend",
+     "clear",
+     "split",
+     "join"
+    ],
+    "k": [
+     "list-literal",
+     "del"
+    ],
+    "mod": [],
+    "err": []
+   },
+   "s": "list, append, pop, sort, split, join"
+  },
+  {
+   "id": "slices",
+   "n": "Срезы и кортежи",
+   "min": 50,
+   "pre": [
+    "lists"
+   ],
    "about": "срезы списков и строк с шагом, разворот, методы строк для обработки текста, кортежи, распаковка и обмен значений, enumerate и zip",
-   "introduces": {"f": ["tuple", "enumerate", "zip", "reversed"], "m": ["strip", "lstrip", "rstrip", "replace", "find", "title", "zfill"], "k": ["slice", "tuple-literal", "unpack"], "mod": [], "err": []}},
-  {"id": "dicts", "n": "Словари и множества", "min": 55, "pre": ["slices"],
+   "introduces": {
+    "f": [
+     "tuple",
+     "enumerate",
+     "zip",
+     "reversed"
+    ],
+    "m": [
+     "strip",
+     "lstrip",
+     "rstrip",
+     "replace",
+     "find",
+     "title",
+     "zfill"
+    ],
+    "k": [
+     "slice",
+     "tuple-literal",
+     "unpack"
+    ],
+    "mod": [],
+    "err": []
+   },
+   "s": "срезы, методы строк, tuple, enumerate, zip"
+  },
+  {
+   "id": "dicts",
+   "n": "Словари и множества",
+   "min": 55,
+   "pre": [
+    "slices"
+   ],
    "about": "словарь «ключ → значение», чтение и запись, get, перебор ключей и пар, подсчёт частот, множества и операции над ними",
-   "introduces": {"f": ["dict", "set"], "m": ["get", "keys", "values", "items", "update", "add", "discard", "setdefault"], "k": ["dict-literal", "set-literal", "set-ops"], "mod": [], "err": ["KeyError"]},
-   "project": "мини-проект: частотный словарь текста песни собственного сочинения"},
-  {"id": "functions", "n": "Функции", "min": 50, "pre": ["dicts"],
-   "about": "зачем свои функции, def, параметры, return и None, функция вызывает функцию, локальные и глобальные имена, global",
-   "introduces": {"f": [], "m": [], "k": ["def", "return", "None", "global"], "mod": [], "err": ["UnboundLocalError"]}},
-  {"id": "args", "n": "Аргументы и функции как значения", "min": 50, "pre": ["functions"],
+   "introduces": {
+    "f": [
+     "dict",
+     "set"
+    ],
+    "m": [
+     "get",
+     "keys",
+     "values",
+     "items",
+     "update",
+     "add",
+     "discard",
+     "setdefault"
+    ],
+    "k": [
+     "dict-literal",
+     "set-literal",
+     "set-ops"
+    ],
+    "mod": [],
+    "err": [
+     "KeyError"
+    ]
+   },
+   "project": "Частотный словарь текста",
+   "s": "dict, get, items, set, объединение и пересечение"
+  },
+  {
+   "id": "functions",
+   "n": "Свои функции",
+   "min": 50,
+   "pre": [
+    "dicts"
+   ],
+   "about": "зачем свои функции, def, параметры, return и None, функция вызывает функцию, локальные и глобальные имена, global, подсказки типов (x: int, -> str) — нужны позже для dataclass",
+   "introduces": {
+    "f": [],
+    "m": [],
+    "k": [
+     "def",
+     "return",
+     "None",
+     "global",
+     "annotation"
+    ],
+    "mod": [],
+    "err": [
+     "UnboundLocalError"
+    ]
+   },
+   "s": "def, return, None, области видимости"
+  },
+  {
+   "id": "args",
+   "n": "Гибкие функции",
+   "min": 50,
+   "pre": [
+    "functions"
+   ],
    "about": "значения по умолчанию, именованные аргументы, *args и **kwargs, звёздочка при вызове, функция как значение, lambda, key у sorted/min/max, map и filter, reduce",
-   "introduces": {"f": ["filter", "functools.reduce"], "m": [], "k": ["default-arg", "*args", "**kwargs", "*unpack", "lambda", "from-import"], "mod": ["functools"], "err": []}},
-  {"id": "comprehensions", "n": "Генераторы списков и память", "min": 45, "pre": ["args"],
+   "introduces": {
+    "f": [
+     "filter",
+     "functools.reduce"
+    ],
+    "m": [],
+    "k": [
+     "default-arg",
+     "*args",
+     "**kwargs",
+     "*unpack",
+     "lambda",
+     "from-import"
+    ],
+    "mod": [
+     "functools"
+    ],
+    "err": []
+   },
+   "s": "*args, **kwargs, lambda, map, filter, key",
+   "project": "Шифр Цезаря"
+  },
+  {
+   "id": "comprehensions",
+   "n": "Выражения-генераторы и память",
+   "min": 45,
+   "pre": [
+    "args"
+   ],
    "about": "списочные, словарные и множественные выражения, условие и выбор внутри, выражение-генератор с sum/any/all, имена как ярлыки на объекты, изменяемость, is, копии",
-   "introduces": {"f": ["any", "all", "id", "copy.copy", "copy.deepcopy"], "m": ["copy"], "k": ["listcomp", "dictcomp", "setcomp", "genexp", "is"], "mod": ["copy"], "err": []}},
-  {"id": "itertools", "n": "Инструменты для коллекций", "min": 40, "pre": ["comprehensions"],
+   "introduces": {
+    "f": [
+     "any",
+     "all",
+     "id",
+     "copy.copy",
+     "copy.deepcopy"
+    ],
+    "m": [
+     "copy"
+    ],
+    "k": [
+     "listcomp",
+     "dictcomp",
+     "setcomp",
+     "genexp",
+     "is"
+    ],
+    "mod": [
+     "copy"
+    ],
+    "err": []
+   },
+   "s": "[x for x in …], ссылки, is, копии"
+  },
+  {
+   "id": "itertools",
+   "n": "Инструменты для коллекций",
+   "min": 40,
+   "pre": [
+    "comprehensions"
+   ],
    "about": "итератор и next, ключ-кортеж для сортировки, itertools (count, cycle, chain, product, permutations, combinations, accumulate, islice), collections (Counter, defaultdict, deque)",
-   "introduces": {"f": ["iter", "next", "itertools.count", "itertools.cycle", "itertools.chain", "itertools.product", "itertools.permutations", "itertools.combinations", "itertools.accumulate", "itertools.islice", "collections.Counter", "collections.defaultdict", "collections.deque"], "m": ["most_common", "appendleft", "popleft"], "k": [], "mod": ["itertools", "collections"], "err": ["StopIteration"]}},
-  {"id": "exceptions", "n": "Исключения", "min": 40, "pre": ["itertools"],
-   "about": "как Python сообщает об ошибке, try/except, несколько except, as, else и finally, raise, иерархия ошибок",
-   "introduces": {"f": ["isinstance"], "m": [], "k": ["try", "except", "finally", "raise"], "mod": [], "err": ["Exception", "ArithmeticError", "LookupError"]}},
-  {"id": "modules", "n": "Модули", "min": 35, "pre": ["exceptions"],
+   "introduces": {
+    "f": [
+     "iter",
+     "next",
+     "itertools.count",
+     "itertools.cycle",
+     "itertools.chain",
+     "itertools.product",
+     "itertools.permutations",
+     "itertools.combinations",
+     "itertools.accumulate",
+     "itertools.islice",
+     "collections.Counter",
+     "collections.defaultdict",
+     "collections.deque"
+    ],
+    "m": [
+     "most_common",
+     "appendleft",
+     "popleft"
+    ],
+    "k": [],
+    "mod": [
+     "itertools",
+     "collections"
+    ],
+    "err": [
+     "StopIteration"
+    ]
+   },
+   "s": "iter, next, itertools, Counter, deque"
+  },
+  {
+   "id": "exceptions",
+   "n": "Исключения",
+   "min": 40,
+   "pre": [
+    "itertools"
+   ],
+   "about": "как Python сообщает об ошибке, try/except, несколько except, as, else и finally, raise, иерархия ошибок, assert для проверки своих предположений",
+   "introduces": {
+    "f": [
+     "isinstance"
+    ],
+    "m": [],
+    "k": [
+     "try",
+     "except",
+     "finally",
+     "raise",
+     "assert"
+    ],
+    "mod": [],
+    "err": [
+     "Exception",
+     "ArithmeticError",
+     "LookupError",
+     "AssertionError"
+    ]
+   },
+   "s": "try, except, else, finally, raise, assert"
+  },
+  {
+   "id": "modules",
+   "n": "Модули",
+   "min": 35,
+   "pre": [
+    "exceptions"
+   ],
    "about": "import, from, as, модули random, datetime, string, свой модуль из файла, __name__ == \"__main__\"",
-   "introduces": {"f": ["random.randint", "random.choice", "random.seed", "random.shuffle", "datetime.date", "datetime.datetime", "datetime.timedelta"], "m": ["strftime", "strptime", "today"], "k": ["import-as", "__name__"], "mod": ["random", "datetime", "string"], "err": ["ModuleNotFoundError", "ImportError"]}},
-  {"id": "files", "n": "Файлы, CSV и JSON", "min": 60, "pre": ["modules"],
+   "introduces": {
+    "f": [
+     "random.randint",
+     "random.choice",
+     "random.seed",
+     "random.shuffle",
+     "datetime.date",
+     "datetime.datetime",
+     "datetime.timedelta"
+    ],
+    "m": [
+     "strftime",
+     "strptime",
+     "today"
+    ],
+    "k": [
+     "import-as",
+     "__name__"
+    ],
+    "mod": [
+     "random",
+     "datetime",
+     "string"
+    ],
+    "err": [
+     "ModuleNotFoundError",
+     "ImportError"
+    ]
+   },
+   "s": "import, from, random, datetime, свой модуль"
+  },
+  {
+   "id": "files",
+   "n": "Файлы и форматы данных",
+   "min": 60,
+   "pre": [
+    "modules"
+   ],
    "about": "поток ввода sys.stdin, open и with, чтение и запись текста, пути pathlib, таблицы CSV, данные JSON (покрывает нору 0 «Файлы и форматы»)",
-   "introduces": {"f": ["open", "sys.stdin", "pathlib.Path", "csv.reader", "csv.DictReader", "csv.writer", "json.load", "json.loads", "json.dump", "json.dumps"], "m": ["read", "readline", "readlines", "write", "read_text", "write_text", "exists", "writerow"], "k": ["with"], "mod": ["sys", "pathlib", "csv", "json"], "err": ["FileNotFoundError"]},
-   "project": "мини-проект: дневник расходов (CSV → итоги → JSON)"},
-  {"id": "recursion", "n": "Рекурсия", "min": 40, "pre": ["files"],
+   "introduces": {
+    "f": [
+     "open",
+     "sys.stdin",
+     "pathlib.Path",
+     "csv.reader",
+     "csv.DictReader",
+     "csv.writer",
+     "json.load",
+     "json.loads",
+     "json.dump",
+     "json.dumps"
+    ],
+    "m": [
+     "read",
+     "readline",
+     "readlines",
+     "write",
+     "read_text",
+     "write_text",
+     "exists",
+     "writerow"
+    ],
+    "k": [
+     "with"
+    ],
+    "mod": [
+     "sys",
+     "pathlib",
+     "csv",
+     "json"
+    ],
+    "err": [
+     "FileNotFoundError"
+    ]
+   },
+   "project": "Дневник расходов",
+   "s": "open, with, pathlib, CSV, JSON"
+  },
+  {
+   "id": "recursion",
+   "n": "Рекурсия",
+   "min": 40,
+   "pre": [
+    "files"
+   ],
    "about": "функция вызывает саму себя, базовый случай, стек вызовов, RecursionError, рекурсия против цикла, запоминание результатов lru_cache",
-   "introduces": {"f": ["functools.lru_cache", "sys.setrecursionlimit"], "m": [], "k": ["decorator-use"], "mod": [], "err": ["RecursionError"]}},
-  {"id": "decorators", "n": "Замыкания, декораторы и генераторы", "min": 50, "pre": ["recursion"],
+   "introduces": {
+    "f": [
+     "functools.lru_cache",
+     "sys.setrecursionlimit"
+    ],
+    "m": [],
+    "k": [
+     "decorator-use"
+    ],
+    "mod": [],
+    "err": [
+     "RecursionError"
+    ]
+   },
+   "s": "базовый случай, стек вызовов, lru_cache"
+  },
+  {
+   "id": "algorithms",
+   "n": "Поиск и сортировка",
+   "s": "линейный и бинарный поиск, сортировки, стек, очередь",
+   "min": 55,
+   "pre": [
+    "recursion"
+   ],
+   "about": "что такое алгоритм и сколько шагов он делает, линейный и бинарный поиск, сортировка выбором и слиянием, сравнение со встроенным sorted, стек и очередь на списке и deque, модуль bisect",
+   "introduces": {
+    "f": [
+     "bisect.bisect_left",
+     "bisect.insort"
+    ],
+    "m": [],
+    "k": [],
+    "mod": [
+     "bisect"
+    ],
+    "err": []
+   }
+  },
+  {
+   "id": "decorators",
+   "n": "Декораторы и генераторы",
+   "min": 50,
+   "pre": [
+    "algorithms"
+   ],
    "about": "функция внутри функции, замыкание, nonlocal, свой декоратор, functools.wraps, функции-генераторы и yield, бесконечные генераторы",
-   "introduces": {"f": ["functools.wraps"], "m": [], "k": ["nested-def", "nonlocal", "decorator-def", "yield", "yield from"], "mod": [], "err": []}},
-  {"id": "classes", "n": "Классы и объекты", "min": 55, "pre": ["decorators"],
+   "introduces": {
+    "f": [
+     "functools.wraps"
+    ],
+    "m": [],
+    "k": [
+     "nested-def",
+     "nonlocal",
+     "decorator-def",
+     "yield",
+     "yield from"
+    ],
+    "mod": [],
+    "err": []
+   },
+   "s": "замыкания, nonlocal, @, yield"
+  },
+  {
+   "id": "classes",
+   "n": "Классы и объекты",
+   "min": 55,
+   "pre": [
+    "decorators"
+   ],
    "about": "объект = данные + действия, class, __init__, self, атрибуты и методы, атрибуты класса, скрытые атрибуты по договорённости, property",
-   "introduces": {"f": ["hasattr", "getattr", "setattr", "property"], "m": ["__init__"], "k": ["class"], "mod": [], "err": ["AttributeError"]}},
-  {"id": "inheritance", "n": "Наследование и магические методы", "min": 55, "pre": ["classes"],
+   "introduces": {
+    "f": [
+     "hasattr",
+     "getattr",
+     "setattr",
+     "property"
+    ],
+    "m": [
+     "__init__"
+    ],
+    "k": [
+     "class"
+    ],
+    "mod": [],
+    "err": [
+     "AttributeError"
+    ]
+   },
+   "s": "class, __init__, self, методы, property"
+  },
+  {
+   "id": "inheritance",
+   "n": "Наследование",
+   "min": 55,
+   "pre": [
+    "classes"
+   ],
    "about": "наследование, переопределение, super(), issubclass, полиморфизм, __str__/__repr__, сравнение, арифметика объектов, __len__, __call__, свои исключения",
-   "introduces": {"f": ["super", "issubclass", "repr"], "m": ["__str__", "__repr__", "__eq__", "__lt__", "__add__", "__len__", "__call__"], "k": ["inherit", "custom-exception"], "mod": [], "err": []}},
-  {"id": "bigproject", "n": "Большой проект: турнирная таблица", "min": 120, "pre": ["inheritance"],
+   "introduces": {
+    "f": [
+     "super",
+     "issubclass",
+     "repr"
+    ],
+    "m": [
+     "__str__",
+     "__repr__",
+     "__eq__",
+     "__lt__",
+     "__add__",
+     "__len__",
+     "__call__"
+    ],
+    "k": [
+     "inherit",
+     "custom-exception"
+    ],
+    "mod": [],
+    "err": []
+   },
+   "s": "super, магические методы, свои исключения"
+  },
+  {
+   "id": "bigproject",
+   "n": "Итоговый проект",
+   "min": 120,
+   "pre": [
+    "inheritance"
+   ],
    "about": "авторский проект в 5 шагах: игроки и матчи (dataclass, Enum), таблица очков, проверки и свои ошибки, сохранение в JSON, команды из потока ввода",
-   "introduces": {"f": ["dataclasses.dataclass", "dataclasses.field", "enum.Enum"], "m": [], "k": [], "mod": ["dataclasses", "enum"], "err": []}},
-  {"id": "numpy", "n": "math и numpy", "min": 55, "pre": ["bigproject"],
+   "introduces": {
+    "f": [
+     "dataclasses.dataclass",
+     "dataclasses.field",
+     "enum.Enum"
+    ],
+    "m": [],
+    "k": [],
+    "mod": [
+     "dataclasses",
+     "enum"
+    ],
+    "err": []
+   },
+   "s": "турнирная таблица в 5 шагов",
+   "project": "Турнирная таблица, 5 шагов"
+  },
+  {
+   "id": "numpy",
+   "n": "Массивы и математика",
+   "min": 55,
+   "pre": [
+    "bigproject"
+   ],
    "about": "ещё math (comb, perm, gcd, lcm, prod, dist, тригонометрия), массив numpy, форма и оси, действия над целым массивом, срезы и маски, агрегаты",
-   "introduces": {"f": ["math.comb", "math.perm", "math.gcd", "math.lcm", "math.prod", "math.dist", "math.sin", "math.cos", "math.radians", "math.pi", "np.array", "np.zeros", "np.ones", "np.arange", "np.linspace", "np.eye"], "m": ["reshape", "sum", "mean", "max", "min", "transpose"], "k": ["np-mask"], "mod": ["numpy"], "err": []}},
-  {"id": "pandas", "n": "pandas: таблицы данных", "min": 55, "pre": ["numpy"],
+   "introduces": {
+    "f": [
+     "math.comb",
+     "math.perm",
+     "math.gcd",
+     "math.lcm",
+     "math.prod",
+     "math.dist",
+     "math.sin",
+     "math.cos",
+     "math.radians",
+     "math.pi",
+     "np.array",
+     "np.zeros",
+     "np.ones",
+     "np.arange",
+     "np.linspace",
+     "np.eye"
+    ],
+    "m": [
+     "reshape",
+     "sum",
+     "mean",
+     "max",
+     "min",
+     "transpose"
+    ],
+    "k": [
+     "np-mask"
+    ],
+    "mod": [
+     "numpy"
+    ],
+    "err": []
+   },
+   "s": "math, numpy, оси, срезы, маски"
+  },
+  {
+   "id": "pandas",
+   "n": "Таблицы данных",
+   "min": 55,
+   "pre": [
+    "numpy"
+   ],
    "about": "Series и DataFrame, чтение CSV, head/tail, выбор столбцов и фильтры, сортировка, новые столбцы, группировка и агрегаты, подсчёт значений",
-   "introduces": {"f": ["pd.Series", "pd.DataFrame", "pd.read_csv"], "m": ["head", "tail", "sort_values", "groupby", "agg", "value_counts", "describe", "assign", "loc", "isna", "idxmax", "idxmin"], "k": [], "mod": ["pandas"], "err": []}},
-  {"id": "requests", "n": "Сеть и requests", "min": 55, "pre": ["pandas"],
+   "introduces": {
+    "f": [
+     "pd.Series",
+     "pd.DataFrame",
+     "pd.read_csv"
+    ],
+    "m": [
+     "head",
+     "tail",
+     "sort_values",
+     "groupby",
+     "agg",
+     "value_counts",
+     "describe",
+     "assign",
+     "loc",
+     "isna",
+     "idxmax",
+     "idxmin"
+    ],
+    "k": [],
+    "mod": [
+     "pandas"
+    ],
+    "err": []
+   },
+   "s": "pandas: Series, DataFrame, группировка"
+  },
+  {
+   "id": "requests",
+   "n": "Запросы к серверам",
+   "min": 55,
+   "pre": [
+    "pandas"
+   ],
    "about": "клиент и сервер, адрес URL, уровни сети (своя схема), HTTP-методы и коды ответа, JSON в ответе, параметры и заголовки, requests с учебными серверами, обработка сетевых ошибок",
-   "introduces": {"f": ["requests.get", "requests.post", "requests.put", "requests.delete"], "m": ["json", "raise_for_status"], "k": [], "mod": ["requests"], "err": ["ConnectionError", "HTTPError"]},
-   "project": "мини-проект: клиент учебного сервера заметок"}
+   "introduces": {
+    "f": [
+     "requests.get",
+     "requests.post",
+     "requests.put",
+     "requests.delete"
+    ],
+    "m": [
+     "json",
+     "raise_for_status"
+    ],
+    "k": [],
+    "mod": [
+     "requests"
+    ],
+    "err": [
+     "ConnectionError",
+     "HTTPError"
+    ]
+   },
+   "project": "Клиент сервера заметок",
+   "s": "HTTP, requests, get, post, JSON"
+  }
  ],
  "holes": [
-  {"id": "turtle", "n": "Черепаха: рисуем кодом", "after": "nested", "run": "shim", "min": 40,
-   "about": "модуль turtle (учебный, рисует на холсте): движение, повороты, перо, цвет, заливка, узоры циклами"},
-  {"id": "bases", "n": "Системы счисления", "after": "slices", "run": "native", "min": 40,
+  {
+   "id": "turtle",
+   "n": "Черепаха: рисуем кодом",
+   "after": "nested",
+   "run": "shim",
+   "min": 40,
+   "about": "модуль turtle (учебный, рисует на холсте): движение, повороты, перо, цвет, заливка, узоры циклами"
+  },
+  {
+   "id": "bases",
+   "n": "Системы счисления: любое основание",
+   "after": "slices",
+   "run": "native",
+   "min": 40,
    "about": "двоичная, восьмеричная, шестнадцатеричная, перевод вручную через // и %, bin/oct/hex, int(строка, основание), любое основание",
-   "introduces": {"f": ["bin", "oct", "hex"], "m": [], "k": [], "mod": [], "err": []}},
-  {"id": "regex", "n": "Регулярные выражения", "after": "files", "run": "native", "min": 50,
-   "about": "модуль re: шаблоны, классы символов, повторы, группы, search/findall/sub/fullmatch, проверка форматов; мини-проект: парсер логов"},
-  {"id": "fsauto", "n": "Автоматизация файлов", "after": "files", "run": "native-vfs", "min": 40,
-   "about": "os, shutil, pathlib на виртуальной файловой системе Pyodide: обход папок, копирование, перемещение; мини-проект: разобрать папку «Загрузки»"},
-  {"id": "cli", "n": "Утилиты командной строки", "after": "files", "run": "native", "min": 35,
-   "about": "sys.argv и argparse (разбор списка аргументов, переданного в parse_args), справка --help; мини-проект: конвертер валют по фиксированным курсам"},
-  {"id": "pillow", "n": "Картинки на Pillow", "after": "files", "run": "pyodide-package", "min": 40,
-   "about": "пиксели и цвета, открыть/создать изображение, размер, обрезка, текст и водяной знак, мини-галерея (пакет докачивается при наличии интернета)"},
-  {"id": "algorithms", "n": "Алгоритмы", "after": "recursion", "run": "native", "min": 60,
-   "about": "сложность на пальцах, сортировка выбором/пузырьком/слиянием, бинарный поиск, стек и очередь, рекурсивный перебор"},
-  {"id": "tkinter", "n": "Окна на tkinter", "after": "inheritance", "run": "read-only", "min": 40,
-   "about": "окно, виджеты, события и обработчики; код для компьютера, в приложении — вопросы «что произойдёт», «найди ошибку», «допиши обработчик»; калькулятор, заметки, трекер привычек"},
-  {"id": "pygame", "n": "Игры на pygame", "after": "inheritance", "run": "read-only", "min": 45,
-   "about": "игровой цикл, кадры, спрайты, столкновения прямоугольников (логика проверяется в приложении без окна), змейка"},
-  {"id": "tools", "n": "Инструменты Python", "after": "bigproject", "run": "read-only+native", "min": 45,
-   "about": "venv, pip, requirements.txt, pyinstaller (объяснение и команды для ПК); logging и assert/pytest-стиль проверок (запускаются в приложении)"},
-  {"id": "matplotlib", "n": "Графики на matplotlib", "after": "pandas", "run": "pyodide-package", "min": 40,
-   "about": "линейный график, столбцы, гистограмма, подписи и легенда, график по CSV"},
-  {"id": "api", "n": "API: погода, курсы, факты", "after": "requests", "run": "shim", "min": 45,
-   "about": "что такое API и ключ, ключи только в переменных окружения, разбор вложенного JSON, ограничения запросов; учебные серверы погоды, курсов и фактов; мини-проект: консольная погода"},
-  {"id": "scraping", "n": "Парсинг сайтов", "after": "requests", "run": "shim+pyodide-package", "min": 50,
-   "about": "этика: robots.txt, условия сайта, нагрузка, личные данные; HTML-дерево, BeautifulSoup на учебном сайте, сбор таблицы"},
-  {"id": "bots", "n": "Чат-боты", "after": "requests", "run": "shim", "min": 50,
-   "about": "учебный мессенджер вместо Telegram: обновления, обработчики команд, эхо-бот, напоминалка, бот погоды; токен из окружения"},
-  {"id": "webserver", "n": "Свой веб-сервер", "after": "requests", "run": "shim+read-only", "min": 55,
-   "about": "сервер изнутри: запрос → функция → ответ, маршруты декораторами, JSON API на учебном мини-фреймворке; как то же выглядит на Flask и FastAPI"},
-  {"id": "async", "n": "Асинхронность и потоки", "after": "requests", "run": "native+read-only", "min": 50,
-   "about": "asyncio.run, async/await, gather, имитация загрузок через asyncio.sleep; threading и сокеты — объяснение и код для ПК"},
-  {"id": "ipaddress", "n": "IP-адреса и подсети", "after": "requests", "run": "native", "min": 40,
-   "about": "модуль ipaddress: IPv4/IPv6, сети и маски, hosts(), проверка вхождения, strict=False, ValueError; мини-проект: калькулятор подсетей"}
+   "introduces": {
+    "f": [
+     "bin",
+     "oct",
+     "hex"
+    ],
+    "m": [],
+    "k": [],
+    "mod": [],
+    "err": []
+   }
+  },
+  {
+   "id": "regex",
+   "n": "Регулярные выражения: поиск по шаблону",
+   "after": "files",
+   "run": "native",
+   "min": 50,
+   "about": "модуль re: шаблоны, классы символов, повторы, группы, search/findall/sub/fullmatch, проверка форматов; мини-проект: парсер логов"
+  },
+  {
+   "id": "fsauto",
+   "n": "Автоматизация: наводим порядок в папках",
+   "after": "files",
+   "run": "native-vfs",
+   "min": 40,
+   "about": "os, shutil, pathlib на виртуальной файловой системе Pyodide: обход папок, копирование, перемещение; мини-проект: разобрать папку «Загрузки»"
+  },
+  {
+   "id": "cli",
+   "n": "Командная строка: свои утилиты",
+   "after": "files",
+   "run": "native",
+   "min": 35,
+   "about": "sys.argv и argparse (разбор списка аргументов, переданного в parse_args), справка --help; мини-проект: конвертер валют по фиксированным курсам"
+  },
+  {
+   "id": "pillow",
+   "n": "Pillow: обработка картинок",
+   "after": "files",
+   "run": "pyodide-package",
+   "min": 40,
+   "about": "пиксели и цвета, открыть/создать изображение, размер, обрезка, текст и водяной знак, мини-галерея (пакет докачивается при наличии интернета)"
+  },
+  {
+   "id": "tkinter",
+   "n": "Tkinter: окна и кнопки",
+   "after": "inheritance",
+   "run": "read-only",
+   "min": 40,
+   "about": "окно, виджеты, события и обработчики; код для компьютера, в приложении — вопросы «что произойдёт», «найди ошибку», «допиши обработчик»; калькулятор, заметки, трекер привычек"
+  },
+  {
+   "id": "pygame",
+   "n": "Pygame: свои игры",
+   "after": "inheritance",
+   "run": "read-only",
+   "min": 45,
+   "about": "игровой цикл, кадры, спрайты, столкновения прямоугольников (логика проверяется в приложении без окна), змейка"
+  },
+  {
+   "id": "tools",
+   "n": "Инструменты: проект как у профи",
+   "after": "bigproject",
+   "run": "read-only+native",
+   "min": 45,
+   "about": "venv, pip, requirements.txt, pyinstaller (объяснение и команды для ПК); logging и assert/pytest-стиль проверок (запускаются в приложении)"
+  },
+  {
+   "id": "matplotlib",
+   "n": "Matplotlib: графики по данным",
+   "after": "pandas",
+   "run": "pyodide-package",
+   "min": 40,
+   "about": "линейный график, столбцы, гистограмма, подписи и легенда, график по CSV"
+  },
+  {
+   "id": "api",
+   "n": "API: погода, курсы, факты",
+   "after": "requests",
+   "run": "shim",
+   "min": 45,
+   "about": "что такое API и ключ, ключи только в переменных окружения, разбор вложенного JSON, ограничения запросов; учебные серверы погоды, курсов и фактов; мини-проект: консольная погода"
+  },
+  {
+   "id": "scraping",
+   "n": "Парсинг: данные со страниц",
+   "after": "requests",
+   "run": "shim+pyodide-package",
+   "min": 50,
+   "about": "этика: robots.txt, условия сайта, нагрузка, личные данные; HTML-дерево, BeautifulSoup на учебном сайте, сбор таблицы"
+  },
+  {
+   "id": "bots",
+   "n": "Чат-боты: учебный мессенджер",
+   "after": "requests",
+   "run": "shim",
+   "min": 50,
+   "about": "учебный мессенджер вместо Telegram: обновления, обработчики команд, эхо-бот, напоминалка, бот погоды; токен из окружения"
+  },
+  {
+   "id": "webserver",
+   "n": "Веб-сервер: свой API",
+   "after": "requests",
+   "run": "shim+read-only",
+   "min": 55,
+   "about": "сервер изнутри: запрос → функция → ответ, маршруты декораторами, JSON API на учебном мини-фреймворке; как то же выглядит на Flask и FastAPI"
+  },
+  {
+   "id": "async",
+   "n": "Асинхронность: много дел сразу",
+   "after": "requests",
+   "run": "native+read-only",
+   "min": 50,
+   "about": "asyncio.run, async/await, gather, имитация загрузок через asyncio.sleep; threading и сокеты — объяснение и код для ПК"
+  },
+  {
+   "id": "ipaddress",
+   "n": "IP-адреса: сети и подсети",
+   "after": "requests",
+   "run": "native",
+   "min": 40,
+   "about": "модуль ipaddress: IPv4/IPv6, сети и маски, hosts(), проверка вхождения, strict=False, ValueError; мини-проект: калькулятор подсетей"
+  }
  ]
 }
