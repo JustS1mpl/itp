@@ -91,7 +91,8 @@
      "max",
      "math.sqrt",
      "math.ceil",
-     "math.floor"
+     "math.floor",
+     "math.pi"
     ],
     "m": [],
     "k": [
@@ -808,7 +809,6 @@
      "math.sin",
      "math.cos",
      "math.radians",
-     "math.pi",
      "np.array",
      "np.zeros",
      "np.ones",
