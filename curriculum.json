@@ -564,12 +564,18 @@
      "random.shuffle",
      "datetime.date",
      "datetime.datetime",
-     "datetime.timedelta"
+     "datetime.timedelta",
+     "math.factorial",
+     "string.ascii_lowercase",
+     "string.ascii_letters",
+     "string.digits",
+     "string.punctuation"
     ],
     "m": [
      "strftime",
      "strptime",
-     "today"
+     "today",
+     "weekday"
     ],
     "k": [
      "import-as",

@@ -178,7 +178,8 @@ core = core.replace('/*ITPY*/{}', _json.dumps(_py, ensure_ascii=False))
 rep(anchor, core + "\nseedLit();window.addEventListener('resize',function(){if(app.querySelector('.path'))links()});\napplyTheme();if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',emoLoad);else emoLoad();")
 # --- достижения за проекты (по названию острова project). Правило действует и в старом projEnd базы,
 #     и в новом projEnd из v5/a_screens.js, поэтому якорь встречается 2 раза.
-rep("bump(key);ach('proj');snd('fanfare');", "bump(key);ach('proj');if(!at||at==='skip'){S.cn.pj=Math.min(99999,S.cn.pj+1);save();if(S.cn.pj>=3)ach('pj3')}if(/Анализ качества/.test(it.n||''))ach('pran');if(/Обработка запроса/.test(it.n||''))ach('papi');if(/WSGI/.test(it.n||''))ach('pwsgi');if(/^Банк, этап/.test(it.n||'')){var bk_=true;TOPICS[i].items.forEach(function(x,k){if(x.t==='project'&&/^Банк, этап/.test(x.n||'')&&!S.d[i+'-'+k])bk_=false});if(bk_)ach('pbank')}snd('fanfare');", 2)
+# достижения за проекты 7.0 (DECISIONES §48): одиночные по началу названия, многоэтапные — когда пройдены все этапы
+rep("bump(key);ach('proj');snd('fanfare');", "bump(key);ach('proj');if(!at||at==='skip'){S.cn.pj=Math.min(99999,S.cn.pj+1);save();if(S.cn.pj>=3)ach('pj3')}var pn_=it.n||'';[['Квитанция','preceipt'],['Угадай число','pguess'],['Частотный словарь','pfreq'],['Шифр Цезаря','pcaesar'],['Дневник расходов','pdiary']].forEach(function(r){if(pn_.indexOf(r[0])===0)ach(r[1])});[['Мессенджер, этап','pmsg'],['RPG, этап','prpg']].forEach(function(r){if(pn_.indexOf(r[0])!==0)return;var ok_=true;TOPICS[i].items.forEach(function(x,k){if(x.t==='project'&&(x.n||'').indexOf(r[0])===0&&!S.d[i+'-'+k])ok_=false});if(ok_)ach(r[1])});snd('fanfare');", 2)
 
 s=s.replace('.slice(0,16).join(','.slice(0,20).join(').replace('maxlength="16"','maxlength="20"')
 assert '4.3.0' not in s

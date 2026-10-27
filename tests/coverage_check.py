@@ -43,7 +43,7 @@ def scan(code):
         tree = ast.parse(code)
     except SyntaxError:
         return None
-    own, mods, calls, ks, errs, imported = set(), set(), set(), set(), set(), set()
+    own, mods, calls, ks, errs, imported, local = set(), set(), set(), set(), set(), set(), set()
     for n in ast.walk(tree):                                  # что код определяет сам
         if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
             own.add(n.name)
@@ -52,6 +52,13 @@ def scan(code):
         elif isinstance(n, ast.arg):
             own.add(n.arg)
         elif isinstance(n, (ast.Import, ast.ImportFrom)):
+            names = [a.name for a in n.names] if isinstance(n, ast.Import) else [n.module or '']
+            if all(is_local(m) for m in names):
+                # учебный модуль из файла рядом с программой: его имена — свои
+                for a in n.names:
+                    own.add(a.asname or a.name.split('.')[0])
+                    local.add(a.asname or a.name.split('.')[0])
+                continue
             for a in n.names:
                 if isinstance(n, ast.Import):
                     mods.add(a.name)
@@ -67,8 +74,12 @@ def scan(code):
         if t is ast.Call:
             f = n.func
             if isinstance(f, ast.Name) and f.id not in own:
-                calls.add(f.id)
-            elif isinstance(f, ast.Attribute) and f.attr not in own:
+                bt = getattr(builtins, f.id, None)
+                if isinstance(bt, type) and issubclass(bt, BaseException):
+                    errs.add(f.id)                             # raise ValueError("...") — использование ошибки, а не функции
+                else:
+                    calls.add(f.id)
+            elif isinstance(f, ast.Attribute) and f.attr not in own and not (isinstance(f.value, ast.Name) and f.value.id in local):
                 calls.add(f.attr)
         elif t is ast.Name and isinstance(n.ctx, ast.Load) and n.id not in own and n.id not in ('True', 'False', 'None'):
             if callable(getattr(builtins, n.id, None)) and not (isinstance(getattr(builtins, n.id), type) and issubclass(getattr(builtins, n.id), BaseException)):
@@ -147,6 +158,18 @@ def scan(code):
     except (tokenize.TokenError, IndentationError):
         pass
     return calls | imported, ks, mods, errs
+
+
+def is_local(mod):
+    """модуль, которого нет ни в Python, ни в пакетах Pyodide, — учебный файл рядом с программой (geo.py, grades.py)"""
+    import importlib.util
+    root = mod.split('.')[0]
+    if not root or root in ('numpy', 'pandas', 'matplotlib', 'requests', 'PIL', 'bs4', 'turtle'):
+        return False
+    try:
+        return importlib.util.find_spec(root) is None
+    except (ImportError, ValueError):
+        return True
 
 
 def pre_codes(h):
