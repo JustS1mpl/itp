@@ -1059,18 +1059,18 @@ html[data-ph=pop] .pav .rw{position:absolute;left:50%;bottom:5px;width:116px;mar
 @media (max-width:360px){html[data-ph=card] .hero{padding-left:122px}html[data-ph=card] .pav{width:110px}html[data-ph=card] .pav .rw{width:106px}html[data-ph=corner] .hero{padding-right:128px}html[data-ph=corner] .pav{width:120px}html[data-ph=corner] .pav .rw{width:114px}}
 /* профиль на широком экране (от 600 px, 6.9.0): шапка — кролик целиком внутри карточки (не торчит над ней), «Уровень» слева
    и «до N: ещё …» справа над полоской, чтобы полоса во всю ширину не висела пустой. Серия по-прежнему крупная и выделенная,
-   а пустой угол её плитки занимает большая морковка (число и подпись — слева внизу). На телефоне всё как было */
+   а морковка стоит сразу справа от числа, на его высоте; подпись — под ними, всё по центру плитки; размер числа и морковки растёт с шириной плитки (cqi), трёхзначная серия помещается. На телефоне всё как было */
 @media (min-width:600px){
  html[data-ph=card] .hero{margin-top:6px;min-height:176px;padding:22px 26px 22px 156px}
  html[data-ph=card] .pav{left:22px;bottom:6px;width:112px}
  html[data-ph=card] .pav .rw{width:110px}
  .hn .nmx{font-size:1.75rem}
  .lvp{justify-content:space-between;margin:8px 0 10px}
- .tile.tbig{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;column-gap:8px;padding:20px 20px 18px}
- .tile.tbig>span:first-child{grid-column:2;grid-row:1;align-self:center;font-size:5.5rem}.tile.tbig>span:first-child .em{width:6.5rem;height:6.5rem}
- .tile.tbig>span:last-child{grid-column:1;grid-row:1}
- .tile.tbig b{font-size:4.25rem}
- .tile.tbig small{font-size:1rem}
+ .tile.tbig{container-type:inline-size;display:grid;grid-template-columns:auto auto;justify-content:center;align-content:center;align-items:center;column-gap:10px;row-gap:0;padding:20px 18px 18px}
+ .tile.tbig>span:last-child{display:contents}
+ .tile.tbig b{grid-column:1;grid-row:1;font-size:4.25rem;font-size:clamp(3rem,32cqi,5.75rem)}
+ .tile.tbig>span:first-child{grid-column:2;grid-row:1;font-size:4rem}.tile.tbig>span:first-child .em{width:4.5rem;height:4.5rem;width:clamp(3.5rem,34cqi,6rem);height:clamp(3.5rem,34cqi,6rem)}
+ .tile.tbig small{grid-column:1/-1;grid-row:2;margin-top:10px;font-size:1.125rem}
 }
 /* заголовок темы: плоская строка с цветной полоской слева */
 .thead,.thead.now{background:var(--card);border:0;border-left:4px solid var(--line2);border-radius:var(--r);box-shadow:none}
