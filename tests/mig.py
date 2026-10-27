@@ -16,7 +16,7 @@ with sync_playwright() as p:
     S = pg.evaluate("JSON.stringify({d:S.d,tk:S.tk,at:S.at,es:S.es,hu:S.hu,start:S.start,mv:S.mv,mode:S.mode})")
     print('topics', n); print(S)
     s = json.loads(S)
-    assert n == 25, n
+    assert n == 27, n
     assert s['d'] == {'0-0': 1, '1-0': 1, '17-0': 1, '17-1': 1, '18-0': 1, '23-2': 1}, s['d']
     assert s['tk'] == {'17-4-0': 1}, s['tk']
     assert s['at'] == {'17-1': 'full'} and s['es'] == {'17-1': 0} and s['hu'] == {'17': 1}, s

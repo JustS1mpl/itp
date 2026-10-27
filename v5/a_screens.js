@@ -139,6 +139,9 @@ function condHtml(text,long){
 function exHtml(ex,strict){
   var m=/^Проверка запустит:\n([\s\S]*?)\nВывод:\n([\s\S]*)$/.exec(String(ex||''));
   if(m)return'<p class="qlab">Проверка запустит такой код</p><pre class="cmp">'+esc(m[1])+'</pre><p class="qlab">и ждёт такой вывод</p><pre class="cmp">'+esc(m[2])+'</pre>';
+  /* вход/вывод в несколько строк (таблицы, матрицы): блоками с равной шириной знаков, иначе пробелы схлопываются */
+  var e2=/^(?:Вход:\n([\s\S]*?)\n)?Вывод:\n([\s\S]*)$/.exec(String(ex||''));
+  if(e2&&!strict)return(e2[1]!=null?'<p class="qlab">Ввод</p><pre class="cmp">'+esc(e2[1])+'</pre>':'')+'<p class="qlab">Вывод</p><pre class="cmp">'+esc(e2[2])+'</pre>';
   return strict?'<pre class="cmp">'+esc(ex)+'</pre>':'<p>'+esc(ex).replace(/\n/g,'<br>')+'</p>'}
 function qSec(title,body,open){return'<details class="qsec"'+(open?' open':'')+'><summary>'+title+'</summary><div class="qsb">'+body+'</div></details>'}
 var QTB='<div class="qtb"><button type="button" data-q="1">Развернуть всё</button><button type="button" data-q="0">Свернуть всё</button></div>';

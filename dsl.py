@@ -41,10 +41,43 @@ exec(compile(%r, '<ex>', 'exec'), {'__name__': '__main__'})
 '''
 
 
+# ---------- код с numpy / pandas / matplotlib: вывод берём у настоящего движка курса ----------
+# Обычный CPython сборки даёт другой вывод (numpy на wasm32 считает целые как int32, версии pandas отличаются),
+# поэтому такие программы запускаются в Pyodide из уже собранного out5.html. Результаты лежат в pyo_cache.json,
+# чтобы пересборка была быстрой и повторяемой. Пакеты Pyodide берутся из PYODIDE_PKGS (tests/h.py).
+PYO_RE = re.compile(r'^\s*(import|from)\s+(numpy|pandas|matplotlib)\b', re.M)
+_PYO = {}
+
+
+def _pyo_run(code, lines, files):
+    cf = 'pyo_cache.json'
+    if 'cache' not in _PYO:
+        _PYO['cache'] = json.load(open(cf, encoding='utf-8')) if os.path.exists(cf) else {}
+    key = hashlib.sha1(json.dumps([code, lines, files or {}], ensure_ascii=False, sort_keys=True).encode()).hexdigest()
+    c = _PYO['cache']
+    if key not in c:
+        if 'pg' not in _PYO:
+            sys.path.insert(0, os.path.abspath('tests'))
+            from h import open_page
+            from playwright.sync_api import sync_playwright
+            pw = sync_playwright().start()
+            b, ctx, pg, logs = open_page(pw, os.path.abspath('out5.html'))
+            pg.evaluate('skReady()')
+            _PYO.update(pw=pw, b=b, pg=pg)
+        r = _PYO['pg'].evaluate('async (a)=>{const r=await exec(a[0],{lines:a[1],files:a[2]});return [r.out,r.err]}', [code, lines, files or {}])
+        assert not r[1], ('ошибка в Pyodide', code, r[1])
+        c[key] = r[0]
+        json.dump(c, open(cf, 'w', encoding='utf-8'), ensure_ascii=False, indent=0, sort_keys=True)
+    return c[key]
+
+
 def run(code, lines=None, files=None):
     """возвращает (plain, transcript_html)"""
     import tempfile
     lines = lines or []
+    if PYO_RE.search(code):
+        plain = _pyo_run(code, lines, files)
+        return plain, esc(plain)
     d = tempfile.mkdtemp()
     for k, v in (files or {}).items():
         open(d + '/' + k, 'w', encoding='utf-8', newline='').write(v)

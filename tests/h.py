@@ -2,11 +2,16 @@ import json, sys, os
 from playwright.sync_api import sync_playwright
 W=os.path.dirname(os.path.abspath(__file__))
 SK=W+'/sk/'
+PK=os.environ.get('PYODIDE_PKGS','/tmp/pyfull/x/pyodide/').rstrip('/')+'/'  # локальная копия пакетов Pyodide (CDN из песочницы недоступен)
 def route(r):
     u=r.request.url
     if 'skulpt@1.2.0/dist/' in u:
         f=u.split('/dist/')[1]
         r.fulfill(path=SK+f, content_type='application/javascript')
+    elif 'cdn.jsdelivr.net/pyodide/' in u and os.path.isdir(PK):
+        f=u.split('/full/')[1].split('?')[0]
+        if os.path.exists(PK+f): r.fulfill(path=PK+f, headers={'access-control-allow-origin':'*'})
+        else: r.abort()
     elif 'fonts.googleapis' in u or 'gstatic' in u:
         r.fulfill(status=200, body='', content_type='text/css')
     else:

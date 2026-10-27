@@ -9,4 +9,6 @@ def build():
     out.insert(9, importlib.import_module('c_tur').build())   # доп. глава «Черепаха»: между темами 8 и 9
     out.insert(11, importlib.import_module('c_base').build())  # доп. глава «Системы счисления»: после темы «Строки, кортежи, списки»
     out.append(importlib.import_module('c_bankpj').build())  # тема «Большой проект: банк»: после «Исключения и модули»
+    out.append(importlib.import_module('c_np').build())  # тема «Модули math и numpy»: последняя тема курса (файл Темы_8)
+    out.append(importlib.import_module('c_pd').build())  # тема «Модуль pandas»: после numpy (файл Темы_8)
     return out
