@@ -44,6 +44,20 @@ with sync_playwright() as p:
         pg.evaluate(f"task({i},{j},{k})"); settle(pg)
         chk(pg.evaluate(WIDE), f'{tag}: задание шире экрана')
         chk(pg.evaluate("!document.getElementById('edk')"), f'{tag}: подсказка про Ctrl + Enter на сенсорном экране')
+        # компактный пример: короткие ввод и вывод стоят рядом
+        r = pg.evaluate("""(()=>{const d=[...document.querySelectorAll('.tcard .exio>div')].map(x=>x.getBoundingClientRect());
+          return d.length===2 && Math.abs(d[0].top-d[1].top)<2})()""")
+        chk(r, f'{tag}: ввод и вывод примера не рядом')
+        if SHOTS:
+            pg.screenshot(path=os.path.join(SHOTS, f'task7_{tag}.png'))
+        # настройка «Крупно» — прежний вид: ввод и вывод друг под другом
+        pg.evaluate("setSet('exl','b')"); pg.wait_for_timeout(200)
+        r = pg.evaluate("""(()=>{const d=[...document.querySelectorAll('.tcard .exio>div')].map(x=>x.getBoundingClientRect());
+          return d.length===2 && d[1].top>d[0].bottom-1})()""")
+        chk(r, f'{tag}: «Крупно» не ставит ввод и вывод друг под другом')
+        if SHOTS and w == 390:
+            pg.screenshot(path=os.path.join(SHOTS, f'taskbig_{tag}.png'))
+        pg.evaluate("setSet('exl','c')")
         tpl = pg.evaluate("document.querySelector('.rsb').dataset.tpl")
         chk(pg.evaluate("document.getElementById('code').value") == tpl, f'{tag}: в редакторе не шаблон')
 
@@ -72,6 +86,16 @@ with sync_playwright() as p:
         chk(pg.evaluate("document.getElementById('code').selectionStart") == len(v) - 2, f'{tag}: стрелка влево')
         chk(pg.evaluate("document.activeElement.id") == 'code', f'{tag}: полоска забрала фокус')
 
+        # условие поверх кода: открывается, фокус остаётся в поле, закрывается
+        key('cond'); pg.wait_for_timeout(300)
+        r = pg.evaluate("""(()=>{const p=document.getElementById('kbq'),b=p.getBoundingClientRect();
+          return [!p.hidden, /Склеить/.test(p.textContent), document.activeElement.id, b.top>=0, b.height<=innerHeight*.5+1]})()""")
+        chk(r == [True, True, 'code', True, True], f'{tag}: условие поверх кода {r}')
+        if SHOTS:
+            pg.screenshot(path=os.path.join(SHOTS, f'cond_{tag}.png'))
+        key('cond'); pg.wait_for_timeout(200)
+        chk(pg.evaluate("document.getElementById('kbq').hidden"), f'{tag}: условие не закрылось')
+
         # длинный код: строка с курсором должна оставаться над полоской
         pg.evaluate("c=document.getElementById('code');c.setSelectionRange(c.value.length,c.value.length)")
         for n in range(30):
@@ -90,6 +114,15 @@ with sync_playwright() as p:
         pg.locator('.rsb').tap(); pg.wait_for_timeout(400)
         pg.locator('.modal button, [role=dialog] button').filter(has_text='Вернуть').first.tap(); pg.wait_for_timeout(400)
         chk(pg.evaluate("document.getElementById('code').value") == tpl, f'{tag}: сброс не вернул шаблон')
+
+        # вывод после «Запустить» виден над нижней панелью
+        pg.evaluate("c=document.getElementById('code');c.value='print(\"Склеить: 1\")';c.dispatchEvent(new Event('input'))")
+        pg.locator('#run').tap()
+        pg.wait_for_function("/завершена/.test((document.getElementById('rst')||{}).textContent||'')", timeout=90000)
+        pg.wait_for_timeout(800)
+        r = pg.evaluate("""(()=>{const o=document.getElementById('o').getBoundingClientRect(),d=document.getElementById('dock').getBoundingClientRect();
+          return [o.top>=0, o.top<d.top-10]})()""")
+        chk(r == [True, True], f'{tag}: вывод не виден {r}')
 
         i, j = pg.evaluate(PROJ, 'Дневник')
         pg.evaluate(f"project({i},{j})"); settle(pg)

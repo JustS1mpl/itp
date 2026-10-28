@@ -138,12 +138,16 @@ function condHtml(text,long){
     var t=qTitle(body);
     h+='<details class="qd"><summary>'+esc(pre+t[0])+'</summary><div class="qdb">'+qfmt(t[1])+'</div></details>'});
   return h}
+/* 7.0: ввод и вывод примера — рядом, если обе колонки помещаются по самой длинной строке (ширина в знаках
+   моноширинного шрифта), иначе друг под другом; решает сетка, а не JS, поэтому работает при любой ширине экрана */
+function exIO(inp,out){var w=Math.max.apply(null,(inp==null?'':inp).split('\n').concat(out.split('\n')).map(function(l){return l.length}));
+  return'<div class="exio" style="--exw:'+(Math.min(w,60)+3)+'ch">'+(inp!=null?'<div><p class="qlab">Ввод</p><pre class="cmp">'+esc(inp)+'</pre></div>':'')+'<div><p class="qlab">Вывод</p><pre class="cmp">'+esc(out)+'</pre></div></div>'}
 function exHtml(ex,strict){
   var m=/^Проверка запустит:\n([\s\S]*?)\nВывод:\n([\s\S]*)$/.exec(String(ex||''));
   if(m)return'<p class="qlab">Проверка запустит такой код</p><pre class="cmp">'+esc(m[1])+'</pre><p class="qlab">и ждёт такой вывод</p><pre class="cmp">'+esc(m[2])+'</pre>';
   /* вход/вывод в несколько строк (таблицы, матрицы): блоками с равной шириной знаков, иначе пробелы схлопываются */
   var e2=/^(?:Вход:\n([\s\S]*?)\n)?Вывод:\n([\s\S]*)$/.exec(String(ex||''));
-  if(e2&&!strict)return(e2[1]!=null?'<p class="qlab">Ввод</p><pre class="cmp">'+esc(e2[1])+'</pre>':'')+'<p class="qlab">Вывод</p><pre class="cmp">'+esc(e2[2])+'</pre>';
+  if(e2&&!strict)return exIO(e2[1],e2[2]);
   return strict?'<pre class="cmp">'+esc(ex)+'</pre>':'<p>'+esc(ex).replace(/\n/g,'<br>')+'</p>'}
 function qSec(title,body,open){return'<details class="qsec"'+(open?' open':'')+'><summary>'+title+'</summary><div class="qsb">'+body+'</div></details>'}
 var QTB='<div class="qtb"><button type="button" data-q="1">Развернуть всё</button><button type="button" data-q="0">Свернуть всё</button></div>';
@@ -166,7 +170,9 @@ var IOHTML=conHtml();
 /* консоль показывается при первом запуске, пока её нет — не занимает место */
 (function(){var lr=liveRun;liveRun=function(code){var c=$('cons');if(c)c.hidden=false;var q=$('cmq');if(q)q.hidden=true;var r=lr(code);consWatch();return r}})();
 function runBind(c){
-  $('run').onclick=function(){var o=$('o'),cs=$('cons');if(cs)cs.hidden=false;if(!SKOK){o.textContent='Загружаю среду Python…'}needSk().then(function(ok){if(ok)liveRun(c.value)})}}
+  $('run').onclick=function(){var o=$('o'),cs=$('cons');if(cs)cs.hidden=false;if(!SKOK){o.textContent='Загружаю среду Python…'}needSk().then(function(ok){if(ok)liveRun(c.value)});
+    /* 7.0: вывод сразу в поле зрения — на телефоне он начинается ниже края экрана */
+    if(cs)requestAnimationFrame(function(){try{cs.scrollIntoView({block:'nearest',behavior:RM()?'auto':'smooth'})}catch(e){}})}}
 /* редактор растёт вместе с кодом: внутри нет второй прокрутки, только у страницы */
 function initEd(c,cb){
   var ed=c.closest('.ed'),gt=ed.querySelector('.gt'),hh=c.previousElementSibling,pr={'(':')','[':']','{':'}','"':'"'},AP=String.fromCharCode(39);pr[AP]=AP;if(!ST('ac'))pr={};
@@ -211,16 +217,22 @@ function initEd(c,cb){
 /* Полоска одна на всё приложение и цепляется к редактору в фокусе. Высоту клавиатуры даёт visualViewport:
    всё, что ниже его края, закрыто. Пока пишешь, нижняя панель с «Проверить» прячется, полоска встаёт
    прямо над клавиатурой, а строка с курсором прокручивается так, чтобы оставаться над полоской. */
-var KB={el:null,c:null,ins:null};
+var KB={el:null,c:null,ins:null,q:false};
 function kbBar(){
   if(KB.el)return KB.el;
   var nm={'⇥':'Отступ','⇤':'Убрать отступ','←':'Курсор влево','→':'Курсор вправо'};
-  var b=document.createElement('div');b.className='kbar';b.hidden=true;b.setAttribute('role','toolbar');b.setAttribute('aria-label','Символы для кода');
-  b.innerHTML=['⇥','⇤','←','→','(',')',':','"',"'",'=','[',']','{','}','+','-','*','/','%','<','>','#','_',',','.'].map(function(k){return'<button type="button" tabindex="-1" data-k="'+esc(k)+'"'+(nm[k]?' class="kx" aria-label="'+nm[k]+'"':'')+'>'+esc(k)+'</button>'}).join('');
+  var b=document.createElement('div');b.className='kbar';b.hidden=true;
+  /* над строкой символов — условие задачи: раскрывается кнопкой «Условие», клавиатура при этом не закрывается */
+  b.innerHTML='<div class="kbq" id="kbq" hidden role="region" aria-label="Условие задачи"></div><div class="kbr" role="toolbar" aria-label="Символы для кода"><button type="button" tabindex="-1" data-k="cond" class="kx kq" aria-expanded="false" aria-controls="kbq">Условие</button>'+
+   ['⇥','⇤','←','→','(',')',':','"',"'",'=','[',']','{','}','+','-','*','/','%','<','>','#','_',',','.'].map(function(k){return'<button type="button" tabindex="-1" data-k="'+esc(k)+'"'+(nm[k]?' class="kx" aria-label="'+nm[k]+'"':'')+'>'+esc(k)+'</button>'}).join('')+'</div>';
   /* нажатие не должно забирать фокус у поля, иначе клавиатура закроется */
   b.addEventListener('pointerdown',function(e){e.preventDefault()});
   b.addEventListener('mousedown',function(e){e.preventDefault()});
-  b.addEventListener('click',function(e){var t=e.target.closest('button');if(!t||!KB.ins||!KB.c)return;if(document.activeElement!==KB.c)KB.c.focus({preventScroll:true});KB.ins(t.dataset.k);if(ST('vib')&&navigator.vibrate)navigator.vibrate(5)});
+  b.addEventListener('click',function(e){var t=e.target.closest('button');if(!t||!KB.ins||!KB.c)return;
+    if(document.activeElement!==KB.c)KB.c.focus({preventScroll:true});
+    if(t.closest('.kbq'))return;
+    if(t.dataset.k==='cond'){kbCond(!KB.q);return}
+    KB.ins(t.dataset.k);if(ST('vib')&&navigator.vibrate)navigator.vibrate(5)});
   document.body.appendChild(b);KB.el=b;
   if(window.visualViewport){visualViewport.addEventListener('resize',kbPlace);visualViewport.addEventListener('scroll',kbPlace)}
   return b}
@@ -228,10 +240,21 @@ function kbPlace(){
   var b=KB.el,c=KB.c;if(!b)return;
   var on=!KBD&&!!c&&c.isConnected&&document.activeElement===c,vv=window.visualViewport;
   b.hidden=!on;document.documentElement.classList.toggle('kbo',on);
-  if(!on)return;
+  if(!on){kbCond(false);return}
+  b.querySelector('.kq').hidden=!kbSrc();
   var kb=vv?Math.max(0,innerHeight-vv.height-vv.offsetTop):0;
   b.style.transform=kb?'translateY('+(-kb)+'px)':'';
+  b.style.setProperty('--kbqh',Math.round((vv?vv.height:innerHeight)*.45)+'px');
   kbCaret()}
+/* карточка условия на текущем экране: задание или цель проекта */
+function kbSrc(){return app.querySelector('.tcard')||app.querySelector('.pj .card')}
+function kbCond(open){
+  var b=KB.el;if(!b)return;var p=b.querySelector('.kbq'),t=b.querySelector('.kq'),s=kbSrc();
+  if(open&&!s)open=false;
+  KB.q=!!open;p.hidden=!open;t.setAttribute('aria-expanded',open?'true':'false');t.classList.toggle('on',!!open);
+  if(!open){p.innerHTML='';return}
+  var k=s.cloneNode(true);k.querySelectorAll('[id]').forEach(function(x){x.removeAttribute('id')});
+  p.innerHTML='';p.appendChild(k);qBind(p);p.scrollTop=0;kbCaret()}
 function kbCaret(){
   var c=KB.c,b=KB.el;if(!c||!b||b.hidden)return;
   var vv=window.visualViewport,cs=getComputedStyle(c),lh=parseFloat(cs.lineHeight)||24,pt=parseFloat(cs.paddingTop)||12;

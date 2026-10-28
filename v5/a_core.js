@@ -1,5 +1,5 @@
 /* ===================== ИТП — ядро: настройки, сохранение, звук, серия, цели, достижения ===================== */
-function defset(){return{acc:'',tz:100,anim:'full',vol:70,sfx:1,vib:1,emo:1,ty:1,toc:1,rep:1,ln:1,ac:1,cf:15,gc:1,bg:1,ks:0,ph:'card',sh:'v',fl:'tilt'}}
+function defset(){return{acc:'',exl:'c',tz:100,anim:'full',vol:70,sfx:1,vib:1,emo:1,ty:1,toc:1,rep:1,ln:1,ac:1,cf:15,gc:1,bg:1,ks:0,ph:'card',sh:'v',fl:'tilt'}}
 function ST(k){return S.set&&S.set[k]!==undefined?S.set[k]:defset()[k]}
 function RM(){return ST('anim')==='off'||matchMedia('(prefers-reduced-motion:reduce)').matches}
 function pad2(n){return(n<10?'0':'')+n}
@@ -59,7 +59,7 @@ function applyPrefs(){
   r.setAttribute('data-theme',th);
   if(ST('acc'))r.setAttribute('data-acc',ST('acc'));else r.removeAttribute('data-acc');
   r.style.setProperty('--tz',ST('tz')/100);r.style.setProperty('--cf',ST('cf')+'px');
-  r.setAttribute('data-anim',ST('anim'));r.setAttribute('data-fl',ST('fl'));r.classList.toggle('noln',!ST('ln'));r.setAttribute('data-ph',ST('ph'));r.classList.toggle('nobg',!ST('bg'));
+  r.setAttribute('data-anim',ST('anim'));r.setAttribute('data-fl',ST('fl'));r.classList.toggle('noln',!ST('ln'));r.setAttribute('data-ph',ST('ph'));r.classList.toggle('nobg',!ST('bg'));r.classList.toggle('exbig',ST('exl')==='b');
   var m=document.querySelector('meta[name=theme-color]');if(!m){m=document.createElement('meta');m.name='theme-color';document.head.appendChild(m)}
   m.content=th==='dark'?'#171315':'#FBF7F5';
 }
