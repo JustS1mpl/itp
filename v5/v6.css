@@ -1408,3 +1408,46 @@ details[open]>summary::after{transform:rotate(-135deg)}
 .tcard.lq details.qsec{margin-top:12px}
 .pjl{padding-bottom:8px}
 @media (prefers-reduced-motion:reduce){details.qsec>summary::after,details.qd>summary::after{transition:none}}
+
+/* ===== 7.0: типографика и палитра окна заданий и вопросов (DECISIONES §49) ===== */
+/* лигатуры в коде запрещены: Cascadia Code иначе рисует >= как ≥, а такого символа в Python нет */
+pre,code,textarea,#hl,.pyex p,.qv,.cmp{font-variant-ligatures:none;font-feature-settings:"liga" 0,"calt" 0}
+/* цвет типа островка: задачи — оранжевый, проект — розовый, вопросы — зелёный; надписи темнее на светлой теме и светлее на тёмной */
+.tcard,.pj{--tk:var(--t-code)}
+.pj{--tk:var(--t-project)}
+.q,.opts{--tk:var(--t-flash)}
+.tcard{background:var(--card);border-radius:var(--r);padding:14px 16px 16px;box-shadow:0 0 0 1px var(--line)}
+.tcard .ov{display:inline-flex;align-items:center;margin:0 0 10px;padding:3px 10px;border-radius:var(--pill,999px);
+  font-size:.6875rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--card2)}
+.tcard h2,.tcard.lq .tqt{font-size:1.0625rem;font-weight:600;line-height:1.55;letter-spacing:0;color:var(--ink)}
+.tcard.lq .tqt p.qh{font-weight:800}
+.pyex{background:var(--card2);border-radius:var(--r-sm);padding:10px 14px 12px}
+.pyex>span,.qlab{font-size:.6875rem!important;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.pyex pre,.pyex pre.cmp,.qsb pre.cmp{font-size:.9375rem;line-height:1.5;background:var(--card)}
+/* значения в «ёлочках» — точный текст вывода */
+.qv{font-family:var(--mono);font-size:.9em;font-weight:600;padding:1px 6px;border-radius:6px;background:var(--card2);color:var(--ink);
+  -webkit-box-decoration-break:clone;box-decoration-break:clone;white-space:pre-wrap}
+/* вопросы: заголовок легче, код вопроса на подложке цвета вопросов */
+.q{font-weight:800;line-height:1.35;letter-spacing:-.005em}
+.q~pre{font-size:.9375rem;line-height:1.5}
+@supports (background:color-mix(in srgb,red 50%,blue)){
+  .tcard .ov{color:color-mix(in srgb,var(--tk) 62%,var(--ink));background:color-mix(in srgb,var(--tk) 14%,var(--card))}
+  .pyex>span,.tcard .qlab,.pj .qlab{color:color-mix(in srgb,var(--tk) 55%,var(--ink))}
+  .qv{background:color-mix(in srgb,var(--tk,var(--t-code)) 13%,var(--card2))}
+  .q~pre{background:color-mix(in srgb,var(--t-flash) 7%,var(--card));box-shadow:inset 3px 0 0 color-mix(in srgb,var(--t-flash) 70%,transparent)}
+}
+
+/* 7.0: телефон — полоска символов над клавиатурой и кнопка «вернуть начальный код» (DECISIONES §49) */
+.edh .rsb{width:40px;height:40px;color:var(--muted)}
+.edh .rsb svg{width:19px;height:19px}
+.edh .rsb:hover{opacity:1;background:var(--card2)}
+.kbar{position:fixed;left:0;right:0;bottom:0;z-index:40;display:flex;gap:6px;padding:6px 8px;overflow-x:auto;overscroll-behavior:contain;scrollbar-width:none;touch-action:pan-x;background:color-mix(in srgb,var(--card2) 92%,transparent);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-top:1px solid var(--line);will-change:transform}
+.kbar[hidden]{display:none}
+.kbar::-webkit-scrollbar{display:none}
+.kbar button{flex:none;min-width:42px;height:42px;padding:0 10px;border:0;border-radius:10px;background:var(--card);color:var(--ink);font:700 18px/1 var(--mono);box-shadow:0 1px 0 var(--line2);touch-action:manipulation;-webkit-tap-highlight-color:transparent;font-variant-ligatures:none}
+.kbar button.kx{font-family:inherit;font-size:17px;color:var(--accent-ink);background:color-mix(in srgb,var(--accent) 12%,var(--card))}
+.kbar button:active{background:var(--soft);transform:translateY(1px)}
+/* пока пишешь код на телефоне, нижняя панель не перекрывает строки — она вернётся, когда клавиатура закроется */
+.kbo .dock{visibility:hidden}
+/* запас снизу, чтобы последнюю строку кода можно было прокрутить выше полоски */
+.kbo body{padding-bottom:72px}

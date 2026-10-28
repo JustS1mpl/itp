@@ -124,17 +124,19 @@ var QLONG=700;
 function qTitle(t){var k=t.indexOf(':');if(k>2&&k<=70)return[t.slice(0,k),t.slice(k+1).trim()||t];
   var d=t.search(/[.!?](\s|$)/);if(d>0&&d<=90&&t.slice(d+1).trim())return[t.slice(0,d+1),t.slice(d+1).trim()];
   return[t.slice(0,56).replace(/\s+\S*$/,'')+'…',t]}
+/* 7.0: значения в «ёлочках» в условиях — точный текст вывода; показываем их моноширинным шрифтом на подложке */
+function qfmt(t){return esc(t).replace(/«([^«»\n]{1,80})»/g,'«<span class="qv">$1</span>»')}
 function condHtml(text,long){
   var L=String(text||'').split('\n').filter(function(x){return x.trim()});
-  if(!long)return L.map(function(l){return'<p>'+esc(l)+'</p>'}).join('');
+  if(!long)return L.map(function(l){return'<p>'+qfmt(l)+'</p>'}).join('');
   var h='';
   L.forEach(function(l){
     var m=/^\s*(—\s*|\d+\)\s*)(.*)$/.exec(l);
-    if(!m){h+='<p'+(/:\s*$/.test(l)?' class="qh"':'')+'>'+esc(l)+'</p>';return}
+    if(!m){h+='<p'+(/:\s*$/.test(l)?' class="qh"':'')+'>'+qfmt(l)+'</p>';return}
     var pre=m[1].indexOf(')')>0?m[1].trim()+' ':'',body=m[2];
-    if(body.length<=110){h+='<p class="qi">'+esc(l)+'</p>';return}
+    if(body.length<=110){h+='<p class="qi">'+qfmt(l)+'</p>';return}
     var t=qTitle(body);
-    h+='<details class="qd"><summary>'+esc(pre+t[0])+'</summary><div class="qdb">'+esc(t[1])+'</div></details>'});
+    h+='<details class="qd"><summary>'+esc(pre+t[0])+'</summary><div class="qdb">'+qfmt(t[1])+'</div></details>'});
   return h}
 function exHtml(ex,strict){
   var m=/^Проверка запустит:\n([\s\S]*?)\nВывод:\n([\s\S]*)$/.exec(String(ex||''));
@@ -152,11 +154,13 @@ function filesHtml(f){var fs=typeof fsOf==='function'?fsOf(f):(f&&typeof f==='ob
 function taskCard(q,lab){
   var lg=String(q.q||'').length>QLONG||(String(q.q||'').length>330&&/\n/.test(q.q));
   var big=String(q.q||'').length>260;
-  if(!big)return'<section class="tcard"><span class="ov">'+(lab||'Задание')+'</span><h2>'+esc(q.q)+'</h2>'+(q.ex?'<div class="pyex"><span>Пример</span>'+exHtml(q.ex,q.strict)+'</div>':'')+filesHtml(q.f)+'</section>';
+  if(!big)return'<section class="tcard"><span class="ov">'+(lab||'Задание')+'</span><h2>'+qfmt(q.q)+'</h2>'+(q.ex?'<div class="pyex"><span>Пример</span>'+exHtml(q.ex,q.strict)+'</div>':'')+filesHtml(q.f)+'</section>';
   return'<section class="tcard lq"><span class="ov">'+(lab||'Задание')+'</span>'+(lg?QTB:'')+'<div class="tqt" role="heading" aria-level="2">'+condHtml(q.q,lg)+'</div>'+(q.ex?qSec('Пример',exHtml(q.ex,q.strict),true):'')+filesHtml(q.f)+'</section>'}
 function edHtml(dc){return'<div class="ed"><div class="gt" aria-hidden="true"></div><div class="ew"><pre id="hl" aria-hidden="true"></pre><textarea id="code" wrap="off" spellcheck="false" autocapitalize="off" autocorrect="off" autocomplete="off" aria-label="Код"'+(KBD?' aria-describedby="edk"':'')+'>'+esc(dc)+'</textarea></div></div>'}
 function runBtn(pri){return'<button class="btn s'+(pri?'':' g')+'" id="run" aria-keyshortcuts="Control+Enter">'+ico('play')+'Запустить</button>'}
-function edCard(lab,dc,headL){return'<div class="edc"><div class="edh">'+(headL||'<span class="ov">'+lab+'</span>')+runBtn()+'</div>'+edHtml(dc)+'</div>'+(KBD?'<p class="mu hint0" id="edk">Ctrl + Enter запускает код.</p>':'')}
+IC.undo='<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>';
+/* tpl — начальный код задания: рядом с «Запустить» кнопка вернуть его (7.0) */
+function edCard(lab,dc,headL,tpl){return'<div class="edc"><div class="edh">'+(headL||'<span class="ov">'+lab+'</span>')+(tpl!==undefined?'<button class="icon rsb" type="button" data-tpl="'+esc(tpl)+'" aria-label="Вернуть начальный код" title="Вернуть начальный код">'+ico('undo')+'</button>':'')+runBtn()+'</div>'+edHtml(dc)+'</div>'+(KBD?'<p class="mu hint0" id="edk">Ctrl + Enter запускает код.</p>':'')}
 function conHtml(){return'<section class="cons" id="cons" hidden aria-label="Вывод программы"><div class="csh"><span class="ov">Вывод</span><p class="mu rst" id="rst" hidden aria-live="polite"></p></div><pre class="out" id="o"></pre><div class="cmq" id="cmq" hidden></div>'+'<form class="inrow" id="ir" autocomplete="off"><input class="f" id="ii" placeholder="Ответ программе" aria-label="Ввод для программы" autocomplete="off" enterkeyhint="send"><button class="btn" id="ib" type="submit">Ввод</button></form></section>'}
 var IOHTML=conHtml();
 /* консоль показывается при первом запуске, пока её нет — не занимает место */
@@ -187,7 +191,53 @@ function initEd(c,cb){
     fire();
   });
   window.addEventListener('resize',function rs(){if(!c.isConnected){window.removeEventListener('resize',rs);return}fit()});
+  /* 7.0: вернуть начальный код — с вопросом, ведь черновик пропадёт */
+  var rb=ed.parentNode.querySelector('.rsb');
+  if(rb)rb.onclick=function(){if(c.value===rb.dataset.tpl)return;modal('<h2>Вернуть начальный код?</h2><p>Всё, что написано в редакторе, пропадёт.</p>',[['Вернуть',function(){c.value=rb.dataset.tpl;c.setSelectionRange(c.value.length,c.value.length);fire()},0,1],['Отмена',null,1]])};
+  /* 7.0: полоска символов над клавиатурой телефона */
+  function ins(k){
+    var p=c.selectionStart,q=c.selectionEnd,v=c.value;
+    if(k==='←'||k==='→'){var n=p!==q?(k==='←'?p:q):k==='←'?Math.max(0,p-1):Math.min(v.length,p+1);c.setSelectionRange(n,n);return kbCaret()}
+    if(k==='⇥'){c.setRangeText('    ',p,q,'end');return fire()}
+    if(k==='⇤'){var ls=v.lastIndexOf('\n',p-1)+1,m=v.slice(ls,ls+4).match(/^ */)[0].length;if(m){c.setRangeText('',ls,ls+m);c.setSelectionRange(Math.max(ls,p-m),Math.max(ls,q-m));fire()}return}
+    if(ST('ac')&&p===q&&v[p]===k&&/^[)\]}"']$/.test(k)){c.setSelectionRange(p+1,p+1);return kbCaret()}
+    if(pr[k]&&!((k==='"'||k===AP)&&!qo(v,p))){c.setRangeText(k+v.slice(p,q)+pr[k],p,q,'end');c.setSelectionRange(q+1,q+1);return fire()}
+    c.setRangeText(k,p,q,'end');fire()}
+  c.addEventListener('focus',function(){if(KBD)return;KB.c=c;KB.ins=ins;kbBar();kbPlace();setTimeout(kbPlace,400)});
+  c.addEventListener('blur',function(){setTimeout(kbPlace,150)});
+  c.addEventListener('input',function(){if(KB.c===c)requestAnimationFrame(kbCaret)});
   return sync}
+
+/* Полоска одна на всё приложение и цепляется к редактору в фокусе. Высоту клавиатуры даёт visualViewport:
+   всё, что ниже его края, закрыто. Пока пишешь, нижняя панель с «Проверить» прячется, полоска встаёт
+   прямо над клавиатурой, а строка с курсором прокручивается так, чтобы оставаться над полоской. */
+var KB={el:null,c:null,ins:null};
+function kbBar(){
+  if(KB.el)return KB.el;
+  var nm={'⇥':'Отступ','⇤':'Убрать отступ','←':'Курсор влево','→':'Курсор вправо'};
+  var b=document.createElement('div');b.className='kbar';b.hidden=true;b.setAttribute('role','toolbar');b.setAttribute('aria-label','Символы для кода');
+  b.innerHTML=['⇥','⇤','←','→','(',')',':','"',"'",'=','[',']','{','}','+','-','*','/','%','<','>','#','_',',','.'].map(function(k){return'<button type="button" tabindex="-1" data-k="'+esc(k)+'"'+(nm[k]?' class="kx" aria-label="'+nm[k]+'"':'')+'>'+esc(k)+'</button>'}).join('');
+  /* нажатие не должно забирать фокус у поля, иначе клавиатура закроется */
+  b.addEventListener('pointerdown',function(e){e.preventDefault()});
+  b.addEventListener('mousedown',function(e){e.preventDefault()});
+  b.addEventListener('click',function(e){var t=e.target.closest('button');if(!t||!KB.ins||!KB.c)return;if(document.activeElement!==KB.c)KB.c.focus({preventScroll:true});KB.ins(t.dataset.k);if(ST('vib')&&navigator.vibrate)navigator.vibrate(5)});
+  document.body.appendChild(b);KB.el=b;
+  if(window.visualViewport){visualViewport.addEventListener('resize',kbPlace);visualViewport.addEventListener('scroll',kbPlace)}
+  return b}
+function kbPlace(){
+  var b=KB.el,c=KB.c;if(!b)return;
+  var on=!KBD&&!!c&&c.isConnected&&document.activeElement===c,vv=window.visualViewport;
+  b.hidden=!on;document.documentElement.classList.toggle('kbo',on);
+  if(!on)return;
+  var kb=vv?Math.max(0,innerHeight-vv.height-vv.offsetTop):0;
+  b.style.transform=kb?'translateY('+(-kb)+'px)':'';
+  kbCaret()}
+function kbCaret(){
+  var c=KB.c,b=KB.el;if(!c||!b||b.hidden)return;
+  var vv=window.visualViewport,cs=getComputedStyle(c),lh=parseFloat(cs.lineHeight)||24,pt=parseFloat(cs.paddingTop)||12;
+  var ln=c.value.slice(0,c.selectionEnd).split('\n').length-1,y=c.getBoundingClientRect().top+pt+ln*lh;
+  var top=(vv?vv.offsetTop:0)+76,bot=(vv?vv.offsetTop+vv.height:innerHeight)-b.offsetHeight-14;
+  if(y+lh>bot)scrollBy(0,y+lh-bot);else if(y<top)scrollBy(0,y-top)}
 
 /* --- итог островка: что получил, сколько опыта, куда дальше --- */
 function doneScreen(o){
@@ -262,7 +312,7 @@ function quiz(i,j){
     save2();
     var q=Ql[idx[0]],qi=idx[0],sel=-1,ch=false,right=false,ord=q.o.map(function(x,n){return n});
     if(ph)ord.sort(function(){return Math.random()-.5});
-    var h=lessonTop('<div class="sbar" id="sb" role="img" aria-label="Отвечено '+st.filter(Boolean).length+' из '+tot+'">'+segs()+'</div>')+'<h1 class="sr-only">'+esc(IT(i,j).n||'Вопросы')+'</h1>'+(ph?'<div class="qph">🔁 Работа над ошибками</div>':'')+'<h2 class="q">'+esc(q.q)+'</h2>'+(q.v||'')+(q.c?'<pre>'+hl(q.c)+'</pre>':'')+optsHtml(q,ord);
+    var h=lessonTop('<div class="sbar" id="sb" role="img" aria-label="Отвечено '+st.filter(Boolean).length+' из '+tot+'">'+segs()+'</div>')+'<h1 class="sr-only">'+esc(IT(i,j).n||'Вопросы')+'</h1>'+(ph?'<div class="qph">🔁 Работа над ошибками</div>':'')+'<h2 class="q">'+qfmt(q.q)+'</h2>'+(q.v||'')+(q.c?'<pre>'+hl(q.c)+'</pre>':'')+optsHtml(q,ord);
     scr('quiz',h+dockHtml('<button class="btn" id="go" disabled>Проверить</button>',0,1));if(q.v)imgZoom(app);
     $('x').onclick=goBack;
     var g=$('go'),os=app.querySelectorAll('.opt');
@@ -289,7 +339,7 @@ function task(i,j,k){
   var fu=T.findIndex(function(x,n){return!S.tk[key+'-'+n]});if(fu<0)fu=T.length-1;
   var dots='<div class="sbar" role="group" aria-label="Задание '+(k+1)+' из '+T.length+'">'+T.map(function(x,n){var ok=S.tk[key+'-'+n],go=n!==k&&(ok||n===fu);
     return'<button type="button" class="'+(ok?'ok':'')+(n===k?' cu':'')+'" data-n="'+n+'"'+(go?' title="Задание '+(n+1)+'"':' disabled')+' aria-label="Задание '+(n+1)+(ok?', решено':'')+'"'+(n===k?' aria-current="step"':'')+'></button>'}).join('')+'</div>';
-  scr('task',lessonTop(dots,'<span class="lstep" aria-hidden="true">'+(k+1)+' / '+T.length+'</span>'+(q.h?'<button class="icon" id="hb" aria-label="Подсказка (опыт будет вдвое меньше)" aria-keyshortcuts="Control+H">'+ico('bulb')+'</button>':''))+'<h1 class="sr-only">'+esc(it.n||'Задания с кодом')+', задание '+(k+1)+' из '+T.length+'</h1>'+taskCard(q)+'<div id="hint"></div>'+edCard('Решение',dc)+conHtml()+'<div id="fb" aria-live="polite"></div>'+dockHtml('<button class="btn" id="chk">Проверить</button>'));
+  scr('task',lessonTop(dots,'<span class="lstep" aria-hidden="true">'+(k+1)+' / '+T.length+'</span>'+(q.h?'<button class="icon" id="hb" aria-label="Подсказка (опыт будет вдвое меньше)" aria-keyshortcuts="Control+H">'+ico('bulb')+'</button>':''))+'<h1 class="sr-only">'+esc(it.n||'Задания с кодом')+', задание '+(k+1)+' из '+T.length+'</h1>'+taskCard(q)+'<div id="hint"></div>'+edCard('Решение',dc,0,'# Пиши код здесь\n'+(q.starter||''))+conHtml()+'<div id="fb" aria-live="polite"></div>'+dockHtml('<button class="btn" id="chk">Проверить</button>'));
   $('x').onclick=goBack;
   app.querySelectorAll('.top .sbar button[data-n]').forEach(function(b){b.onclick=function(){if(!b.disabled)task(i,j,+b.dataset.n)}});
   var c=$('code'),sync=initEd(c,function(){drc(i,j,k).codes[k]=c.value.slice(0,3000);lazySave()});sync();
@@ -332,7 +382,7 @@ function project(i,j){
   /* at: skip — пропущен; seen — пропущен и эталон открыт: решить можно, но уже без опыта */
   var it=IT(i,j),key=i+'-'+j,done=S.d[key],seen=S.at[key]==='seen',sk=S.at[key]==='skip'||seen,bonus=it.bonus>0?it.bonus|0:40;
   var dc=((S.dr[key]||{}).codes||{})[0]||'# Пиши код здесь\n'+(it.starter||''),hs=String(it.h||'').split('\n').filter(Boolean);
-  scr('project',lessonTop('<span class="lstep">🚀 Мини-проект · по желанию</span>',done?'':'<button class="btn t" id="sk" style="margin:0">Пропустить</button>')+'<div class="pj"><h1>'+esc(it.n)+'</h1>'+(String(it.q||'').length>QLONG?'<div class="card pjl">'+QTB+qSec('Цель',condHtml(it.q,true),true)+(hs.length?qSec('Что пригодится',hs.map(function(l){return'<p class="qi">'+hintTx(l)+'</p>'}).join(''),false):'')+(it.ex?qSec('Пример',exHtml(it.ex,it.strict),true):'')+filesHtml(it.f)+'</div>':'<div class="card"><b>Цель</b><p>'+esc(it.q).replace(/\n/g,'</p><p>')+'</p>'+(hs.length?'<b>Что пригодится</b><p>'+hs.map(function(l){return hintTx(l)}).join('<br>')+'</p>':'')+(it.ex?'<b>Пример</b>'+(it.strict?'<pre class="cmp">'+esc(it.ex)+'</pre>':exHtml(it.ex,false)):'')+filesHtml(it.f)+'</div>')+'<p class="mu" style="margin:0 4px 14px">'+(seen?'Эталон открыт, поэтому опыт за проект не начисляется. Решить его всё равно можно.':sk?'Этот проект пропущен. Сделай его сейчас и получи бонус +'+bonus+' ⭐. Или посмотри эталон, но тогда уже без опыта.':done?'Проект уже выполнен, бонус за него получен.':'Проект можно пропустить, тема всё равно засчитается. За выполнение бонус +'+bonus+' ⭐.')+'</p></div>'+edCard('Решение',dc)+conHtml()+'<div id="fb" aria-live="polite"></div>'+dockHtml('<button class="btn" id="chk">Проверить</button>'+(sk&&it.sol?'<button class="btn t" id="pjs">Посмотреть эталон</button>':'')));
+  scr('project',lessonTop('<span class="lstep">🚀 Мини-проект · по желанию</span>',done?'':'<button class="btn t" id="sk" style="margin:0">Пропустить</button>')+'<div class="pj"><h1>'+esc(it.n)+'</h1>'+(String(it.q||'').length>QLONG?'<div class="card pjl">'+QTB+qSec('Цель',condHtml(it.q,true),true)+(hs.length?qSec('Что пригодится',hs.map(function(l){return'<p class="qi">'+hintTx(l)+'</p>'}).join(''),false):'')+(it.ex?qSec('Пример',exHtml(it.ex,it.strict),true):'')+filesHtml(it.f)+'</div>':'<div class="card"><b>Цель</b><p>'+qfmt(it.q).replace(/\n/g,'</p><p>')+'</p>'+(hs.length?'<b>Что пригодится</b><p>'+hs.map(function(l){return hintTx(l)}).join('<br>')+'</p>':'')+(it.ex?'<b>Пример</b>'+(it.strict?'<pre class="cmp">'+esc(it.ex)+'</pre>':exHtml(it.ex,false)):'')+filesHtml(it.f)+'</div>')+'<p class="mu" style="margin:0 4px 14px">'+(seen?'Эталон открыт, поэтому опыт за проект не начисляется. Решить его всё равно можно.':sk?'Этот проект пропущен. Сделай его сейчас и получи бонус +'+bonus+' ⭐. Или посмотри эталон, но тогда уже без опыта.':done?'Проект уже выполнен, бонус за него получен.':'Проект можно пропустить, тема всё равно засчитается. За выполнение бонус +'+bonus+' ⭐.')+'</p></div>'+edCard('Решение',dc,0,'# Пиши код здесь\n'+(it.starter||''))+conHtml()+'<div id="fb" aria-live="polite"></div>'+dockHtml('<button class="btn" id="chk">Проверить</button>'+(sk&&it.sol?'<button class="btn t" id="pjs">Посмотреть эталон</button>':'')));
   $('x').onclick=home;qBind(app);
   var c=$('code'),ed=c.closest('.ed');ed.dataset.min=300;var sync=initEd(c,function(){drc(i,j,0).codes[0]=c.value.slice(0,3000);lazySave()});sync();
   skReady();chkPulse();runBind(c);

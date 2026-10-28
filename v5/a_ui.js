@@ -391,7 +391,7 @@ function oge(){practice()}
 /* вопрос в тренировке: та же раскладка, что у островка с вопросами */
 function askQ(q,o){
   var sel=-1,ch=false,right=false,ord=q.o.map(function(x,n){return n}).sort(function(){return Math.random()-.5});
-  var h='<div class="top ls"><button class="icon" id="x" aria-label="Выйти">'+ico('x')+'</button><div class="grow">'+o.mid+'</div></div><h1 class="sr-only">Тренировка</h1><h2 class="q">'+esc(q.q)+'</h2>'+(q.v||'')+(q.c?'<pre>'+hl(q.c)+'</pre>':'')+optsHtml(q,ord);
+  var h='<div class="top ls"><button class="icon" id="x" aria-label="Выйти">'+ico('x')+'</button><div class="grow">'+o.mid+'</div></div><h1 class="sr-only">Тренировка</h1><h2 class="q">'+(typeof qfmt==='function'?qfmt(q.q):esc(q.q))+'</h2>'+(q.v||'')+(q.c?'<pre>'+hl(q.c)+'</pre>':'')+optsHtml(q,ord);
   scr('askq',h+dockHtml('<button class="btn" id="go" disabled>Проверить</button>',0,1));if(q.v)imgZoom(app);
   $('x').onclick=o.exit;
   var g=$('go'),os=app.querySelectorAll('.opt');
@@ -431,7 +431,7 @@ function rcNext(){
   var P=passed('test'),T=[];P.forEach(function(p){IT(p[0],p[1]).tasks.forEach(function(q,n){T.push({q:q,k:p[0]+'-'+p[1]+'-'+n})})});
   if(!T.length){practice();return}
   var x;do{x=T[Math.floor(Math.random()*T.length)]}while(T.length>1&&x.k===RND.last);RND.last=x.k;var q=x.q;
-  scr('rcode','<h1 class="sr-only">Случайный код</h1><div class="top ls"><button class="icon" id="x" aria-label="Выйти">'+ico('x')+'</button><span class="lstep grow">🎲 Случайный код</span>'+(q.h?'<button class="icon" id="hb" aria-label="Подсказка">'+ico('bulb')+'</button>':'')+'</div>'+taskCard(q)+'<div id="hint"></div>'+edCard('Решение','# Пиши код здесь\n'+(q.starter||''))+conHtml()+'<div id="fb"></div>'+dockHtml('<button class="btn" id="chk">Проверить</button>'));
+  scr('rcode','<h1 class="sr-only">Случайный код</h1><div class="top ls"><button class="icon" id="x" aria-label="Выйти">'+ico('x')+'</button><span class="lstep grow">🎲 Случайный код</span>'+(q.h?'<button class="icon" id="hb" aria-label="Подсказка">'+ico('bulb')+'</button>':'')+'</div>'+taskCard(q)+'<div id="hint"></div>'+edCard('Решение','# Пиши код здесь\n'+(q.starter||''),0,'# Пиши код здесь\n'+(q.starter||''))+conHtml()+'<div id="fb"></div>'+dockHtml('<button class="btn" id="chk">Проверить</button>'));
   $('x').onclick=practice;
   var c=$('code'),sync=initEd(c,function(){});sync();
   if(q.h)$('hb').onclick=function(){snd('hint');$('hb').classList.add('on');$('hint').innerHTML='<div class="fb"><b>Подсказка</b>'+hintTx(q.h)+'</div>';$('hint').scrollIntoView({block:'nearest',behavior:RM()?'auto':'smooth'})};
