@@ -141,6 +141,8 @@ def _body(spec, state, key, query=()):
     # 7.0: "status" — свой код ответа (для задач про ошибки); "param" + "variants" — ответ зависит от параметра запроса:
     # {"param": "city", "variants": {"Омск": {...}}} — значения нет среди вариантов → 404 {"error": "not found"}
     code = spec.get('status', 200)
+    if 'key' in spec and dict(query).get('key') != spec['key']:  # 7.0: API с ключом в параметре key
+        return 401, _json.dumps({'error': 'invalid api key'}, ensure_ascii=False).encode('utf-8'), 'application/json'
     if 'statuses' in spec:  # коды по очереди на каждый запрос, последний повторяется: [503, 503, 200]
         n = state.get(key + '#', 0)
         state[key + '#'] = n + 1
