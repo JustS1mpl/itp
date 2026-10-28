@@ -150,7 +150,8 @@ function exHtml(ex,strict){
   if(e2&&!strict)return exIO(e2[1],e2[2]);
   return strict?'<pre class="cmp">'+esc(ex)+'</pre>':'<p>'+esc(ex).replace(/\n/g,'<br>')+'</p>'}
 function qSec(title,body,open){return'<details class="qsec"'+(open?' open':'')+'><summary>'+title+'</summary><div class="qsb">'+body+'</div></details>'}
-var QTB='<div class="qtb"><button type="button" data-q="1">Развернуть всё</button><button type="button" data-q="0">Свернуть всё</button></div>';
+/* 7.0: кнопок «Развернуть всё / Свернуть всё» больше нет (владелец: лишнее) — каждый пункт раскрывается сам */
+var QTB='';
 function qBind(root){(root||document).querySelectorAll('.qtb button').forEach(function(b){b.onclick=function(){
   var on=b.dataset.q==='1',card=b.closest('.card,.tcard')||root;card.querySelectorAll('details').forEach(function(d){d.open=on});snd('click')}})}
 /* 7.0: файлы рядом с программой (поле f задачи или проекта) — показываем ученику их содержимое */
