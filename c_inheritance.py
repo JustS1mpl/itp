@@ -7,6 +7,11 @@ from dsl import *
 
 def th_inherit():
     terms = [
+        ('утиная типизация', '«Если ходит как утка и крякает как утка — это утка»: Python не проверяет класс объекта, ему важно, '
+                             'чтобы нужный метод был. Полиморфизм работает и без общего родителя.'),
+        ('множественное наследование', 'class C(A, B): класс получает методы обоих родителей. Метод ищется по порядку MRO.'),
+        ('MRO', 'Method Resolution Order — порядок, в котором Python ищет метод: сам класс, потом родители слева направо, в конце object. '
+                'Его показывает Класс.__mro__.'),
         ('наследование', 'class Дочерний(Родитель): новый класс получает все атрибуты и методы родителя и может добавить свои '
                          'или заменить (переопределить) родительские.\n'
                          'Пример:\nclass Animal:\n    def hi(self):\n        return "..."\n\nclass Cat(Animal):\n    def hi(self):\n        return "мяу"\n\n'
@@ -41,6 +46,20 @@ def th_inherit():
              'class Rect(Shape):\n    def __init__(self, w, h):\n        self.w = w\n        self.h = h\n\n    def area(self):\n        return self.w * self.h\n\n\n'
              'shapes = [Square(3), Rect(2, 5), Square(1)]\nprint(sum(s.area() for s in shapes))') +
         '<p>Цикл не знает, какие фигуры в списке, — он просто зовёт <code>area()</code>. Добавится новая фигура — менять цикл не придётся.</p>'
+
+        + '<h3>Утиная типизация</h3>'
+        '<p>Общий родитель удобен, но не обязателен. Python не спрашивает, какого класса объект, — он просто вызывает метод. '
+        'Есть метод — всё работает. Это [[утиная типизация]]:</p>'
+        + ex('class Duck:\n    def speak(self):\n        return "кря"\n\n\nclass Robot:\n    def speak(self):\n        return "бип-буп"\n\n\n'
+             'for thing in [Duck(), Robot()]:\n    print(thing.speak())') +
+        '<h3>Несколько родителей</h3>'
+        '<p>Класс может наследовать сразу от нескольких — [[множественное наследование]]. Если метод есть у обоих родителей, Python '
+        'берёт первый по порядку [[MRO]]: сам класс, затем родители слева направо:</p>'
+        + ex('class Car:\n    def move(self):\n        return "еду"\n\n\nclass Boat:\n    def move(self):\n        return "плыву"\n\n    def anchor(self):\n'
+             '        return "якорь брошен"\n\n\nclass Amphibian(Car, Boat):\n    pass\n\n\na = Amphibian()\nprint(a.move(), a.anchor())\n'
+             'print([c.__name__ for c in Amphibian.__mro__])') +
+        '<p>Множественное наследование быстро запутывает код, поэтому его используют осторожно — обычно чтобы добавить классу '
+        'небольшую «примесь» с парой методов.</p>' 
     )
     return th('Наследование', terms, body)
 
@@ -143,6 +162,10 @@ def fl_str():
 
 def th_ops():
     terms = [
+        ('__radd__', 'Сложение «справа»: если x + obj не получилось у x, Python пробует obj.__radd__(x). Нужен, чтобы работала sum, '
+                     'которая начинает с 0.'),
+        ('__iadd__', 'Метод для +=. Меняет объект на месте и обязательно возвращает self. Без него += работает через __add__ и создаёт новый объект.'),
+        ('total_ordering', 'Декоратор класса из functools: если в классе есть __eq__ и __lt__, он сам допишет <=, > и >=.'),
         ('__add__', 'Метод для +: __add__(self, other) возвращает новый объект — результат сложения.'),
         ('__len__', 'Метод для len(obj): возвращает целое число не меньше нуля.'),
         ('__call__', 'Метод, который делает объект вызываемым как функция: obj(аргументы) вызывает obj.__call__(аргументы).'),
@@ -162,6 +185,16 @@ def th_ops():
              'sale = Discount(20)\nprint(sale(1000), sale(250))') +
         '<p>Не стоит придумывать магию без нужды: <code>+</code> должен означать сложение, а <code>len</code> — размер. '
         'Тогда код с объектами читается так же легко, как с числами и списками.</p>'
+        + '<h3>sum, += и все сравнения</h3>'
+        '<p><code>sum</code> начинает с нуля: <code>0 + Money(300)</code>. У числа нет сложения с деньгами, и тогда Python пробует '
+        '«сложение справа» — [[__radd__]] у второго слагаемого. [[__iadd__]] отвечает за <code>+=</code>: он меняет объект на месте '
+        'и возвращает self. А декоратор [[total_ordering]] по двум методам — <code>__eq__</code> и <code>__lt__</code> — сам допишет '
+        'остальные сравнения:</p>'
+        + ex('from functools import total_ordering\n\n\n@total_ordering\nclass Money:\n    def __init__(self, rub):\n        self.rub = rub\n\n    def __add__(self, other):\n'
+             '        return Money(self.rub + other.rub)\n\n    def __radd__(self, other):\n        return Money(other + self.rub)\n\n    def __iadd__(self, other):\n'
+             '        self.rub += other.rub\n        return self\n\n    def __eq__(self, other):\n        return self.rub == other.rub\n\n    def __lt__(self, other):\n'
+             '        return self.rub < other.rub\n\n    def __repr__(self):\n        return f"{self.rub} ₽"\n\n\nwallet = Money(100)\nwallet += Money(50)\n'
+             'print(wallet, sum([Money(10), Money(20), Money(5)]))\nprint(Money(5) >= Money(3), Money(5) <= Money(3))')
     )
     return th('Арифметика и вызов', terms, body)
 
@@ -288,7 +321,7 @@ def code_final():
              '«Ошибка: знаменатель равен нулю».',
              'Сокращение: наибольший общий делитель — алгоритм Евклида: while b: a, b = b, a % b (бери модули чисел).\n'
              'Если den < 0 — поменяй знак обоим. Сложение: Fraction(a.num * b.den + b.num * a.den, a.den * b.den). '
-             'Сравнение без дробных чисел: a.num * b.den < b.num * a.den.\nСумму считай циклом от Fraction(0, 1): встроенная sum начинает с числа 0 и с дробью сложить его не сможет.',
+             'Сравнение без дробных чисел: a.num * b.den < b.num * a.den.\nСумму считай циклом от Fraction(0, 1): встроенная sum начинает с числа 0 и без __radd__ с дробью его не сложит.',
              'def gcd(a, b):\n    a, b = abs(a), abs(b)\n    while b:\n        a, b = b, a % b\n    return a\n\n\nclass Fraction:\n    def __init__(self, num, den):\n'
              '        if den == 0:\n            raise ValueError("знаменатель равен нулю")\n        if den < 0:\n            num, den = -num, -den\n        g = gcd(num, den)\n'
              '        self.num = num // g\n        self.den = den // g\n\n    def __add__(self, other):\n        return Fraction(self.num * other.den + other.num * self.den, self.den * other.den)\n\n'

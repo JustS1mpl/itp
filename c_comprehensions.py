@@ -145,6 +145,10 @@ def th_memory():
         'Отсюда похожая ловушка — список списков через умножение:<code>&#91;[0] * 3] * 3</code> создаёт три ярлыка на одну и ту же строку. '
         'Правильно — списочным выражением: <code>&#91;[0] * 3 for i in range(3)]</code>.</p>'
         + ex('bad = [[0] * 3] * 3\nbad[0][0] = 1\nprint(bad)\ngood = [[0] * 3 for i in range(3)]\ngood[0][0] = 1\nprint(good)')
+        + '<h3>Сравнение с None</h3>'
+        '<p>None в программе ровно один, поэтому с ним сравнивают через <code>is</code>: <code>x is None</code>, <code>x is not None</code>. '
+        'Так принято: это короче проверки ==, и никакой хитрый объект не сможет «притвориться» равным None:</p>'
+        + ex('ages = {"Аня": 15}\nage = ages.get("Борис")\nprint(age is None, ages.get("Аня") is not None)')
     )
     return th('Имена и объекты', terms, body)
 

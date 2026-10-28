@@ -34,6 +34,9 @@ NOTES = servers(**{'notes.itp': {'collection': 'notes', 'users': [
 
 def th_http():
     terms = [
+        ('urllib', 'Стандартный модуль для работы с адресами; его часть urllib.parse разбирает и собирает URL.'),
+        ('urlsplit','urllib.parse.urlsplit(адрес) — разбирает URL на части: scheme, netloc (хост и порт), path, query.'),
+        ('content', 'r.content — тело ответа байтами (bytes), как пришло. r.text — то же, раскодированное в строку. Картинки и файлы берут через content.'),
         ('сервер', 'Программа, которая ждёт запросы по сети и отвечает на них. Клиент — тот, кто спрашивает: браузер, приложение, твоя программа.'),
         ('URL', 'Адрес ресурса: схема://хост:порт/путь?параметры. Например, http://127.0.0.1:5000/numbers — схема http, хост 127.0.0.1, '
                 'порт 5000, путь /numbers.'),
@@ -66,6 +69,11 @@ def th_http():
         + ex('import requests\n\nnumbers = requests.get("' + D + '/numbers").json()\nprint(numbers, sum(numbers))\n'
              'city = requests.get("' + D + '/city").json()\nprint(city["name"], city["population"])\nr = requests.get("' + D + '/nothing")\nprint(r.status_code, r.text)') +
         '<p>Если пути нет, сервер отвечает кодом 404. Это не ошибка Python: программа не падает, просто нужно проверить код.</p>'
+        + '<h3>Части адреса и тело ответа</h3>'
+        '<p>Адрес состоит из частей, и разобрать его помогает [[urlsplit]] из стандартного модуля urllib.parse. А у ответа, '
+        'кроме <code>text</code>, есть [[content]] — те же данные байтами: так приходят картинки и файлы.</p>'
+        + ex('from urllib.parse import urlsplit\nimport requests\n\nparts = urlsplit("http://127.0.0.1:5000/numbers?sort=asc")\nprint(parts.scheme, parts.netloc, parts.path, parts.query)\n'
+             'r = requests.get("http://127.0.0.1:5000/")\nprint(len(r.text), len(r.content), r.content[:6])')
     )
     return th('Клиент, сервер и HTTP', terms, body)
 
