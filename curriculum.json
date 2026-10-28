@@ -1098,7 +1098,26 @@
    "after": "bigproject",
    "run": "read-only+native",
    "min": 45,
-   "about": "venv, pip, requirements.txt, pyinstaller (объяснение и команды для ПК); logging и assert/pytest-стиль проверок (запускаются в приложении)"
+   "about": "venv, pip, requirements.txt, pyinstaller (объяснение и команды для ПК); logging и assert/pytest-стиль проверок (запускаются в приложении)",
+   "introduces": {
+    "f": [
+     "logging.basicConfig",
+     "logging.getLogger",
+     "logging.INFO",
+     "sys.stdout"
+    ],
+    "m": [
+     "debug",
+     "info",
+     "warning",
+     "error"
+    ],
+    "k": [],
+    "mod": [
+     "logging"
+    ],
+    "err": []
+   }
   },
   {
    "id": "matplotlib",

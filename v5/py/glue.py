@@ -359,6 +359,21 @@ def _itp_reset():
                 pass
     linecache.cache.pop('main.py', None)
     random.seed()
+    # 7.0: Python в приложении живёт между запусками — журнал logging от прошлой программы сбрасываем,
+    # иначе basicConfig новой программы молча ничего не сделает
+    _lg = sys.modules.get('logging')
+    if _lg is not None:
+        try:
+            _root = _lg.getLogger()
+            for _h in _root.handlers[:]:
+                _root.removeHandler(_h)
+            _root.setLevel(_lg.WARNING)
+            for _l in list(_lg.Logger.manager.loggerDict.values()):
+                if isinstance(_l, _lg.Logger):
+                    _l.setLevel(_lg.NOTSET)
+                    _l.handlers.clear()
+        except Exception:
+            pass
 
 # ---- v5.4.0: модуль turtle (исходник добавляется при сборке в _TURTLE_SRC) ----
 import importlib.abc, importlib.util
