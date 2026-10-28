@@ -917,7 +917,7 @@
    "after": "nested",
    "run": "shim",
    "min": 40,
-   "about": "модуль turtle (учебный, рисует на холсте): движение, повороты, перо, цвет, заливка, узоры циклами"
+   "about": "модуль turtle (учебный, рисует на холсте): движение, повороты, перо, цвет, заливка, узоры циклами", "introduces": {"f": ["turtle.forward", "turtle.backward", "turtle.left", "turtle.right", "turtle.penup", "turtle.pendown", "turtle.goto", "turtle.pensize", "turtle.color", "turtle.begin_fill", "turtle.end_fill", "turtle.circle"], "m": [], "k": [], "mod": ["turtle"], "err": []}
   },
   {
    "id": "bases",
@@ -944,7 +944,7 @@
    "after": "files",
    "run": "native",
    "min": 50,
-   "about": "модуль re: шаблоны, классы символов, повторы, группы, search/findall/sub/fullmatch, проверка форматов; мини-проект: парсер логов"
+   "about": "модуль re: шаблоны, классы символов, повторы, группы, search/findall/sub/fullmatch, проверка форматов; мини-проект: парсер логов", "introduces": {"f": ["re.search", "re.findall", "re.sub", "re.fullmatch"], "m": ["group"], "k": [], "mod": ["re"], "err": []}
   },
   {
    "id": "fsauto",
@@ -960,7 +960,7 @@
    "after": "files",
    "run": "native",
    "min": 35,
-   "about": "sys.argv и argparse (разбор списка аргументов, переданного в parse_args), справка --help; мини-проект: конвертер валют по фиксированным курсам"
+   "about": "sys.argv и argparse (разбор списка аргументов, переданного в parse_args), справка --help; мини-проект: конвертер валют по фиксированным курсам", "introduces": {"f": ["argparse.ArgumentParser"], "m": ["add_argument", "parse_args", "format_help"], "k": [], "mod": ["argparse"], "err": []}
   },
   {
    "id": "pillow",
@@ -1048,7 +1048,7 @@
    "after": "requests",
    "run": "native",
    "min": 40,
-   "about": "модуль ipaddress: IPv4/IPv6, сети и маски, hosts(), проверка вхождения, strict=False, ValueError; мини-проект: калькулятор подсетей"
+   "about": "модуль ipaddress: IPv4/IPv6, сети и маски, hosts(), проверка вхождения, strict=False, ValueError; мини-проект: калькулятор подсетей", "introduces": {"f": ["ipaddress.ip_address", "ipaddress.ip_network"], "m": ["hosts", "subnets"], "k": [], "mod": ["ipaddress"], "err": []}
   }
  ]
 }

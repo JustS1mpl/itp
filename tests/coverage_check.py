@@ -87,7 +87,8 @@ def scan(code):
             elif isinstance(getattr(builtins, n.id, None), type):
                 errs.add(n.id)                                 # встроенные исключения: ValueError и т.д.
         elif t is ast.Attribute and isinstance(n.value, ast.Name) and n.value.id in modnames:
-            calls.add(n.attr)                                  # math.pi, sys.stdin
+            if not (n.attr.startswith('_') and not n.attr.startswith('__')):
+                calls.add(n.attr)                              # math.pi, sys.stdin; служебное turtle._LOG проверки — не учебное
         elif t in (ast.FunctionDef, ast.AsyncFunctionDef):
             ks.add('def')
             if n.name.startswith('__') and n.name.endswith('__'):
