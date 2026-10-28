@@ -80,5 +80,13 @@
 ## Сборка с темы 25
 Собирать на окружении E (там Playwright: код с numpy/pandas dsl.py запускает в Pyodide из out5.html и кэширует вывод в pyo_cache.json): `bash "E:/Program Files/itp-tools/tmp/b.sh" xc` — то же, что mk.sh, плюс legacy_trace и xc5. mk.sh тоже работает с этим окружением: `PY="E:/Program Files/itp-tools/venv/Scripts/python.exe" bash mk.sh` (нужны PYTHONIOENCODING=utf-8, PYTHONUTF8=1 и PLAYWRIGHT_BROWSERS_PATH на ms-playwright в itp-tools).
 
+## Фаза 5 — кроличьи норы (с 2026-10-28)
+Нора — c_h_<id>.py (topic(..., opt=True)), открывается после темы after; что вводит — holes[].introduces в curriculum.json.
+Готовы (coverage 0, xc5 bad 0): bases, regex (+ проект «Парсер логов»), ipaddress (+ «Калькулятор подсетей»), cli (+ «Конвертер валют»), turtle,
+fsauto (+ «Разобрать папку «Загрузки»»), async, tools, api (+ «Консольная погода»). «Ученик» проверил все, кроме tools и api.
+Осталось: tkinter, pygame (код для компьютера + логика без окна), matplotlib, bots, webserver (нужен учебный мини-фреймворк/мессенджер),
+scraping, pillow (пакеты Pyodide; для сборки код с ними должен идти через Pyodide, как numpy — см. PYO_RE в dsl.py).
+Ещё сделано попутно: файлы задач во вложенных папках; движок сбрасывает logging между запусками; requests_shim: status, statuses, param+variants, collection, key.
+
 ## Следующий шаг
 Фаза 3 закончена. Фаза 5 — норы по списку holes в curriculum.json. Порядок работы над темой: перечень понятий из `legacy-do-not-read` (только имена, уже есть в `curriculum.json`) → писать с чистого листа → `PY=py bash mk.sh` без нарушений → `xc5` bad 0 → выгрузка текста для «ученика» (`py tests/student_export.py файл.txt "Название темы"`; файл класть в `E:\Program Files\itp-tools\tmp`) → суб-агент на Sonnet 5.5 → правки → коммит. После правок в v5/ — `tests/mobile7.py` (телефон).
