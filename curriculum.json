@@ -1146,7 +1146,30 @@
    "after": "requests",
    "run": "native+read-only",
    "min": 50,
-   "about": "asyncio.run, async/await, gather, имитация загрузок через asyncio.sleep; threading и сокеты — объяснение и код для ПК"
+   "about": "asyncio.run, async/await, gather, имитация загрузок через asyncio.sleep; threading и сокеты — объяснение и код для ПК",
+   "introduces": {
+    "f": [
+     "asyncio.run",
+     "asyncio.sleep",
+     "asyncio.gather",
+     "asyncio.create_task",
+     "threading.Thread",
+     "time.sleep"
+    ],
+    "m": [
+     "start"
+    ],
+    "k": [
+     "async def",
+     "await"
+    ],
+    "mod": [
+     "asyncio",
+     "threading",
+     "time"
+    ],
+    "err": []
+   }
   },
   {
    "id": "ipaddress",
