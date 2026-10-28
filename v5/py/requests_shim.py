@@ -169,6 +169,9 @@ class _Server:
         self.routes = dict(spec.get('routes', {}))
         self.users = _json.loads(_json.dumps(spec['users'])) if 'users' in spec else None
         self.coll = '/' + spec.get('collection', 'users')
+        # 7.0: учебный мессенджер для ботов (как Telegram): {"bot": {"token": …, "updates": [{"update_id": 1, "message": {…}}]}}
+        self.bot = _json.loads(_json.dumps(spec['bot'])) if 'bot' in spec else None
+        self.sent = []
         self.token = spec.get('token')
         self.state = {}
 
@@ -183,6 +186,8 @@ class _Server:
             return self._json(200, {'message': 'Секретные данные для владельца токена'})
         if p == '/echo':
             return self._json(200, {'method': method, 'args': dict(query), 'json': body})
+        if self.bot is not None and p in ('/getUpdates', '/sendMessage'):
+            return self._bot(p, dict(query), body)
         if self.users is not None and (p == self.coll or p.startswith(self.coll + '/')):
             return self._users(method, p, body)
         spec = self.routes.get(p)
@@ -191,6 +196,21 @@ class _Server:
         if method not in spec.get('methods', ['GET']):
             return 405, b'Method Not Allowed', 'text/plain; charset=utf-8'
         return _body(spec, self.state, p, query)
+
+    def _bot(self, p, query, body):
+        if query.get('token') != self.bot['token']:
+            return self._json(401, {'ok': False, 'error': 'Unauthorized'})
+        if p == '/getUpdates':
+            try:
+                offset = int(query.get('offset', 0))
+            except ValueError:
+                offset = 0
+            return self._json(200, {'ok': True, 'result': [u for u in self.bot['updates'] if u['update_id'] >= offset]})
+        if not isinstance(body, dict) or 'chat_id' not in body or not str(body.get('text', '')).strip():
+            return self._json(400, {'ok': False, 'error': 'Нужны chat_id и непустой text'})
+        msg = {'message_id': len(self.sent) + 1, 'chat_id': body['chat_id'], 'text': str(body['text'])}
+        self.sent.append(msg)
+        return self._json(200, {'ok': True, 'result': msg})
 
     def _users(self, method, p, body):
         rest = p[len(self.coll):].strip('/')

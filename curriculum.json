@@ -885,7 +885,8 @@
      "requests.delete",
      "requests.ConnectionError",
      "requests.HTTPError",
-     "urllib.parse.urlsplit"
+     "urllib.parse.urlsplit",
+     "os.environ"
     ],
     "m": [
      "json",
@@ -894,7 +895,8 @@
     "k": [],
     "mod": [
      "requests",
-     "urllib"
+     "urllib",
+     "os"
     ],
     "err": [
      "ConnectionError",
@@ -1167,14 +1169,10 @@
    "min": 45,
    "about": "что такое API и ключ, ключи только в переменных окружения, разбор вложенного JSON, ограничения запросов; учебные серверы погоды, курсов и фактов; мини-проект: консольная погода",
    "introduces": {
-    "f": [
-     "os.environ"
-    ],
+    "f": [],
     "m": [],
     "k": [],
-    "mod": [
-     "os"
-    ],
+    "mod": [],
     "err": []
    }
   },
@@ -1192,7 +1190,14 @@
    "after": "requests",
    "run": "shim",
    "min": 50,
-   "about": "учебный мессенджер вместо Telegram: обновления, обработчики команд, эхо-бот, напоминалка, бот погоды; токен из окружения"
+   "about": "учебный мессенджер вместо Telegram: обновления, обработчики команд, эхо-бот, напоминалка, бот погоды; токен из окружения",
+   "introduces": {
+    "f": [],
+    "m": [],
+    "k": [],
+    "mod": [],
+    "err": []
+   }
   },
   {
    "id": "webserver",
