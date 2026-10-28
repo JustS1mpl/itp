@@ -59,7 +59,8 @@ self.onmessage=async function(e){var m=e.data;
     RUN={lines:m.lines||[],i:0,ask:!!m.ask,echo:!!m.ask,eof:0,over:false};
     var res=null,fail=null;
     try{
-      if(m.files)Object.keys(m.files).forEach(function(n){try{py.FS.writeFile('/home/pyodide/'+n,String(m.files[n]))}catch(x){}});
+      /* 7.0: файлы задачи могут лежать в папках («Загрузки/фото.jpg») — сначала создаём папки */
+      if(m.files)Object.keys(m.files).forEach(function(n){try{var p='/home/pyodide/'+n;py.FS.mkdirTree(p.slice(0,p.lastIndexOf('/')));py.FS.writeFile(p,String(m.files[n]))}catch(x){}});
       var f=py.globals.get('_itp_run');res=f(m.code,!m.ask,String(m.seed));try{f.destroy()}catch(x){}
     }catch(err){fail=String(err&&err.message||err)}
     /* pygame пытается открыть окно (SDL ищет экран страницы), а в фоновом процессе браузера окна нет */

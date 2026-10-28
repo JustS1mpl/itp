@@ -1017,7 +1017,33 @@
    "after": "files",
    "run": "native-vfs",
    "min": 40,
-   "about": "os, shutil, pathlib на виртуальной файловой системе Pyodide: обход папок, копирование, перемещение; мини-проект: разобрать папку «Загрузки»"
+   "about": "os, shutil, pathlib на виртуальной файловой системе Pyodide: обход папок, копирование, перемещение; мини-проект: разобрать папку «Загрузки»",
+   "introduces": {
+    "f": [
+     "shutil.copy",
+     "shutil.move",
+     "shutil.rmtree"
+    ],
+    "m": [
+     "iterdir",
+     "rglob",
+     "glob",
+     "is_file",
+     "is_dir",
+     "stat",
+     "relative_to",
+     "as_posix",
+     "mkdir",
+     "rename",
+     "unlink",
+     "with_name"
+    ],
+    "k": [],
+    "mod": [
+     "shutil"
+    ],
+    "err": []
+   }
   },
   {
    "id": "cli",

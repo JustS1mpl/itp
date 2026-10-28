@@ -81,6 +81,7 @@ def run(code, lines=None, files=None):
         return plain, esc(plain)
     d = tempfile.mkdtemp()
     for k, v in (files or {}).items():
+        os.makedirs(os.path.dirname(d + '/' + k), exist_ok=True)  # файлы задачи могут лежать в папках: «Загрузки/фото.jpg»
         open(d + '/' + k, 'w', encoding='utf-8', newline='').write(v)
     r = subprocess.run([PY, '-c', WRAP % (lines, code)], capture_output=True, text=True, timeout=15, cwd=d, input=None)
     assert r.returncode == 0, (code, r.stderr)
