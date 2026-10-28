@@ -1431,10 +1431,14 @@ pre,code,textarea,#hl,.pyex p,.qv,.cmp{font-variant-ligatures:none;font-feature-
 .q{font-weight:800;line-height:1.35;letter-spacing:-.005em}
 .q~pre{font-size:.9375rem;line-height:1.5}
 @supports (background:color-mix(in srgb,red 50%,blue)){
-  .tcard .ov{color:color-mix(in srgb,var(--tk) 62%,var(--ink));background:color-mix(in srgb,var(--tk) 14%,var(--card))}
-  .pyex>span,.tcard .qlab,.pj .qlab{color:color-mix(in srgb,var(--tk) 55%,var(--ink))}
-  .qv{background:color-mix(in srgb,var(--tk,var(--t-code)) 13%,var(--card2))}
-  .q~pre{background:color-mix(in srgb,var(--t-flash) 7%,var(--card));box-shadow:inset 3px 0 0 color-mix(in srgb,var(--t-flash) 70%,transparent)}
+  /* без тёплых подмесов: оранжевый на бежевом давал жёлтый (владелец, dev.8). Цвет — только у метки, и это акцент
+     пользователя, как у полоски прогресса и «Проверить»; подложки примера и значений — нейтральный серый от цвета текста */
+  .tcard .ov{color:var(--accent-ink);background:var(--soft)}
+  .pyex{background:color-mix(in srgb,var(--ink) 4.5%,var(--card))}
+  .pyex pre,.pyex pre.cmp{box-shadow:0 0 0 1px color-mix(in srgb,var(--ink) 8%,transparent)}
+  .pyex>span,.tcard .qlab,.pj .qlab{color:var(--muted)}
+  .qv{background:color-mix(in srgb,var(--ink) 8%,var(--card));color:var(--ink)}
+  .q~pre{background:color-mix(in srgb,var(--ink) 3%,var(--card));box-shadow:inset 3px 0 0 color-mix(in srgb,var(--accent) 70%,transparent)}
 }
 
 /* 7.0: телефон — полоска символов над клавиатурой и кнопка «вернуть начальный код» (DECISIONES §49) */
