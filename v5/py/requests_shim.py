@@ -137,22 +137,36 @@ class Response:
 
 
 # ---------------------------------------------------------------- виртуальные серверы
-def _body(spec, state, key):
+def _body(spec, state, key, query=()):
+    # 7.0: "status" — свой код ответа (для задач про ошибки); "param" + "variants" — ответ зависит от параметра запроса:
+    # {"param": "city", "variants": {"Омск": {...}}} — значения нет среди вариантов → 404 {"error": "not found"}
+    code = spec.get('status', 200)
+    if 'statuses' in spec:  # коды по очереди на каждый запрос, последний повторяется: [503, 503, 200]
+        n = state.get(key + '#', 0)
+        state[key + '#'] = n + 1
+        code = spec['statuses'][min(n, len(spec['statuses']) - 1)]
+    if 'param' in spec:
+        v = dict(query).get(spec['param'])
+        if v not in spec['variants']:
+            return 404, _json.dumps({'error': 'not found'}, ensure_ascii=False).encode('utf-8'), 'application/json'
+        return code, _json.dumps(spec['variants'][v], ensure_ascii=False).encode('utf-8'), 'application/json'
     if 'json' in spec:
-        return 200, _json.dumps(spec['json'], ensure_ascii=False).encode('utf-8'), 'application/json'
+        return code, _json.dumps(spec['json'], ensure_ascii=False).encode('utf-8'), 'application/json'
     if 'seq' in spec:
         n = state.get(key, 0)
         state[key] = n + 1
-        return 200, str(spec['seq'][n % len(spec['seq'])]).encode('utf-8'), 'text/plain; charset=utf-8'
-    return 200, str(spec.get('text', '')).encode('utf-8'), 'text/plain; charset=utf-8'
+        return code, str(spec['seq'][n % len(spec['seq'])]).encode('utf-8'), 'text/plain; charset=utf-8'
+    return code, str(spec.get('text', '')).encode('utf-8'), 'text/plain; charset=utf-8'
 
 
 class _Server:
-    """routes: {"/путь": {"text": ...} | {"json": ...} | {"seq": [...]}}; users: список JSON-объектов (ресурс /users)."""
+    """routes: {"/путь": {"text": ...} | {"json": ...} | {"seq": [...]}}; users: список JSON-объектов (ресурс /users,
+    или /<collection>, если в описании сервера есть "collection": "notes")."""
 
     def __init__(self, spec):
         self.routes = dict(spec.get('routes', {}))
         self.users = _json.loads(_json.dumps(spec['users'])) if 'users' in spec else None
+        self.coll = '/' + spec.get('collection', 'users')
         self.token = spec.get('token')
         self.state = {}
 
@@ -167,17 +181,17 @@ class _Server:
             return self._json(200, {'message': 'Секретные данные для владельца токена'})
         if p == '/echo':
             return self._json(200, {'method': method, 'args': dict(query), 'json': body})
-        if self.users is not None and (p == '/users' or p.startswith('/users/')):
+        if self.users is not None and (p == self.coll or p.startswith(self.coll + '/')):
             return self._users(method, p, body)
         spec = self.routes.get(p)
         if spec is None:
             return 404, b'Not Found', 'text/plain; charset=utf-8'
         if method not in spec.get('methods', ['GET']):
             return 405, b'Method Not Allowed', 'text/plain; charset=utf-8'
-        return _body(spec, self.state, p)
+        return _body(spec, self.state, p, query)
 
     def _users(self, method, p, body):
-        rest = p[len('/users'):].strip('/')
+        rest = p[len(self.coll):].strip('/')
         if rest == '':
             if method == 'GET':
                 return self._json(200, self.users)

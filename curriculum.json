@@ -864,7 +864,9 @@
      "requests.get",
      "requests.post",
      "requests.put",
-     "requests.delete"
+     "requests.delete",
+     "requests.ConnectionError",
+     "requests.HTTPError"
     ],
     "m": [
      "json",

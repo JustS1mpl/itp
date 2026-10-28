@@ -155,7 +155,7 @@ var QTB='';
 function qBind(root){(root||document).querySelectorAll('.qtb button').forEach(function(b){b.onclick=function(){
   var on=b.dataset.q==='1',card=b.closest('.card,.tcard')||root;card.querySelectorAll('details').forEach(function(d){d.open=on});snd('click')}})}
 /* 7.0: файлы рядом с программой (поле f задачи или проекта) — показываем ученику их содержимое */
-function filesHtml(f){var fs=typeof fsOf==='function'?fsOf(f):(f&&typeof f==='object'?f:null);if(!fs)return'';var ks=Object.keys(fs);if(!ks.length)return'';return qSec('Файлы рядом с программой: '+ks.map(esc).join(', '),ks.map(function(n){return'<p class="qlab">'+esc(n)+'</p><pre class="cmp">'+esc(fs[n])+'</pre>'}).join(''),false)}
+function filesHtml(f){var fs=typeof fsOf==='function'?fsOf(f):(f&&typeof f==='object'?f:null);if(!fs)return'';var ks=Object.keys(fs).filter(function(n){return n.indexOf('_itp')!==0});if(!ks.length)return'';/* _itp_servers.json — служебный файл учебных серверов */return qSec('Файлы рядом с программой: '+ks.map(esc).join(', '),ks.map(function(n){return'<p class="qlab">'+esc(n)+'</p><pre class="cmp">'+esc(fs[n])+'</pre>'}).join(''),false)}
 function taskCard(q,lab){
   var lg=String(q.q||'').length>QLONG||(String(q.q||'').length>330&&/\n/.test(q.q));
   var big=String(q.q||'').length>260;
