@@ -87,7 +87,7 @@ def code_log():
     return ts('Логи', [
         task('Проверка requirements.txt. Рядом с программой лежит requirements.txt. Настрой журнал: уровень INFO, формат «%(levelname)s: %(message)s», '
              'вывод в sys.stdout. Для каждой строки файла: пустые и комментарии (с #) пропусти; строку «пакет==версия» запиши в лог INFO «ПАКЕТ ВЕРСИЯ»; '
-             'строку без == — WARNING «версия не зафиксирована: СТРОКА»; если пакет уже встречался с == — ERROR «ПАКЕТ указан дважды». '
+             'строку без == — WARNING «версия не зафиксирована: СТРОКА»; если пакет уже встречался с == — ERROR «ПАКЕТ указан дважды» (INFO для такой строки не пишется). '
              'В конце выведи print «Пакетов: N» — сколько разных пакетов с зафиксированной версией.',
              'line.strip(); if not line or line.startswith("#"): continue. name, ver = line.split("==").\nПакеты храни во множестве.',
              'import logging\nimport sys\n\nlogging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s", stream=sys.stdout)\nlog = logging.getLogger("req")\n'

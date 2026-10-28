@@ -1139,7 +1139,25 @@
    "after": "pandas",
    "run": "pyodide-package",
    "min": 40,
-   "about": "линейный график, столбцы, гистограмма, подписи и легенда, график по CSV"
+   "about": "линейный график, столбцы, гистограмма, подписи и легенда, график по CSV",
+   "introduces": {
+    "f": [
+     "matplotlib.pyplot.plot",
+     "matplotlib.pyplot.bar",
+     "matplotlib.pyplot.hist",
+     "matplotlib.pyplot.title",
+     "matplotlib.pyplot.xlabel",
+     "matplotlib.pyplot.ylabel",
+     "matplotlib.pyplot.legend",
+     "matplotlib.pyplot.show"
+    ],
+    "m": [],
+    "k": [],
+    "mod": [
+     "matplotlib"
+    ],
+    "err": []
+   }
   },
   {
    "id": "api",

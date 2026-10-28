@@ -80,29 +80,31 @@ def code_events():
         task('Логика калькулятора. Напиши класс Calculator с методом press(key), который возвращает строку для экрана. Кнопки: цифры, «+», «-», «*», «/», '
              '«=» и «C». Цифры дописываются к текущему числу (экран показывает его; ведущий 0 заменяется). Операция запоминает число и операцию и '
              'начинает новое число; «=» считает результат и показывает его (целое — без «.0»; деление на ноль — «Ошибка»). «C» сбрасывает всё в «0». '
-             'Если перед операцией уже была операция, сначала считается она.',
+             'Если перед операцией уже была операция, сначала считается она. После операции экран показывает запомненное число (после «1+2+» — уже 3). '
+             'После «=» цифра начинает новое число, а операция продолжает считать с результата. Двух операций подряд в проверке нет.',
              'Храни: current — строка набираемого числа, stored — запомненное число, op — операция. compute(): по op из stored и current.\n'
              'Целое без .0: int(r) if r == int(r) else r.',
-             'class Calculator:\n    def __init__(self):\n        self.current = "0"\n        self.stored = None\n        self.op = None\n\n    def compute(self):\n'
+             'class Calculator:\n    def __init__(self):\n        self.current = "0"\n        self.stored = None\n        self.op = None\n        self.done = False\n\n    def compute(self):\n'
              '        a, b = self.stored, float(self.current)\n        if self.op == "+":\n            r = a + b\n        elif self.op == "-":\n            r = a - b\n'
              '        elif self.op == "*":\n            r = a * b\n        else:\n            if b == 0:\n                return None\n            r = a / b\n'
              '        return int(r) if r == int(r) else r\n\n    def press(self, key):\n        if key == "C":\n            self.__init__()\n        elif key.isdigit():\n'
-             '            self.current = key if self.current == "0" else self.current + key\n        elif key in "+-*/":\n            if self.op is not None:\n'
+             '            self.current = key if self.current == "0" or self.done else self.current + key\n            self.done = False\n        elif key in "+-*/":\n            if self.op is not None:\n'
              '                r = self.compute()\n                if r is None:\n                    self.__init__()\n                    return "Ошибка"\n                self.current = str(r)\n'
              '            self.stored = float(self.current)\n            self.op = key\n            self.current = "0"\n            return str(self.stored if self.stored != int(self.stored) else int(self.stored))\n'
              '        elif key == "=" and self.op is not None:\n            r = self.compute()\n            self.__init__()\n            if r is None:\n                return "Ошибка"\n'
-             '            self.current = str(r)\n        return self.current\n',
+             '            self.current = str(r)\n            self.done = True\n        return self.current\n',
              ['c = Calculator()\nfor k in "12+30=":\n    print(c.press(k))', 'c = Calculator()\nprint(" ".join(c.press(k) for k in "7/2="))\nprint(" ".join(c.press(k) for k in "C5*4-6="))',
-              'c = Calculator()\nprint(" ".join(c.press(k) for k in "9/0="))\nprint(" ".join(c.press(k) for k in "007+1="))'], tail=TL),
-        task('Логика заметок. Окно заметок вызывает методы класса Notes: add(text) — добавить (пустой текст или только пробелы — не добавлять, вернуть False), '
-             'delete(i) — удалить заметку с номером i (с 1; вернуть False, если такой нет), find(word) — список заметок, где есть слово без учёта регистра, '
+              'c = Calculator()\nprint(" ".join(c.press(k) for k in "9/0="))\nprint(" ".join(c.press(k) for k in "007+1="))\nprint(" ".join(c.press(k) for k in "5=3+1+2=*2="))'], tail=TL),
+        task('Логика заметок. Окно заметок вызывает методы класса Notes: add(text) — добавить текст без пробелов по краям и вернуть True (пустой текст или '
+             'только пробелы — не добавлять, вернуть False), delete(i) — удалить заметку с номером i (с 1) и вернуть True, или False, если такой нет, '
+             'find(word) — список текстов заметок, в которых есть эта подстрока без учёта регистра, '
              'listing() — строки «N. ТЕКСТ» для списка в окне. Напиши класс.',
              'Храни заметки списком. listing: [f"{i}. {t}" for i, t in enumerate(self.items, 1)].',
              'class Notes:\n    def __init__(self):\n        self.items = []\n\n    def add(self, text):\n        if not text.strip():\n            return False\n'
              '        self.items.append(text.strip())\n        return True\n\n    def delete(self, i):\n        if not 1 <= i <= len(self.items):\n            return False\n'
              '        self.items.pop(i - 1)\n        return True\n\n    def find(self, word):\n        return [t for t in self.items if word.lower() in t.lower()]\n\n'
              '    def listing(self):\n        return [f"{i}. {t}" for i, t in enumerate(self.items, 1)]\n',
-             ['n = Notes()\nprint(n.add("Купить хлеб"), n.add("   "), n.add("Позвонить бабушке"))\nprint(n.listing())',
+             ['n = Notes()\nprint(n.add("Купить хлеб"), n.add("   "), n.add("  Позвонить бабушке "))\nprint(n.listing())\nprint(n.find("БАБУШ"), n.find("сыр"))',
               'n = Notes()\nfor t in ["ДЗ по алгебре", "хлеб", "алгебра: №112"]:\n    n.add(t)\nprint(n.find("АЛГЕБР"))\nprint(n.delete(2), n.delete(5))\nprint(n.listing())'], tail=TL),
     ])
 
@@ -112,7 +114,7 @@ def project():
               'Окно трекера будет вызывать класс Tracker, а пока проверим его командами. Привычку отмечают по дням (номер дня — целое, начиная с 1). '
               'На вход подаются команды, последняя — «стоп»:\n— «добавить ПРИВЫЧКА» → «Добавлено: ПРИВЫЧКА» или «Уже есть: ПРИВЫЧКА»;\n'
               '— «отметить ПРИВЫЧКА ДЕНЬ» → «ПРИВЫЧКА: день ДЕНЬ отмечен» (повторная отметка ничего не меняет и пишет то же); нет привычки — «Нет привычки: ПРИВЫЧКА»;\n'
-              '— «серия ПРИВЫЧКА ДЕНЬ» → «ПРИВЫЧКА: серия N» — сколько дней подряд отмечено, заканчивая этим днём (если этот день не отмечен — 0);\n'
+              '— «серия ПРИВЫЧКА ДЕНЬ» → «ПРИВЫЧКА: серия N» — сколько дней подряд отмечено, заканчивая этим днём (если этот день не отмечен — 0); нет привычки — «Нет привычки: ПРИВЫЧКА»;\n'
               '— «итоги» → по привычкам в алфавитном порядке «ПРИВЫЧКА: дней D, лучшая серия B», или «Привычек нет».\n'
               'Названия привычек — одно слово. У привычки без отметок лучшая серия — 0.',
               'В Tracker словарь «привычка → множество отмеченных дней»\nСерия до дня d: пока d в множестве — считать и уменьшать d\n'
