@@ -2,6 +2,30 @@
 function defset(){return{acc:'',exl:'c',tz:100,anim:'full',vol:70,sfx:1,vib:1,emo:1,ty:1,toc:1,rep:1,ln:1,ac:1,cf:15,gc:1,bg:1,ks:0,ph:'card',sh:'v',fl:'tilt'}}
 function ST(k){return S.set&&S.set[k]!==undefined?S.set[k]:defset()[k]}
 function RM(){return ST('anim')==='off'||matchMedia('(prefers-reduced-motion:reduce)').matches}
+/* --- ключи сохранений и языки (U2-2, U2-3; DECISIONES §70) ---
+   Два уровня данных. 1) Настройки устройства — отдельный ключ ITPAPP, вне прогресса: согласие с условиями, язык
+   интерфейса, выбранный язык программирования. Сброс прогресса их не трогает. 2) Прогресс S — свой ключ у каждого
+   языка программирования: у Python прежний (pyshag2, в пробных сборках pyshag7dev — без переноса данных), у других
+   «ключ.код» (pyshag2.js…). Store (хранилище в базе) берёт ключ через saveKey() при загрузке; смена языка — запись
+   в ITPAPP и перезапуск, тогда загружаются прогресс, курс и движок этого языка. Пока язык один, выбор не показывается.
+   saveKey и appGet вызываются раньше, чем выполнятся var этого файла, поэтому не зависят от них. */
+var UILANGS=[['ru','Русский']];                 /* языки интерфейса; второй появится вместе со словарём строк */
+var PLANGS=[{id:'py',n:'Python',s:'Самый понятный первый язык'}];  /* языки курса: id, название, подпись в меню */
+function appGet(){var o=null;try{o=JSON.parse(localStorage.getItem('itp-app')||'null')}catch(e){}if(!o||typeof o!=='object'||Array.isArray(o))o=window.ITPAPPM||{};return o}
+function appSet(p){var o=appGet();for(var k in p)o[k]=p[k];window.ITPAPPM=o;try{localStorage.setItem('itp-app',JSON.stringify(o))}catch(e){}return o}
+function plCur(){var p=appGet().pl;return typeof p==='string'&&/^[a-z]{1,8}$/.test(p)?p:'py'}
+function saveKey(base){var p=plCur();window.ITPKB=base;return p==='py'?base:base+'.'+p}
+/* строка «Язык программирования» в настройках: пустая, пока язык один */
+function plRow(){if(PLANGS.length<2)return'';var c=plCur(),l=PLANGS.filter(function(x){return x.id===c})[0]||PLANGS[0];
+  return SR('💬','Язык программирования',esc(l.n),'','pl')}
+/* смена языка: прогресс текущего сохранён; если у нового языка прогресса ещё нет, туда переносятся ник, обращение
+   и оформление, чтобы не знакомиться заново */
+function plSwitch(id){if(id===plCur())return;save();
+  try{var b=window.ITPKB||'pyshag2',k=id==='py'?b:b+'.'+id;if(!localStorage.getItem(k))localStorage.setItem(k,JSON.stringify({nick:S.nick,g:S.g,reg:S.reg,set:S.set,theme:S.theme,mute:S.mute}))}catch(e){}
+  appSet({pl:id});location.reload()}
+document.addEventListener('click',function(e){var b=e.target&&e.target.closest&&e.target.closest('.lst button.li[data-a="pl"]');if(!b)return;
+  modal('<h2>Язык программирования</h2><p class="mu">У каждого языка свой курс и свой прогресс. Прогресс по прежнему языку сохранится.</p>'+PLANGS.map(function(x){return'<button class="btn'+(x.id===plCur()?'':' g')+'" data-pl="'+x.id+'" style="margin-top:8px">'+esc(x.n)+'</button>'}).join(''),[['Отмена',null,1]]);
+  document.querySelectorAll('.modal [data-pl]').forEach(function(x){x.onclick=function(){plSwitch(x.dataset.pl)}})});
 function pad2(n){return(n<10?'0':'')+n}
 function dnum(s){var p=s.split('-');return Math.round(Date.UTC(+p[0],p[1]-1,+p[2])/864e5)}
 function dadd(s,n){var p=s.split('-'),d=new Date(Date.UTC(+p[0],p[1]-1,+p[2]+n));return d.getUTCFullYear()+'-'+pad2(d.getUTCMonth()+1)+'-'+pad2(d.getUTCDate())}

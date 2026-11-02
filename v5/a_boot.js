@@ -213,11 +213,11 @@ function crtOpen(op){
   CRT.off.push(function(){document.removeEventListener('keydown',hurry,true)});
   rbLoad(function(R){if(!CRT||CRT.el!==o)return;if(R)o.style.setProperty('--rb','url('+R.ol+')');var lg=o.querySelector('.lg');if(lg)rbHalftone(lg)});
   if(op.reboot){bx('power');CRT.hiss=bxHiss();crtDialog(true,1);return}
-  if(!full){CRT.hiss=bxHiss();crtDialog(false);return}
+  if(!full){CRT.hiss=bxHiss();crtAgree().then(function(){if(CRT&&CRT.el===o)crtDialog(false)});return}
   /* звук пробуем включить сразу: браузер разрешает это не всегда (обычно нужен первый жест), тогда заставка начинается тихо */
   try{if(typeof sxEnsure==='function')sxEnsure()}catch(e){}
   bx('power');CRT.hiss=bxHiss();
-  crtSplash().then(function(){if(CRT&&CRT.el===o)crtDialog(true)})}
+  crtSplash().then(crtAgree).then(crtUiLang).then(function(){if(CRT&&CRT.el===o)crtDialog(true)})}
 
 /* заставка (~7 с): кролик разгорается с мерцанием, как неоновая лампа, «дышит», появляется подпись, всё гаснет вспышкой.
    Если звук ещё не разрешён, первое касание не пропускает заставку, а включает звук прямо на ней; пропускает второе */
@@ -228,6 +228,47 @@ function crtSplash(){return new Promise(function(res){
     if(!CRT.lgs&&!late&&!S.mute){late=1;bxReady(function(){if(!CRT||ok)return;CRT.lgs=bx('late');if(!CRT.hiss)CRT.hiss=bxHiss()});return}
     go(1)};
   crtT(function(){go(0)},CRT.rm?2600:6800)})}
+
+/* --- пользовательское соглашение (U2-1): окно сразу после заставки, до знакомства с кроликом. Согласие хранится
+   в настройках устройства (appGet в a_core.js), а не в прогрессе: сброс прогресса его не спрашивает снова.
+   AGV — версия текста: если условия поменяются по существу, номер увеличивают, и окно покажется ещё раз.
+   У тех, кто начал раньше (вступление уже пройдено), окно один раз появится при запуске поверх Пути. --- */
+var AGV=1;
+var AGT='<p>ИТП («И так, программирование») — учебное приложение для изучения Python. Пожалуйста, прочитай коротко, на каких условиях им можно пользоваться.</p>'
+  +'<h3>Для чего</h3><p>Приложение сделано для личного обучения. Пользуйся им, чтобы учиться самому.</p>'
+  +'<h3>Материалы ИТП</h3><p>Тексты, задания, теория, рисунки и спрайты кролика, звуки, оформление и код самого приложения принадлежат автору ИТП. Их нельзя копировать, выкладывать, продавать, переделывать или использовать вне приложения без разрешения автора. Код, который ты пишешь в заданиях, — твой.</p>'
+  +'<h3>Без гарантий</h3><p>ИТП предоставляется «как есть». Мы стараемся, чтобы всё работало и было верно, но не обещаем, что в приложении нет ошибок, что прогресс никогда не потеряется и что курс совпадёт со школьной программой или экзаменом. Чтобы не потерять прогресс, делай резервную копию в настройках.</p>'
+  +'<h3>Данные</h3><p>Ник, прогресс и настройки хранятся в этом браузере на твоём устройстве. Если очистить данные браузера, они удалятся.</p>'
+  +'<h3>Изменения</h3><p>Условия могут обновляться вместе с приложением. Если изменится что-то важное, приложение покажет их снова.</p>';
+function agOk(){var a=appGet().agree;return !!(a&&a.v>=AGV)}
+function agSave(){if(typeof DVPV!=='undefined'&&DVPV)return;appSet({agree:{v:AGV,d:day(new Date())}})}
+/* в терминале: карточка поверх экрана; кнопка одна — без согласия дальше не пройти. В просмотре вступления
+   (режим разработчика) показывается всегда и ничего не записывает */
+function crtAgree(){return new Promise(function(res){
+  if(!CRT||(agOk()&&!(typeof DVPV!=='undefined'&&DVPV)))return res();
+  var w=document.createElement('div');w.className='agr';w.setAttribute('role','dialog');w.setAttribute('aria-modal','true');w.setAttribute('aria-labelledby','agt');
+  w.innerHTML='<div class="agc"><h2 id="agt">Пользовательское соглашение</h2><div class="agb" tabindex="0">'+AGT+'</div><button type="button" class="agy">Принимаю</button><p class="agn">Нажимая «Принимаю», ты соглашаешься с этими условиями.</p></div>';
+  CRT.el.querySelector('.sc').appendChild(w);bx('beep');
+  var b=w.querySelector('.agy');if(!CRT.touch)b.focus({preventScroll:true});
+  b.onclick=function(){if(!CRT)return;bx('ok');agSave();w.classList.add('out');crtT(function(){w.remove();res()},CRT.rm?0:260)}})}
+/* для тех, кто прошёл вступление до появления соглашения: обычное окно приложения при первом запуске */
+(function(){var g0=greet;greet=function(){var r=g0.apply(this,arguments);
+  if(!agOk()&&!document.querySelector('.modal.agm'))setTimeout(function(){if(agOk())return;modal('<h2>Пользовательское соглашение</h2><div class="agb">'+AGT+'</div>',[['Принимаю',function(){agSave()}]]);var ms=document.querySelectorAll('.modal');if(ms.length)ms[ms.length-1].classList.add('agm')},300);
+  return r}})();
+
+/* --- язык интерфейса (U2-2): до ника; пока язык один, вопроса нет. Ответ — в настройках устройства --- */
+function crtUiLang(){
+  if(!CRT||UILANGS.length<2||appGet().ui)return Promise.resolve();
+  CRT.el.classList.add('live');
+  return crtSys(['Язык / Language']).then(function(){return crtMenu(UILANGS.map(function(x,k){return{h:'<span class="tno">['+(k+1)+']</span>'+esc(x[1])}}),'Язык интерфейса')}).then(function(k){
+    appSet({ui:UILANGS[k][0]});crtYou('> '+UILANGS[k][1])})}
+/* --- язык программирования (U2-3): сразу после ника и обращения; пока язык один, вопроса нет. Выбран не Python —
+   ник и обращение переносятся в прогресс этого языка, и приложение перезапускается уже с его курсом --- */
+function crtPlang(){
+  if(!CRT||PLANGS.length<2||appGet().pl)return Promise.resolve();
+  return crtSay(['На каком языке будем программировать?']).then(function(){return crtMenu(PLANGS.map(function(x,k){return{h:'<span class="tno">['+(k+1)+']</span><span class="ct">'+esc(x.n)+'<small>'+esc(x.s||'')+'</small></span>'}}),'Язык программирования')}).then(function(k){
+    var l=PLANGS[k];crtYou('> '+l.n);if(l.id==='py'){appSet({pl:'py'});return}
+    plSwitch(l.id);return new Promise(function(){})})}
 
 function crtScroll(el){var t=CRT&&CRT.tm;if(!t)return;
   if(el&&el.offsetHeight>t.clientHeight*.6)t.scrollTop=Math.max(0,el.offsetTop-t.clientHeight*.25);else t.scrollTop=t.scrollHeight}
@@ -299,7 +340,7 @@ function crtDialog(full,reboot){
   if(!S.nick)p=p.then(function(){return crtSay(reboot?['Привет ещё раз.','Как я могу к тебе обращаться? Только нормально.']:['Привет.','Как я могу к тебе обращаться?'])}).then(crtName).then(function(v){
     NK=v;return crtSay((v==='Морковка'&&NKBAD>1?[]:['Приятно познакомиться, '+v+'.']).concat(['Ты парень или девушка? Это нужно, чтобы окончания в тексте были правильными.']))}).then(function(){
     return crtMenu([['m','Парень'],['f','Девушка'],['','Не указывать']].map(function(x,k){return{c:'tgd',a:' data-g="'+x[0]+'"',h:'<span class="tno">['+(k+1)+']</span>'+x[1]}}),'Как к тебе обращаться')}).then(function(k){
-    S.nick=NK;S.g=['m','f',''][k];if(!S.reg)S.reg=day(new Date());save();crtYou('> '+['Парень','Девушка','Не указывать'][k])});
+    S.nick=NK;S.g=['m','f',''][k];if(!S.reg)S.reg=day(new Date());save();crtYou('> '+['Парень','Девушка','Не указывать'][k])}).then(crtPlang);
   else p=p.then(function(){return crtSay(['С возвращением, '+S.nick+'.'])});
   p.then(function(){if(CRT)return crtSay(['С чего начнём?','Выбери первую тему, которую ещё не знаешь. Пропущенные можно пройти потом.'])}).then(function(){
     if(!CRT)return;

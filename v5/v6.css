@@ -1481,3 +1481,24 @@ html.exbig .exio pre.cmp,html.exbig .pyex .exio pre.cmp{margin:6px 0 0;padding:1
   html.exbig .tcard .pyex,html.exbig .pj .card .pyex{background:color-mix(in srgb,var(--ink) 4.5%,var(--card))}
   html.exbig .exio pre.cmp,html.exbig .pyex .exio pre.cmp{box-shadow:0 0 0 1px color-mix(in srgb,var(--ink) 8%,transparent)}
 }
+
+/* ===== U2: вступление — пользовательское соглашение (сессия U2; правки здесь не пересекаются с экранами учёбы) ===== */
+.crt .agr{position:absolute;inset:0;z-index:6;display:flex;align-items:center;justify-content:center;padding:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom));background:rgba(4,8,5,.72);animation:agIn .35s ease-out both}
+.crt .agr.out{animation:agOut .26s ease-in both}
+.crt .agc{display:flex;flex-direction:column;width:min(34rem,100%);max-height:min(40rem,100%);padding:22px 22px 16px;border:1.5px solid rgba(98,255,143,.55);border-radius:18px;background:#0b120d;box-shadow:0 0 0 1px rgba(98,255,143,.08),0 0 40px rgba(98,255,143,.12),0 24px 60px rgba(0,0,0,.6);color:#d2ffdf}
+.crt .agc h2{margin:0 0 12px;font-size:1.25rem;font-weight:800;color:var(--ph);text-shadow:0 0 8px var(--phg)}
+.crt .agb{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding-right:6px;font-size:.9375rem;line-height:1.5;color:rgba(210,255,223,.86);scrollbar-width:thin;scrollbar-color:rgba(98,255,143,.35) transparent}
+.crt .agb:focus-visible{outline:1px solid rgba(98,255,143,.45);outline-offset:4px;border-radius:6px}
+.crt .agb h3{margin:14px 0 4px;font-size:.8125rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ph2)}
+.crt .agb p{margin:0 0 6px}
+.crt .agy{margin-top:16px;min-height:48px;border:0;border-radius:12px;background:var(--ph);color:#04140a;font:800 1rem var(--nun);cursor:pointer;box-shadow:0 0 18px rgba(98,255,143,.35)}
+.crt .agy:hover{filter:brightness(1.06)}.crt .agy:focus-visible{outline:2px solid #d2ffdf;outline-offset:3px}
+.crt .agn{margin:10px 0 0;font-size:.75rem;text-align:center;color:rgba(210,255,223,.55)}
+@keyframes agIn{from{opacity:0}to{opacity:1}}
+@keyframes agIn2{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+.crt .agr .agc{animation:agIn2 .4s cubic-bezier(.2,.8,.2,1) both}
+@keyframes agOut{to{opacity:0}}
+.crt.rm .agr,.crt.rm .agr .agc,.crt.rm .agr.out{animation:none}
+.modal.agm .agb{max-height:min(52vh,26rem);overflow-y:auto;overscroll-behavior:contain;font-size:.9375rem;line-height:1.5;margin-bottom:6px}
+.modal.agm .agb h3{margin:12px 0 4px;font-size:.8125rem;letter-spacing:.06em;text-transform:uppercase;color:var(--mu,inherit)}
+.modal.agm .agb p{margin:0 0 6px}

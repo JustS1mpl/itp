@@ -209,5 +209,8 @@ rep('<title>ИТП v' + VER + '</title>', '<title>ИТП — И так, прог
 # пробные сборки 7.0 хранят сохранения под своим ключом: не портят настоящий прогресс 6.x и не берут его себе
 if '-dev' in VER:
     rep("var KEY='pyshag2',", "var KEY='pyshag7dev',")
+# U2-3: у каждого языка программирования свой ключ прогресса (saveKey в v5/a_core.js; у Python ключ прежний)
+s = re.sub(r"var KEY='(pyshag[^']*)',", r"var KEY=saveKey('\1'),", s)
+assert "var KEY=saveKey(" in s
 open('out5.html', 'w', encoding='utf-8').write(s)
 print('ok', len(s))
