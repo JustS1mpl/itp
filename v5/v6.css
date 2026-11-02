@@ -1567,12 +1567,10 @@ html.exbig .exio pre.cmp,html.exbig .pyex .exio pre.cmp{margin:6px 0 0;padding:1
 .skl li:not(.on) .sktx small .skx path{fill:var(--line2)}
 .sktx b{font-size:1.0625rem;font-weight:700;line-height:1.3}
 .skl li:not(.on) .sktx b,.skl li:not(.on) .sktx small{color:var(--muted)}
-/* U1-11: подсказка — лампочка Phosphor (duotone): контур цветом текста, колба жёлтая; взятая подсказка — мягкая жёлтая подложка */
+/* U1-11: подсказка — лампочка в том же стиле, что значки «Что ты уже умеешь»: один цвет (цвет текста), заливка — он же, полупрозрачно;
+   взятая подсказка — как остальные включённые кнопки (.icon.on) */
 .icon.hbe .hbl{width:26px;height:26px;transition:transform var(--d2) var(--e-spring)}
-.icon.hbe .hbl .d{fill:var(--gold);opacity:.85}
 .icon.hbe:active .hbl{transform:scale(.88)}
-.icon.hbe.on{background:color-mix(in srgb,var(--gold) 22%,var(--card))}
-.icon.hbe.on .hbl .d{opacity:1}
 /* U1-14: пример в «Изученных функциях» — как в окне термина */
 .dx .cpw{margin:4px 0 10px}.dx pre.out{margin:0 0 10px}
 .dx .tvo{margin:0 0 4px;color:var(--muted);font-size:.8125rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
