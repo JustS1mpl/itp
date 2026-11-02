@@ -1310,6 +1310,23 @@
     "mod": [],
     "err": []
    }
+  },
+  {
+   "id": "docker",
+   "n": "Docker: контейнер за вечер",
+   "after": "recursion",
+   "run": "read-only+native",
+   "min": 40,
+   "about": "образ и контейнер, Dockerfile, слои и кэш, compose, порты и тома (код и команды для ПК); в приложении — разбор Dockerfile, кэш слоёв, порядок запуска рекурсией; мини-проект: линтер Dockerfile",
+   "introduces": {
+    "f": [],
+    "m": [
+     "partition"
+    ],
+    "k": [],
+    "mod": [],
+    "err": []
+   }
   }
  ]
 }
