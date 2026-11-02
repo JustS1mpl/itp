@@ -1179,10 +1179,32 @@
   {
    "id": "scraping",
    "n": "Парсинг: данные со страниц",
-   "after": "requests",
+   "after": "bigproject",
    "run": "shim+pyodide-package",
    "min": 50,
-   "about": "этика: robots.txt, условия сайта, нагрузка, личные данные; HTML-дерево, BeautifulSoup на учебном сайте, сбор таблицы"
+   "about": "этика: robots.txt, условия сайта, нагрузка, личные данные; HTML-дерево, BeautifulSoup на учебном сайте, сбор таблицы",
+   "introduces": {
+    "f": [
+     "bs4.BeautifulSoup",
+     "urllib.parse.urljoin",
+     "urllib.robotparser.RobotFileParser"
+    ],
+    "m": [
+     "find_all",
+     "get_text",
+     "select",
+     "select_one",
+     "splitlines",
+     "parse",
+     "can_fetch",
+     "crawl_delay"
+    ],
+    "k": [],
+    "mod": [
+     "bs4"
+    ],
+    "err": []
+   }
   },
   {
    "id": "bots",
