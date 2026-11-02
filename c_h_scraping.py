@@ -105,7 +105,7 @@ def th_soup():
         ('get_text', 'tag.get_text(strip=True) — текст тега и всех вложенных, без пробелов по краям. Атрибут — tag["href"] или tag.get("href").'),
         ('select', 'soup.select("CSS-селектор") — теги по селектору, как в CSS: "table.prices tr", "ul.people a", "#list td". select_one — первый такой тег.'),
         ('select_one', 'soup.select_one("селектор") — первый тег по селектору или None.'),
-        ('urljoin', 'from urllib.parse import urljoin; urljoin(адрес_страницы, href) — полный адрес ссылки: относительный путь достраивается от адреса страницы.'),
+        ('urljoin', 'from urllib.parse import urljoin; urljoin(адрес_страницы, href) — полный адрес ссылки: относительный путь достраивается от папки страницы (последняя часть адреса, вроде post.html, отбрасывается; «../» — на папку выше).'),
     ]
     body = (
         '<p>Не у каждого сайта есть API. Тогда данные берут прямо со страницы — это [[парсинг]]. Страница — это текст на языке [[HTML]]: '
@@ -114,7 +114,7 @@ def th_soup():
         + ex('import requests\nfrom bs4 import BeautifulSoup\n\nhtml = requests.get("http://news.itp/").text\nsoup = BeautifulSoup(html, "html.parser")\n'
              'print(soup.title.string)\nprint(soup.find("h1").get_text())\nfor art in soup.find_all("article", class_="news"):\n'
              '    link = art.find("a")\n    date = art.find("span", class_="date").get_text()\n    print(date, link.get_text(), link["href"])', files=NEWSSITE) +
-        '<p>[[find_all]] возвращает все подходящие теги, find — первый. У каждого найденного тега можно снова искать внутри, а [[get_text]] '
+        '<p><code>soup.title</code> — первый тег title, <code>.string</code> — его текст. [[find_all]] возвращает все подходящие теги, find — первый. У каждого найденного тега можно снова искать внутри, а [[get_text]] '
         'отдаёт его текст. Реклама с классом ad в список не попала: искали только class_="news".</p>'
         '<h3>CSS-селекторы</h3>'
         '<p>Цепочку «внутри article.news найди h2, внутри него a» короче записать селектором, как в CSS: точка — класс, решётка — id, пробел — '
@@ -146,7 +146,7 @@ def fl_soup():
 def code_soup():
     return ts('HTML и BeautifulSoup', [
         task('Свежие новости. Рядом с программой лежит страница news.html. На вход подаётся дата ГГГГ-ММ-ДД. Выведи новости (только article с классом '
-             'news) не раньше этой даты, от новых к старым, строками «ДАТА | ЗАГОЛОВОК», а затем «Найдено: N из M» (M — всего новостей). Реклама '
+             'news) с этой даты включительно, от новых к старым, строками «ДАТА | ЗАГОЛОВОК», а затем «Найдено: N из M» (M — всего новостей). Реклама '
              'не новость.',
              'Даты в виде ГГГГ-ММ-ДД сравниваются и сортируются как строки. Пары (дата, заголовок) — sorted(…, reverse=True).',
              'from bs4 import BeautifulSoup\n\nsince = input()\nwith open("news.html", encoding="utf-8") as f:\n    soup = BeautifulSoup(f.read(), "html.parser")\n'
@@ -154,8 +154,8 @@ def code_soup():
              'fresh = sorted([n for n in news if n[0] >= since], reverse=True)\nfor date, title in fresh:\n    print(f"{date} | {title}")\n'
              'print(f"Найдено: {len(fresh)} из {len(news)}")',
              ['2026-10-25', '2026-11-02', '2000-01-01'], files={'news.html': NEWS}),
-        task('Бюджет. Таблица цен — на странице http://shop.itp/prices (таблица с классом prices: товар, цена вида «2 490 ₽», наличие «есть»/«нет»). '
-             'На вход подаётся бюджет в рублях. Выведи товары в наличии, которые укладываются в бюджет, от дешёвых к дорогим — «ТОВАР: ЦЕНА», а '
+        task('Бюджет. Таблица цен — на странице http://shop.itp/prices (таблица с классом prices: товар, цена вида «2 490 ₽» с обычным пробелом, наличие «есть»/«нет»). '
+             'На вход подаётся бюджет в рублях. Выведи товары в наличии, которые укладываются в бюджет (цена не больше бюджета), от дешёвых к дорогим — «ТОВАР: ЦЕНА», а '
              'затем «Можно купить: N» или, если таких нет, «Ничего не подходит». Последней строкой — «Нет в наличии: ТОВАРЫ» через запятую в порядке таблицы.',
              'Строки — soup.select("table.prices tr")[1:]; ячейки — row.find_all("td"). Цена: price.replace("₽", "").replace(" ", "").',
              'import requests\nfrom bs4 import BeautifulSoup\n\nbudget = int(input())\nsoup = BeautifulSoup(requests.get("http://shop.itp/prices").text, "html.parser")\n'
@@ -166,8 +166,8 @@ def code_soup():
              ['2500', '300', '10000'], files=SHOPSITE),
         task('Ссылки. На сайте клуба http://club.itp две страницы: /team/index.html и /events/index.html. На вход подаётся путь страницы. Собери её ссылки '
              'и переведи в полные адреса через urljoin(адрес страницы, href) — относительные «anya.html» и «../» он достроит сам. Ссылки '
-             '«#…» и «mailto:» пропусти. Выведи внутренние адреса (на club.itp) по алфавиту без повторов, а затем «Внешних: N» — сколько разных ссылок ведёт '
-             'на другие сайты.',
+             '«#…» и «mailto:» пропусти. Выведи внутренние адреса (на club.itp) по алфавиту без повторов, а затем «Внешних: N» — сколько разных полных адресов ведёт '
+             'на другие сайты. У всех ссылок на страницах есть href.',
              'Сайт адреса — urlsplit(url).netloc. Без повторов — множество, затем sorted.',
              'from urllib.parse import urljoin, urlsplit\nimport requests\nfrom bs4 import BeautifulSoup\n\npage = "http://club.itp" + input()\n'
              'soup = BeautifulSoup(requests.get(page).text, "html.parser")\ninner, outer = set(), set()\nfor a in soup.find_all("a"):\n    href = a["href"]\n'
@@ -183,7 +183,7 @@ def th_robots():
         ('robots.txt', 'Файл в корне сайта (/robots.txt) с правилами для роботов: каким программам и какие разделы обходить нельзя. Закон его не '
                        'требует, но вежливый парсер его читает и слушается.'),
         ('User-agent', 'Строка robots.txt: для какого робота правила ниже. * — для всех, у кого нет своего блока.'),
-        ('Disallow', 'Строка robots.txt: путь, который роботу обходить нельзя. Disallow: / — весь сайт.'),
+        ('Disallow', 'Строка robots.txt: путь, который роботу обходить нельзя, — запрещены все адреса, которые с него начинаются. Disallow: / — весь сайт.'),
         ('Crawl-delay', 'Строка robots.txt: сколько секунд ждать между запросами к сайту.'),
         ('RobotFileParser', 'urllib.robotparser.RobotFileParser — разбор robots.txt: rp.parse(строки), rp.can_fetch(имя_робота, адрес) — можно ли, '
                             'rp.crawl_delay(имя_робота) — пауза или None.'),
@@ -254,7 +254,7 @@ def code_robots():
         task('Весь каталог. Магазин мерча http://merch.itp: каталог на страницах /catalog/1, /catalog/2, …, на каждой — карточки div.card с span.title '
              'и b.price, внизу — ссылка a.next на следующую страницу (на последней её нет). Обойди каталог с первой страницы, слушаясь robots.txt '
              '(робот itp-bot): запрещённую страницу не скачивай и дальше не иди. На вход подаётся слово. Выведи «Страниц: N», «Товаров: M», '
-             'затем товары, в названии которых есть это слово (без учёта регистра), «НАЗВАНИЕ — ЦЕНА» по возрастанию цены, или «Ничего не нашлось».',
+             'затем товары, в названии которых есть это слово (без учёта регистра), «НАЗВАНИЕ — ЦЕНА» (цена — число) по возрастанию цены, при равной — по названию, или «Ничего не нашлось».',
              'Цикл while url and rp.can_fetch(…); следующий адрес — urljoin(url, nxt["href"]).',
              'from urllib.parse import urljoin\nimport requests\nfrom bs4 import BeautifulSoup\nfrom urllib.robotparser import RobotFileParser\n\nword = input().lower()\n'
              'rp = RobotFileParser()\nrp.parse(requests.get("http://merch.itp/robots.txt").text.splitlines())\nurl = "http://merch.itp/catalog/1"\npages = 0\ngoods = []\n'
@@ -282,10 +282,10 @@ def project():
     return pj('Монитор цен',
               'Ищем, где дешевле. Три магазина, у каждого своя вёрстка:\n'
               '— http://neon.itp/goods — список ul.goods, в каждом li.item: span.name и span.price вида «2 490 ₽»;\n'
-              '— http://pixel.itp/list — таблица #list: в строке две ячейки td, цена — в атрибуте data-price второй ячейки; но у магазина есть и API: '
-              'http://pixel.itp/api/prices отдаёт JSON «товар → цена»;\n'
+              '— http://pixel.itp/list — таблица #list: в строке две ячейки td, цена — в атрибуте data-price второй ячейки (первая строка таблицы — заголовки th); но у магазина есть и API: '
+              'http://pixel.itp/api/prices отдаёт JSON «товар → цена» (цены — числа);\n'
               '— http://cyber.itp/shop — блоки div.p: название в h3, цена в i вида «3 500 ₽».\n'
-              'Перед тем как скачать страницу, проверь robots.txt магазина для робота itp-bot. Если страница запрещена, а у магазина есть API, '
+              'robots.txt есть у каждого магазина. Перед тем как скачать страницу, проверь его для робота itp-bot (адрес API проверять не нужно). Названия товаров совпадают точно. Если страница запрещена, а у магазина есть API, '
               'возьми цены из API; если запрещена и API нет — пропусти магазин. На вход подаются названия товаров, по одному в строке. Для каждого '
               'выведи «ТОВАР: ЦЕНА в МАГАЗИН» — лучшая цена (при равенстве — магазин, который идёт раньше в списке выше; магазин — его адрес, например '
               'neon.itp) — или «ТОВАР: нигде нет». В конце — «Источники: …» — как получены данные каждого магазина, в порядке списка: «neon.itp — '
