@@ -58,6 +58,8 @@ function clean(r){
   var sg=(r.sg&&typeof r.sg==='object'&&!Array.isArray(r.sg))?r.sg:{};
   var sgl=[7,14,30,50];/* не SGN: clean() зовут при загрузке раньше, чем выполняются var */
   o.sg={n:sgl.indexOf(sg.n)>=0?sg.n:0,a:sg.a?1:0,ok:sgl.indexOf(sg.ok)>=0?sg.ok:0};
+  /* U1-7: последнее показанное умение (-1 — ещё не знаем) */
+  o.skk=Number.isInteger(r.skk)&&r.skk>=0&&r.skk<40?r.skk:-1;
   return o}
 /* --- тема, акцент, размер текста --- */
 function applyPrefs(){

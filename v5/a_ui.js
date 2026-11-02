@@ -518,17 +518,25 @@ function skPts(){var n=0;TOPICS.forEach(function(t,i){if(t.intro)return;for(var 
 function skList(){var c=0,th={};TOPICS.forEach(function(t,i){if(t.intro||t.opt)return;c+=ni(i);th[t.n]=c});
   return SKL.map(function(m){return{t:m[0]?th[m[0]]:0,e:m[1],n:m[2],c:m[3]}}).filter(function(m){return m.t!==undefined})}
 function skNow(){var p=skPts(),L=skList(),k=0;L.forEach(function(m,i){if(p>=m.t)k=i});return{p:p,L:L,k:k}}
-function skCard(){var s=skNow(),m=s.L[s.k],nx=s.L[s.k+1];
-  return'<button class="skc" id="skl"><span class="ske">'+ski(m.e)+'</span><span class="skt"><small>Что ты уже умеешь</small><b>'+(s.k?'Можешь '+esc(m.c):'Пока только начинаем')+'</b>'+(nx?'<span class="mu">Дальше: '+esc(nx.n)+', ещё '+(nx.t-s.p)+' '+pl(nx.t-s.p,['островок','островка','островков'])+'</span>':'')+'</span>'+ico('chev','ch')+'</button>'}
+/* U1-7: новое умение — окно после итога островка (как в Duolingo «теперь ты можешь…») с переходом на страницу.
+   S.skk — последнее показанное; -1 у старых сохранений: тогда запоминаем текущее молча, без окна за прошлое */
+function skNew(){var k=skNow().k;if(S.skk<0){S.skk=k;save();return false}return k>S.skk}
+function skPop(then){
+  var s=skNow(),m=s.L[s.k];S.skk=s.k;save();
+  var o=modal('<div class="skm"><span class="skd" aria-hidden="true">'+ski(m.e)+'</span><p class="skr">Новое умение</p><h2>'+esc(m.n)+'</h2>'+rbSay('Теперь ты можешь '+esc(m.c)+'!')+'</div>',
+   [['Посмотреть прогресс',function(){var f=then;then=null;setTimeout(function(){skills(f)},RM()?0:200)}],['Дальше',null,1]]);
+  var rm=o.remove;o.remove=function(){rm.call(o);if(then){var f=then;then=null;setTimeout(f,RM()?0:200)}};
+  snd('ach');return o}
 /* реплика кролика: голова без подложки и пузырь с хвостиком, как у персонажей Duolingo */
 function rbSay(t){var hd=IMG.wowhead||IMG.eat;return'<div class="gsay">'+(hd?'<img class="gav" src="'+hd+'" alt="" draggable="false">':'')+'<p>'+t+'</p></div>'}
-function skills(){
+/* back — куда вернуться: в настройки (по умолчанию) или дальше по пути из окна нового умения */
+function skills(back){
   var s=skNow(),L=s.L,m=L[s.k];
   var h='<div class="top ls"><button class="icon" id="x" aria-label="Назад">'+ico('back')+'</button><h1>Что ты уже умеешь</h1></div><div class="skp">'+
    '<div class="skh">'+SKHX+'<b>'+s.p+'</b></div><p class="mu skn">'+pl(s.p,['островок пройден','островка пройдено','островков пройдено'])+', норы тоже считаются</p>'+
    rbSay(s.k?'Значит, ты уже можешь '+esc(m.c)+'!':'Пройди первую тему, и здесь появится, что ты уже можешь')+
    '<h2 class="skov">Прогресс</h2><ol class="skl">'+L.map(function(x,i){var on=s.p>=x.t,nw=i===s.k;return'<li class="'+(on?'on':'')+(nw?' now':'')+(i+1<L.length&&s.p>=L[i+1].t?' fl':'')+'"><span class="skd">'+ski(x.e)+'</span><span class="sktx"><small>'+SKHX+x.t+'</small><b>'+esc(x.n)+'</b></span></li>'}).join('')+'</ol></div>';
-  scr('skills',h,'prof');$('x').onclick=profile}
+  scr('skills',h);$('x').onclick=function(){if(typeof back==='function')back();else{SBACK=SBACK||profile;settings()}}}
 /* U1-9: цель дня и цель серии выбираются в одном окне (sgChooser в a_screens.js) */
 function goalSheet(){sgChooser(function(){if(CURTAB!=='prof')return;KEEPSCR=1;SKEY='profile';var y=window.scrollY;profile();window.scrollTo(0,y)})}
 function profile(){BACK=profile;
@@ -538,7 +546,7 @@ function profile(){BACK=profile;
   function erow(r,k){return'<div class="eg2"'+(k>=EM?' hidden':'')+'><div class="erow"><span>'+esc(r.n)+'</span><b aria-label="ошибок: '+r.c+'">'+r.c+'</b></div><div class="elist">'+r.l.map(function(x){return'<button class="elink" data-i="'+r.i+'" data-j="'+x.j+'"><span class="et">'+x.ic+'&nbsp;'+esc(x.n)+'<small>ошибок: '+x.e+'</small></span><span class="eg">Отработать</span></button>'}).join('')+'</div></div>'}
   scr('profile',head()+'<h1 class="sr-only">Профиль</h1><div class="pf">'+
    '<div class="hero"><div class="pav" aria-hidden="true">'+rabbit('eat')+'</div><div class="hn"><b class="nmx">'+nk(S.nick)+'</b><div class="lvp"><span class="pill">Уровень '+LV.l+'</span><span class="mu">до '+(LV.l+1)+': ещё '+LV.left+' ⭐</span></div><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+LV.p+'" aria-label="Прогресс уровня"><i class="grow" style="width:'+LV.p+'%"></i></div></div></div>'+
-   '<div class="tiles"><button class="tile tbig" id="tst"><span aria-hidden="true">🥕</span><span><b>'+s+'</b><small>'+pl(s,['день','дня','дней'])+' подряд</small></span>'+(f.n?'<i class="fzm" aria-label="заморозок: '+f.n+'">❄️'+f.n+'</i>':'')+'</button><div class="tcol"><div class="tile"><span aria-hidden="true">🏆</span><span><b>'+Math.max(S.max,s)+'</b><small>рекорд серии</small></span></div><button class="tile" id="txp"><span aria-hidden="true">⭐</span><span><b>'+S.xp+'</b><small>опыта</small></span></button><div class="tile"><span aria-hidden="true">📚</span><span><b>'+n+' из '+NT()+'</b><small>тем пройдено</small></span></div>'+(HD()?'<div class="tile"><span aria-hidden="true">🐰</span><span><b>'+HD()+' из '+HN()+'</b><small>нор пройдено</small></span></div>':'')+'</div></div>'+skCard()+
+   '<div class="tiles"><button class="tile tbig" id="tst"><span aria-hidden="true">🥕</span><span><b>'+s+'</b><small>'+pl(s,['день','дня','дней'])+' подряд</small></span>'+(f.n?'<i class="fzm" aria-label="заморозок: '+f.n+'">❄️'+f.n+'</i>':'')+'</button><div class="tcol"><div class="tile"><span aria-hidden="true">🏆</span><span><b>'+Math.max(S.max,s)+'</b><small>рекорд серии</small></span></div><button class="tile" id="txp"><span aria-hidden="true">⭐</span><span><b>'+S.xp+'</b><small>опыта</small></span></button><div class="tile"><span aria-hidden="true">📚</span><span><b>'+n+' из '+NT()+'</b><small>тем пройдено</small></span></div>'+(HD()?'<div class="tile"><span aria-hidden="true">🐰</span><span><b>'+HD()+' из '+HN()+'</b><small>нор пройдено</small></span></div>':'')+'</div></div>'+
    '<section class="psec"><div class="ch2"><b>Цель дня</b><button class="btn t" id="gset">'+g+' '+pl(g,['островок','островка','островков'])+' ›</button></div><div class="psf"><div class="bar gbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+gp+'" aria-label="Цель дня: '+d+' из '+g+'"><i class="grow" style="width:'+gp+'%"></i></div>'+weekRow('g')+(S.sg.n?'<p class="mu gnote">Цель серии: '+Math.min(s,S.sg.n)+' из '+S.sg.n+' '+pl(S.sg.n,['дня','дней','дней'])+' подряд, за неё +'+SGX[S.sg.n]+' ⭐.</p>':'<p class="mu gnote">Цель серии не выбрана. Нажми на цель дня, чтобы выбрать.</p>')+'</div></section>'+
    shelf()+
    '<section class="psec"><div class="ch2"><b>Активность</b></div><div class="psf">'+calHtml()+'</div></section>'+
@@ -548,7 +556,7 @@ function profile(){BACK=profile;
   /* подпись месяца стоит у его первого дня и часто уезжает влево за край — под лентой сразу сегодняшний день, потом тот, на который нажали */
   bindHead(profile);calBind();var ci0=$('ci');if(ci0&&!ci0.textContent)ci0.textContent=calText(day(new Date()));var csc=app.querySelector('.csc');if(csc){csc.tabIndex=0;csc.setAttribute('aria-label','Календарь активности, листается вбок')}
   var vr=$('vr'),vt;vr.onclick=function(){vr.classList.add('on');clearTimeout(vt);vt=setTimeout(function(){vr.classList.remove('on')},2500)};
-  $('tst').onclick=streakSheet;$('txp').onclick=levelSheet;$('gset').onclick=goalSheet;$('skl').onclick=skills;
+  $('tst').onclick=streakSheet;$('txp').onclick=levelSheet;$('gset').onclick=goalSheet;
   if($('emr'))$('emr').onclick=function(){app.querySelectorAll('.eg2[hidden]').forEach(function(x){x.hidden=false});this.remove()};
   app.querySelectorAll('.fd').forEach(function(b){b.onclick=function(){fdOpen(b)}});
   app.querySelectorAll('.lst .li').forEach(function(b){b.onclick=function(){var a=b.dataset.a;if(a==='dc')dict();else if(a==='sh')share();else if(a==='intr'){BACK=profile;theory(0,0)}else if(a==='st'){SBACK=profile;settings()}}});
@@ -599,7 +607,9 @@ function settings(){
    SR('🔠','Размер кода','',SG('cf',[[13,'S'],[15,'M'],[17,'L'],[19,'XL']],ST('cf')))+
    SR('🔢','Номера строк','',SW('ln',ST('ln')))+
    SR('🧩','Закрывать скобки и кавычки','Сама допишет пару',SW('ac',ST('ac')))+'</div>';
+  var skn=skNow();
   h+='<div class="sec">Профиль и данные</div><div class="lst">'+
+   SR('🌱','Что ты уже умеешь',skn.k?esc(skn.L[skn.k].n)+', '+skn.p+' '+pl(skn.p,['островок','островка','островков']):'Шкала умений курса','','skl')+
    SR('🐰','Никнейм',nk(S.nick),'','nick')+
    SR('🙂','Обращение','Для правильных окончаний в тексте',SG('g',[['m','Парень'],['f','Девушка'],['','Не указывать']],S.g||''))+
    SR('💾','Резервная копия','Сохранить или загрузить прогресс','','bk')+
@@ -618,6 +628,7 @@ function settings(){
   app.querySelectorAll('.lst button.li').forEach(function(b){b.onclick=function(){var a=b.dataset.a;
     if(a==='nick')askName('Никнейм',S.nick,function(n){n=Array.from(n).slice(0,20).join('');if(nkBad(n)){snd('bad');toast('🐰 Так ник назвать нельзя');return false}S.nick=n;save();again();toast('Никнейм изменён')},20);
     else if(a==='bk')backup();
+    else if(a==='skl')skills();
     else if(a==='kb')keys();
     else if(a==='intro'){BACK=function(){settings()};theory(0,0)}
     else if(a==='rs1')modal('<h2>Сбросить оформление?</h2><p>Тема, цвет, размер текста, звук и другие настройки станут как в начале. Прогресс не изменится.</p>',[['Сбросить',function(){themeSwap(function(){S.set=clean({}).set;S.theme='';S.mute=0;save();applyPrefs();emoLoad();again()});toast('Настройки сброшены')},0,1],['Отмена',null,1]]);

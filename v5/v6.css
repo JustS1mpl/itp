@@ -1491,21 +1491,17 @@ html.exbig .exio pre.cmp,html.exbig .pyex .exio pre.cmp{margin:6px 0 0;padding:1
 .wd i .wck{width:62%;height:62%;fill:none;stroke:currentColor;stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round}
 .wd.on i{background:linear-gradient(170deg,color-mix(in srgb,#fff 16%,var(--accent)),var(--accent));box-shadow:inset 0 -2px 0 color-mix(in srgb,#000 14%,var(--accent))}
 .wd.td.on i{box-shadow:inset 0 -2px 0 color-mix(in srgb,#000 14%,var(--accent)),0 0 0 2px var(--card),0 0 0 4px color-mix(in srgb,var(--accent) 40%,transparent)}
-/* U1-10: итог островка. Плитки как в Duolingo: цветная шапка с подписью и однотонное поле с числом, в один ряд;
-   появляются по очереди коротким подъёмом. Весь итог — по центру экрана над нижней панелью */
+/* U1-10: плитки итога островка (опыт, точность, время) в один ряд, появляются по очереди; итог — по центру экрана над нижней панелью */
 .fin{min-height:calc(100dvh - var(--dkh,96px) - 48px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 0 24px}
 .fin>.xps{align-self:stretch;width:100%}
-.xpr{display:flex;flex-wrap:nowrap;justify-content:center;gap:12px;width:100%;margin:20px 0 16px}
-.xpr .xpt{--tc:var(--gold);flex:1 1 0;min-width:0;max-width:136px;padding:0 0 2px;border:2px solid var(--tc);border-radius:16px;background:var(--tc);box-shadow:none}
-.xpr .xpt.ac{--tc:var(--accent)}
-.xpr .xpt.tmr{--tc:var(--ice)}
-.xpr .xpt small{padding:4px 4px 3px;font-size:.75rem;font-weight:900;letter-spacing:0;text-transform:none;color:var(--on)}
-.xpr .xpt.x small{color:#3A2A00}
-.xpr .xpt b{display:flex;align-items:center;justify-content:center;gap:6px;min-height:52px;border-radius:12px;background:var(--card);color:var(--ink);font-size:1.375rem;white-space:nowrap;font-variant-numeric:tabular-nums}
-.xpr .xpt b .em{width:1.25rem;height:1.25rem}
-.xpt.dt{opacity:0;transform:translateY(12px)}
-.xpt.dt.in{opacity:1;transform:none;transition:opacity .2s ease-out,transform .3s cubic-bezier(.2,.8,.2,1)}
-.xpt.x.pp{animation:none}
+.xpr{flex-wrap:nowrap;width:100%}
+.xpr .xpt{flex:1 1 0;min-width:0;max-width:132px;padding:10px 8px 12px}
+.xpr .xpt b{font-size:1.375rem;white-space:nowrap}
+.xpt.ac{background:linear-gradient(160deg,color-mix(in srgb,var(--accent) 20%,var(--card)),var(--card));border-color:color-mix(in srgb,var(--accent) 40%,var(--line))}
+.xpt.tmr{background:linear-gradient(160deg,color-mix(in srgb,var(--ice) 22%,var(--card)),var(--card));border-color:color-mix(in srgb,var(--ice) 45%,var(--line))}
+.xpt .em{width:1.3rem;height:1.3rem}
+.xpt.dt{opacity:0;transform:translateY(14px) scale(.7)}
+.xpt.dt.in{opacity:1;transform:none;transition:opacity .25s ease-out,transform .5s var(--e-spring)}
 /* реплика кролика: голова без подложки, пузырь с хвостиком к ней */
 .gsay{display:flex;align-items:center;gap:8px;width:100%;max-width:420px;margin:0 0 24px;text-align:left}
 .gsay .gav{flex:none;width:64px;height:64px;object-fit:contain}
@@ -1536,40 +1532,19 @@ html.exbig .exio pre.cmp,html.exbig .pyex .exio pre.cmp{margin:6px 0 0;padding:1
 .sgr:active{transform:scale(.99)}
 .sgl{margin:0 0 8px;font-weight:800}
 @media (prefers-reduced-motion:reduce){.xpt.dt{opacity:1;transform:none}.gst{animation:none}}
-/* U1-5: серия на телефоне — плоская строка во всю ширину (морковка, число, подпись), под ней остальные цифры в ряд */
-@media (max-width:599px){
- .tiles{grid-template-columns:minmax(0,1fr)}
- .tile.tbig{flex-direction:row;align-items:center;justify-content:flex-start;gap:14px;min-height:0;padding:14px 16px}
- .tile.tbig>span:first-child{font-size:2.25rem}.tile.tbig>span:first-child .em{width:2.6rem;height:2.6rem}
- .tile.tbig>span:last-child{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
- .tile.tbig b{font-size:2.5rem;line-height:1}
- .tile.tbig small{margin:0;font-size:1rem}
- .tile.tbig .fzm{top:50%;transform:translateY(-50%)}
- .tcol{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
- .tcol.n4,.tcol:has(>.tile:nth-child(4)){grid-template-columns:repeat(2,minmax(0,1fr))}
- .tcol .tile{flex-direction:column;align-items:flex-start;gap:6px;padding:12px}
- .tcol .tile+.tile::before{left:0;right:auto;top:12px;bottom:12px;width:1px;height:auto}
- .tcol:has(>.tile:nth-child(4)) .tile:nth-child(3)::before{display:none}
- .tcol:has(>.tile:nth-child(4)) .tile:nth-child(n+3){border-top:1px solid var(--line)}
-}
+/* окно нового умения */
+.skm{text-align:center}
+.skm .skd{margin:4px auto 12px;width:72px;height:72px;background:var(--accent);color:var(--on)}
+.skm .skd svg{width:32px;height:32px}
+.skm .skr{margin:0 0 6px;font-size:.875rem;font-weight:800;color:var(--muted)}
+.skm h2{margin:0 0 6px}
 /* U1-6: профиль на широком экране — кролик, как на телефоне, торчит из-за верхнего края панели */
 @media (min-width:600px){
  html[data-ph=card] .hero{margin-top:96px;min-height:132px;padding:22px 26px 22px 176px}
  html[data-ph=card] .pav{left:16px;bottom:8px;width:150px}
  html[data-ph=card] .pav .rw{width:146px}
 }
-/* U1-7: «Что ты уже умеешь». Карточка в профиле и страница как в Duolingo: крупно знак-остров и число, реплика кролика,
-   ниже вехи — кружок со значком на общей линии (пройденная часть — цветом акцента), число и короткое действие */
-.skc{display:flex;align-items:center;gap:12px;width:100%;margin:12px 0 0;padding:12px 12px 12px 16px;border:0;border-radius:var(--r-lg);background:var(--card);box-shadow:inset 0 0 0 1px var(--line);color:var(--ink);text-align:left;transition:background var(--d2)}
-.skc:active{transform:scale(.99)}
-.skc .ske{flex:none;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:var(--on)}
-.skc .ske svg,.skd svg{width:22px;height:22px}
-.skt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
-.skt small{font-size:.8125rem;font-weight:700;color:var(--muted)}
-.skt b{font-size:1rem;line-height:1.3}
-.skt .mu{font-size:.8125rem}
-.skc .ch{flex:none;color:var(--muted)}
-@media (hover:hover){.skc:hover{background:var(--card2)}}
+/* U1-7: страница «Что ты уже умеешь» (из настроек и из окна нового умения) */
 .skp{padding:8px 0 32px}
 .skh{display:flex;align-items:center;justify-content:center;gap:16px;margin:16px 0 4px}
 .skx{width:84px;height:58px}
@@ -1600,3 +1575,6 @@ html.exbig .exio pre.cmp,html.exbig .pyex .exio pre.cmp{margin:6px 0 0;padding:1
 /* U1-14: пример в «Изученных функциях» — как в окне термина */
 .dx .cpw{margin:4px 0 10px}.dx pre.out{margin:0 0 10px}
 .dx .tvo{margin:0 0 4px;color:var(--muted);font-size:.8125rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+/* U1-7: реплика кролика внутри окна — пузырь на подложке окна чуть темнее, чтобы не сливался */
+.mc .gsay{margin:12px auto 4px}
+.mc .gsay p,.mc .gsay p::before{background:var(--card2)}

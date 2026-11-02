@@ -275,8 +275,8 @@ function doneScreen(o){
   var many=o.err>=ROLL_AT,acc=o.acc>=0?o.acc:-1,tm=o.tm>=0?o.tm:-1;
   /* плитки как в Duolingo: опыт, точность, время — появляются по очереди */
   var tl='<div class="xpt x dt" id="xpt"><small>Опыт</small><b>⭐ <span id="xpn">+0</span></b></div>'+
-   (acc>=0?'<div class="xpt ac dt"><small>'+(acc===100?'Без ошибок':'Точность')+'</small><b>'+acc+'%</b></div>':o.err!==undefined?'<div class="xpt ac dt"><small>Ошибок</small><b>'+o.err+'</b></div>':'')+
-   (tm>=0?'<div class="xpt tmr dt"><small>Время</small><b>'+fmtTm(tm)+'</b></div>':'');
+   (acc>=0?'<div class="xpt ac dt"><small>Точность</small><b>🎯 '+acc+'%</b></div>':o.err!==undefined?'<div class="xpt dt"><small>Ошибок</small><b>'+o.err+'</b></div>':'')+
+   (tm>=0?'<div class="xpt tmr dt"><small>Время</small><b>⏰ '+fmtTm(tm)+'</b></div>':'');
   var h='<div class="fin">'+rabbit(many?'rolled':(o.mood||(o.err===0?'cool':'happy')))+'<h1>'+o.title+'</h1>'+(many?'<p class="lead">Непростой островок: ошибок было много. Но он пройден, а ошибки разобраны.</p>':o.lead?'<p class="lead">'+o.lead+'</p>':'')+
    '<div class="xpr">'+tl+'</div>'+
    (o.bonus?'<p class="note2">'+o.bonus+'</p>':'')+(o.note?'<p class="note2">'+esc(o.note)+'</p>':'')+
@@ -304,6 +304,7 @@ function doneScreen(o){
 function postDone(then){
   if(GOALP){GOALP=0;return goalScreen(function(){postDone(then)})}
   if(sgAsk())return sgChooser(function(){postDone(then)});
+  if(skNew())return skPop(then);
   then()}
 /* выбор цели серии спрашиваем после 2-го пройденного островка (вступление не считается) и после каждой достигнутой цели */
 function islN(){var n=0;for(var k in S.d){var i=+k.split('-')[0];if(TOPICS[i]&&!TOPICS[i].intro&&/^\d+-\d+$/.test(k))n++}return n}
