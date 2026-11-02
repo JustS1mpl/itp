@@ -1,8 +1,9 @@
 /* ===================== ИТП 6.6 — вступление: заставка, терминал, «синий экран» =====================
    Первый запуск: заставка со светящимся растровым кроликом и подписью IT'S THE PROGRAMMING (как логотип студии перед
    игрой) → терминал во весь экран с лёгким налётом старой видеокассеты (зерно, редкая полоса трекинга и подёргивание),
-   за текстом еле заметно стекают символы → кролик спрашивает ник, обращение и первую тему → сбой, экран гаснет в точку,
-   чёрный экран → «синий экран» на ~7 секунд → трещины → медленное осыпание осколками, под ними уже Путь.
+   за текстом еле заметно стекают символы → пользовательское соглашение → кролик спрашивает ник, обращение и первую тему →
+   сбой, экран гаснет в точку, чёрный экран → «синий экран» ~5 секунд → один удар, стекло трескается целиком → осколки
+   осыпаются, под ними уже Путь.
    Если ник есть, а тема не выбрана, терминал открывается сразу с вопросом о теме, без заставки.
    Кролик — та же картинка, что у иконки профиля (--pi-o и --pi-f из build5.py): из неё кодом делаются растр заставки
    и контур для терминала. Всё рисуется и звучит кодом (canvas, CSS, SVG, Web Audio). При «меньше движения» нет дождя,
@@ -93,14 +94,19 @@ var BX={
     bxT(c,o,.5,2600,.45,.28,'sine',55,.004);bxN(c,o,.92,.25,.35,'lowpass',320,90,.7)},
   /* синий экран: щелчок реле и низкий гудок */
   bsod:function(c,o){bxN(c,o,0,.05,.45,'lowpass',900,0,.7,.001);bxT(c,o,.02,98,.9,.45,'sine',0,.006);bxT(c,o,.02,196,.7,.18,'sine',0,.006)},
-  /* удар по стеклу: хлопок, низкий «бум», звон и россыпь мелких тресков */
+  /* один удар по стеклу: хлопок, низкий «бум» и сухой треск, который бежит по экрану вместе с трещинами (~0,15 с) */
   impact:function(c,o){
-    bxN(c,o,0,.06,.95,'highpass',1300,0,.7,.001);bxT(c,o,0,72,.5,.85,'sine',38,.002);bxN(c,o,0,.7,.22,'bandpass',3200,2400,6);
-    for(var k=0;k<16;k++)bxN(c,o,bxR(.04,.85),bxR(.006,.014),bxR(.25,.6),'bandpass',bxR(2500,6000),0,3,.001)},
-  /* осыпание: шорох крошки и сотни мелких «дзыньков», больше в начале */
-  shatter:function(c,o){
-    bxN(c,o,0,.7,.45,'bandpass',3600,2200,.9,.006);bxN(c,o,.1,1.6,.12,'highpass',5000,0,.7,.3);
-    for(var k=0;k<46;k++){var t=Math.pow(Math.random(),1.7)*2.4,hi=Math.random()<.75;bxT(c,o,t,hi?bxR(2200,5600):bxR(900,2000),bxR(.06,.32),bxR(.05,.17),'sine',0,.002)}}
+    bxN(c,o,0,.06,.95,'highpass',1300,0,.7,.001);bxT(c,o,0,72,.5,.85,'sine',38,.002);bxN(c,o,0,.35,.2,'bandpass',3200,2400,6);
+    for(var k=0;k<14;k++)bxN(c,o,Math.pow(k/14,1.4)*.16+bxR(0,.01),bxR(.005,.012),bxR(.3,.6)*(1-k/20),'bandpass',bxR(2200,5200),0,3,.001)},
+  /* осыпание, по расписанию самих осколков (a.t — секунды, когда каждый срывается): в первый миг — хруст ломающегося
+     стекла, потом у каждого сорвавшегося куска свой короткий «дзынь» (крупные ниже, мелкие выше) и шорох крошки */
+  shatter:function(c,o,a){
+    var ts=(a&&a.t)||[],n=ts.length;
+    bxN(c,o,0,.09,.8,'highpass',1800,0,.7,.001);bxN(c,o,0,.55,.4,'bandpass',3600,2000,.9,.004);bxT(c,o,0,140,.18,.3,'triangle',70,.002,900);
+    bxN(c,o,.05,(n?ts[n-1]:.6)+.4,.08,'highpass',5200,0,.7,.15);
+    ts.forEach(function(t,k){if(k%Math.max(1,Math.ceil(n/40)))return;var s=Math.random();
+      bxT(c,o,t+bxR(0,.02),s<.7?bxR(2400,5600):bxR(1100,2200),bxR(.08,.3),bxR(.06,.14)*(1-k/n*.5),'sine',0,.002);
+      if(s<.35)bxN(c,o,t,bxR(.01,.03),bxR(.15,.3),'bandpass',bxR(3000,6000),0,3,.001)})}
 };
 /* играть звук; вернуть его выход (чтобы оборвать, если заставку пропустили) */
 function bx(n,a){var c=bxC();if(!c||!BX[n])return null;
@@ -382,11 +388,11 @@ function bsod(){
   /* касание — сразу к Пути */
   function end(){if(gone)return;gone=1;tms.forEach(clearTimeout);b.remove();var x=document.getElementById('shards');if(x)x.remove();document.documentElement.classList.remove('crt-on')}
   b.onclick=end;
-  /* 1,4 с темноты (в центре гаснет точка кинескопа), потом синий экран; проценты ползут неровно ~6,5 с */
-  var pc=b.querySelector('.bp b'),steps=[0,0,2,5,5,9,14,14,20,27,33,33,41,48,55,55,62,70,76,83,88,88,94,100],B=1400,ST=270;
+  /* 1,1 с темноты (в центре гаснет точка кинескопа), потом синий экран; проценты ползут неровно ~4,8 с */
+  var pc=b.querySelector('.bp b'),steps=[0,0,2,5,5,9,14,14,20,27,33,33,41,48,55,55,62,70,76,83,88,88,94,100],B=1100,ST=200;
   T(function(){b.classList.remove('blk');bx('bsod')},B);
   steps.forEach(function(v,k){T(function(){pc.textContent=v},B+ST*k)});
-  T(function(){bsCrack(b,T,end)},B+ST*steps.length+700)}
+  T(function(){bsCrack(b,T,end)},B+ST*steps.length+500)}
 
 /* разбиение экрана на осколки как у настоящего стекла: ячейки Вороного вокруг случайных точек, у места удара точки гуще
    (там мелкая крошка), к краям реже (крупные куски). Каждая ячейка — пересечение полуплоскостей «ближе к своей точке» */
@@ -404,9 +410,9 @@ function bsCells(w,h,cx,cy){
     pts.forEach(function(q,j){if(i===j||pl.length<3)return;var nx=q[0]-p[0],ny=q[1]-p[1];pl=bsClip(pl,nx,ny,(nx*(p[0]+q[0])+ny*(p[1]+q[1]))/2)});
     return pl}).filter(function(pl){return pl.length>2})}
 
-/* удар в три приёма, как будто по стеклу бьют несколько раз: звёздочка у места удара → трещины до середины → до краёв.
-   Каждый удар — со звуком и встряской; внутри этапа трещины прорисовываются по очереди от центра (WAAPI, а не CSS:
-   до своей очереди каждая трещина гарантированно скрыта, и вся сетка не вспыхивает разом) */
+/* один удар (U2-4): вспышка и встряска в месте удара, и стекло трескается сразу целиком — трещины разбегаются от удара
+   до краёв за ~0,15 с, вместе с сухим треском в звуке. Секунду стекло держится в рамке, потом осыпается. Трещины
+   рисуются через WAAPI (а не CSS): до своей очереди каждая гарантированно скрыта */
 function bsCrack(b,T,end){
   var w=innerWidth,h=innerHeight,cx=w*(.44+Math.random()*.12),cy=h*(.4+Math.random()*.1),D=Math.hypot(w,h),cells=bsCells(w,h,cx,cy),seen={},ed=[],e=.5;
   function bd(a,b2){return(Math.abs(a[0])<e&&Math.abs(b2[0])<e)||(Math.abs(a[0]-w)<e&&Math.abs(b2[0]-w)<e)||(Math.abs(a[1])<e&&Math.abs(b2[1])<e)||(Math.abs(a[1]-h)<e&&Math.abs(b2[1]-h)<e)}
@@ -414,50 +420,53 @@ function bsCrack(b,T,end){
     var ka=Math.round(a[0])+','+Math.round(a[1]),kc=Math.round(c[0])+','+Math.round(c[1]),key=ka<kc?ka+'|'+kc:kc+'|'+ka;if(seen[key])continue;seen[key]=1;
     var d0=Math.hypot(a[0]-cx,a[1]-cy),d1=Math.hypot(c[0]-cx,c[1]-cy);if(d1<d0){var t=a;a=c;c=t;t=d0;d0=d1;d1=t}
     ed.push({a:a,c:c,d:d0/D,L:Math.ceil(Math.hypot(c[0]-a[0],c[1]-a[1]))})}});
-  var ST=[[0,.09,0],[.09,.26,1150],[.26,9,2300]],sv='';
+  var sv='';
   ed.forEach(function(q,k){var p=' d="M'+q.a[0].toFixed(1)+' '+q.a[1].toFixed(1)+'L'+q.c[0].toFixed(1)+' '+q.c[1].toFixed(1)+'" data-k="'+k+'" style="stroke-dasharray:'+q.L+';stroke-dashoffset:'+q.L+'"/>';sv+='<path class="cu2"'+p+'<path class="cl"'+p});
   var bv=b.querySelector('.bsv');
-  bv.insertAdjacentHTML('beforeend','<svg class="ck" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none" aria-hidden="true">'+sv+'</svg>');
-  var svg=bv.querySelector('.ck'),ps=svg.querySelectorAll('path');
-  [].forEach.call(ps,function(pe){var q=ed[+pe.getAttribute('data-k')],sg=ST[q.d<ST[0][1]?0:q.d<ST[1][1]?1:2],span=Math.min(sg[1],.6)-sg[0];
-    pe.animate([{strokeDashoffset:q.L},{strokeDashoffset:0}],{duration:90+q.L*1.4,delay:sg[2]+70+Math.max(0,q.d-sg[0])/span*650+Math.random()*90,easing:'ease-out',fill:'both'})});
-  ST.forEach(function(sg,k){T(function(){
-    var fl=document.createElementNS('http://www.w3.org/2000/svg','circle');fl.setAttribute('class','imp');fl.setAttribute('cx',cx.toFixed(1));fl.setAttribute('cy',cy.toFixed(1));fl.setAttribute('r',10+k*4);svg.insertBefore(fl,svg.firstChild);
-    bx('impact');bv.animate([{transform:'translate('+(-4-k*2)+'px,'+(2+k)+'px)'},{transform:'translate('+(3+k*2)+'px,'+(-2-k)+'px)'},{transform:'none'}],{duration:220+k*40,easing:'steps(3)'})},sg[2])});
-  T(function(){bsShatter(b,cells,cx,cy,w,h,D,T,end)},ST[2][2]+1700)}
+  bv.insertAdjacentHTML('beforeend','<svg class="ck" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none" aria-hidden="true"><circle class="imp" cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="14"/>'+sv+'</svg>');
+  [].forEach.call(bv.querySelectorAll('.ck path'),function(pe){var q=ed[+pe.getAttribute('data-k')];
+    pe.animate([{strokeDashoffset:q.L},{strokeDashoffset:0}],{duration:40+q.L*.3,delay:q.d*240+Math.random()*25,easing:'ease-out',fill:'both'})});
+  bx('impact');
+  bv.animate([{transform:'translate(-7px,4px)',filter:'brightness(1.7)'},{transform:'translate(5px,-3px)',filter:'brightness(1.2)',offset:.35},{transform:'translate(-2px,1px)',offset:.7},{transform:'none',filter:'none'}],{duration:320,easing:'ease-out'});
+  T(function(){bsShatter(b,cells,cx,cy,w,h,D,T,end)},1000)}
 
-/* осыпание: стекло вываливается из рамки на зрителя. Кусок чуть проседает, отклоняется вперёд вокруг своего верхнего края
-   (низ идёт к зрителю, кусок немного растёт) и падает вниз с ускорением; куски срываются почти одновременно с небольшим
-   разбросом, нижние и ближние к удару — раньше. Ничего не тает: каждый кусок уходит за нижний край */
+/* осыпание: каждый кусок чуть выталкивается из рамки от места удара (к зрителю), потом падает с ускорением, как под
+   действием тяжести, поворачиваясь и темнея на наклоне. Первыми срываются куски у места удара и нижние, за ~0,8 с
+   осыпается всё. Звук стекла играет по тому же расписанию: «дзынь» каждого куска — в миг, когда он срывается.
+   Ничего не тает: каждый кусок уходит за нижний край, под ним уже Путь */
 function bsShatter(b,cells,cx,cy,w,h,D,T,end){
-  var v=b.querySelector('.bsv'),box=document.createElement('div'),last=0,G=4200,an=[];box.id='shards';box.onclick=end;
+  var v=b.querySelector('.bsv'),box=document.createElement('div'),last=0,G=3400,an=[],ts=[];box.id='shards';box.onclick=end;
   cells.forEach(function(pl){
     var xs=pl.map(function(p){return p[0]}),ys=pl.map(function(p){return p[1]});
     var x0=Math.max(0,Math.floor(Math.min.apply(0,xs))),y0=Math.max(0,Math.floor(Math.min.apply(0,ys))),x1=Math.min(w,Math.ceil(Math.max.apply(0,xs))),y1=Math.min(h,Math.ceil(Math.max.apply(0,ys)));
     if(x1-x0<2||y1-y0<2)return;
-    var d=document.createElement('div'),inn=document.createElement('div'),pp=pl.map(function(p){return(p[0]-x0).toFixed(1)+' '+(p[1]-y0).toFixed(1)});
-    d.className='shd';inn.className='shi';
+    var d=document.createElement('div'),inn=document.createElement('div'),sh=document.createElement('i'),pp=pl.map(function(p){return(p[0]-x0).toFixed(1)+' '+(p[1]-y0).toFixed(1)});
+    d.className='shd';inn.className='shi';sh.className='shg';
     d.style.cssText='left:'+x0+'px;top:'+y0+'px;width:'+(x1-x0)+'px;height:'+(y1-y0)+'px;clip-path:polygon('+pp.map(function(q){return q.replace(' ','px ')+'px'}).join(',')+')';
     inn.style.cssText='left:'+(-x0)+'px;top:'+(-y0)+'px;width:'+w+'px;height:'+h+'px';
-    inn.appendChild(v.cloneNode(true));d.appendChild(inn);
+    inn.appendChild(v.cloneNode(true));d.appendChild(inn);d.appendChild(sh);
     /* тонкая светлая кромка скола */
     d.insertAdjacentHTML('beforeend','<svg class="she" viewBox="0 0 '+(x1-x0)+' '+(y1-y0)+'" aria-hidden="true"><polygon points="'+pp.join(' ')+'"/></svg>');
     box.appendChild(d);
     var mx=0,my=0;pl.forEach(function(p){mx+=p[0];my+=p[1]});mx=mx/pl.length;my=my/pl.length;
-    var ar=(x1-x0)*(y1-y0)/(w*h),ds=Math.hypot(mx-cx,my-cy)/D,sm=Math.max(.25,1-ar*6);
-    var dy=h-y0+120,du=Math.round(Math.sqrt(2*dy/G)*1000*(1+Math.random()*.15)),dl=Math.round(Math.random()*420+(1-my/h)*380+ds*260);
-    var dx=((mx-cx)/w)*60+(Math.random()-.5)*30,rz=(Math.random()-.5)*30*sm,rx=-(25+Math.random()*45)*sm,tz=60+Math.random()*160,sg=1.5+Math.random()*3,SG=200,tot=SG+du;
-    last=Math.max(last,dl+tot);
-    d.style.transformOrigin='50% 0';
-    /* одна анимация на общих часах: проседание → отклонение вперёд → падение; отстать от расписания она не может */
-    an.push(d.animate([{transform:'translate3d(0,0,0) rotateX(0deg) rotateZ(0deg)',easing:'ease-out'},
-      {transform:'translate3d(0,'+sg.toFixed(1)+'px,0) rotateX('+(rx*.08).toFixed(1)+'deg) rotateZ('+(rz*.05).toFixed(1)+'deg)',offset:SG/tot,easing:'cubic-bezier(.45,0,.9,.55)'},
-      {transform:'translate3d('+(dx*.3).toFixed(1)+'px,'+(dy*.22).toFixed(1)+'px,'+(tz*.6).toFixed(0)+'px) rotateX('+(rx*.75).toFixed(1)+'deg) rotateZ('+(rz*.45).toFixed(1)+'deg)',offset:(SG+du*.45)/tot,easing:'cubic-bezier(.3,0,1,.7)'},
-      {transform:'translate3d('+dx.toFixed(1)+'px,'+(dy+sg).toFixed(1)+'px,'+tz.toFixed(0)+'px) rotateX('+rx.toFixed(1)+'deg) rotateZ('+rz.toFixed(1)+'deg)'}],
-      {duration:tot,delay:dl,fill:'both'}))});
-  document.body.appendChild(box);b.remove();bx('shatter');document.documentElement.classList.remove('crt-on');
-  app.animate([{filter:'brightness(.45)'},{filter:'brightness(.45)',offset:.25},{filter:'brightness(1)'}],{duration:Math.min(3000,last),easing:'ease-out'});
-  T(function(){snd('level')},Math.min(2200,last*.7));
+    var ar=(x1-x0)*(y1-y0)/(w*h),ds=Math.hypot(mx-cx,my-cy)/D,sm=Math.max(.3,1-ar*6),an0=Math.atan2(my-cy,mx-cx);
+    var dl=Math.round(ds*480+(1-my/h)*240+Math.random()*90);
+    var dy=h-y0+80,du=Math.round(Math.sqrt(2*dy/G)*1000*(1+Math.random()*.12)),P=110,tot=P+du;
+    var pu=(6+Math.random()*10)*(1-ds),px=Math.cos(an0)*pu,py=Math.sin(an0)*pu,dx=px*3+(Math.random()-.5)*36;
+    var rz=(Math.random()-.5)*44*sm,rx=-(18+Math.random()*40)*sm,tz=50+Math.random()*140;
+    last=Math.max(last,dl+tot);ts.push(dl/1000);
+    d.style.transformOrigin=((mx-x0)/(x1-x0)*100).toFixed(0)+'% '+((my-y0)/(y1-y0)*100).toFixed(0)+'%';
+    /* выталкивание → падение (кривая ускорения похожа на y = t²) */
+    an.push(d.animate([{transform:'translate3d(0,0,0) rotateX(0deg) rotateZ(0deg)',easing:'cubic-bezier(.2,.7,.3,1)'},
+      {transform:'translate3d('+px.toFixed(1)+'px,'+py.toFixed(1)+'px,'+(tz*.25).toFixed(0)+'px) rotateX('+(rx*.12).toFixed(1)+'deg) rotateZ('+(rz*.1).toFixed(1)+'deg)',offset:P/tot,easing:'cubic-bezier(.45,0,.9,.6)'},
+      {transform:'translate3d('+dx.toFixed(1)+'px,'+(dy+py).toFixed(1)+'px,'+tz.toFixed(0)+'px) rotateX('+rx.toFixed(1)+'deg) rotateZ('+rz.toFixed(1)+'deg)'}],
+      {duration:tot,delay:dl,fill:'both'}));
+    sh.animate([{opacity:0},{opacity:0,offset:P/tot},{opacity:.55}],{duration:tot,delay:dl,fill:'both',easing:'ease-in'})});
+  document.body.appendChild(box);b.remove();
+  ts.sort(function(a,b2){return a-b2});bx('shatter',{t:ts});
+  document.documentElement.classList.remove('crt-on');
+  app.animate([{filter:'brightness(.45)'},{filter:'brightness(.45)',offset:.2},{filter:'brightness(1)'}],{duration:Math.min(2400,last),easing:'ease-out'});
+  T(function(){snd('level')},Math.min(1800,last*.75));
   /* сцена заканчивается, когда упал последний кусок; таймер — только запасной */
   Promise.all(an.map(function(a){return a.finished})).then(end,end);
   T(end,last+1500)}

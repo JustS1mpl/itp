@@ -1502,3 +1502,5 @@ html.exbig .exio pre.cmp,html.exbig .pyex .exio pre.cmp{margin:6px 0 0;padding:1
 .modal.agm .agb{max-height:min(52vh,26rem);overflow-y:auto;overscroll-behavior:contain;font-size:.9375rem;line-height:1.5;margin-bottom:6px}
 .modal.agm .agb h3{margin:12px 0 4px;font-size:.8125rem;letter-spacing:.06em;text-transform:uppercase;color:var(--mu,inherit)}
 .modal.agm .agb p{margin:0 0 6px}
+/* U2-4: тень на наклонившемся осколке (непрозрачность растёт, пока кусок падает) */
+.shd .shg{position:absolute;inset:0;pointer-events:none;opacity:0;background:linear-gradient(165deg,rgba(255,255,255,.16),rgba(0,12,40,.42) 70%)}
