@@ -6,6 +6,7 @@ import shutil
 _TS = os.path.abspath('.turtle_shim')
 os.makedirs(_TS, exist_ok=True)
 shutil.copy('v5/py/turtle_shim.py', _TS + '/turtle.py')
+shutil.copy('v5/py/miniweb_shim.py', _TS + '/miniweb.py')  # учебный веб-фреймворк (нора «Веб-сервер»)
 shutil.copy('v5/py/requests_shim.py', _TS + '/requests.py')  # учебный requests с виртуальными серверами: тот же файл, что в приложении
 os.environ['PYTHONPATH'] = _TS + os.pathsep + os.path.abspath('shim') + os.pathsep + os.environ.get('PYTHONPATH', '')
 XMAP = {}  # примеры к объяснениям вопросов: ключ = начало текста вопроса, значение = (код, ввод[, вывод])
@@ -46,7 +47,7 @@ exec(compile(%r, '<ex>', 'exec'), {'__name__': '__main__'})
 # Обычный CPython сборки даёт другой вывод (numpy на wasm32 считает целые как int32, версии pandas отличаются),
 # поэтому такие программы запускаются в Pyodide из уже собранного out5.html. Результаты лежат в pyo_cache.json,
 # чтобы пересборка была быстрой и повторяемой. Пакеты Pyodide берутся из PYODIDE_PKGS (tests/h.py).
-PYO_RE = re.compile(r'^\s*(import|from)\s+(numpy|pandas|matplotlib)\b', re.M)
+PYO_RE = re.compile(r'^\s*(import|from)\s+(numpy|pandas|matplotlib|bs4|PIL)\b', re.M)
 _PYO = {}
 
 

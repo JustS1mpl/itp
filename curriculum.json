@@ -1205,7 +1205,25 @@
    "after": "requests",
    "run": "shim+read-only",
    "min": 55,
-   "about": "сервер изнутри: запрос → функция → ответ, маршруты декораторами, JSON API на учебном мини-фреймворке; как то же выглядит на Flask и FastAPI"
+   "about": "сервер изнутри: запрос → функция → ответ, маршруты декораторами, JSON API на учебном мини-фреймворке miniweb, тест-клиент, мидлвары; как то же выглядит на Flask и FastAPI",
+   "introduces": {
+    "f": [
+     "miniweb.App"
+    ],
+    "m": [
+     "route",
+     "test_client",
+     "request",
+     "before",
+     "after",
+     "serve"
+    ],
+    "k": [],
+    "mod": [
+     "miniweb"
+    ],
+    "err": []
+   }
   },
   {
    "id": "async",

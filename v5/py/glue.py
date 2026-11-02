@@ -394,7 +394,7 @@ class _SrcLoader(importlib.abc.Loader):
 
 class _SrcFinder(importlib.abc.MetaPathFinder):
     """Свои модули ИТП, исходник которых вшит при сборке: turtle (_TURTLE_SRC), requests (_REQUESTS_SRC, учебные серверы)."""
-    MODS = {'turtle': '_TURTLE_SRC', 'requests': '_REQUESTS_SRC'}
+    MODS = {'turtle': '_TURTLE_SRC', 'requests': '_REQUESTS_SRC', 'miniweb': '_MINIWEB_SRC'}
 
     def find_spec(self, name, path=None, target=None):
         var = self.MODS.get(name)

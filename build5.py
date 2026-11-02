@@ -193,7 +193,7 @@ _blocks = ''.join('<script type="text/plain" id="%s">%s</script>\n' % (i, t) for
     ('py-wasm', _b(_P + 'pyodide.asm.wasm', 1)), ('py-asm', _b(_P + 'pyodide.asm.js', 1)), ('py-zip', _b(_P + 'python_stdlib.zip')),
     ('py-lock', open(_P + 'pyodide-lock.json', encoding='utf-8').read().replace('</', '<\\/')),
     ('py-loader', open(_P + 'pyodide.js', encoding='utf-8').read().replace('</script', '<\\/script')),
-    ('py-glue', open('v5/py/glue.py', encoding='utf-8').read() + '\n_TURTLE_SRC = ' + repr(open('v5/py/turtle_shim.py', encoding='utf-8').read()) + '\n_REQUESTS_SRC = ' + repr(open('v5/py/requests_shim.py', encoding='utf-8').read()) + '\n'), ('py-worker', open('v5/py/worker.js', encoding='utf-8').read())))
+    ('py-glue', open('v5/py/glue.py', encoding='utf-8').read() + '\n_TURTLE_SRC = ' + repr(open('v5/py/turtle_shim.py', encoding='utf-8').read()) + '\n_REQUESTS_SRC = ' + repr(open('v5/py/requests_shim.py', encoding='utf-8').read()) + '\n_MINIWEB_SRC = ' + repr(open('v5/py/miniweb_shim.py', encoding='utf-8').read()) + '\n'),('py-worker', open('v5/py/worker.js', encoding='utf-8').read())))
 assert s.count('</body>') == 1
 s = s.replace('</body>', _blocks + '</body>')
 s = s.replace('v5.1.3', VER).replace('__VER__', VER)
