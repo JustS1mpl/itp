@@ -275,8 +275,8 @@ function doneScreen(o){
   var many=o.err>=ROLL_AT,acc=o.acc>=0?o.acc:-1,tm=o.tm>=0?o.tm:-1;
   /* плитки как в Duolingo: опыт, точность, время — появляются по очереди */
   var tl='<div class="xpt x dt" id="xpt"><small>Опыт</small><b>⭐ <span id="xpn">+0</span></b></div>'+
-   (acc>=0?'<div class="xpt ac dt"><small>Точность</small><b>🎯 '+acc+'%</b></div>':o.err!==undefined?'<div class="xpt dt"><small>Ошибок</small><b>'+o.err+'</b></div>':'')+
-   (tm>=0?'<div class="xpt tmr dt"><small>Время</small><b>⏰ '+fmtTm(tm)+'</b></div>':'');
+   (acc>=0?'<div class="xpt ac dt"><small>Точность</small><b>🎯 <span class="cnt" data-v="'+acc+'" data-f="p">'+acc+'%</span></b></div>':o.err!==undefined?'<div class="xpt dt"><small>Ошибок</small><b>'+o.err+'</b></div>':'')+
+   (tm>=0?'<div class="xpt tmr dt"><small>Время</small><b>⏰ <span class="cnt" data-v="'+tm+'" data-f="t">'+fmtTm(tm)+'</span></b></div>':'');
   var h='<div class="fin">'+rabbit(many?'rolled':(o.mood||(o.err===0?'cool':'happy')))+'<h1>'+o.title+'</h1>'+(many?'<p class="lead">Непростой островок: ошибок было много. Но он пройден, а ошибки разобраны.</p>':o.lead?'<p class="lead">'+o.lead+'</p>':'')+
    '<div class="xpr">'+tl+'</div>'+
    (o.bonus?'<p class="note2">'+o.bonus+'</p>':'')+(o.note?'<p class="note2">'+esc(o.note)+'</p>':'')+
@@ -293,7 +293,10 @@ function doneScreen(o){
     if(k===0){if(!x){n.textContent='+0';return}
       /* опыт «набегает» числом */
       var t0=0,xt=xpTick();t.classList.add('pp');requestAnimationFrame(function st(q){if(!t0)t0=q;var kk=Math.min(1,(q-t0)/650),vv=Math.round(x*(1-Math.pow(1-kk,3)));n.textContent='+'+vv;xt(vv);if(kk<1&&n.isConnected)requestAnimationFrame(st)});sparks(t)}
-    else snd('pet')},300+k*520)});
+    else{snd('pet');
+      /* точность и время тоже «набегают» числом, как опыт */
+      var c=e.querySelector('.cnt');if(c){var v=+c.dataset.v,f=c.dataset.f,t1=0,fm=function(z){return f==='t'?fmtTm(z):z+'%'};c.textContent=fm(0);
+        requestAnimationFrame(function st2(q){if(!t1)t1=q;var kk=Math.min(1,(q-t1)/600),vv=Math.round(v*(1-Math.pow(1-kk,3)));c.textContent=fm(vv);if(kk<1&&c.isConnected)requestAnimationFrame(st2)})}}},300+k*520)});
   /* потом заполняется полоса уровня */
   xpStripRun();
   /* U1-8, U1-9: после итога — экран цели дня и (один раз) выбор цели серии; главная кнопка сначала ведёт туда.

@@ -1594,3 +1594,11 @@ html.exbig .exio pre.cmp,html.exbig .pyex .exio pre.cmp{margin:6px 0 0;padding:1
 .tile.tbig>span:first-child{display:flex;align-items:center;justify-content:center;line-height:0;align-self:center}
 .tile.tbig>span:first-child .em{display:block;vertical-align:top}
 .skd svg{width:26px;height:26px}
+/* U1-10: при появлении плитки итога по ней один раз пробегает блик; число не меняет ширину плитки, пока набегает */
+.xpr .xpt{position:relative;overflow:hidden}
+.xpr .xpt .cnt,.xpr .xpt #xpn{font-variant-numeric:tabular-nums}
+.xpr .xpt::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.55) 50%,transparent 65%);transform:translateX(-120%)}
+[data-theme=dark] .xpr .xpt::after{background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.18) 50%,transparent 65%)}
+.xpr .xpt.dt.in::after{animation:xshine .9s .15s cubic-bezier(.4,0,.2,1) both}
+@keyframes xshine{to{transform:translateX(120%)}}
+@media (prefers-reduced-motion:reduce){.xpr .xpt::after{display:none}}
