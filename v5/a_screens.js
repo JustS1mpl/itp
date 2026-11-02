@@ -3,7 +3,7 @@
    перенесена без изменений, поменялась только раскладка. Ничего о конкретных темах здесь не записано. */
 
 /* --- переходы между экранами: направление объясняет, куда ты попал --- */
-var SDEP={home:0,practice:0,editor:0,profile:0,greet:0,nick:0,place:0,settings:1,dict:1,codes:1,hole:1,theory:1,quiz:1,task:1,project:1,askq:1,rcode:1,done:2},PSKEY='';
+var SDEP={home:0,practice:0,editor:0,profile:0,greet:0,nick:0,place:0,settings:1,dict:1,codes:1,hole:1,theory:1,quiz:1,task:1,project:1,askq:1,rcode:1,skills:1,done:2,goal:2},PSKEY='';
 function show(h,tab){
   cancelAnimationFrame(TYR);HRE=null;tocKill();CERR=0;
   document.removeEventListener('click',popOut,true);if(JIO){JIO.disconnect();JIO=null}
@@ -264,10 +264,21 @@ function kbCaret(){
   if(y+lh>bot)scrollBy(0,y+lh-bot);else if(y<top)scrollBy(0,y-top)}
 
 /* --- итог островка: что получил, сколько опыта, куда дальше --- */
+/* U1-10: время прохождения островка — с первого захода в него (в памяти; после перезагрузки страницы отсчёт начнётся заново) */
+var ISLT={k:'',t:0};
+function islStart(k){if(ISLT.k!==k)ISLT={k:k,t:Date.now()}}
+function islTime(k){var r=ISLT.k===k?Math.round((Date.now()-ISLT.t)/1000):-1;ISLT={k:'',t:0};return r}
+function fmtTm(s){var m=Math.floor(s/60),h=Math.floor(m/60);return h?h+':'+pad2(m%60)+':'+pad2(s%60):m+':'+pad2(s%60)}
+/* точность: доля верных попыток (n заданий или вопросов, err ошибок) */
+function accOf(n,err){return n>0?Math.round(n/(n+(err||0))*100):-1}
 function doneScreen(o){
-  var many=o.err>=ROLL_AT;
+  var many=o.err>=ROLL_AT,acc=o.acc>=0?o.acc:-1,tm=o.tm>=0?o.tm:-1;
+  /* плитки как в Duolingo: опыт, точность, время — появляются по очереди */
+  var tl='<div class="xpt x dt" id="xpt"><small>Опыт</small><b>⭐ <span id="xpn">+0</span></b></div>'+
+   (acc>=0?'<div class="xpt ac dt"><small>Точность</small><b>🎯 '+acc+'%</b></div>':o.err!==undefined?'<div class="xpt dt"><small>Ошибок</small><b>'+o.err+'</b></div>':'')+
+   (tm>=0?'<div class="xpt tmr dt"><small>Время</small><b>⏰ '+fmtTm(tm)+'</b></div>':'');
   var h='<div class="fin">'+rabbit(many?'rolled':(o.mood||(o.err===0?'cool':'happy')))+'<h1>'+o.title+'</h1>'+(many?'<p class="lead">Непростой островок: ошибок было много. Но он пройден, а ошибки разобраны.</p>':o.lead?'<p class="lead">'+o.lead+'</p>':'')+
-   '<div class="xpr">'+(o.err!==undefined?'<div class="xpt"><small>Ошибок</small><b>'+o.err+'</b></div>':'')+'<div class="xpt x" id="xpt"><small>Опыт</small><b>⭐ <span id="xpn">+0</span></b></div></div>'+
+   '<div class="xpr">'+tl+'</div>'+
    (o.bonus?'<p class="note2">'+o.bonus+'</p>':'')+(o.note?'<p class="note2">'+esc(o.note)+'</p>':'')+
    (o.tj?'<div class="tj">🎉 Тема «'+esc(o.tj)+'» пройдена!</div>':'')+(o.lv?'<div><span class="lvup">⬆️ Новый уровень: '+o.lv+'</span></div>':'')+
    xpStrip(o.x)+'</div>';
@@ -276,12 +287,52 @@ function doneScreen(o){
      тема пройдена или новый уровень звучат через конфетти (там нужный звук выбирает SX.cs) */
   SX.cs=o.tj?'fanfare':(o.lv?'level':'');setTimeout(function(){SX.cs=''},1500);
   if(!o.tj&&!o.lv&&!sndRecent('fanfare',600))snd('done');
-  if(RM()&&o.x>0)setTimeout(function(){snd('xpt',{k:0})},260);
-  /* опыт «набегает» числом, потом заполняется полоса уровня */
-  var n=$('xpn'),t=$('xpt'),x=o.x||0;
-  if(RM()||!x){n.textContent='+'+x}else{var t0=0,xt=xpTick();setTimeout(function(){t.classList.add('pp');requestAnimationFrame(function st(ts){if(!t0)t0=ts;var k=Math.min(1,(ts-t0)/650),vv=Math.round(x*(1-Math.pow(1-k,3)));n.textContent='+'+vv;xt(vv);if(k<1&&n.isConnected)requestAnimationFrame(st)});sparks(t)},260)}
+  var n=$('xpn'),t=$('xpt'),x=o.x||0,ts=app.querySelectorAll('.xpr .dt');
+  if(RM()){ts.forEach(function(e){e.classList.add('in')});n.textContent='+'+x;if(x>0)setTimeout(function(){snd('xpt',{k:0})},260)}
+  else ts.forEach(function(e,k){setTimeout(function(){if(!e.isConnected)return;e.classList.add('in');
+    if(k===0){if(!x){n.textContent='+0';return}
+      /* опыт «набегает» числом */
+      var t0=0,xt=xpTick();t.classList.add('pp');requestAnimationFrame(function st(q){if(!t0)t0=q;var kk=Math.min(1,(q-t0)/650),vv=Math.round(x*(1-Math.pow(1-kk,3)));n.textContent='+'+vv;xt(vv);if(kk<1&&n.isConnected)requestAnimationFrame(st)});sparks(t)}
+    else snd('pet')},300+k*520)});
+  /* потом заполняется полоса уровня */
   xpStripRun();
+  /* U1-8, U1-9: после итога — экран цели дня и (один раз) выбор цели серии; главная кнопка сначала ведёт туда.
+     Обработчик вешается раньше, чем экран получит свой onclick, поэтому срабатывает первым */
+  var gb=$('go');if(gb)gb.addEventListener('click',function(e){if(!GOALP&&!sgAsk())return;e.stopImmediatePropagation();var f=gb.onclick;postDone(function(){if(f)f.call(gb)})});
   var b=document.querySelector('#dock .btn');if(b)setTimeout(function(){b.focus({preventScroll:true})},60)}
+/* очередь после итога островка: цель дня → выбор цели серии → куда шёл ученик */
+function postDone(then){
+  if(GOALP){GOALP=0;return goalScreen(function(){postDone(then)})}
+  if(sgAsk())return sgChooser(function(){postDone(then)});
+  then()}
+/* выбор цели серии спрашиваем после 2-го пройденного островка (вступление не считается) и после каждой достигнутой цели */
+function islN(){var n=0;for(var k in S.d){var i=+k.split('-')[0];if(TOPICS[i]&&!TOPICS[i].intro&&/^\d+-\d+$/.test(k))n++}return n}
+function sgAsk(){return!!S.sg&&!S.sg.a&&!S.sg.n&&islN()>=2}
+function sgChooser(then){
+  S.sg.a=1;save();
+  var nx=SGN.filter(function(n){return n>(S.sg.ok||0)})[0]||SGN[SGN.length-1],cur=S.sg.n||nx,gl=S.goal;
+  var m=modal('<div class="sgc"><h2>'+(S.sg.ok&&!S.sg.n?'Новая цель серии':'Сколько дней подряд держим серию?')+'</h2><p class="mu">'+(S.sg.ok&&!S.sg.n?'Цель в '+S.sg.ok+' '+pl(S.sg.ok,['день','дня','дней'])+' выполнена. Замахнёмся дальше?':'Заходи каждый день и выполняй цель дня. Дойдёшь до цели серии — получишь опыт: чем дольше, тем больше.')+'</p>'+
+   '<div class="sgo" role="radiogroup" aria-label="Цель серии">'+SGN.map(function(n){return'<button role="radio" class="sgb" data-n="'+n+'" aria-checked="'+(n===cur)+'"><b>'+n+'</b><span>'+pl(n,['день','дня','дней'])+'</span><small>+'+SGX[n]+' ⭐</small></button>'}).join('')+'</div>'+
+   '<p class="sgl">Цель дня: сколько островков проходить</p>'+SG('goal',[[1,'1 островок'],[2,'2'],[3,'3']],gl)+'</div>',
+   [['Готово',function(){S.sg.n=cur;S.goal=gl;save()}],['Позже',null,1]]);
+  segInit(m);
+  m.querySelectorAll('.sgb').forEach(function(b){b.onclick=function(){cur=+b.dataset.n;m.querySelectorAll('.sgb').forEach(function(x){x.setAttribute('aria-checked',x===b?'true':'false')});snd('click')}});
+  m.querySelectorAll('.segc button').forEach(function(b){b.onclick=function(){var g=b.parentNode;g.querySelectorAll('button').forEach(function(x){var on=x===b;x.classList.toggle('on',on);x.setAttribute('aria-checked',on?'true':'false')});gl=+b.dataset.v;snd('click');segPos(g,true)}});
+  /* окно закрыли любым способом — идём дальше */
+  var rm=m.remove;m.remove=function(){rm.call(m);if(then){var f=then;then=null;setTimeout(f,RM()?0:200)}};
+  return m}
+/* U1-8: цель дня выполнена — морковка вместо огонька, сколько дней подряд, неделя с отметками */
+function goalScreen(then){
+  var s=streakNow(),sg=S.sg&&S.sg.n,hd=IMG.wowhead||IMG.eat;
+  var h='<div class="gday">'+
+   '<div class="gsay">'+(hd?'<span class="gav" aria-hidden="true"><img src="'+hd+'" alt="" draggable="false"></span>':'')+'<p>'+G('Ты справился!','Ты справилась!','Цель дня выполнена!')+' Встретимся завтра.</p></div>'+
+   '<div class="gcar" aria-hidden="true">🥕</div><b class="gnum">'+s+'</b><p class="glab">'+pl(s,['день','дня','дней'])+' подряд</p>'+
+   weekRow('a')+
+   (sg?'<div class="gsg"><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="'+sg+'" aria-valuenow="'+Math.min(s,sg)+'" aria-label="Цель серии"><i class="grow" style="width:'+Math.min(100,Math.round(s/sg*100))+'%"></i></div><span class="mu">Цель серии: '+Math.min(s,sg)+' из '+sg+' · +'+SGX[sg]+' ⭐</span></div>':'')+
+   '</div>';
+  scr('goal',h+dockHtml('<button class="btn" id="gz">Закрыть</button><button class="btn t" id="gsh">'+ico('share')+'Поделиться</button>',1));
+  snd('streak');vib([20,30,20]);
+  $('gz').onclick=function(){then()};$('gsh').onclick=share}
 function sparks(el){
   var r=el.getBoundingClientRect(),cols=['var(--gold)','var(--carrot)','var(--accent)','#fff'];
   for(var k=0;k<14;k++){var s=document.createElement('i');s.style.cssText='position:fixed;z-index:31;left:'+(r.left+r.width/2)+'px;top:'+(r.top+r.height/2)+'px;width:7px;height:7px;margin:-3.5px;border-radius:2px;pointer-events:none;background:'+cols[k%4];document.body.appendChild(s);
@@ -295,7 +346,9 @@ function theory(i,j){
   scr('theory',lessonTop('<div class="rprog" role="progressbar" aria-label="Прочитано" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="rpb"></i></div>','<span class="lstep">≈ '+readMin(it)+' мин</span>')+'<article class="th"><p class="ov tov">'+esc(TOPICS[i].n)+'</p><h1 class="tt">'+esc(it.n)+'</h1><div id="tb">'+h+'</div><p class="mu tm" id="tm">'+(fresh&&!rm&&ST('ty')?TMSK:TMT)+'</p></article><button class="btn" id="go">'+(S.d[i+'-'+j]?'Готово':G('Я прочитал','Я прочитала','Прочитано')+', открыть дальше')+'</button>');
   $('x').onclick=goBack;qBind(app);
   app.querySelectorAll('.term').forEach(function(b){b.onclick=function(){var x=T[b.dataset.n];sheet(x.n,x.d)}});
-  $('go').onclick=function(){var w=tdone(i);if(!S.d[i+'-'+j]){snd('theory');bump(i+'-'+j)}if(TOPICS[i].intro&&!w&&tdone(i)&&S.start===0){reveal();return}if(TOPICS[i].intro&&(S.start>0||w)){goBack();if(!w)toast('Готово. Эта кнопка больше не нужна и пропала из профиля');return}home();if(!w&&tdone(i)){toast('🎉 Тема «'+TOPICS[i].n+'» пройдена!');confetti(allDone()?2:1)}};
+  $('go').onclick=function(){var w=tdone(i);if(!S.d[i+'-'+j]){snd('theory');bump(i+'-'+j)}if(TOPICS[i].intro&&!w&&tdone(i)&&S.start===0){reveal();return}if(TOPICS[i].intro&&(S.start>0||w)){goBack();if(!w)toast('Готово. Эта кнопка больше не нужна и пропала из профиля');return}
+    /* U1-8: цель дня выполнена теорией — сначала её экран */
+    postDone(function(){home();if(!w&&tdone(i)){toast('🎉 Тема «'+TOPICS[i].n+'» пройдена!');confetti(allDone()?2:1)}})};
   if(window.TW)TW.scan(app);
   tocBuild();if(fresh&&!rm&&ST('ty'))typeIn($('tb'),$('tm'));
   readProg()}
@@ -314,7 +367,7 @@ function readProg(){
 
 /* --- вопросы --- */
 function quiz(i,j){
-  var key=i+'-'+j,Ql=IT(i,j).q,tot=Ql.length,D=S.dr[key],first=!S.at[key];
+  var key=i+'-'+j,Ql=IT(i,j).q,tot=Ql.length,D=S.dr[key],first=!S.at[key];islStart(key);
   var idx=[],st=Ql.map(function(){return 0}),ph=0,er=0,nx=0,cb=0,bon=0;
   if(D&&D.kind==='q'&&D.st&&D.st.length===tot){idx=D.qs.filter(function(x){return x<tot});st=D.st.split('').map(Number);ph=D.ph;er=D.er;nx=D.nx}
   if(!idx.length){idx=Ql.map(function(x,n){return n});st=st.map(function(){return 0});ph=0;er=0;nx=0}
@@ -325,7 +378,7 @@ function quiz(i,j){
     var a=award(key,20,nx?99:er,first&&!nx?bon:0,1);
     if(nx&&a.x)a.note='Повторная ошибка, поэтому только +2. Опыт за островок даётся один раз, а тренироваться можно сколько угодно.';
     var tj=!tj0&&tdone(i);
-    doneScreen({title:'Островок пройден',lead:er?'Ошибки разобраны, двигаемся дальше.':'Без единой ошибки!',err:er,x:a.x,bonus:!nx&&first&&bon&&er<=3?'Бонус за серию верных ответов: +'+bon+' ⭐':'',note:a.note,tj:tj?TOPICS[i].n:'',lv:a.lv,btns:'<button class="btn" id="go">Дальше</button>'+(nx?'<button class="btn t" id="rp">Пройти заново</button>':'')});
+    doneScreen({title:'Островок пройден',lead:er?'Ошибки разобраны, двигаемся дальше.':'Без единой ошибки!',err:er,acc:accOf(tot,er),tm:islTime(key),x:a.x,bonus:!nx&&first&&bon&&er<=3?'Бонус за серию верных ответов: +'+bon+' ⭐':'',note:a.note,tj:tj?TOPICS[i].n:'',lv:a.lv,btns:'<button class="btn" id="go">Дальше</button>'+(nx?'<button class="btn t" id="rp">Пройти заново</button>':'')});
     $('go').onclick=goBack;if(nx)$('rp').onclick=function(){quiz(i,j)};
     if(tj||a.lv)confetti(tj&&allDone()?2:1)}
   function nextq(){
@@ -356,19 +409,21 @@ function quiz(i,j){
 
 /* --- задания с кодом --- */
 function task(i,j,k){
-  var it=IT(i,j),T=it.tasks,q=T[k],key=i+'-'+j,tk=key+'-'+k;
+  var it=IT(i,j),T=it.tasks,q=T[k],key=i+'-'+j,tk=key+'-'+k;islStart(key);
   var dc=((S.dr[key]||{}).codes||{})[k]||(S.tk[tk]?'':'# Пиши код здесь\n'+(q.starter||''));
   /* полоска заданий: на решённое задание (и на первое нерешённое) можно перейти — взять прошлый код или ещё раз
      посмотреть, как задумано */
   var fu=T.findIndex(function(x,n){return!S.tk[key+'-'+n]});if(fu<0)fu=T.length-1;
   var dots='<div class="sbar" role="group" aria-label="Задание '+(k+1)+' из '+T.length+'">'+T.map(function(x,n){var ok=S.tk[key+'-'+n],go=n!==k&&(ok||n===fu);
     return'<button type="button" class="'+(ok?'ok':'')+(n===k?' cu':'')+'" data-n="'+n+'"'+(go?' title="Задание '+(n+1)+'"':' disabled')+' aria-label="Задание '+(n+1)+(ok?', решено':'')+'"'+(n===k?' aria-current="step"':'')+'></button>'}).join('')+'</div>';
-  scr('task',lessonTop(dots,'<span class="lstep" aria-hidden="true">'+(k+1)+' / '+T.length+'</span>'+(q.h?'<button class="icon" id="hb" aria-label="Подсказка (опыт будет вдвое меньше)" aria-keyshortcuts="Control+H">'+ico('bulb')+'</button>':''))+'<h1 class="sr-only">'+esc(it.n||'Задания с кодом')+', задание '+(k+1)+' из '+T.length+'</h1>'+taskCard(q)+'<div id="hint"></div>'+edCard('Решение',dc,0,'# Пиши код здесь\n'+(q.starter||''))+conHtml()+'<div id="fb" aria-live="polite"></div>'+dockHtml('<button class="btn" id="chk">Проверить</button>'));
+  scr('task',lessonTop(dots,'<span class="lstep" aria-hidden="true">'+(k+1)+' / '+T.length+'</span>'+(q.h?'<button class="icon" id="hb" aria-label="Подсказка (опыт будет вдвое меньше)" aria-keyshortcuts="Control+H">'+ico('bulb')+'</button>':''))+'<h1 class="sr-only">'+esc(it.n||'Задания с кодом')+', задание '+(k+1)+' из '+T.length+'</h1>'+(k>0&&!S.tp&&S.tk[key+'-'+(k-1)]?'<div class="tip0" id="tip0" role="note"><span>Решённое задание можно открыть снова: нажми на его полоску сверху. Там твой код и «как задумано».</span><button class="btn t" id="tip0b">Понятно</button></div>':'')+taskCard(q)+'<div id="hint"></div>'+edCard('Решение',dc,0,'# Пиши код здесь\n'+(q.starter||''))+conHtml()+'<div id="fb" aria-live="polite"></div>'+dockHtml('<button class="btn" id="chk">Проверить</button>'));
   $('x').onclick=goBack;
+  if($('tip0')){S.tp=1;save();$('tip0b').onclick=function(){var t=$('tip0');if(t)t.remove()}}
   app.querySelectorAll('.top .sbar button[data-n]').forEach(function(b){b.onclick=function(){if(!b.disabled)task(i,j,+b.dataset.n)}});
   var c=$('code'),sync=initEd(c,function(){drc(i,j,k).codes[k]=c.value.slice(0,3000);lazySave()});sync();
-  /* вернулись к уже решённому заданию: сразу «дальше» и эталон, проверить заново тоже можно */
-  if(S.tk[tk]){var nl=k+1>=T.length;dockSet('<button class="btn g" id="chk">Проверить</button><button class="btn" id="nx">'+(fu>k&&fu!==k?'К заданию '+(fu+1):nl?'Завершить':'Следующее задание')+'</button>'+(q.sol?'<button class="btn t" id="sl">Посмотреть, как задумано</button>':''));
+  /* вернулись к уже решённому заданию: сразу «дальше» и эталон; «Проверить» появляется, только когда код изменили (U1-1) */
+  if(S.tk[tk]){var nl=k+1>=T.length,c0=c.value;dockSet('<button class="btn g" id="chk" hidden>Проверить</button><button class="btn" id="nx">'+(fu>k&&fu!==k?'К заданию '+(fu+1):nl?'Завершить':'Следующее задание')+'</button>'+(q.sol?'<button class="btn t" id="sl">Посмотреть, как задумано</button>':''));
+    c.addEventListener('input',function(){var b=$('chk');if(b&&b.classList.contains('g'))b.hidden=c.value===c0});
     $('nx').onclick=function(){fu>k?task(i,j,fu):nl?end(i,j):task(i,j,k+1)};if(q.sol)$('sl').onclick=function(){solModal(q.sol)}}
   function showHint(){var hb=$('hb');if(hb)hb.classList.add('on');$('hint').innerHTML='<div class="fb"><b>Подсказка</b>'+hintTx(q.h)+'<br><span class="mu">Опыт за это задание: 50% от максимума.</span></div>'}
   if(q.h){
@@ -396,7 +451,7 @@ function task(i,j,k){
 function end(i,j){
   var key=i+'-'+j,tj0=tdone(i);rec(key,ERR);bump(key);var a=award(key,60,ERR,0,HINT?.5:1),all=allDone(),tj=!tj0&&tdone(i),e=ERR,hn=HINT;
   HINT=0;
-  doneScreen({title:all?'Обучение завершено!':'Задания решены',lead:all?'Кролик научился программировать и построил автоматическую кормушку 🤖':'Кролик сыт и доволен.',err:e,x:a.x,bonus:hn?'С подсказкой: 50% опыта':'',note:a.note,tj:tj?TOPICS[i].n:'',lv:a.lv,btns:'<button class="btn" id="go">К темам</button>'});
+  doneScreen({title:all?'Обучение завершено!':'Задания решены',lead:all?'Кролик научился программировать и построил автоматическую кормушку 🤖':'Кролик сыт и доволен.',err:e,acc:accOf(IT(i,j).tasks.length,e),tm:islTime(key),x:a.x,bonus:hn?'С подсказкой: 50% опыта':'',note:a.note,tj:tj?TOPICS[i].n:'',lv:a.lv,btns:'<button class="btn" id="go">К темам</button>'});
   $('go').onclick=goBack;
   if(tj||a.lv)confetti(tj&&all?2:1)}
 
@@ -404,7 +459,7 @@ function end(i,j){
 function project(i,j){
   var PF=0;
   /* at: skip — пропущен; seen — пропущен и эталон открыт: решить можно, но уже без опыта */
-  var it=IT(i,j),key=i+'-'+j,done=S.d[key],seen=S.at[key]==='seen',sk=S.at[key]==='skip'||seen,bonus=it.bonus>0?it.bonus|0:40;
+  var it=IT(i,j),key=i+'-'+j,done=S.d[key];islStart(key);var seen=S.at[key]==='seen',sk=S.at[key]==='skip'||seen,bonus=it.bonus>0?it.bonus|0:40;
   var dc=((S.dr[key]||{}).codes||{})[0]||'# Пиши код здесь\n'+(it.starter||''),hs=String(it.h||'').split('\n').filter(Boolean);
   scr('project',lessonTop('<span class="lstep">🚀 Мини-проект · по желанию</span>',done?'':'<button class="btn t" id="sk" style="margin:0">Пропустить</button>')+'<div class="pj"><h1>'+esc(it.n)+'</h1>'+(String(it.q||'').length>QLONG?'<div class="card pjl">'+QTB+qSec('Цель',condHtml(it.q,true),true)+(hs.length?qSec('Что пригодится',hs.map(function(l){return'<p class="qi">'+hintTx(l)+'</p>'}).join(''),false):'')+(it.ex?qSec('Пример',exHtml(it.ex,it.strict),true):'')+filesHtml(it.f)+'</div>':'<div class="card"><b>Цель</b><p>'+qfmt(it.q).replace(/\n/g,'</p><p>')+'</p>'+(hs.length?'<b>Что пригодится</b><p>'+hs.map(function(l){return hintTx(l)}).join('<br>')+'</p>':'')+(it.ex?'<b>Пример</b>'+(it.strict?'<pre class="cmp">'+esc(it.ex)+'</pre>':exHtml(it.ex,false)):'')+filesHtml(it.f)+'</div>')+'<p class="mu" style="margin:0 4px 14px">'+(seen?'Эталон открыт, поэтому опыт за проект не начисляется. Решить его всё равно можно.':sk?'Этот проект пропущен. Сделай его сейчас и получи бонус +'+bonus+' ⭐. Или посмотри эталон, но тогда уже без опыта.':done?'Проект уже выполнен, бонус за него получен.':'Проект можно пропустить, тема всё равно засчитается. За выполнение бонус +'+bonus+' ⭐.')+'</p></div>'+edCard('Решение',dc,0,'# Пиши код здесь\n'+(it.starter||''))+conHtml()+'<div id="fb" aria-live="polite"></div>'+dockHtml('<button class="btn" id="chk">Проверить</button>'+(sk&&it.sol?'<button class="btn t" id="pjs">Посмотреть эталон</button>':'')));
   $('x').onclick=home;qBind(app);
@@ -429,7 +484,7 @@ function projEnd(i,j){
   else if(at==='seen')S.at[key]='full';
   bump(key);ach('proj');snd('fanfare');
   var tj=!tj0&&tdone(i),all=allDone();
-  doneScreen({mood:'wow',title:all?'Обучение завершено!':'Проект готов!',lead:all?'Кролик научился программировать и построил автоматическую кормушку 🤖':'Кролик в восторге 🚀',x:x,note:x?'':at==='seen'?'Эталон был открыт, поэтому опыт не начислен.':'Бонус за этот проект уже получен.',tj:tj?TOPICS[i].n:'',lv:lv,btns:'<button class="btn" id="go">К темам</button>'+(it.sol?'<button class="btn t" id="sl">Посмотреть, как задумано</button>':'')});
+  doneScreen({mood:'wow',title:all?'Обучение завершено!':'Проект готов!',lead:all?'Кролик научился программировать и построил автоматическую кормушку 🤖':'Кролик в восторге 🚀',tm:islTime(key),x:x,note:x?'':at==='seen'?'Эталон был открыт, поэтому опыт не начислен.':'Бонус за этот проект уже получен.',tj:tj?TOPICS[i].n:'',lv:lv,btns:'<button class="btn" id="go">К темам</button>'+(it.sol?'<button class="btn t" id="sl">Посмотреть, как задумано</button>':'')});
   $('go').onclick=home;if(it.sol)$('sl').onclick=function(){solModal(it.sol)};
   if(tj||lv)confetti(tj&&all?2:1)}
 

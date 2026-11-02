@@ -52,6 +52,12 @@ function clean(r){
   o.cn={ne:cnum('ne'),nn:cnum('nn'),nd:vdate(cn.nd),gn:cnum('gn'),gd:vdate(cn.gd),pf:cnum('pf'),pj:cnum('pj'),rc:cnum('rc')};
   var hu={};if(r.hu&&typeof r.hu==='object'&&!Array.isArray(r.hu))for(var h in r.hu)if(/^\d{1,3}$/.test(h)&&+h<TOPICS.length&&r.hu[h])hu[h]=1;o.hu=hu;
   o.rp=vdate(r.rp);o.rnd=r.rnd?1:0;
+  /* U1-2: подсказка про возврат к решённым заданиям уже показана */
+  o.tp=r.tp?1:0;
+  /* U1-9: цель серии — n: сколько дней подряд держать (0 — не выбрана), a: уже спрашивали, ok: последняя достигнутая цель */
+  var sg=(r.sg&&typeof r.sg==='object'&&!Array.isArray(r.sg))?r.sg:{};
+  var sgl=[7,14,30,50];/* не SGN: clean() зовут при загрузке раньше, чем выполняются var */
+  o.sg={n:sgl.indexOf(sg.n)>=0?sg.n:0,a:sg.a?1:0,ok:sgl.indexOf(sg.ok)>=0?sg.ok:0};
   return o}
 /* --- тема, акцент, размер текста --- */
 function applyPrefs(){
@@ -126,6 +132,14 @@ function fzEarn(){
   if(S.fz.n>=2){S.fz.p=0;return}
   S.fz.p++;if(S.fz.p>=15){S.fz.p=0;S.fz.n++;toast('Новая заморозка серии! Теперь их: '+S.fz.n);snd('freeze');ach('ice')}}
 /* --- цели --- */
+/* U1-9: цель серии и опыт за неё: чем дольше, тем больше */
+var SGN=[7,14,30,50],SGX={7:70,14:160,30:400,50:750};
+/* экран «цель дня выполнена» ждёт своей очереди: показывается после итога островка (postDone в a_screens.js) */
+var GOALP=0;
+function sgCheck(){
+  var n=S.sg&&S.sg.n;if(!n||S.streak<n)return;
+  var x=SGX[n]||0;S.sg.ok=n;S.sg.n=0;S.sg.a=0;save();
+  var lv=addXp(x);setTimeout(function(){toast('Цель серии: '+n+' '+pl(n,['день','дня','дней'])+' подряд! +'+x+' ⭐');snd('streak');if(lv)toast('Новый уровень: '+lv)},400)}
 function goalDone(){var h=S.hist[day(new Date())];return h?h.les:0}
 function wkStart(){var d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()-((d.getDay()+6)%7));return day(d)}
 function wkCount(){var w=wkStart(),n=0;for(var i=0;i<7;i++)if(S.gm[dadd(w,i)])n++;return n}
@@ -133,9 +147,11 @@ function goalCheck(){
   var t=day(new Date());if(goalDone()<S.goal||S.gm[t])return;
   S.gm[t]=1;var ks=Object.keys(S.gm).sort();while(ks.length>70)delete S.gm[ks.shift()];
   S.cn.gn=(S.cn.gd===dadd(t,-1))?S.cn.gn+1:1;S.cn.gd=t;save();
-  toast('Цель дня выполнена!');snd('done');
+  /* U1-8: вместо строки сверху — отдельный экран после итога островка */
+  GOALP=1;
   if(S.cn.gn>=5)ach('g5');if(S.cn.gn>=14)ach('g14');if(S.cn.gn>=30)ach('g30');
-  if(wkCount()>=5&&S.wk!==wkStart()){S.wk=wkStart();var lv=addXp(50);toast('Цель недели закрыта: +50 ⭐');ach('week');if(lv)toast('Новый уровень: '+lv)}
+  /* U1-9: бонуса «+50 за 5 дней недели» больше нет — опыт даёт цель серии; достижение «Цель недели» осталось */
+  if(wkCount()>=5&&S.wk!==wkStart()){S.wk=wkStart();ach('week')}
 }
 /* --- достижения --- */
 var ACH=[
@@ -212,6 +228,7 @@ function bump(k){
     if(hr>=23||hr<4){ach('night');if(S.cn.nd!==t){S.cn.nn=(S.cn.nd===dadd(t,-1))?S.cn.nn+1:1;S.cn.nd=t}if(S.cn.nn>=5)ach('owl5')}
     if(hr>=4&&hr<8)ach('early');
     if(prev&&dnum(t)-dnum(prev)>3)ach('back');
+    sgCheck();
     if(S.streak>=7)ach('w1');if(S.streak>=30)ach('m1');if(S.streak>=100)ach('s100');
     var m=/^(\d+)-\d+$/.exec(k);if(m&&tdone(+m[1]))topicDone(+m[1]);
     goalCheck();

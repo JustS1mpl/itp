@@ -1481,3 +1481,49 @@ html.exbig .exio pre.cmp,html.exbig .pyex .exio pre.cmp{margin:6px 0 0;padding:1
   html.exbig .tcard .pyex,html.exbig .pj .card .pyex{background:color-mix(in srgb,var(--ink) 4.5%,var(--card))}
   html.exbig .exio pre.cmp,html.exbig .pyex .exio pre.cmp{box-shadow:0 0 0 1px color-mix(in srgb,var(--ink) 8%,transparent)}
 }
+
+/* ===== U1 (2026-11-02): экраны учёбы и профиль ===== */
+/* U1-2: одноразовая подсказка над заданием — по полоске можно вернуться к решённому */
+.tip0{display:flex;align-items:center;gap:12px;margin:0 0 12px;padding:12px 12px 12px 16px;border-radius:var(--r-lg);background:color-mix(in srgb,var(--accent) 12%,var(--card));font-size:.9375rem;line-height:1.4}
+.tip0>span{flex:1;min-width:0}
+.tip0 .btn{flex:none;width:auto;margin:0;min-height:40px;padding:0 14px}
+/* U1-12: дни серии — галочка штрихом, отмеченный день с мягким объёмом */
+.wd i .wck{width:62%;height:62%;fill:none;stroke:currentColor;stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round}
+.wd.on i{background:linear-gradient(170deg,color-mix(in srgb,#fff 16%,var(--accent)),var(--accent));box-shadow:inset 0 -2px 0 color-mix(in srgb,#000 14%,var(--accent))}
+.wd.td.on i{box-shadow:inset 0 -2px 0 color-mix(in srgb,#000 14%,var(--accent)),0 0 0 2px var(--card),0 0 0 4px color-mix(in srgb,var(--accent) 40%,transparent)}
+/* U1-10: плитки итога островка появляются по очереди */
+.xpr{flex-wrap:wrap}
+.xpr .xpt{flex:1 1 0;min-width:0;max-width:132px;padding:10px 8px 12px}
+.xpr .xpt b{font-size:1.375rem;white-space:nowrap}
+.xpt.ac{background:linear-gradient(160deg,color-mix(in srgb,var(--accent) 20%,var(--card)),var(--card));border-color:color-mix(in srgb,var(--accent) 40%,var(--line))}
+.xpt.tmr{background:linear-gradient(160deg,color-mix(in srgb,var(--ice) 22%,var(--card)),var(--card));border-color:color-mix(in srgb,var(--ice) 45%,var(--line))}
+.xpt .em{width:1.3rem;height:1.3rem}
+.xpt.dt{opacity:0;transform:translateY(14px) scale(.7)}
+.xpt.dt.in{opacity:1;transform:none;transition:opacity .25s ease-out,transform .5s var(--e-spring)}
+/* U1-8: цель дня выполнена */
+.gday{display:flex;flex-direction:column;align-items:center;text-align:center;padding:14px 0 8px}
+.gsay{display:flex;align-items:center;gap:12px;max-width:440px;margin:0 0 18px;padding:12px 16px 12px 12px;border-radius:var(--r-xl);background:var(--card);box-shadow:inset 0 0 0 1px var(--line);text-align:left}
+.gsay p{margin:0;font-size:1.0625rem;font-weight:800;line-height:1.35}
+.gav{flex:none;width:52px;height:52px;border-radius:50%;background:var(--pink-soft,var(--soft));display:grid;place-items:center;overflow:hidden}
+.gav img{width:46px;height:46px;object-fit:contain}
+.gcar{font-size:5.5rem;line-height:1;margin:6px 0 0;animation:gcar .8s var(--e-spring) both}
+.gcar .em{width:7rem;height:7rem}
+@keyframes gcar{0%{transform:scale(.3) rotate(-18deg);opacity:0}60%{transform:scale(1.08) rotate(6deg);opacity:1}100%{transform:none}}
+.gnum{display:block;margin:4px 0 0;font-size:4.5rem;font-weight:900;line-height:1;letter-spacing:-.04em;color:var(--carrot-ink);font-variant-numeric:tabular-nums;animation:xpp .6s .35s var(--e-spring) both}
+.glab{margin:2px 0 18px;font-size:1.25rem;font-weight:900;color:var(--carrot-ink)}
+.gday .wk{width:100%;max-width:400px}
+.gsg{width:100%;max-width:400px;margin:16px 0 0;display:flex;flex-direction:column;gap:8px}
+.gsg .mu{font-size:.875rem}
+.gsg .bar{flex:none}
+/* U1-9: выбор цели серии */
+.sgc h2{margin-bottom:6px}
+.sgo{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:14px 0 18px}
+.sgb{display:flex;flex-direction:column;align-items:center;gap:2px;padding:12px 4px 10px;border:0;border-radius:var(--r-lg);background:var(--card2);color:var(--ink);transition:background var(--d2),transform var(--d1)}
+.sgb b{font-size:1.625rem;font-weight:900;line-height:1.1}
+.sgb span{font-size:.8125rem;font-weight:800;color:var(--muted)}
+.sgb small{margin-top:4px;font-size:.75rem;font-weight:900;color:var(--carrot-ink)}
+.sgb small .em{width:.85rem;height:.85rem}
+.sgb[aria-checked=true]{background:var(--carrot-soft);box-shadow:inset 0 0 0 2px var(--carrot)}
+.sgb:active{transform:scale(.95)}
+.sgl{margin:0 0 8px;font-weight:800}
+@media (prefers-reduced-motion:reduce){.xpt.dt{opacity:1;transform:none}.gcar,.gnum{animation:none}}

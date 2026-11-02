@@ -21,6 +21,7 @@ var IC={
  lock:'<rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
  arrow:'<path d="M12 5v14M6 13l6 6 6-6"/>',
  search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/>',
+ share:'<path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="m16 6-4-4-4 4"/><path d="M12 2v13"/>',
  gear:'<circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7"/>'
 };
 function ico(n,cls){return'<svg class="'+(cls||'')+'" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">'+IC[n]+'</svg>'}
@@ -68,12 +69,14 @@ function bindHead(re){
   if(window.IntersectionObserver)new IntersectionObserver(function(e){document.documentElement.classList.toggle('scr',!e[0].isIntersecting)}).observe(m)})();
 
 /* --- серия, заморозки, уровень --- */
+/* U1-12: галочка дня серии — своя, рисуется кодом: толстый скруглённый штрих, без символа ✓ из шрифта */
+var WCHK='<svg class="wck" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5.5 12.8l4.2 4.2L18.6 7.6"/></svg>';
 function weekRow(mode){
   var w=wkStart(),t=day(new Date()),nm=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'],h='<div class="wk" role="list" aria-label="Эта неделя">';
   for(var i=0;i<7;i++){
     var d=dadd(w,i),a=S.hist[d]&&S.hist[d].les>0,fz=S.fz.u.indexOf(d)>=0&&!a,g=!!S.gm[d],cl,ic,st;
-    if(mode==='g'){cl=g?'on':(d>t?'fu':'');ic=g?'✓':'';st=g?'цель выполнена':'нет'}
-    else{cl=a?'on':fz?'fz':(d>t?'fu':'');ic=a?'✓':fz?'❄️':'';st=a?'занимался':fz?'заморозка':'нет'}
+    if(mode==='g'){cl=g?'on':(d>t?'fu':'');ic=g?WCHK:'';st=g?'цель выполнена':'нет'}
+    else{cl=a?'on':fz?'fz':(d>t?'fu':'');ic=a?WCHK:fz?'❄️':'';st=a?'занимался':fz?'заморозка':'нет'}
     h+='<div class="wd '+cl+(d===t?' td':'')+'" role="listitem" aria-label="'+nm[i]+': '+st+'"><span aria-hidden="true">'+nm[i]+'</span><i aria-hidden="true">'+ic+'</i></div>'}
   return h+'</div>'}
 function fzLeft(){return 15-S.fz.p}
@@ -241,9 +244,8 @@ function burrow(o,side){
 function hole(i){HOLE=i;curOnce(function(){hole0(i)})}
 function hole0(i){BACK=home;fzApply();
   var t=TOPICS[i],p=holePar(i),n=ni(i),c=0;for(var j=0;j<n;j++)if(S.d[i+'-'+j])c++;
-  var pn=0;for(var x=0;x<=p;x++)if(!TOPICS[x].intro&&!TOPICS[x].opt)pn++;
   var h='<div class="top ls"><button class="icon" id="x" aria-label="Назад на Путь">'+ico('back')+'</button><h1>'+esc(holeName(t))+'</h1></div>'+
-   '<section class="topic hole" aria-label="'+esc('Доп. глава: '+t.n)+'"><div class="hhd'+(c===n?' dn':'')+'"><span class="nwr">'+burrowSvg()+'</span><h2>'+esc(t.n)+'</h2><p class="mu">'+esc(t.s||'')+'</p><p class="hnt">Доп. глава по желанию, открывается после островка «'+esc(p>=0?IT(p,holeAt(i)).n||'':'')+'» темы '+pn+'. В счёт тем не входит, опыт за островки начисляется как обычно.</p><div class="hpr"><div class="ring" style="--p:'+Math.round(c/Math.max(1,n)*100)+'" role="img" aria-label="Пройдено '+c+' из '+n+'"><span>'+c+'/'+n+'</span></div><span>'+(c===n?'Глава пройдена':c?'Пройдено '+c+' из '+n:'Ещё не начата')+'</span></div></div>'+
+   '<section class="topic hole" aria-label="'+esc('Доп. глава: '+t.n)+'"><div class="hhd'+(c===n?' dn':'')+'"><span class="nwr">'+burrowSvg()+'</span><h2>'+esc(t.n)+'</h2><p class="mu">'+esc(t.s||'')+'</p><p class="hnt">Доп. глава по желанию: открыта всегда, заходи, когда интересно. В счёт тем не входит, опыт за островки начисляется как обычно.</p><div class="hpr"><div class="ring" style="--p:'+Math.round(c/Math.max(1,n)*100)+'" role="img" aria-label="Пройдено '+c+' из '+n+'"><span>'+c+'/'+n+'</span></div><span>'+(c===n?'Глава пройдена':c?'Пройдено '+c+' из '+n:'Ещё не начата')+'</span></div></div>'+
    '<div class="path'+(RM()?'':' stg')+'" data-i="'+i+'">';
   for(var j2=0;j2<n;j2++)h+=island(i,j2,j2);
   scr('hole',h+'</div></section>','home');links();
@@ -475,10 +477,8 @@ function fdOpen(btn){
   },RM()?0:230)}
 
 /* --- профиль --- */
-function goalSheet(){
-  var m=modal('<h2>Цель дня</h2><p class="mu">Сколько островков проходить в день. Выполни цель в 5 днях недели и получи +50 ⭐.</p>'+SG('goal',[[1,'1 островок'],[2,'2'],[3,'3']],S.goal),[['Готово',function(){KEEPSCR=1;SKEY='profile';var y=window.scrollY;profile();window.scrollTo(0,y)}]]);
-  segInit(m);
-  m.querySelectorAll('.segc button').forEach(function(b){b.onclick=function(){var g=b.parentNode;g.querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x===b)});setSet('goal',b.dataset.v);snd('click');segPos(g,true)}})}
+/* U1-9: цель дня и цель серии выбираются в одном окне (sgChooser в a_screens.js) */
+function goalSheet(){sgChooser(function(){if(CURTAB!=='prof')return;KEEPSCR=1;SKEY='profile';var y=window.scrollY;profile();window.scrollTo(0,y)})}
 function profile(){BACK=profile;
   var n=ND(),LV=lvlInfo(S.xp),d=goalDone(),g=S.goal,gp=Math.min(100,Math.round(d/g*100)),f=S.fz,s=streakNow();
   var rows=TOPICS.map(function(t,i){var c=0,l=[];(t.items||[]).forEach(function(x,j){var e=S.es[i+'-'+j]||0;c+=e;if(e>0)l.push({j:j,n:x.n,e:e,ic:ity(x)[1]})});return{i:i,n:t.n,c:c,l:l}}).filter(function(r){return r.c>0}).sort(function(a,b){return b.c-a.c});
@@ -487,7 +487,7 @@ function profile(){BACK=profile;
   scr('profile',head()+'<h1 class="sr-only">Профиль</h1><div class="pf">'+
    '<div class="hero"><div class="pav" aria-hidden="true">'+rabbit('eat')+'</div><div class="hn"><b class="nmx">'+nk(S.nick)+'</b><div class="lvp"><span class="pill">Уровень '+LV.l+'</span><span class="mu">до '+(LV.l+1)+': ещё '+LV.left+' ⭐</span></div><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+LV.p+'" aria-label="Прогресс уровня"><i class="grow" style="width:'+LV.p+'%"></i></div></div></div>'+
    '<div class="tiles"><button class="tile tbig" id="tst"><span aria-hidden="true">🥕</span><span><b>'+s+'</b><small>'+pl(s,['день','дня','дней'])+' подряд</small></span>'+(f.n?'<i class="fzm" aria-label="заморозок: '+f.n+'">❄️'+f.n+'</i>':'')+'</button><div class="tcol"><div class="tile"><span aria-hidden="true">🏆</span><span><b>'+Math.max(S.max,s)+'</b><small>рекорд серии</small></span></div><button class="tile" id="txp"><span aria-hidden="true">⭐</span><span><b>'+S.xp+'</b><small>опыта</small></span></button><div class="tile"><span aria-hidden="true">📚</span><span><b>'+n+' из '+NT()+'</b><small>тем пройдено</small></span></div></div></div>'+
-   '<section class="psec"><div class="ch2"><b>Цель дня</b><button class="btn t" id="gset">'+g+' '+pl(g,['островок','островка','островков'])+' ›</button></div><div class="psf"><div class="bar gbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+gp+'" aria-label="Цель дня: '+d+' из '+g+'"><i class="grow" style="width:'+gp+'%"></i></div>'+weekRow('g')+'<p class="mu gnote">Цель в 5 днях недели даёт +50 ⭐. Сейчас: '+wkCount()+' из 5.</p></div></section>'+
+   '<section class="psec"><div class="ch2"><b>Цель дня</b><button class="btn t" id="gset">'+g+' '+pl(g,['островок','островка','островков'])+' ›</button></div><div class="psf"><div class="bar gbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+gp+'" aria-label="Цель дня: '+d+' из '+g+'"><i class="grow" style="width:'+gp+'%"></i></div>'+weekRow('g')+(S.sg.n?'<p class="mu gnote">Цель серии: '+Math.min(s,S.sg.n)+' из '+S.sg.n+' '+pl(S.sg.n,['дня','дней','дней'])+' подряд, за неё +'+SGX[S.sg.n]+' ⭐.</p>':'<p class="mu gnote">Цель серии не выбрана. Нажми на цель дня, чтобы выбрать.</p>')+'</div></section>'+
    shelf()+
    '<section class="psec"><div class="ch2"><b>Активность</b></div><div class="psf">'+calHtml()+'</div></section>'+
    (rows.length?'<section class="psec"><div class="ch2"><b>Работа над ошибками</b></div><div class="psf">'+rows.map(erow).join('')+(more?'<button class="btn t emore" id="emr">Показать все темы ('+rows.length+')</button>':'')+'<p class="mu enote">Пройди островок без ошибок, и он исчезнет из списка.</p></div></section>':'')+
