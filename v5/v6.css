@@ -1491,39 +1491,112 @@ html.exbig .exio pre.cmp,html.exbig .pyex .exio pre.cmp{margin:6px 0 0;padding:1
 .wd i .wck{width:62%;height:62%;fill:none;stroke:currentColor;stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round}
 .wd.on i{background:linear-gradient(170deg,color-mix(in srgb,#fff 16%,var(--accent)),var(--accent));box-shadow:inset 0 -2px 0 color-mix(in srgb,#000 14%,var(--accent))}
 .wd.td.on i{box-shadow:inset 0 -2px 0 color-mix(in srgb,#000 14%,var(--accent)),0 0 0 2px var(--card),0 0 0 4px color-mix(in srgb,var(--accent) 40%,transparent)}
-/* U1-10: плитки итога островка появляются по очереди */
-.xpr{flex-wrap:wrap}
-.xpr .xpt{flex:1 1 0;min-width:0;max-width:132px;padding:10px 8px 12px}
-.xpr .xpt b{font-size:1.375rem;white-space:nowrap}
-.xpt.ac{background:linear-gradient(160deg,color-mix(in srgb,var(--accent) 20%,var(--card)),var(--card));border-color:color-mix(in srgb,var(--accent) 40%,var(--line))}
-.xpt.tmr{background:linear-gradient(160deg,color-mix(in srgb,var(--ice) 22%,var(--card)),var(--card));border-color:color-mix(in srgb,var(--ice) 45%,var(--line))}
-.xpt .em{width:1.3rem;height:1.3rem}
-.xpt.dt{opacity:0;transform:translateY(14px) scale(.7)}
-.xpt.dt.in{opacity:1;transform:none;transition:opacity .25s ease-out,transform .5s var(--e-spring)}
-/* U1-8: цель дня выполнена */
-.gday{display:flex;flex-direction:column;align-items:center;text-align:center;padding:14px 0 8px}
-.gsay{display:flex;align-items:center;gap:12px;max-width:440px;margin:0 0 18px;padding:12px 16px 12px 12px;border-radius:var(--r-xl);background:var(--card);box-shadow:inset 0 0 0 1px var(--line);text-align:left}
-.gsay p{margin:0;font-size:1.0625rem;font-weight:800;line-height:1.35}
-.gav{flex:none;width:52px;height:52px;border-radius:50%;background:var(--pink-soft,var(--soft));display:grid;place-items:center;overflow:hidden}
-.gav img{width:46px;height:46px;object-fit:contain}
-.gcar{font-size:5.5rem;line-height:1;margin:6px 0 0;animation:gcar .8s var(--e-spring) both}
-.gcar .em{width:7rem;height:7rem}
-@keyframes gcar{0%{transform:scale(.3) rotate(-18deg);opacity:0}60%{transform:scale(1.08) rotate(6deg);opacity:1}100%{transform:none}}
-.gnum{display:block;margin:4px 0 0;font-size:4.5rem;font-weight:900;line-height:1;letter-spacing:-.04em;color:var(--carrot-ink);font-variant-numeric:tabular-nums;animation:xpp .6s .35s var(--e-spring) both}
-.glab{margin:2px 0 18px;font-size:1.25rem;font-weight:900;color:var(--carrot-ink)}
+/* U1-10: итог островка. Плитки как в Duolingo: цветная шапка с подписью и однотонное поле с числом, в один ряд;
+   появляются по очереди коротким подъёмом. Весь итог — по центру экрана над нижней панелью */
+.fin{min-height:calc(100dvh - var(--dkh,96px) - 48px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 0 24px}
+.fin>.xps{align-self:stretch;width:100%}
+.xpr{display:flex;flex-wrap:nowrap;justify-content:center;gap:12px;width:100%;margin:20px 0 16px}
+.xpr .xpt{--tc:var(--gold);flex:1 1 0;min-width:0;max-width:136px;padding:0 0 2px;border:2px solid var(--tc);border-radius:16px;background:var(--tc);box-shadow:none}
+.xpr .xpt.ac{--tc:var(--accent)}
+.xpr .xpt.tmr{--tc:var(--ice)}
+.xpr .xpt small{padding:4px 4px 3px;font-size:.75rem;font-weight:900;letter-spacing:0;text-transform:none;color:var(--on)}
+.xpr .xpt.x small{color:#3A2A00}
+.xpr .xpt b{display:flex;align-items:center;justify-content:center;gap:6px;min-height:52px;border-radius:12px;background:var(--card);color:var(--ink);font-size:1.375rem;white-space:nowrap;font-variant-numeric:tabular-nums}
+.xpr .xpt b .em{width:1.25rem;height:1.25rem}
+.xpt.dt{opacity:0;transform:translateY(12px)}
+.xpt.dt.in{opacity:1;transform:none;transition:opacity .2s ease-out,transform .3s cubic-bezier(.2,.8,.2,1)}
+.xpt.x.pp{animation:none}
+/* реплика кролика: голова без подложки, пузырь с хвостиком к ней */
+.gsay{display:flex;align-items:center;gap:8px;width:100%;max-width:420px;margin:0 0 24px;text-align:left}
+.gsay .gav{flex:none;width:64px;height:64px;object-fit:contain}
+.gsay p{position:relative;flex:1;margin:0 0 0 8px;padding:12px 16px;border-radius:16px;background:var(--card);box-shadow:inset 0 0 0 1px var(--line);font-size:1rem;font-weight:800;line-height:1.35}
+.gsay p::before{content:'';position:absolute;left:-7px;top:50%;width:12px;height:12px;margin-top:-6px;background:var(--card);border-left:1px solid var(--line);border-bottom:1px solid var(--line);transform:rotate(45deg)}
+/* U1-8: цель дня выполнена — число и морковка рядом, под ними подпись и неделя */
+.gday{min-height:calc(100dvh - var(--dkh,140px) - 48px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:16px 0 24px}
+.gst{display:flex;align-items:center;justify-content:center;gap:12px;animation:gin .35s cubic-bezier(.2,.8,.2,1) both}
+.gnum{font-size:5.5rem;font-weight:900;line-height:1;letter-spacing:-.03em;color:var(--carrot-ink);font-variant-numeric:tabular-nums}
+.gcar{font-size:4.5rem;line-height:1}.gcar .em{width:5rem;height:5rem}
+@keyframes gin{from{opacity:0;transform:translateY(12px) scale(.96)}to{opacity:1;transform:none}}
+.glab{margin:4px 0 24px;font-size:1.25rem;font-weight:900;color:var(--carrot-ink)}
 .gday .wk{width:100%;max-width:400px}
-.gsg{width:100%;max-width:400px;margin:16px 0 0;display:flex;flex-direction:column;gap:8px}
-.gsg .mu{font-size:.875rem}
+.gsg{width:100%;max-width:400px;margin:20px 0 0;display:flex;flex-direction:column;gap:8px}
 .gsg .bar{flex:none}
-/* U1-9: выбор цели серии */
-.sgc h2{margin-bottom:6px}
-.sgo{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:14px 0 18px}
-.sgb{display:flex;flex-direction:column;align-items:center;gap:2px;padding:12px 4px 10px;border:0;border-radius:var(--r-lg);background:var(--card2);color:var(--ink);transition:background var(--d2),transform var(--d1)}
-.sgb b{font-size:1.625rem;font-weight:900;line-height:1.1}
-.sgb span{font-size:.8125rem;font-weight:800;color:var(--muted)}
-.sgb small{margin-top:4px;font-size:.75rem;font-weight:900;color:var(--carrot-ink)}
-.sgb small .em{width:.85rem;height:.85rem}
-.sgb[aria-checked=true]{background:var(--carrot-soft);box-shadow:inset 0 0 0 2px var(--carrot)}
-.sgb:active{transform:scale(.95)}
+.gsg .bar i{background:var(--carrot)}
+.gsg .mu{font-size:.875rem}
+/* U1-9: выбор цели серии — список строк, как в Duolingo */
+.sgc h2{margin-bottom:4px}
+.sgc>.mu{margin:0}
+.sgo{display:flex;flex-direction:column;gap:8px;margin:16px 0 20px}
+.sgr{display:grid;grid-template-columns:auto 1fr auto;align-items:baseline;gap:12px;min-height:52px;padding:12px 16px;border:0;border-radius:12px;background:var(--card);box-shadow:inset 0 0 0 1px var(--line2);color:var(--ink);text-align:left;transition:box-shadow var(--d2),background var(--d2)}
+.sgr b{font-size:1.0625rem;font-weight:900}
+.sgr span{color:var(--muted);font-weight:700}
+.sgr small{color:var(--muted);font-size:.8125rem;font-weight:700;font-variant-numeric:tabular-nums}
+.sgr[aria-checked=true]{background:var(--soft);box-shadow:inset 0 0 0 2px var(--accent)}
+.sgr[aria-checked=true] span{color:var(--accent-ink)}
+.sgr:active{transform:scale(.99)}
 .sgl{margin:0 0 8px;font-weight:800}
-@media (prefers-reduced-motion:reduce){.xpt.dt{opacity:1;transform:none}.gcar,.gnum{animation:none}}
+@media (prefers-reduced-motion:reduce){.xpt.dt{opacity:1;transform:none}.gst{animation:none}}
+/* U1-5: серия на телефоне — плоская строка во всю ширину (морковка, число, подпись), под ней остальные цифры в ряд */
+@media (max-width:599px){
+ .tiles{grid-template-columns:minmax(0,1fr)}
+ .tile.tbig{flex-direction:row;align-items:center;justify-content:flex-start;gap:14px;min-height:0;padding:14px 16px}
+ .tile.tbig>span:first-child{font-size:2.25rem}.tile.tbig>span:first-child .em{width:2.6rem;height:2.6rem}
+ .tile.tbig>span:last-child{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+ .tile.tbig b{font-size:2.5rem;line-height:1}
+ .tile.tbig small{margin:0;font-size:1rem}
+ .tile.tbig .fzm{top:50%;transform:translateY(-50%)}
+ .tcol{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+ .tcol.n4,.tcol:has(>.tile:nth-child(4)){grid-template-columns:repeat(2,minmax(0,1fr))}
+ .tcol .tile{flex-direction:column;align-items:flex-start;gap:6px;padding:12px}
+ .tcol .tile+.tile::before{left:0;right:auto;top:12px;bottom:12px;width:1px;height:auto}
+ .tcol:has(>.tile:nth-child(4)) .tile:nth-child(3)::before{display:none}
+ .tcol:has(>.tile:nth-child(4)) .tile:nth-child(n+3){border-top:1px solid var(--line)}
+}
+/* U1-6: профиль на широком экране — кролик, как на телефоне, торчит из-за верхнего края панели */
+@media (min-width:600px){
+ html[data-ph=card] .hero{margin-top:96px;min-height:132px;padding:22px 26px 22px 176px}
+ html[data-ph=card] .pav{left:16px;bottom:8px;width:150px}
+ html[data-ph=card] .pav .rw{width:146px}
+}
+/* U1-7: «Что ты уже умеешь». Карточка в профиле и страница как в Duolingo: крупно знак-остров и число, реплика кролика,
+   ниже вехи — кружок со значком на общей линии (пройденная часть — цветом акцента), число и короткое действие */
+.skc{display:flex;align-items:center;gap:12px;width:100%;margin:12px 0 0;padding:12px 12px 12px 16px;border:0;border-radius:var(--r-lg);background:var(--card);box-shadow:inset 0 0 0 1px var(--line);color:var(--ink);text-align:left;transition:background var(--d2)}
+.skc:active{transform:scale(.99)}
+.skc .ske{flex:none;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:var(--on)}
+.skc .ske svg,.skd svg{width:22px;height:22px}
+.skt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.skt small{font-size:.8125rem;font-weight:700;color:var(--muted)}
+.skt b{font-size:1rem;line-height:1.3}
+.skt .mu{font-size:.8125rem}
+.skc .ch{flex:none;color:var(--muted)}
+@media (hover:hover){.skc:hover{background:var(--card2)}}
+.skp{padding:8px 0 32px}
+.skh{display:flex;align-items:center;justify-content:center;gap:16px;margin:16px 0 4px}
+.skx{width:84px;height:58px}
+.skx path{fill:var(--accent)}.skx path.s{fill:var(--accent-d)}
+.skh b{font-size:4.5rem;font-weight:900;line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.skn{text-align:center;margin:4px 0 24px}
+.skp .gsay{margin:0 auto 32px}
+.skov{margin:0 4px 16px;font-size:.8125rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.skl{list-style:none;margin:0;padding:0}
+.skl li{position:relative;display:flex;align-items:center;gap:16px;min-height:56px;padding:0 0 28px}
+.skl li:last-child{padding-bottom:0}
+.skl li::before{content:'';position:absolute;left:28px;top:44px;bottom:-12px;width:8px;margin-left:-4px;background:var(--card2)}
+.skl li:last-child::before{display:none}
+.skl li.fl::before{background:var(--accent)}
+.skd{position:relative;z-index:1;flex:none;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:var(--card2);color:var(--muted)}
+.skl li.on .skd{background:var(--accent);color:var(--on)}
+.sktx{display:flex;flex-direction:column;gap:4px;min-width:0}
+.sktx small{display:flex;align-items:center;gap:6px;font-size:1rem;font-weight:900;color:var(--ink);font-variant-numeric:tabular-nums}
+.sktx small .skx{width:22px;height:16px}
+.skl li:not(.on) .sktx small .skx path{fill:var(--line2)}
+.sktx b{font-size:1.0625rem;font-weight:700;line-height:1.3}
+.skl li:not(.on) .sktx b,.skl li:not(.on) .sktx small{color:var(--muted)}
+/* U1-11: подсказка — цветная лампочка (Fluent Emoji, MIT) */
+.icon.hbe .hbi{font-size:1.35rem;line-height:1}.icon.hbe .hbi .em{width:1.6rem;height:1.6rem}
+.icon.hbe .hbi{transition:transform var(--d2) var(--e-spring)}
+.icon.hbe:active .hbi{transform:scale(.88)}
+.icon.hbe.on{background:color-mix(in srgb,var(--gold) 22%,var(--card))}
+/* U1-14: пример в «Изученных функциях» — как в окне термина */
+.dx .cpw{margin:4px 0 10px}.dx pre.out{margin:0 0 10px}
+.dx .tvo{margin:0 0 4px;color:var(--muted);font-size:.8125rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase}

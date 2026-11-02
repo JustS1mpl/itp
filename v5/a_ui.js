@@ -477,6 +477,58 @@ function fdOpen(btn){
   },RM()?0:230)}
 
 /* --- профиль --- */
+/* U1-13: кроличьи норы — сколько пройдено целиком (в профиле и в «Поделиться» — только когда пройдена хотя бы одна) */
+function HN(){return TOPICS.filter(function(t){return t.opt}).length}
+function HD(){return TOPICS.filter(function(t,i){if(!t.opt||!ni(i))return false;for(var j=0;j<ni(i);j++)if(!S.d[i+'-'+j])return false;return true}).length}
+function shareTxt(){var n=ND(),h=HD(),s=streakNow();return'Я учу Python в ИТП! Уже '+G('прошёл','прошла','пройдено')+' '+n+' '+pl(n,['тему','темы','тем'])+(h?' и '+h+' '+pl(h,['кроличью нору','кроличьи норы','кроличьих нор'])+' из '+HN():'')+(s?', '+s+' '+pl(s,['день','дня','дней'])+' подряд':'')+', '+S.xp+' XP. Попробуй и ты!'}
+/* --- U1-7: «Что ты уже умеешь» — шкала курса как в Duolingo. Очки — пройденные островки (и в норах тоже, вступление не в счёт);
+   веха — конец темы: её порог равен числу островков основного курса до неё включительно --- */
+/* значки вех — линейные, в духе набора Lucide (ISC), нарисованы здесь же; цвет — currentColor */
+var SKI={sprout:'<path d="M7 20h10M12 20v-8"/><path d="M12 12C12 8 9.5 6 5 6c0 4 2.5 6 7 6zM12 10c0-3 2-5 6.5-5 0 3-2 5-6.5 5z"/>',
+ msg:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+ kbd:'<rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/>',
+ calc:'<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 18h.01M12 18h4"/>',
+ loop:'<path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/>',
+ list:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
+ fn:'<path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5a2 2 0 0 0 2 2h1M16 21h1a2 2 0 0 0 2-2v-5a2 2 0 0 1 2-2 2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/>',
+ file:'<path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9l-.8-1.2A2 2 0 0 0 7.9 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z"/>',
+ sort:'<path d="m3 16 4 4 4-4M7 20V4M11 4h10M11 8h7M11 12h4"/>',
+ box:'<path d="M21 8a2 2 0 0 0-1-1.7l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l7-4a2 2 0 0 0 1-1.7z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/>',
+ chart:'<path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-3"/>',
+ bot:'<rect x="3" y="8" width="18" height="12" rx="2"/><path d="M12 8V4H8M2 14h2M20 14h2M9 13v2M15 13v2"/>',
+ cap:'<path d="M22 10 12 5 2 10l10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>'};
+function ski(k){return'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">'+SKI[k]+'</svg>'}
+/* знак-остров: тот же наклонный шестиугольник, что на Пути, плоский, в цвет акцента */
+var SKHX='<svg class="skx" viewBox="6 10 80 56" aria-hidden="true" focusable="false"><path class="s" d="M9 34 L27 54 L65 54 L83 34 L83 44 L65 64 L27 64 L9 44 Z"/><path d="M9 34 L27 14 L65 14 L83 34 L65 54 L27 54 Z"/></svg>';
+/* вехи как в Duolingo: короткое действие из жизни, которое уже по силам; can — то же для реплики «Значит, ты уже можешь…» */
+var SKL=[['','sprout','Начинаем',''],
+ ['Начало знакомства','msg','Напиши первую программу','написать свою программу'],
+ ['Переменные и ввод','kbd','Поговори с программой','научить программу задавать вопросы'],
+ ['Условия','calc','Сделай калькулятор','сделать свой калькулятор'],
+ ['Циклы в циклах','loop','Нарисуй узор','рисовать узоры кодом'],
+ ['Словари и множества','list','Собери телефонную книгу','собрать свою телефонную книгу'],
+ ['Гибкие функции','fn','Напиши мини-игру','написать мини-игру'],
+ ['Файлы и форматы данных','file','Разбери файлы с данными','работать с файлами'],
+ ['Поиск и сортировка','sort','Отсортируй рекорды','отсортировать таблицу рекордов'],
+ ['Наследование','box','Опиши героя игры','описать героя игры классом'],
+ ['Таблицы данных','chart','Найди закономерность в данных','разбирать таблицы с данными'],
+ ['Запросы к серверам','bot','Сделай бота','сделать своего бота'],
+ ['Итоговые проекты','cap','Курс пройден','сделать свой проект от идеи до программы']];
+function skPts(){var n=0;TOPICS.forEach(function(t,i){if(t.intro)return;for(var j=0;j<ni(i);j++)if(S.d[i+'-'+j]||(!t.opt&&i<S.start))n++});return n}
+function skList(){var c=0,th={};TOPICS.forEach(function(t,i){if(t.intro||t.opt)return;c+=ni(i);th[t.n]=c});
+  return SKL.map(function(m){return{t:m[0]?th[m[0]]:0,e:m[1],n:m[2],c:m[3]}}).filter(function(m){return m.t!==undefined})}
+function skNow(){var p=skPts(),L=skList(),k=0;L.forEach(function(m,i){if(p>=m.t)k=i});return{p:p,L:L,k:k}}
+function skCard(){var s=skNow(),m=s.L[s.k],nx=s.L[s.k+1];
+  return'<button class="skc" id="skl"><span class="ske">'+ski(m.e)+'</span><span class="skt"><small>Что ты уже умеешь</small><b>'+(s.k?'Можешь '+esc(m.c):'Пока только начинаем')+'</b>'+(nx?'<span class="mu">Дальше: '+esc(nx.n)+', ещё '+(nx.t-s.p)+' '+pl(nx.t-s.p,['островок','островка','островков'])+'</span>':'')+'</span>'+ico('chev','ch')+'</button>'}
+/* реплика кролика: голова без подложки и пузырь с хвостиком, как у персонажей Duolingo */
+function rbSay(t){var hd=IMG.wowhead||IMG.eat;return'<div class="gsay">'+(hd?'<img class="gav" src="'+hd+'" alt="" draggable="false">':'')+'<p>'+t+'</p></div>'}
+function skills(){
+  var s=skNow(),L=s.L,m=L[s.k];
+  var h='<div class="top ls"><button class="icon" id="x" aria-label="Назад">'+ico('back')+'</button><h1>Что ты уже умеешь</h1></div><div class="skp">'+
+   '<div class="skh">'+SKHX+'<b>'+s.p+'</b></div><p class="mu skn">'+pl(s.p,['островок пройден','островка пройдено','островков пройдено'])+', норы тоже считаются</p>'+
+   rbSay(s.k?'Значит, ты уже можешь '+esc(m.c)+'!':'Пройди первую тему, и здесь появится, что ты уже можешь')+
+   '<h2 class="skov">Прогресс</h2><ol class="skl">'+L.map(function(x,i){var on=s.p>=x.t,nw=i===s.k;return'<li class="'+(on?'on':'')+(nw?' now':'')+(i+1<L.length&&s.p>=L[i+1].t?' fl':'')+'"><span class="skd">'+ski(x.e)+'</span><span class="sktx"><small>'+SKHX+x.t+'</small><b>'+esc(x.n)+'</b></span></li>'}).join('')+'</ol></div>';
+  scr('skills',h,'prof');$('x').onclick=profile}
 /* U1-9: цель дня и цель серии выбираются в одном окне (sgChooser в a_screens.js) */
 function goalSheet(){sgChooser(function(){if(CURTAB!=='prof')return;KEEPSCR=1;SKEY='profile';var y=window.scrollY;profile();window.scrollTo(0,y)})}
 function profile(){BACK=profile;
@@ -486,7 +538,7 @@ function profile(){BACK=profile;
   function erow(r,k){return'<div class="eg2"'+(k>=EM?' hidden':'')+'><div class="erow"><span>'+esc(r.n)+'</span><b aria-label="ошибок: '+r.c+'">'+r.c+'</b></div><div class="elist">'+r.l.map(function(x){return'<button class="elink" data-i="'+r.i+'" data-j="'+x.j+'"><span class="et">'+x.ic+'&nbsp;'+esc(x.n)+'<small>ошибок: '+x.e+'</small></span><span class="eg">Отработать</span></button>'}).join('')+'</div></div>'}
   scr('profile',head()+'<h1 class="sr-only">Профиль</h1><div class="pf">'+
    '<div class="hero"><div class="pav" aria-hidden="true">'+rabbit('eat')+'</div><div class="hn"><b class="nmx">'+nk(S.nick)+'</b><div class="lvp"><span class="pill">Уровень '+LV.l+'</span><span class="mu">до '+(LV.l+1)+': ещё '+LV.left+' ⭐</span></div><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+LV.p+'" aria-label="Прогресс уровня"><i class="grow" style="width:'+LV.p+'%"></i></div></div></div>'+
-   '<div class="tiles"><button class="tile tbig" id="tst"><span aria-hidden="true">🥕</span><span><b>'+s+'</b><small>'+pl(s,['день','дня','дней'])+' подряд</small></span>'+(f.n?'<i class="fzm" aria-label="заморозок: '+f.n+'">❄️'+f.n+'</i>':'')+'</button><div class="tcol"><div class="tile"><span aria-hidden="true">🏆</span><span><b>'+Math.max(S.max,s)+'</b><small>рекорд серии</small></span></div><button class="tile" id="txp"><span aria-hidden="true">⭐</span><span><b>'+S.xp+'</b><small>опыта</small></span></button><div class="tile"><span aria-hidden="true">📚</span><span><b>'+n+' из '+NT()+'</b><small>тем пройдено</small></span></div></div></div>'+
+   '<div class="tiles"><button class="tile tbig" id="tst"><span aria-hidden="true">🥕</span><span><b>'+s+'</b><small>'+pl(s,['день','дня','дней'])+' подряд</small></span>'+(f.n?'<i class="fzm" aria-label="заморозок: '+f.n+'">❄️'+f.n+'</i>':'')+'</button><div class="tcol"><div class="tile"><span aria-hidden="true">🏆</span><span><b>'+Math.max(S.max,s)+'</b><small>рекорд серии</small></span></div><button class="tile" id="txp"><span aria-hidden="true">⭐</span><span><b>'+S.xp+'</b><small>опыта</small></span></button><div class="tile"><span aria-hidden="true">📚</span><span><b>'+n+' из '+NT()+'</b><small>тем пройдено</small></span></div>'+(HD()?'<div class="tile"><span aria-hidden="true">🐰</span><span><b>'+HD()+' из '+HN()+'</b><small>нор пройдено</small></span></div>':'')+'</div></div>'+skCard()+
    '<section class="psec"><div class="ch2"><b>Цель дня</b><button class="btn t" id="gset">'+g+' '+pl(g,['островок','островка','островков'])+' ›</button></div><div class="psf"><div class="bar gbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+gp+'" aria-label="Цель дня: '+d+' из '+g+'"><i class="grow" style="width:'+gp+'%"></i></div>'+weekRow('g')+(S.sg.n?'<p class="mu gnote">Цель серии: '+Math.min(s,S.sg.n)+' из '+S.sg.n+' '+pl(S.sg.n,['дня','дней','дней'])+' подряд, за неё +'+SGX[S.sg.n]+' ⭐.</p>':'<p class="mu gnote">Цель серии не выбрана. Нажми на цель дня, чтобы выбрать.</p>')+'</div></section>'+
    shelf()+
    '<section class="psec"><div class="ch2"><b>Активность</b></div><div class="psf">'+calHtml()+'</div></section>'+
@@ -496,7 +548,7 @@ function profile(){BACK=profile;
   /* подпись месяца стоит у его первого дня и часто уезжает влево за край — под лентой сразу сегодняшний день, потом тот, на который нажали */
   bindHead(profile);calBind();var ci0=$('ci');if(ci0&&!ci0.textContent)ci0.textContent=calText(day(new Date()));var csc=app.querySelector('.csc');if(csc){csc.tabIndex=0;csc.setAttribute('aria-label','Календарь активности, листается вбок')}
   var vr=$('vr'),vt;vr.onclick=function(){vr.classList.add('on');clearTimeout(vt);vt=setTimeout(function(){vr.classList.remove('on')},2500)};
-  $('tst').onclick=streakSheet;$('txp').onclick=levelSheet;$('gset').onclick=goalSheet;
+  $('tst').onclick=streakSheet;$('txp').onclick=levelSheet;$('gset').onclick=goalSheet;$('skl').onclick=skills;
   if($('emr'))$('emr').onclick=function(){app.querySelectorAll('.eg2[hidden]').forEach(function(x){x.hidden=false});this.remove()};
   app.querySelectorAll('.fd').forEach(function(b){b.onclick=function(){fdOpen(b)}});
   app.querySelectorAll('.lst .li').forEach(function(b){b.onclick=function(){var a=b.dataset.a;if(a==='dc')dict();else if(a==='sh')share();else if(a==='intr'){BACK=profile;theory(0,0)}else if(a==='st'){SBACK=profile;settings()}}});

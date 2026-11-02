@@ -275,8 +275,8 @@ function doneScreen(o){
   var many=o.err>=ROLL_AT,acc=o.acc>=0?o.acc:-1,tm=o.tm>=0?o.tm:-1;
   /* плитки как в Duolingo: опыт, точность, время — появляются по очереди */
   var tl='<div class="xpt x dt" id="xpt"><small>Опыт</small><b>⭐ <span id="xpn">+0</span></b></div>'+
-   (acc>=0?'<div class="xpt ac dt"><small>Точность</small><b>🎯 '+acc+'%</b></div>':o.err!==undefined?'<div class="xpt dt"><small>Ошибок</small><b>'+o.err+'</b></div>':'')+
-   (tm>=0?'<div class="xpt tmr dt"><small>Время</small><b>⏰ '+fmtTm(tm)+'</b></div>':'');
+   (acc>=0?'<div class="xpt ac dt"><small>'+(acc===100?'Без ошибок':'Точность')+'</small><b>'+acc+'%</b></div>':o.err!==undefined?'<div class="xpt ac dt"><small>Ошибок</small><b>'+o.err+'</b></div>':'')+
+   (tm>=0?'<div class="xpt tmr dt"><small>Время</small><b>'+fmtTm(tm)+'</b></div>':'');
   var h='<div class="fin">'+rabbit(many?'rolled':(o.mood||(o.err===0?'cool':'happy')))+'<h1>'+o.title+'</h1>'+(many?'<p class="lead">Непростой островок: ошибок было много. Но он пройден, а ошибки разобраны.</p>':o.lead?'<p class="lead">'+o.lead+'</p>':'')+
    '<div class="xpr">'+tl+'</div>'+
    (o.bonus?'<p class="note2">'+o.bonus+'</p>':'')+(o.note?'<p class="note2">'+esc(o.note)+'</p>':'')+
@@ -297,8 +297,8 @@ function doneScreen(o){
   /* потом заполняется полоса уровня */
   xpStripRun();
   /* U1-8, U1-9: после итога — экран цели дня и (один раз) выбор цели серии; главная кнопка сначала ведёт туда.
-     Обработчик вешается раньше, чем экран получит свой onclick, поэтому срабатывает первым */
-  var gb=$('go');if(gb)gb.addEventListener('click',function(e){if(!GOALP&&!sgAsk())return;e.stopImmediatePropagation();var f=gb.onclick;postDone(function(){if(f)f.call(gb)})});
+     Свой onclick кнопка получает сразу после doneScreen, поэтому оборачиваем его на следующем шаге */
+  setTimeout(function(){var gb=$('go');if(!gb)return;var f=gb.onclick;gb.onclick=function(e){if(GOALP||sgAsk())postDone(function(){if(f)f.call(gb,e)});else if(f)f.call(gb,e)}},0);
   var b=document.querySelector('#dock .btn');if(b)setTimeout(function(){b.focus({preventScroll:true})},60)}
 /* очередь после итога островка: цель дня → выбор цели серии → куда шёл ученик */
 function postDone(then){
@@ -308,27 +308,28 @@ function postDone(then){
 /* выбор цели серии спрашиваем после 2-го пройденного островка (вступление не считается) и после каждой достигнутой цели */
 function islN(){var n=0;for(var k in S.d){var i=+k.split('-')[0];if(TOPICS[i]&&!TOPICS[i].intro&&/^\d+-\d+$/.test(k))n++}return n}
 function sgAsk(){return!!S.sg&&!S.sg.a&&!S.sg.n&&islN()>=2}
+/* как в Duolingo: строки со сроком и словом про него, выбранная — с рамкой акцента; опыт — тихой подписью справа */
+var SGW={7:'Хорошее начало',14:'Уже привычка',30:'Месяц подряд',50:'Железная воля'};
 function sgChooser(then){
   S.sg.a=1;save();
-  var nx=SGN.filter(function(n){return n>(S.sg.ok||0)})[0]||SGN[SGN.length-1],cur=S.sg.n||nx,gl=S.goal;
-  var m=modal('<div class="sgc"><h2>'+(S.sg.ok&&!S.sg.n?'Новая цель серии':'Сколько дней подряд держим серию?')+'</h2><p class="mu">'+(S.sg.ok&&!S.sg.n?'Цель в '+S.sg.ok+' '+pl(S.sg.ok,['день','дня','дней'])+' выполнена. Замахнёмся дальше?':'Заходи каждый день и выполняй цель дня. Дойдёшь до цели серии — получишь опыт: чем дольше, тем больше.')+'</p>'+
-   '<div class="sgo" role="radiogroup" aria-label="Цель серии">'+SGN.map(function(n){return'<button role="radio" class="sgb" data-n="'+n+'" aria-checked="'+(n===cur)+'"><b>'+n+'</b><span>'+pl(n,['день','дня','дней'])+'</span><small>+'+SGX[n]+' ⭐</small></button>'}).join('')+'</div>'+
-   '<p class="sgl">Цель дня: сколько островков проходить</p>'+SG('goal',[[1,'1 островок'],[2,'2'],[3,'3']],gl)+'</div>',
+  var nx=SGN.filter(function(n){return n>(S.sg.ok||0)})[0]||SGN[SGN.length-1],cur=S.sg.n||nx,gl=S.goal,re=S.sg.ok&&!S.sg.n;
+  var m=modal('<div class="sgc"><h2>'+(re?'Новая цель серии':'Цель серии')+'</h2><p class="mu">'+(re?'Ты '+G('продержался','продержалась','продержался')+' '+S.sg.ok+' '+pl(S.sg.ok,['день','дня','дней'])+' подряд. Сколько дальше?':'Сколько дней подряд будешь заниматься? Дойдёшь — получишь опыт, и чем дольше серия, тем больше.')+'</p>'+
+   '<div class="sgo" role="radiogroup" aria-label="Цель серии">'+SGN.map(function(n){return'<button role="radio" class="sgr" data-n="'+n+'" aria-checked="'+(n===cur)+'"><b>'+n+' '+pl(n,['день','дня','дней'])+'</b><span>'+SGW[n]+'</span><small>+'+SGX[n]+' опыта</small></button>'}).join('')+'</div>'+
+   '<p class="sgl">Островков в день</p>'+SG('goal',[[1,'1'],[2,'2'],[3,'3']],gl)+'</div>',
    [['Готово',function(){S.sg.n=cur;S.goal=gl;save()}],['Позже',null,1]]);
   segInit(m);
-  m.querySelectorAll('.sgb').forEach(function(b){b.onclick=function(){cur=+b.dataset.n;m.querySelectorAll('.sgb').forEach(function(x){x.setAttribute('aria-checked',x===b?'true':'false')});snd('click')}});
+  m.querySelectorAll('.sgr').forEach(function(b){b.onclick=function(){cur=+b.dataset.n;m.querySelectorAll('.sgr').forEach(function(x){x.setAttribute('aria-checked',x===b?'true':'false')});snd('click')}});
   m.querySelectorAll('.segc button').forEach(function(b){b.onclick=function(){var g=b.parentNode;g.querySelectorAll('button').forEach(function(x){var on=x===b;x.classList.toggle('on',on);x.setAttribute('aria-checked',on?'true':'false')});gl=+b.dataset.v;snd('click');segPos(g,true)}});
   /* окно закрыли любым способом — идём дальше */
   var rm=m.remove;m.remove=function(){rm.call(m);if(then){var f=then;then=null;setTimeout(f,RM()?0:200)}};
   return m}
 /* U1-8: цель дня выполнена — морковка вместо огонька, сколько дней подряд, неделя с отметками */
 function goalScreen(then){
-  var s=streakNow(),sg=S.sg&&S.sg.n,hd=IMG.wowhead||IMG.eat;
-  var h='<div class="gday">'+
-   '<div class="gsay">'+(hd?'<span class="gav" aria-hidden="true"><img src="'+hd+'" alt="" draggable="false"></span>':'')+'<p>'+G('Ты справился!','Ты справилась!','Цель дня выполнена!')+' Встретимся завтра.</p></div>'+
-   '<div class="gcar" aria-hidden="true">🥕</div><b class="gnum">'+s+'</b><p class="glab">'+pl(s,['день','дня','дней'])+' подряд</p>'+
+  var s=streakNow(),sg=S.sg&&S.sg.n;
+  var h='<div class="gday">'+rbSay(G('Ты справился','Ты справилась','Цель дня выполнена')+'. Встретимся завтра')+
+   '<div class="gst"><b class="gnum">'+s+'</b><span class="gcar" aria-hidden="true">🥕</span></div><p class="glab">'+pl(s,['день','дня','дней'])+' подряд</p>'+
    weekRow('a')+
-   (sg?'<div class="gsg"><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="'+sg+'" aria-valuenow="'+Math.min(s,sg)+'" aria-label="Цель серии"><i class="grow" style="width:'+Math.min(100,Math.round(s/sg*100))+'%"></i></div><span class="mu">Цель серии: '+Math.min(s,sg)+' из '+sg+' · +'+SGX[sg]+' ⭐</span></div>':'')+
+   (sg?'<div class="gsg"><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="'+sg+'" aria-valuenow="'+Math.min(s,sg)+'" aria-label="Цель серии"><i style="width:'+Math.min(100,Math.round(s/sg*100))+'%"></i></div><span class="mu">Цель серии: '+Math.min(s,sg)+' из '+sg+', за неё +'+SGX[sg]+' опыта</span></div>':'')+
    '</div>';
   scr('goal',h+dockHtml('<button class="btn" id="gz">Закрыть</button><button class="btn t" id="gsh">'+ico('share')+'Поделиться</button>',1));
   snd('streak');vib([20,30,20]);
@@ -416,7 +417,7 @@ function task(i,j,k){
   var fu=T.findIndex(function(x,n){return!S.tk[key+'-'+n]});if(fu<0)fu=T.length-1;
   var dots='<div class="sbar" role="group" aria-label="Задание '+(k+1)+' из '+T.length+'">'+T.map(function(x,n){var ok=S.tk[key+'-'+n],go=n!==k&&(ok||n===fu);
     return'<button type="button" class="'+(ok?'ok':'')+(n===k?' cu':'')+'" data-n="'+n+'"'+(go?' title="Задание '+(n+1)+'"':' disabled')+' aria-label="Задание '+(n+1)+(ok?', решено':'')+'"'+(n===k?' aria-current="step"':'')+'></button>'}).join('')+'</div>';
-  scr('task',lessonTop(dots,'<span class="lstep" aria-hidden="true">'+(k+1)+' / '+T.length+'</span>'+(q.h?'<button class="icon" id="hb" aria-label="Подсказка (опыт будет вдвое меньше)" aria-keyshortcuts="Control+H">'+ico('bulb')+'</button>':''))+'<h1 class="sr-only">'+esc(it.n||'Задания с кодом')+', задание '+(k+1)+' из '+T.length+'</h1>'+(k>0&&!S.tp&&S.tk[key+'-'+(k-1)]?'<div class="tip0" id="tip0" role="note"><span>Решённое задание можно открыть снова: нажми на его полоску сверху. Там твой код и «как задумано».</span><button class="btn t" id="tip0b">Понятно</button></div>':'')+taskCard(q)+'<div id="hint"></div>'+edCard('Решение',dc,0,'# Пиши код здесь\n'+(q.starter||''))+conHtml()+'<div id="fb" aria-live="polite"></div>'+dockHtml('<button class="btn" id="chk">Проверить</button>'));
+  scr('task',lessonTop(dots,'<span class="lstep" aria-hidden="true">'+(k+1)+' / '+T.length+'</span>'+(q.h?'<button class="icon hbe" id="hb" aria-label="Подсказка (опыт будет вдвое меньше)" aria-keyshortcuts="Control+H"><span class="hbi" aria-hidden="true">💡</span></button>':''))+'<h1 class="sr-only">'+esc(it.n||'Задания с кодом')+', задание '+(k+1)+' из '+T.length+'</h1>'+(k>0&&!S.tp&&S.tk[key+'-'+(k-1)]?'<div class="tip0" id="tip0" role="note"><span>Решённое задание можно открыть снова: нажми на его полоску сверху. Там твой код и «как задумано».</span><button class="btn t" id="tip0b">Понятно</button></div>':'')+taskCard(q)+'<div id="hint"></div>'+edCard('Решение',dc,0,'# Пиши код здесь\n'+(q.starter||''))+conHtml()+'<div id="fb" aria-live="polite"></div>'+dockHtml('<button class="btn" id="chk">Проверить</button>'));
   $('x').onclick=goBack;
   if($('tip0')){S.tp=1;save();$('tip0b').onclick=function(){var t=$('tip0');if(t)t.remove()}}
   app.querySelectorAll('.top .sbar button[data-n]').forEach(function(b){b.onclick=function(){if(!b.disabled)task(i,j,+b.dataset.n)}});
@@ -540,7 +541,7 @@ function dict(){
   L.forEach(function(x){
     if(!open||(S.dsort&&x.ti!==lt)){closeG();lt=x.ti;h+='<div class="dg">'+(S.dsort?'<div class="dt">'+esc(x.tn)+'</div>':'')+'<div class="dl">';open=true}
     var nt=S.nt[x.n]||'',op=!!DOPEN[x.n],c=fcol(x.n);
-    h+='<div class="de'+(op?' op':'')+(nt.trim()?' hn':'')+'" data-n="'+esc(x.n)+'" data-s="'+esc((x.n+' '+x.d).toLowerCase())+'"><button class="dh" aria-expanded="'+(op?'true':'false')+'"><code'+(c?' style="color:'+c+'"':'')+'>'+esc(x.n)+'</code><span class="dn" role="img" aria-label="Есть заметка">📝</span>'+ico('chev','dc')+'</button><div class="dp"><div class="di"><div class="dx"><p>'+esc(x.d).replace(/\n/g,'<br>')+'</p><textarea class="note" rows="1" maxlength="1000" placeholder="Моя заметка" aria-label="Заметка к '+esc(x.n)+'">'+esc(nt)+'</textarea></div></div></div></div>'});
+    h+='<div class="de'+(op?' op':'')+(nt.trim()?' hn':'')+'" data-n="'+esc(x.n)+'" data-s="'+esc((x.n+' '+x.d).toLowerCase())+'"><button class="dh" aria-expanded="'+(op?'true':'false')+'"><code'+(c?' style="color:'+c+'"':'')+'>'+esc(x.n)+'</code><span class="dn" role="img" aria-label="Есть заметка">📝</span>'+ico('chev','dc')+'</button><div class="dp"><div class="di"><div class="dx">'+termHtml(x.d)+'<textarea class="note" rows="1" maxlength="1000" placeholder="Моя заметка" aria-label="Заметка к '+esc(x.n)+'">'+esc(nt)+'</textarea></div></div></div></div>'});
   closeG();
   scr('dict',h,'prof');
   $('x').onclick=profile;
