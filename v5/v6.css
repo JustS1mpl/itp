@@ -1578,3 +1578,14 @@ html.exbig .exio pre.cmp,html.exbig .pyex .exio pre.cmp{margin:6px 0 0;padding:1
 /* U1-7: реплика кролика внутри окна — пузырь на подложке окна чуть темнее, чтобы не сливался */
 .mc .gsay{margin:12px auto 4px}
 .mc .gsay p,.mc .gsay p::before{background:var(--card2)}
+/* U1-5: плитка серии на телефоне — как на компьютере: число и морковка рядом по центру, подпись под ними по центру.
+   Размеры растут с шириной плитки (cqi), чтобы и трёхзначная серия помещалась */
+@media (max-width:599px){
+ .tile.tbig{container-type:inline-size;display:grid;grid-template-columns:auto auto;justify-content:center;align-content:center;align-items:center;column-gap:8px;row-gap:0;padding:20px 12px 14px}
+ .tile.tbig>span:last-child{display:contents}
+ .tile.tbig b{grid-column:1;grid-row:1;font-size:44cqi}
+ .tile.tbig>span:first-child{grid-column:2;grid-row:1;font-size:2.5rem}.tile.tbig>span:first-child .em{width:34cqi;height:34cqi}
+ .tile.tbig.d2 b{font-size:34cqi}.tile.tbig.d2>span:first-child .em{width:28cqi;height:28cqi}
+ .tile.tbig.d3 b{font-size:26cqi}.tile.tbig.d3>span:first-child .em{width:22cqi;height:22cqi}
+ .tile.tbig small{grid-column:1/-1;grid-row:2;margin-top:10px;font-size:1.0625rem;text-align:center}
+}
