@@ -536,38 +536,71 @@ function skPop(then){
 /* реплика кролика: голова без подложки и пузырь с хвостиком, как у персонажей Duolingo */
 function rbSay(t){var hd=IMG.wowhead||IMG.eat;return'<div class="gsay">'+(hd?'<img class="gav" src="'+hd+'" alt="" draggable="false">':'')+'<p>'+t+'</p></div>'}
 /* back — куда вернуться: в настройки (по умолчанию) или дальше по пути из окна нового умения */
-/* U1-7: картинка «Я могу…» для «Поделиться», как у Duolingo: вертикальная (для историй), глубокий градиент цвета акцента,
-   сверху ИТП, в центре знак-остров с числом пройденных островков и крупно «Я могу …!», снизу ликующий кролик с искрами */
-var SKBG={'':['#0F3A0B','#2B8420','#6BBE49'],carrot:['#5E2C03','#D9730C','#F7A541'],pink:['#4E0E22','#C73B63','#F07C9A'],blue:['#0A2156','#2563D0','#6FA3F2'],violet:['#1E124F','#6C4BD6','#A992FF']};
-function skImg(cb){
+/* U1-7: картинка «Я могу…» для «Поделиться». Без кролика и островка: логотип Python рядом с числом (как флаг у Duolingo),
+   крупно «Я могу …!», а внизу — окно редактора с маленькой программой, которая и есть это умение, и её вывод.
+   Логотип Python — товарный знак Python Software Foundation, используется без изменений, чтобы назвать язык (правила PSF это разрешают) */
+var PYLOGO='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0.21 -0.077 110 110"><linearGradient id="a" gradientUnits="userSpaceOnUse" x1="63.8159" y1="56.6829" x2="118.4934" y2="1.8225" gradientTransform="matrix(1 0 0 -1 -53.2974 66.4321)"><stop offset="0" stop-color="#387EB8"/><stop offset="1" stop-color="#366994"/></linearGradient><path fill="url(#a)" d="M55.023-0.077c-25.971,0-26.25,10.081-26.25,12.156c0,3.148,0,12.594,0,12.594h26.75v3.781c0,0-27.852,0-37.375,0c-7.949,0-17.938,4.833-17.938,26.25c0,19.673,7.792,27.281,15.656,27.281c2.335,0,9.344,0,9.344,0s0-9.765,0-13.125c0-5.491,2.721-15.656,15.406-15.656c15.91,0,19.971,0,26.531,0c3.902,0,14.906-1.696,14.906-14.406c0-13.452,0-17.89,0-24.219C82.054,11.426,81.515-0.077,55.023-0.077z M40.273,8.392c2.662,0,4.813,2.150,4.813,4.813c0,2.661-2.151,4.813-4.813,4.813s-4.813-2.151-4.813-4.813C35.46,10.542,37.611,8.392,40.273,8.392z"/><linearGradient id="b" gradientUnits="userSpaceOnUse" x1="97.0444" y1="21.6321" x2="155.6665" y2="-34.5308" gradientTransform="matrix(1 0 0 -1 -53.2974 66.4321)"><stop offset="0" stop-color="#FFE052"/><stop offset="1" stop-color="#FFC331"/></linearGradient><path fill="url(#b)" d="M55.397,109.923c25.959,0,26.282-10.271,26.282-12.156c0-3.148,0-12.594,0-12.594H54.897v-3.781c0,0,28.032,0,37.375,0c8.009,0,17.938-4.954,17.938-26.25c0-23.322-10.538-27.281-15.656-27.281c-2.336,0-9.344,0-9.344,0s0,10.216,0,13.125c0,5.491-2.631,15.656-15.406,15.656c-15.91,0-19.476,0-26.532,0c-3.892,0-14.906,1.896-14.906,14.406c0,14.475,0,18.265,0,24.219C28.366,100.497,31.562,109.923,55.397,109.923z M70.148,101.454c-2.662,0-4.813-2.151-4.813-4.813s2.150-4.813,4.813-4.813c2.661,0,4.813,2.151,4.813,4.813S72.809,101.454,70.148,101.454z"/></svg>';
+/* у каждой вехи — своя маленькая программа и её вывод */
+var SKCODE={msg:['print("Привет, мир!")','Привет, мир!'],
+ kbd:['name = input("Как тебя зовут? ")\nprint("Привет,", name)','Как тебя зовут? Влад\nПривет, Влад'],
+ calc:['a = float(input())\nb = float(input())\nprint(a * b)','2.5\n4\n10.0'],
+ loop:['for i in range(1, 5):\n    print("*" * i)','*\n**\n***\n****'],
+ list:['book = {"Аня": "555-01"}\nbook["Макс"] = "555-02"\nprint(book["Макс"])','555-02'],
+ fn:['import random\n\ndef roll():\n    return random.randint(1, 6)\n\nprint("Выпало:", roll())','Выпало: 5'],
+ file:['with open("scores.csv") as f:\n    for line in f:\n        print(line.strip())','Аня,97\nМакс,85'],
+ sort:['scores = [42, 97, 65, 88]\nscores.sort(reverse=True)\nprint(scores[:3])','[97, 88, 65]'],
+ box:['class Hero:\n    def __init__(self, name):\n        self.name = name\n        self.hp = 100\n\nprint(Hero("Ви").hp)','100'],
+ chart:['import pandas as pd\n\ndf = pd.read_csv("games.csv")\nprint(df["score"].mean())','78.4'],
+ bot:['import requests\n\nr = requests.get(URL)\nprint(r.json()["temp"])','-3'],
+ cap:['project = Project("мой бот")\nproject.build()\nproject.share()','Готово!']};
+var SKBG={'':['#0B2E09','#1F6516','#43A034'],carrot:['#4A2302','#B65E08','#F08C1A'],pink:['#3E0A1B','#952746','#D9557A'],blue:['#081A44','#1A479A','#3B7BE6'],violet:['#170D3D','#4E31A8','#7E62E8']};
+function skImg(cb,vr){
   var s=skNow(),m=s.L[s.k],W=1080,H=1920,cv=document.createElement('canvas');cv.width=W;cv.height=H;
-  var g=cv.getContext('2d'),F='Nunito,system-ui,-apple-system,"Segoe UI",sans-serif',C=SKBG[ST('acc')]||SKBG[''];
-  function star(x,y,r,a){g.save();g.globalAlpha=a;g.fillStyle='#fff';g.beginPath();g.moveTo(x,y-r);g.quadraticCurveTo(x,y,x+r*.42,y);g.quadraticCurveTo(x,y,x,y+r);g.quadraticCurveTo(x,y,x-r*.42,y);g.quadraticCurveTo(x,y,x,y-r);g.fill();
-    var gl=g.createRadialGradient(x,y,0,x,y,r*1.4);gl.addColorStop(0,'rgba(255,255,255,.35)');gl.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=gl;g.beginPath();g.arc(x,y,r*1.4,0,6.283);g.fill();g.restore()}
+  var g=cv.getContext('2d'),F='Nunito,system-ui,-apple-system,"Segoe UI",sans-serif',MF='"Cascadia Code","Cascadia Mono",Consolas,ui-monospace,monospace',C=SKBG[ST('acc')]||SKBG[''],cd=SKCODE[m.e]||SKCODE.msg;cd=[cd[0],cd[1].replace(/Влад/g,String(S.nick||'Влад').slice(0,14))];
+  function star(x,y,r,a){g.save();g.globalAlpha=a;var gl=g.createRadialGradient(x,y,0,x,y,r*1.6);gl.addColorStop(0,'rgba(255,255,255,.45)');gl.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=gl;g.beginPath();g.arc(x,y,r*1.6,0,6.283);g.fill();
+    g.fillStyle='#fff';g.beginPath();g.moveTo(x,y-r);g.quadraticCurveTo(x,y,x+r*.38,y);g.quadraticCurveTo(x,y,x,y+r);g.quadraticCurveTo(x,y,x-r*.38,y);g.quadraticCurveTo(x,y,x,y-r);g.fill();g.restore()}
+  function rr(x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
   function wrap(t,mw){var w=t.split(' '),L=[],c='';w.forEach(function(x){var n=c?c+' '+x:x;if(g.measureText(n).width>mw&&c){L.push(c);c=x}else c=n});if(c)L.push(c);return L}
-  function draw(rb){
-    /* фон: сверху тёмный тон акцента, к низу — сам акцент; светлое пятно за кроликом */
-    var bg=g.createLinearGradient(0,0,0,H);bg.addColorStop(0,C[0]);bg.addColorStop(.62,C[1]);bg.addColorStop(1,C[2]);g.fillStyle=bg;g.fillRect(0,0,W,H);
-    var gw=g.createRadialGradient(W*.62,H*.8,40,W*.62,H*.8,620);gw.addColorStop(0,'rgba(255,255,255,.28)');gw.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=gw;g.fillRect(0,0,W,H);
-    /* шапка: ИТП и подпись */
-    g.textBaseline='alphabetic';g.fillStyle='rgba(255,255,255,.82)';g.font='900 76px '+F;g.textAlign='left';g.fillText('ИТП',96,180);g.font='700 28px '+F;g.fillStyle='rgba(255,255,255,.6)';g.fillText('И так, программирование',98,224);
-    g.font='800 34px '+F;g.textAlign='right';g.fillStyle='rgba(255,255,255,.7)';g.fillText('ЧТО Я УМЕЮ · PYTHON',W-96,174);
-    /* знак-остров и число */
-    g.font='900 190px '+F;var num=String(s.p),nw=g.measureText(num).width,hw=200,hh=140,gap=44,x0=(W-(hw+gap+nw))/2,yc=520;
-    g.save();g.translate(x0,yc-hh/2);var k=hw/74;
-    g.fillStyle='rgba(0,0,0,.22)';g.beginPath();[[0,20],[18,40],[56,40],[74,20],[74,32],[56,52],[18,52],[0,32]].forEach(function(p,i){g[i?'lineTo':'moveTo'](p[0]*k,p[1]*k*.95)});g.fill();
-    g.fillStyle='#fff';g.beginPath();[[0,20],[18,0],[56,0],[74,20],[56,40],[18,40]].forEach(function(p,i){g[i?'lineTo':'moveTo'](p[0]*k,p[1]*k*.95)});g.fill();g.restore();
-    g.fillStyle='#fff';g.textAlign='left';g.fillText(num,x0+hw+gap,yc+66);
-    g.font='800 38px '+F;g.textAlign='center';g.fillStyle='rgba(255,255,255,.72)';g.fillText(pl(s.p,['островок пройден','островка пройдено','островков пройдено']),W/2,yc+150);
-    /* главное: «Я могу …!» */
-    g.font='900 92px '+F;g.fillStyle='#fff';var L=wrap('Я могу '+m.c+'!',W-180);L.forEach(function(l,i){g.fillText(l,W/2,yc+330+i*112)});
-    /* кролик с искрами и хвост «кометы» */
-    var cy=1540;g.save();g.strokeStyle='rgba(255,255,255,.22)';g.lineWidth=26;g.lineCap='round';g.beginPath();g.moveTo(-40,H-120);g.quadraticCurveTo(W*.45,H-40,W*.98,cy-260);g.stroke();g.restore();
-    if(rb&&rb.width){var bs=760,sc=Math.min(bs/rb.width,bs/rb.height),w=rb.width*sc,h=rb.height*sc;g.drawImage(rb,W/2-w/2+40,H-h-30,w,h)}
-    star(170,1230,46,.95);star(930,1180,36,.9);star(890,1700,58,1);star(120,1760,30,.8);star(1000,1450,22,.7);star(260,1520,18,.6);
+  /* подсветка: те же роли, что в редакторе ИТП — ключевые слова, строки, числа, вызовы, комментарии */
+  var KW=/^(def|class|return|for|in|if|elif|else|import|from|as|with|while|True|False|None|and|or|not|print)$/;
+  function line(t,x,y){var re=/(#.*$)|("[^"]*"|'[^']*')|(\b\d+(?:\.\d+)?\b)|([A-Za-z_]\w*)|(\s+)|([^\sA-Za-z_\d"'#]+)/g,mm;
+    while((mm=re.exec(t))){var tx=mm[0],col='#E6E1D8';
+      if(mm[1])col='#7F8794';else if(mm[2])col='#A8DC76';else if(mm[3])col='#F5A35C';
+      else if(mm[4]){col=tx==='print'?'#E68BD8':KW.test(tx)?'#C99BFF':t.slice(re.lastIndex).trimStart().charAt(0)==='('?'#7EB8FF':'#E6E1D8'}else if(mm[6])col='#9AA3AF';
+      g.fillStyle=col;g.fillText(tx,x,y);x+=g.measureText(tx).width}}
+  function draw(logo){
+    /* фон: тёмный тон акента сверху, светлее к низу; мягкое свечение за окном кода */
+    var bg=g.createLinearGradient(0,0,W*.3,H);bg.addColorStop(0,C[0]);bg.addColorStop(.55,C[1]);bg.addColorStop(1,C[2]);g.fillStyle=bg;g.fillRect(0,0,W,H);
+    var gw=g.createRadialGradient(W*.5,H*.74,60,W*.5,H*.74,760);gw.addColorStop(0,'rgba(255,255,255,.22)');gw.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=gw;g.fillRect(0,0,W,H);
+    /* знаки кода, рассыпанные по фону, как конфетти */
+    g.save();g.fillStyle='rgba(255,255,255,.07)';g.font='800 120px '+MF;g.textAlign='center';[['{ }',150,330,-12],['( )',930,300,10],[':',990,760,0],['#',90,820,-8],['[ ]',940,1090,8],['=',120,1180,0],['"',980,1500,-6]].forEach(function(q){g.save();g.translate(q[1],q[2]);g.rotate(q[3]*Math.PI/180);g.fillText(q[0],0,0);g.restore()});g.restore();
+    /* шапка */
+    g.textBaseline='alphabetic';g.textAlign='left';g.fillStyle='#fff';g.font='900 72px '+F;g.fillText('ИТП',96,170);
+    g.font='700 28px '+F;g.fillStyle='rgba(255,255,255,.62)';g.fillText('И так, программирование',98,212);
+    g.textAlign='right';g.font='800 30px '+F;g.fillStyle='rgba(255,255,255,.7)';g.fillText('ЧТО Я УМЕЮ',W-96,166);
+    /* раскладка: логотип с числом, подпись, «Я могу…», окно кода — одной группой по центру между шапкой и низом */
+    var code=cd[0].split('\n'),out=cd[1].split('\n'),lh=64,pw=W-150,ph=112+code.length*lh+40+out.length*lh+26;
+    g.font='900 88px '+F;var L=wrap('Я могу '+m.c+'!',W-160),tot=250+70+L.length*106+90+ph,y0=290+Math.max(0,(H-170-290-tot)/2);
+    var yc=y0+90,ls=170;g.font='900 200px '+F;var num=String(s.p),nw=g.measureText(num).width,x0=(W-(ls+44+nw))/2;
+    if(logo){g.save();g.shadowColor='rgba(0,0,0,.28)';g.shadowBlur=30;g.shadowOffsetY=10;g.drawImage(logo,x0,yc-ls/2-8,ls,ls);g.restore()}
+    g.textAlign='left';g.fillStyle='#fff';g.fillText(num,x0+ls+44,yc+70);
+    g.textAlign='center';g.font='800 38px '+F;g.fillStyle='rgba(255,255,255,.72)';g.fillText(pl(s.p,['островок пройден','островка пройдено','островков пройдено'])+' на Python',W/2,yc+168);
+    g.font='900 88px '+F;g.fillStyle='#fff';var hy=y0+250+70+64;L.forEach(function(l,i){g.fillText(l,W/2,hy+i*106)});
+    var top=hy+(L.length-1)*106+40+90;
+    g.save();g.translate(W/2,top+ph/2);g.rotate(-3*Math.PI/180);g.translate(-pw/2,-ph/2);
+    g.shadowColor='rgba(0,0,0,.42)';g.shadowBlur=64;g.shadowOffsetY=26;rr(0,0,pw,ph,38);g.fillStyle='#16181C';g.fill();g.shadowColor='transparent';
+    g.strokeStyle='rgba(255,255,255,.1)';g.lineWidth=2;rr(1,1,pw-2,ph-2,37);g.stroke();
+    /* заголовок окна: маленький логотип и имя файла */
+    if(logo)g.drawImage(logo,42,30,42,42);g.font='700 32px '+F;g.fillStyle='rgba(255,255,255,.55)';g.textAlign='left';g.fillText('skill.py',98,63);
+    g.fillStyle='rgba(255,255,255,.08)';g.fillRect(0,98,pw,2);
+    g.font='600 40px '+MF;code.forEach(function(l,i){var y=98+60+i*lh;g.fillStyle='rgba(255,255,255,.25)';g.textAlign='right';g.fillText(String(i+1),80,y);g.textAlign='left';line(l,112,y)});
+    var oy=98+24+code.length*lh;g.save();rr(0,0,pw,ph,38);g.clip();g.fillStyle='rgba(255,255,255,.05)';g.fillRect(0,oy,pw,ph-oy);g.restore();g.fillStyle='rgba(255,255,255,.08)';g.fillRect(0,oy,pw,2);
+    g.font='600 38px '+MF;out.forEach(function(l,i){g.fillStyle='#E6E1D8';g.fillText(l,112,oy+58+i*lh)});g.fillStyle='#7CD06A';g.fillText('›',62,oy+58);
+    g.restore();
+    star(110,top-30,38,.9);star(985,top-80,30,.85);star(990,1830,46,.9);star(70,1790,24,.7);star(880,y0-20,18,.6);
     cb(cv)}
-  var src=IMG.happy||IMG.eat,im=new Image();
-  (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(function(){if(!src)return draw(null);im.onload=function(){draw(im)};im.onerror=function(){draw(null)};im.src=src})}
+  var im=new Image();
+  (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(function(){im.onload=function(){draw(im)};im.onerror=function(){draw(null)};im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(PYLOGO)})}
 function skShare(){
   var s=skNow(),m=s.L[s.k],BLOB=null,tx='Я учу Python в ИТП и уже могу '+m.c+'! Пройдено '+s.p+' '+pl(s.p,['островок','островка','островков'])+'.';
   var btns=[['Сохранить картинку',function(){if(!BLOB){toast('Картинка ещё рисуется');return false}saveFile('itp-skill.png',BLOB);ach('share');toast('Картинка сохранена');return false}]];
