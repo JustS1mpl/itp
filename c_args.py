@@ -65,6 +65,12 @@ def code_params():
              'print(name), затем for k in sorted(info): print(f"  {k}: {info[k]}").',
              'def profile(name, **info):\n    print(name)\n    for k in sorted(info):\n        print(f"  {k}: {info[k]}")',
              ['profile("Ира", city="Тула", age=15)', 'profile("Ли")', 'profile("Ким", level=7, clan="Волки", age=16)'], tail=TL),
+        task('Напиши функцию order(*items, discount=0, **extra): items — цены позиций, discount — скидка в процентах, '
+             'extra — доплаты с названиями (доставка=150). Функция возвращает итог: сумма позиций со скидкой, округлённая '
+             'до целого, плюс все доплаты.',
+             'base = sum(items) * (100 - discount) / 100; затем round(base) + sum(extra.values()).',
+             'def order(*items, discount=0, **extra):\n    base = sum(items) * (100 - discount) / 100\n    return round(base) + sum(extra.values())',
+             ['print(order(300, 200))', 'print(order(1000, 500, discount=10, доставка=150, упаковка=30))', 'print(order(discount=50))'], tail=TL),
     ])
 
 
@@ -121,6 +127,13 @@ def code_lambda():
              'best = max(temps, key=lambda d: temps[d]) — max перебирает ключи, сравнивая по значениям.',
              'temps = {"пн": 3, "вт": 7, "ср": -1, "чт": 12, "пт": 9}\nbest = max(temps, key=lambda d: temps[d])\nprint(f"{best}: {temps[best]}")',
              [''], starter='temps = {"пн": 3, "вт": 7, "ср": -1, "чт": 12, "пт": 9}\n'),
+        task('Лут после рейда. На вход подаются строки «предмет редкость вес» до слова «стоп», редкость — число от 1 до 5. '
+             'Выведи названия через пробел: сначала самые редкие, при равной редкости — более лёгкие, при равном весе — '
+             'по алфавиту.',
+             'Список кортежей (имя, редкость, вес). sorted(loot, key=lambda x: (-x[1], x[2], x[0])), выводи только имена.',
+             'loot = []\nwhile True:\n    s = input()\n    if s == "стоп":\n        break\n    name, r, w = s.split()\n    loot.append((name, int(r), int(w)))\n'
+             'for x in sorted(loot, key=lambda x: (-x[1], x[2], x[0])):\n    print(x[0], end=" ")',
+             ['меч 3 10\nкольцо 5 1\nщит 3 8\nамулет 5 1\nстоп', 'камень 1 99\nстоп', 'а 2 2\nб 2 1\nв 4 9\nстоп']),
     ])
 
 
@@ -181,6 +194,15 @@ def code_functional():
              'длинного слова.',
              'lens = list(map(len, words)); print(*lens); print(max(lens)).',
              'lens = list(map(len, input().split()))\nprint(*lens)\nprint(max(lens))', ['я люблю Python', 'ой', 'это очень длинное предложение']),
+        task('Сигналы с датчиков. На вход подаётся строка целых чисел через пробел. С помощью filter оставь только значения '
+             'от 0 до 100 включительно (остальное — шум), с помощью map переведи их в проценты от 100 в виде «N%», '
+             'а reduce найди произведение первых трёх подходящих значений (если подходящих меньше трёх — всех). '
+             'Выведи строку процентов через пробел и строкой ниже произведение.',
+             'good = list(filter(lambda x: 0 <= x <= 100, nums)); map(lambda x: f"{x}%", good); '
+             'reduce(lambda a, b: a * b, good[:3]). Пустой список не подаётся.',
+             'from functools import reduce\nnums = list(map(int, input().split()))\ngood = list(filter(lambda x: 0 <= x <= 100, nums))\n'
+             'print(" ".join(map(lambda x: f"{x}%", good)))\nprint(reduce(lambda a, b: a * b, good[:3]))',
+             ['5 -3 200 10 2 7', '50', '1 2 3 4 999']),
     ])
 
 

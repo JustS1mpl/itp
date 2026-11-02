@@ -57,6 +57,11 @@ def code_listcomp():
              'table = [[i + j for j in range(1, n + 1)] for i in range(1, n + 1)], затем for row in table: print(*row).',
              'n = int(input())\ntable = [[i + j for j in range(1, n + 1)] for i in range(1, n + 1)]\nfor row in table:\n    print(*row)',
              ['3', '1', '5']),
+        task('Матрица из кода. На вход подаётся число n. Списочным выражением собери таблицу n × n, где в клетке строки i '
+             'и столбца j (с 0) стоит (i * j) % 10, и выведи её построчно, числа через пробел.',
+             'grid = [[(i * j) % 10 for j in range(n)] for i in range(n)], затем for row in grid: print(*row).',
+             'n = int(input())\ngrid = [[(i * j) % 10 for j in range(n)] for i in range(n)]\nfor row in grid:\n    print(*row)',
+             ['4', '1', '6']),
     ])
 
 
@@ -110,6 +115,15 @@ def code_genexp():
         task('Сумма цифр. На вход подаётся строка, в которой встречаются цифры. Выведи сумму всех цифр строки.',
              'sum(int(c) for c in s if c.isdigit()).',
              's = input()\nprint(sum(int(c) for c in s if c.isdigit()))', ['a1b2c3', 'Номер 2048', 'нет цифр']),
+        task('Проверка отряда. На вход подаются строки «ник уровень здоровье» до слова «стоп». Выведи «Готовы все: да/нет» '
+             '(все с уровнем от 10 и здоровьем больше 0), «Есть раненые: да/нет» (хоть у кого-то здоровье меньше 50) '
+             'и «Сила отряда: S» — сумму уровней тех, у кого здоровье больше 0.',
+             'all(...) и any(...) с выражениями-генераторами по списку кортежей, сумма — sum(l for n, l, h in team if h > 0).',
+             'team = []\nwhile True:\n    s = input()\n    if s == "стоп":\n        break\n    n, l, h = s.split()\n    team.append((n, int(l), int(h)))\n'
+             'ok = all(l >= 10 and h > 0 for n, l, h in team)\nhurt = any(h < 50 for n, l, h in team)\n'
+             'print("Готовы все:", "да" if ok else "нет")\nprint("Есть раненые:", "да" if hurt else "нет")\n'
+             'print("Сила отряда:", sum(l for n, l, h in team if h > 0))',
+             ['Кира 12 100\nZed 15 40\nстоп', 'Ли 9 100\nЯн 20 0\nстоп', 'А 10 50\nстоп']),
     ])
 
 
@@ -182,6 +196,13 @@ def code_memory():
              'Списочное выражение создаёт новый список: return [s + bonus for s in scores].',
              'def with_bonus(scores, bonus):\n    return [s + bonus for s in scores]',
              ['a = [5, 7]\nb = with_bonus(a, 10)\nprint(a, b)', 'print(with_bonus([], 3))', 'print(with_bonus([1, 2, 3], -1))'], tail=TL),
+        task('Сохранения уровня. Напиши функцию snapshot(level), которая возвращает независимую копию уровня — списка '
+             'строк-списков символов, — чтобы правки копии не меняли оригинал, и функцию same(a, b), которая возвращает '
+             'пару: равны ли уровни по содержимому и один ли это объект.',
+             'Вложенные списки копирует только copy.deepcopy. В same: return a == b, a is b.',
+             'import copy\n\n\ndef snapshot(level):\n    return copy.deepcopy(level)\n\n\ndef same(a, b):\n    return a == b, a is b',
+             ['lvl = [["#", "."], [".", "@"]]\ns = snapshot(lvl)\ns[1][1] = "."\nprint(lvl[1][1], s[1][1])',
+              'lvl = [["a"]]\nprint(same(lvl, snapshot(lvl)), same(lvl, lvl))', 'print(snapshot([]))'], tail=TL),
     ])
 
 

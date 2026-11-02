@@ -68,6 +68,14 @@ def code_dict():
              'marks = {}\nwhile True:\n    s = input()\n    if s == "стоп":\n        break\n    name, mark = s.split()\n    marks[name] = int(mark)\n'
              'for name in sorted(marks):\n    print(f"{name}: {marks[name]}")',
              ['Орлова 5\nБелов 3\nОрлова 4\nстоп', 'Жиганов 5\nстоп', 'Ким 2\nАбрамов 5\nстоп']),
+        task('Маски для вечеринки. На вход подаются строки «ИМЯ МАСКА» до слова «стоп» — кто какую маску выбрал; если человек '
+             'выбирает повторно, считается последний выбор. Затем подаётся название маски. Выведи по алфавиту через пробел '
+             'имена тех, у кого эта маска, или «Никого».',
+             'Словарь choice[имя] = маска сам перезапишет повторный выбор. Потом соберите имена с нужной маской в список и sort.',
+             'choice = {}\nwhile True:\n    s = input()\n    if s == "стоп":\n        break\n    name, mask = s.split()\n    choice[name] = mask\n'
+             'want = input()\nnames = []\nfor name, mask in choice.items():\n    if mask == want:\n        names.append(name)\nnames.sort()\n'
+             'if len(names) > 0:\n    print(" ".join(names))\nelse:\n    print("Никого")',
+             ['Ян петух\nЛи сова\nАня петух\nстоп\nпетух', 'Ян конь\nЯн тигр\nстоп\nконь', 'Б волк\nА волк\nстоп\nволк']),
     ])
 
 
@@ -130,6 +138,15 @@ def code_count():
              'for k, v in b.items():\n    total[k] = total.get(k, 0) + v\nfor k in sorted(total):\n    print(f"{k}: {total[k]}")',
              [''],
              starter='a = {"ручки": 40, "тетради": 25, "ластики": 10}\nb = {"тетради": 15, "линейки": 7, "ручки": 5}\n'),
+        task('Урожай за сезон. На вход подаются строки «культура количество» до слова «стоп» — по одной на каждый сбор. '
+             'Выведи для каждой культуры «КУЛЬТУРА: всего N», культуры по алфавиту, а последней строкой — культуру, '
+             'которой собрано больше всего.',
+             'total[crop] = total.get(crop, 0) + n. Порядок — for crop in sorted(total). Лучшую найди в том же цикле: '
+             'запоминай культуру, у которой сумма больше, чем у лучшей до неё.',
+             'total = {}\nwhile True:\n    s = input()\n    if s == "стоп":\n        break\n    crop, n = s.split()\n    total[crop] = total.get(crop, 0) + int(n)\n'
+             'best = ""\nfor crop in sorted(total):\n    print(f"{crop}: всего {total[crop]}")\n    if best == "" or total[crop] > total[best]:\n        best = crop\n'
+             'print(f"Лучше всего: {best}")',
+             ['тыква 3\nпастернак 10\nтыква 9\nстоп', 'клубника 1\nстоп', 'а 5\nб 5\nа 1\nстоп']),
     ])
 
 
@@ -200,6 +217,14 @@ def code_set():
              'everyone = set(input().split())\ndone = set(input().split())\nmissing = everyone - done\nif missing:\n'
              '    for name in sorted(missing):\n        print(name)\nelse:\n    print("Все сдали")',
              ['Ира Ли Тимур Оля\nЛи Оля', 'Ким\nКим', 'Шарапов Белов Зайцева\nБелов']),
+        task('Новые блоки. На вход подаются две строки — блоки, которые игрок уже собрал, и блоки в новом мире, через пробел. '
+             'Выведи три строки по алфавиту через пробел: «Новые: …» — есть в мире, но не собраны; «Уже есть: …» — общие; '
+             '«Всего разных: N». Пустой список выведи как «-».',
+             'Два множества a и b: b - a, a & b и a | b. Для вывода — sorted(...) и " ".join, пустой — через проверку длины.',
+             'a = set(input().split())\nb = set(input().split())\nnew = sorted(b - a)\ncommon = sorted(a & b)\n'
+             'print("Новые:", " ".join(new) if len(new) > 0 else "-")\nprint("Уже есть:", " ".join(common) if len(common) > 0 else "-")\n'
+             'print("Всего разных:", len(a | b))',
+             ['камень дерево песок\nпесок обсидиан камень лава', 'земля\nземля', 'а б\nв г']),
     ])
 
 
