@@ -239,6 +239,12 @@ def th(name, terms, body):
             out = _norm_out(plain, False)
             shown = _norm_out(m.group(2), False)
             assert shown.startswith(out), ('вывод в примере термина не совпадает', tn, out, m.group(2)[:120])
+            # в основном курсе после вывода ничего постороннего («Частая ошибка: …» — в тексте термина выше примера)
+            if not os.path.basename(sys._getframe(1).f_code.co_filename).startswith('c_h_'):
+                if os.environ.get('KCOLLECT') and shown != out:
+                    print('TAIL', tn, '|', shown[len(out):].strip().replace('\n', ' / ')[:150])
+                    continue
+                assert shown == out, ('после вывода в примере термина лишний текст — перенеси его выше «Пример:»', tn, shown[len(out):][:120])
     d = {'t': 'theory', 'n': name}
     if terms:
         d['terms'] = [{'n': a, 'd': b} for a, b in terms]
