@@ -1488,7 +1488,7 @@ html.exbig .exio pre.cmp,html.exbig .pyex .exio pre.cmp{margin:6px 0 0;padding:1
 .tip0>span{flex:1;min-width:0}
 .tip0 .btn{flex:none;width:auto;margin:0;min-height:40px;padding:0 14px}
 /* U1-12: дни серии — галочка штрихом, отмеченный день с мягким объёмом */
-.wd i .wck{width:62%;height:62%;fill:none;stroke:currentColor;stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round}
+.wd i .wck{width:58%;height:58%}
 .wd.on i{background:linear-gradient(170deg,color-mix(in srgb,#fff 16%,var(--accent)),var(--accent));box-shadow:inset 0 -2px 0 color-mix(in srgb,#000 14%,var(--accent))}
 .wd.td.on i{box-shadow:inset 0 -2px 0 color-mix(in srgb,#000 14%,var(--accent)),0 0 0 2px var(--card),0 0 0 4px color-mix(in srgb,var(--accent) 40%,transparent)}
 /* U1-10: плитки итога островка (опыт, точность, время) в один ряд, появляются по очереди; итог — по центру экрана над нижней панелью */
@@ -1567,11 +1567,12 @@ html.exbig .exio pre.cmp,html.exbig .pyex .exio pre.cmp{margin:6px 0 0;padding:1
 .skl li:not(.on) .sktx small .skx path{fill:var(--line2)}
 .sktx b{font-size:1.0625rem;font-weight:700;line-height:1.3}
 .skl li:not(.on) .sktx b,.skl li:not(.on) .sktx small{color:var(--muted)}
-/* U1-11: подсказка — цветная лампочка (Fluent Emoji, MIT) */
-.icon.hbe .hbi{font-size:1.35rem;line-height:1}.icon.hbe .hbi .em{width:1.6rem;height:1.6rem}
-.icon.hbe .hbi{transition:transform var(--d2) var(--e-spring)}
-.icon.hbe:active .hbi{transform:scale(.88)}
+/* U1-11: подсказка — лампочка Phosphor (duotone): контур цветом текста, колба жёлтая; взятая подсказка — мягкая жёлтая подложка */
+.icon.hbe .hbl{width:26px;height:26px;transition:transform var(--d2) var(--e-spring)}
+.icon.hbe .hbl .d{fill:var(--gold);opacity:.85}
+.icon.hbe:active .hbl{transform:scale(.88)}
 .icon.hbe.on{background:color-mix(in srgb,var(--gold) 22%,var(--card))}
+.icon.hbe.on .hbl .d{opacity:1}
 /* U1-14: пример в «Изученных функциях» — как в окне термина */
 .dx .cpw{margin:4px 0 10px}.dx pre.out{margin:0 0 10px}
 .dx .tvo{margin:0 0 4px;color:var(--muted);font-size:.8125rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
@@ -1589,3 +1590,9 @@ html.exbig .exio pre.cmp,html.exbig .pyex .exio pre.cmp{margin:6px 0 0;padding:1
  .tile.tbig.d3 b{font-size:26cqi}.tile.tbig.d3>span:first-child .em{width:22cqi;height:22cqi}
  .tile.tbig small{grid-column:1/-1;grid-row:2;margin-top:10px;font-size:1.0625rem;text-align:center}
 }
+/* значки Phosphor: размер задаёт место, где они стоят */
+.btn .phi{width:20px;height:20px;flex:none}
+/* U1-5: морковка в плитке серии всегда по центру числа, сколько бы цифр ни было: картинка в своём флекс-боксе, без строки текста под ней */
+.tile.tbig>span:first-child{display:flex;align-items:center;justify-content:center;line-height:0;align-self:center}
+.tile.tbig>span:first-child .em{display:block;vertical-align:top}
+.skd svg{width:26px;height:26px}

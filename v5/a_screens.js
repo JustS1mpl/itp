@@ -332,7 +332,7 @@ function goalScreen(then){
    weekRow('a')+
    (sg?'<div class="gsg"><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="'+sg+'" aria-valuenow="'+Math.min(s,sg)+'" aria-label="Цель серии"><i style="width:'+Math.min(100,Math.round(s/sg*100))+'%"></i></div><span class="mu">Цель серии: '+Math.min(s,sg)+' из '+sg+', за неё +'+SGX[sg]+' опыта</span></div>':'')+
    '</div>';
-  scr('goal',h+dockHtml('<button class="btn" id="gz">Закрыть</button><button class="btn t" id="gsh">'+ico('share')+'Поделиться</button>',1));
+  scr('goal',h+dockHtml('<button class="btn" id="gz">Закрыть</button><button class="btn t" id="gsh">'+phi('export')+'Поделиться</button>',1));
   snd('streak');vib([20,30,20]);
   $('gz').onclick=function(){then()};$('gsh').onclick=share}
 function sparks(el){
@@ -418,7 +418,7 @@ function task(i,j,k){
   var fu=T.findIndex(function(x,n){return!S.tk[key+'-'+n]});if(fu<0)fu=T.length-1;
   var dots='<div class="sbar" role="group" aria-label="Задание '+(k+1)+' из '+T.length+'">'+T.map(function(x,n){var ok=S.tk[key+'-'+n],go=n!==k&&(ok||n===fu);
     return'<button type="button" class="'+(ok?'ok':'')+(n===k?' cu':'')+'" data-n="'+n+'"'+(go?' title="Задание '+(n+1)+'"':' disabled')+' aria-label="Задание '+(n+1)+(ok?', решено':'')+'"'+(n===k?' aria-current="step"':'')+'></button>'}).join('')+'</div>';
-  scr('task',lessonTop(dots,'<span class="lstep" aria-hidden="true">'+(k+1)+' / '+T.length+'</span>'+(q.h?'<button class="icon hbe" id="hb" aria-label="Подсказка (опыт будет вдвое меньше)" aria-keyshortcuts="Control+H"><span class="hbi" aria-hidden="true">💡</span></button>':''))+'<h1 class="sr-only">'+esc(it.n||'Задания с кодом')+', задание '+(k+1)+' из '+T.length+'</h1>'+(k>0&&!S.tp&&S.tk[key+'-'+(k-1)]?'<div class="tip0" id="tip0" role="note"><span>Решённое задание можно открыть снова: нажми на его полоску сверху. Там твой код и «как задумано».</span><button class="btn t" id="tip0b">Понятно</button></div>':'')+taskCard(q)+'<div id="hint"></div>'+edCard('Решение',dc,0,'# Пиши код здесь\n'+(q.starter||''))+conHtml()+'<div id="fb" aria-live="polite"></div>'+dockHtml('<button class="btn" id="chk">Проверить</button>'));
+  scr('task',lessonTop(dots,'<span class="lstep" aria-hidden="true">'+(k+1)+' / '+T.length+'</span>'+(q.h?'<button class="icon hbe" id="hb" aria-label="Подсказка (опыт будет вдвое меньше)" aria-keyshortcuts="Control+H">'+phi('lightbulb','hbl')+'</button>':''))+'<h1 class="sr-only">'+esc(it.n||'Задания с кодом')+', задание '+(k+1)+' из '+T.length+'</h1>'+(k>0&&!S.tp&&S.tk[key+'-'+(k-1)]?'<div class="tip0" id="tip0" role="note"><span>Решённое задание можно открыть снова: нажми на его полоску сверху. Там твой код и «как задумано».</span><button class="btn t" id="tip0b">Понятно</button></div>':'')+taskCard(q)+'<div id="hint"></div>'+edCard('Решение',dc,0,'# Пиши код здесь\n'+(q.starter||''))+conHtml()+'<div id="fb" aria-live="polite"></div>'+dockHtml('<button class="btn" id="chk">Проверить</button>'));
   $('x').onclick=goBack;
   if($('tip0')){S.tp=1;save();$('tip0b').onclick=function(){var t=$('tip0');if(t)t.remove()}}
   app.querySelectorAll('.top .sbar button[data-n]').forEach(function(b){b.onclick=function(){if(!b.disabled)task(i,j,+b.dataset.n)}});
