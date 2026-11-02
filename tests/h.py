@@ -18,7 +18,7 @@ def route(r):
         r.fulfill(status=200, body='', content_type='text/css')
     else:
         r.continue_()
-def open_page(p, path, state=None, w=420, h=860, touch=False, **kw):
+def open_page(p, path, state=None, w=420, h=860, touch=False, agree=True, **kw):
     b=p.chromium.launch(executable_path='/opt/pw-browsers/chromium-1194/chrome-linux/chrome' if os.path.exists('/opt/pw-browsers/chromium-1194/chrome-linux/chrome') else None, args=['--no-sandbox'])
     ctx=b.new_context(viewport={'width':w,'height':h}, has_touch=touch, is_mobile=touch, **kw)
     ctx.route('**/*', route)
@@ -26,6 +26,9 @@ def open_page(p, path, state=None, w=420, h=860, touch=False, **kw):
     logs=[]
     pg.on('console', lambda m: logs.append(m.type+': '+m.text))
     pg.on('pageerror', lambda e: logs.append('PAGEERROR: '+str(e)))
+    # условия (U2-1) в проверках считаются принятыми: окно соглашения не закрывает экраны; agree=False — показать его
+    if agree:
+        ctx.add_init_script("try{if(!localStorage.getItem('itp-app'))localStorage.setItem('itp-app',JSON.stringify({agree:{v:99,d:'test'}}))}catch(e){}")
     if state is not None:
         ctx.add_init_script("if(!sessionStorage.__seeded){sessionStorage.__seeded=1;localStorage.setItem('pyshag2',%s)}"%json.dumps(json.dumps(state)))
     pg.goto(pathlib.Path(path).resolve().as_uri())
