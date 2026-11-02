@@ -35,16 +35,18 @@ def th_search():
         ('top-k', 'k самых похожих результатов поиска — например, три ближайших к запросу куска текста.'),
     ]
     body = (
-        '<p>Обычный поиск ищет слова: на запрос «котёнок» не найдётся текст про «кошку». Модели ищут по смыслу: превращают текст в '
+        '<p>Языковые модели (LLM — ChatGPT, Claude, GigaChat) отвечают на текст-запрос — промпт. Но сначала им часто нужно найти нужные '
+        'тексты. Обычный поиск ищет слова: на запрос «котёнок» не найдётся текст про «кошку». Модели ищут по смыслу: превращают текст в '
         '[[эмбеддинг]] — вектор из сотен чисел, где похожие по смыслу тексты оказываются рядом. Представь три оси: «про животных», '
         '«про еду», «про транспорт». Тогда близость текстов — это [[косинусное сходство]] их векторов:</p>'
         + ex('import numpy as np\n\n\n' + COS + '\n\n# оси: животные, еда, транспорт\nquery = np.array([0.9, 0.3, 0.0])   # «чем кормить котёнка»\n'
              'docs = {"Корм для кошек": np.array([0.8, 0.6, 0.0]), "Расписание электричек": np.array([0.0, 0.1, 0.9]),\n'
              '        "Котята играют": np.array([1.0, 0.0, 0.1])}\nfor title, v in docs.items():\n    print(f"{cosine(query, v):.3f}  {title}")') +
-        '<p>[[np.dot]] перемножает векторы, [[np.linalg.norm]] даёт длину. Деление на длины убирает размер вектора: длинный и короткий '
+        '<p>[[np.dot]] считает скалярное произведение, [[np.linalg.norm]] — длину. Деление на длины убирает размер вектора: длинный и короткий '
         'тексты про одно и то же получат сходство около 1.</p>'
         '<h3>Векторная база</h3>'
-        '<p>На компьютере вектор строит модель эмбеддингов, а хранит и ищет [[векторная база]]. Выглядит это так:</p>'
+        '<p>В настоящих проектах вектор строит модель эмбеддингов, а хранит и ищет [[векторная база]]. На своём компьютере (не в ИТП — '
+        'нужен интернет и установка пакета) это выглядит так:</p>'
         '<pre class="pc">from sentence_transformers import SentenceTransformer\n\nmodel = SentenceTransformer("intfloat/multilingual-e5-small")\n'
         'vectors = model.encode(["Корм для кошек", "Расписание электричек"])\nprint(vectors.shape)   # (2, 384): два текста по 384 числа</pre>'
         '<p>Здесь без интернета модели нет, поэтому строим учебный эмбеддинг сами — «мешок слов»: вектор из счётчиков слов словаря. Он '
@@ -53,7 +55,10 @@ def th_search():
              'docs = ["Кот любит рыбу и молоко", "Поезд на Москву опаздывает", "Котёнку нужен мягкий корм и молоко"]\n'
              'vocab = sorted(set(w for d in docs for w in words(d)))\nprint(vocab)\nq = vector("Чем кормить кота: рыба или молоко?", vocab)\nprint(q)\n'
              'scores = [(cosine(q, vector(d, vocab)), d) for d in docs]\nfor s, d in sorted(scores, reverse=True)[:2]:\n    print(f"{s:.2f} {d}")') +
-        '<p>«кормить» не совпало с «корм», а «кота» — с «кот»: мешок слов не знает, что это одно слово. Настоящий эмбеддинг поймал бы и это.</p>'
+        '<p>«кормить» не совпало с «корм», а «кота» — с «кот»: мешок слов не знает, что это одно слово. Настоящий эмбеддинг поймал бы и это. '
+        'Слова запроса, которых нет в словаре, просто не попадают в вектор.</p>'
+        '<p>Сходства — дробные числа, и два «равных» могут отличаться в последнем знаке. Поэтому, если важен порядок при равенстве, '
+        'сравнивают округлённые: <code>round(s, 6)</code>.</p>'
     )
     return th('Поиск по смыслу', terms, body)
 
@@ -72,31 +77,36 @@ def fl_search():
 def code_search():
     return ts('Поиск по смыслу', [
         task('Мешок слов. Первая строка — словарь: слова через пробел. Вторая — текст. Выведи вектор текста — массив numpy, где на каждом месте '
-             'стоит, сколько раз слово словаря встретилось в тексте. Слова текста сравнивай в нижнем регистре, без знаков .,!?:; по краям. '
+             'стоит, сколько раз слово словаря встретилось в тексте. Слова текста сравнивай в нижнем регистре, без знаков .,!?:;— по краям. '
              'Затем выведи «Длина: L» — длину вектора с двумя цифрами после точки.',
-             'ws = [w.strip(".,!?:;") for w in text.lower().split()]; вектор — np.array([ws.count(v) for v in vocab]).',
-             'import numpy as np\n\nvocab = input().split()\nws = [w.strip(".,!?:;") for w in input().lower().split()]\nv = np.array([ws.count(x) for x in vocab])\n'
+             'ws = [w.strip(".,!?:;—") for w in text.lower().split()]; вектор — np.array([ws.count(v) for v in vocab]).',
+             'import numpy as np\n\nvocab = input().split()\nws = [w.strip(".,!?:;—") for w in input().lower().split()]\nv = np.array([ws.count(x) for x in vocab])\n'
              'print(v)\nprint(f"Длина: {np.linalg.norm(v):.2f}")',
              ['кот мяч рыба\nКот гонял мяч, а потом кот съел рыбу и снова мяч!', 'код тест баг\nБаг! Ещё баг. Тест упал, код молчит: баг', 'да нет\nможет быть']),
-        task('Косинус. Напиши функцию cosine(a, b) — косинусное сходство двух массивов numpy, округлённое до трёх цифр после точки (обычное '
-             'число float). Если хотя бы один вектор нулевой — верни 0.0.',
-             'np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)); round(float(…), 3).',
+        task('Самый похожий. Напиши две функции. cosine(a, b) — косинусное сходство двух массивов numpy, округлённое до трёх цифр после точки '
+             '(обычное число float); если хотя бы один вектор нулевой — 0.0. most_similar(q, vectors) — номер (с 0) вектора из списка, самого '
+             'похожего на q (при равенстве — меньший номер); если все сходства не больше нуля — -1.',
+             'np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)); round(float(…), 3).\n'
+             'В most_similar пройди по enumerate(vectors) и запоминай лучший номер, меняя его только при строго большем сходстве.',
              'import numpy as np\n\n\ndef cosine(a, b):\n    na, nb = np.linalg.norm(a), np.linalg.norm(b)\n    if na == 0 or nb == 0:\n        return 0.0\n'
-             '    return round(float(np.dot(a, b) / (na * nb)), 3)\n',
-             ['print(cosine(np.array([1, 2]), np.array([2, 4])))\nprint(cosine(np.array([1, 0]), np.array([0, 5])))',
-              'print(cosine(np.array([3, 1, 0]), np.array([1, 1, 1])))\nprint(cosine(np.array([0, 0]), np.array([1, 1])))\nprint(cosine(np.array([1, 2, 3]), np.array([-1, -2, -3])))'],
+             '    return round(float(np.dot(a, b) / (na * nb)), 3)\n\n\ndef most_similar(q, vectors):\n    best, best_s = -1, 0\n    for i, v in enumerate(vectors):\n'
+             '        s = cosine(q, v)\n        if s > best_s:\n            best, best_s = i, s\n    return best\n',
+             ['print(cosine(np.array([1, 2]), np.array([2, 4])))\nprint(cosine(np.array([1, 0]), np.array([0, 5])))\n'
+              'print(most_similar(np.array([1, 1]), [np.array([0, 3]), np.array([2, 2]), np.array([5, 5])]))',
+              'print(cosine(np.array([3, 1, 0]), np.array([1, 1, 1])))\nprint(cosine(np.array([0, 0]), np.array([1, 1])))\nprint(cosine(np.array([1, 2, 3]), np.array([-1, -2, -3])))\n'
+              'print(most_similar(np.array([1, 0]), [np.array([0, 1]), np.array([-1, 0])]))\nprint(most_similar(np.array([0, 1]), [np.array([1, 0]), np.array([1, 2]), np.array([0, 0])]))'],
              tail=TL),
         task('Ближайшие документы. В файле docs.txt по документу в строке. На вход подаются k и запрос. Словарь — все разные слова документов '
-             '(нижний регистр, без .,!?:; по краям), по алфавиту. Построй «мешок слов» для каждого документа и запроса, посчитай косинусное '
-             'сходство и выведи k лучших строками «S.SS ДОКУМЕНТ» по убыванию сходства (при равенстве — в порядке файла). Документы со сходством '
+             '(нижний регистр, без .,!?:;— по краям, пустые не считаются), по алфавиту; слова запроса не из словаря не учитываются. Построй «мешок слов» для каждого документа и запроса, посчитай косинусное '
+             'сходство и выведи k лучших строками «S.SS ДОКУМЕНТ» по убыванию сходства (при равенстве — в порядке файла; сравнивай round(s, 6)). Документы со сходством '
              '0 не выводи. Если ни один не подошёл — «Ничего не найдено».',
-             'Сортировка пар (сходство, номер) по ключу lambda p: (-p[0], p[1]); срез [:k].',
-             'import numpy as np\n\n\ndef words(text):\n    return [w.strip(".,!?:;") for w in text.lower().split()]\n\n\n'
+             'Сортировка пар (сходство, номер) по ключу lambda p: (-round(p[0], 6), p[1]); срез [:k].',
+             'import numpy as np\n\n\ndef words(text):\n    return [w.strip(".,!?:;—") for w in text.lower().split() if w.strip(".,!?:;—")]\n\n\n'
              'def cosine(a, b):\n    na, nb = np.linalg.norm(a), np.linalg.norm(b)\n    if na == 0 or nb == 0:\n        return 0.0\n    return float(np.dot(a, b) / (na * nb))\n\n\n'
              'docs = [line.strip() for line in open("docs.txt", encoding="utf-8") if line.strip()]\nk = int(input())\nquery = input()\n'
              'vocab = sorted(set(w for d in docs for w in words(d)))\nq = np.array([words(query).count(v) for v in vocab])\n'
              'scores = [(cosine(q, np.array([words(d).count(v) for v in vocab])), i) for i, d in enumerate(docs)]\n'
-             'found = [p for p in sorted(scores, key=lambda p: (-p[0], p[1])) if p[0] > 0][:k]\nif not found:\n    print("Ничего не найдено")\n'
+             'found = [p for p in sorted(scores, key=lambda p: (-round(p[0], 6), p[1])) if p[0] > 0][:k]\nif not found:\n    print("Ничего не найдено")\n'
              'for s, i in found:\n    print(f"{s:.2f} {docs[i]}")',
              ['2\nкак вернуть деньги за заказ', '3\nдоставка заказа', '1\nрасписание поездов'],
              files={'docs.txt': 'Заказ можно вернуть в течение 14 дней.\nДеньги за возврат приходят на карту за 3 дня.\nДоставка по городу — 1 день.\n'
@@ -118,19 +128,20 @@ def th_rag():
         '<ol><li>найти по вопросу самые похожие куски своих документов (поиск из прошлой теории);</li>'
         '<li>вставить их в промпт: «Ответь только по этим текстам, иначе скажи „не знаю“»;</li><li>отправить промпт модели.</li></ol>'
         '<p>Документы заранее режут на [[чанк]]и, обычно с [[перекрытие]]м — чтобы фраза на стыке попала целиком хотя бы в один кусок:</p>'
-        + ex('def chunks(text, size, overlap):\n    ws = text.split()\n    step = size - overlap\n    result = []\n    for start in range(0, len(ws), step):\n'
-             '        result.append(" ".join(ws[start:start + size]))\n        if start + size >= len(ws):\n            break\n    return result\n\n\n'
-             'for c in chunks("раз два три четыре пять шесть семь восемь девять", 4, 1):\n    print(c)') +
-        '<p>Если ни один кусок не похож на вопрос достаточно — сходство ниже [[порог сходства]], — честнее сразу ответить «в базе этого '
+        + ex('ws = "раз два три четыре пять шесть семь восемь девять".split()\nsize, overlap = 4, 1\nfor start in range(0, len(ws), size - overlap):\n'
+             '    print(" ".join(ws[start:start + size]))') +
+        '<p>Последний кусок «семь восемь девять» уже целиком вошёл в предыдущий — такие хвосты в задаче научишься отбрасывать.</p>'
+        '<p>Если ни один кусок не похож на вопрос достаточно — сходство ниже [[порог сходства|порога сходства]], — честнее сразу ответить «в базе этого '
         'нет», чем дать модели случайный текст. Найденные куски нумеруют, чтобы модель могла сослаться на источник, а человек — проверить:</p>'
         + ex('found = [(0.82, "Кружок работает по средам с 16:00."), (0.41, "Кабинет 214 на втором этаже."), (0.05, "Столовая открыта до 15:00.")]\n'
              'question = "Когда работает кружок?"\ngood = [text for s, text in found if s >= 0.3]\nlines = [f"[{i}] {t}" for i, t in enumerate(good, 1)]\n'
              'prompt = "Ответь только по источникам и укажи номер. Если ответа нет — скажи «не знаю».\\n" + "\\n".join(lines) + "\\nВопрос: " + question\n'
              'print(prompt)') +
-        '<p>Дальше промпт уходит в API модели — как в норе про LLM API. На компьютере весь RAG — пара десятков строк:</p>'
-        '<pre class="pc">hits = collection.query(query_texts=[question], n_results=3)     # векторная база Chroma\n'
-        'context = "\\n".join(hits["documents"][0])\nanswer = client.messages.create(model="…", max_tokens=300,\n'
-        '    messages=[{"role": "user", "content": f"Источники:\\n{context}\\nВопрос: {question}"}])</pre>'
+        '<p>Дальше промпт отправляют языковой модели через её API — запросом к серверу (как это делается, расскажет нора «LLM API» после '
+        'темы «Запросы к серверам»). На своём компьютере с векторной базой Chroma поиск выглядит так:</p>'
+        '<pre class="pc">hits = collection.query(query_texts=[question], n_results=3)   # три ближайших чанка\n'
+        'context = "\\n".join(hits["documents"][0])\nprompt = f"Ответь только по источникам.\\n{context}\\nВопрос: {question}"\n'
+        '# дальше prompt уходит модели</pre>'
     )
     return th('RAG: ответ по документам', terms, body)
 
@@ -152,23 +163,25 @@ def code_rag():
     return ts('RAG: ответ по документам', [
         task('Нарезка на чанки. Напиши функцию chunks(text, size, overlap): раздели текст на слова и верни список чанков — строк по size слов, '
              'где каждый следующий чанк начинается на size − overlap слов позже. Последний чанк может быть короче; чанк, который целиком '
-             'повторяет хвост предыдущего, не нужен (нарезка заканчивается, как только чанк дошёл до конца текста). Пустой текст — пустой список.',
+             'повторяет хвост предыдущего, не нужен (нарезка заканчивается, как только чанк дошёл до конца текста). Пустой текст — пустой список. '
+             'Если overlap не меньше size, вызови ValueError с текстом «перекрытие должно быть меньше размера».',
              'Шаг step = size - overlap; for start in range(0, len(ws), step); как только start + size >= len(ws) — break.',
-             'def chunks(text, size, overlap):\n    ws = text.split()\n    step = size - overlap\n    result = []\n    for start in range(0, len(ws), step):\n'
+             'def chunks(text, size, overlap):\n    if overlap >= size:\n        raise ValueError("перекрытие должно быть меньше размера")\n    ws = text.split()\n    step = size - overlap\n    result = []\n    for start in range(0, len(ws), step):\n'
              '        result.append(" ".join(ws[start:start + size]))\n        if start + size >= len(ws):\n            break\n    return result\n',
              ['print(chunks("a b c d e f g", 3, 1))\nprint(chunks("a b c d e f g", 3, 0))', 'print(chunks("один два три", 5, 2))\nprint(chunks("", 3, 1))\n'
-              'print(chunks("1 2 3 4 5 6", 4, 2))'], tail=TL),
+              'print(chunks("1 2 3 4 5 6", 4, 2))\ntry:\n    chunks("a b", 2, 2)\nexcept ValueError as e:\n    print(e)'], tail=TL),
         task('Промпт с источниками. Первая строка — вопрос, вторая — порог сходства. Дальше строки «СХОДСТВО|ТЕКСТ» (уже найденные куски, в любом '
-             'порядке), последняя — «конец». Возьми куски со сходством не ниже порога, отсортируй по убыванию сходства и оставь не больше трёх. '
+             'порядке), последняя — «конец». Возьми куски со сходством не ниже порога, отсортируй по убыванию сходства (при равенстве — в порядке '
+             'ввода) и оставь не больше трёх. '
              'Если не осталось ни одного — выведи «В базе нет ответа». Иначе выведи промпт: строку «Ответь только по источникам. Если ответа нет — '
              'скажи «не знаю».», затем источники «[N] ТЕКСТ» с N от 1 и строку «Вопрос: ВОПРОС».',
-             's, text = line.split("|"); сходство — float(s). Сортируй пары по убыванию: sorted(…, reverse=True)[:3].',
+             's, text = line.split("|"); сходство — float(s). sorted(found, key=lambda p: -p[0])[:3] — равные останутся в порядке ввода.',
              'question = input()\nlimit = float(input())\nfound = []\nwhile True:\n    line = input()\n    if line == "конец":\n        break\n'
-             '    s, text = line.split("|")\n    if float(s) >= limit:\n        found.append((float(s), text))\nfound = sorted(found, reverse=True)[:3]\n'
+             '    s, text = line.split("|")\n    if float(s) >= limit:\n        found.append((float(s), text))\nfound = sorted(found, key=lambda p: -p[0])[:3]\n'
              'if not found:\n    print("В базе нет ответа")\nelse:\n    print("Ответь только по источникам. Если ответа нет — скажи «не знаю».")\n'
              '    for i, (s, text) in enumerate(found, 1):\n        print(f"[{i}] {text}")\n    print("Вопрос:", question)',
              ['Где кабинет?\n0.3\n0.12|Столовая до 15:00\n0.55|Кабинет 214 на втором этаже\n0.31|Ключ от кабинета у вахтёра\nконец',
-              'Сколько стоит?\n0.25\n0.9|Участие бесплатное\n0.3|Форма стоит 500 рублей\n0.6|Конструктор выдают бесплатно\n0.26|Взнос не нужен\nконец',
+              'Сколько стоит?\n0.25\n0.9|Участие бесплатное\n0.3|Форма стоит 500 рублей\n0.6|Конструктор выдают бесплатно\n0.6|Взнос не нужен\nконец',
               'Кто директор?\n0.5\n0.2|Кружок по средам\nконец']),
     ])
 
@@ -178,16 +191,17 @@ def project():
               'В файле база.txt — по одному факту о кружке в строке. Сделай справочную, которая отвечает фактами из базы. На вход подаются '
               'вопросы, последняя строка — «стоп». Слова — в нижнем регистре, без знаков .,!?:;«»()— по краям; стоп-слова '
               '(и, в, во, на, с, по, а, не, что, как, к, у, до, из, за, это, ли, для, о) выкидываются. Словарь — все разные слова базы по алфавиту. '
-              'Для каждого вопроса посчитай косинусное сходство его «мешка слов» с каждым фактом. Если лучшее сходство меньше 0.2 — выведи '
-              '«Не нашёл в базе», иначе «[N] ФАКТ (S.SS)», где N — номер факта в файле с 1 (при равенстве — меньший номер). После «стоп» выведи '
+              'Для каждого вопроса посчитай косинусное сходство его «мешка слов» с каждым фактом (слова не из словаря не учитываются). Если лучшее '
+              'сходство меньше 0.35 — выведи '
+              '«Не нашёл в базе», иначе «[N] ФАКТ (S.SS)», где N — номер факта в файле с 1 (при равенстве сходств, округлённых до 6 знаков, — меньший номер). После «стоп» выведи '
               '«Отвечено: A из Q» и «Чаще всего: [N]» — самый частый ответ (при равенстве — меньший номер; если ответов не было — «Чаще всего: —»).',
               'Функции words(text), vector(text, vocab), cosine(a, b) — как в теории\n'
-              'Лучший факт: max(range(len(facts)), key=lambda i: (scores[i], -i))\nСчётчик ответов — Counter; most_common не решит равенство — сортируй сам',
+              'Лучший факт: max(range(len(facts)), key=lambda i: (round(scores[i], 6), -i))\nСчётчик ответов — Counter; most_common не решит равенство — сортируй сам',
               'from collections import Counter\nimport numpy as np\n\nSTOP = ' + STOP + '\n\n\n' + WORDS + '\n\n' + VEC + '\n\n' + COS + '\n\n'
               'facts = [line.strip() for line in open("база.txt", encoding="utf-8") if line.strip()]\nvocab = sorted(set(w for f in facts for w in words(f)))\n'
               'vectors = [vector(f, vocab) for f in facts]\nasked = 0\nhits = Counter()\nwhile True:\n    question = input()\n    if question == "стоп":\n        break\n'
-              '    asked += 1\n    q = vector(question, vocab)\n    scores = [cosine(q, v) for v in vectors]\n    best = max(range(len(facts)), key=lambda i: (scores[i], -i))\n'
-              '    if scores[best] < 0.2:\n        print("Не нашёл в базе")\n        continue\n    hits[best + 1] += 1\n    print(f"[{best + 1}] {facts[best]} ({scores[best]:.2f})")\n'
+              '    asked += 1\n    q = vector(question, vocab)\n    scores = [cosine(q, v) for v in vectors]\n    best = max(range(len(facts)), key=lambda i: (round(scores[i], 6), -i))\n'
+              '    if scores[best] < 0.35:\n        print("Не нашёл в базе")\n        continue\n    hits[best + 1] += 1\n    print(f"[{best + 1}] {facts[best]} ({scores[best]:.2f})")\n'
               'print(f"Отвечено: {sum(hits.values())} из {asked}")\nif hits:\n    top = min(hits, key=lambda n: (-hits[n], n))\n    print(f"Чаще всего: [{top}]")\n'
               'else:\n    print("Чаще всего: —")',
               ['Когда работает кружок?\nГде кабинет 214?\nНужно брать ноутбук?\nКто директор школы?\nКогда соревнования роботов?\nВ каком кабинете кружок?\nстоп',

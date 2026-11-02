@@ -87,10 +87,13 @@ def th_chat():
         '<p>Каждый запрос — с чистого листа. Чтобы был «диалог», программа хранит историю и каждый раз отправляет её целиком: реплики '
         'user и прошлые ответы assistant. Поэтому длинный чат дорожает — история растёт.</p>'
         + ex(ASK + '\n\nhistory = []\nfor text in ["Меня зовут Вика", "Как меня зовут?"]:\n    history.append({"role": "user", "content": text})\n'
-             '    answer = ask(history)["message"]["content"]\n    history.append({"role": "assistant", "content": answer})\n    print(text, "→", answer)\n\n'
+             '    data = ask(history)\n    answer = data["message"]["content"]\n    history.append({"role": "assistant", "content": answer})\n'
+             '    print(text, "→", answer, "| токенов в запросе:", data["usage"]["prompt_tokens"])\n\n'
              'print(ask([{"role": "user", "content": "Как меня зовут?"}])["message"]["content"])', files=SERVERS) +
-        '<p>И главное правило: ответ модели — не факт, пока его не проверили. Спроси учебную модель про лучшего ученика ИТП — она '
-        'назовёт имя и город, которых никто не знает. Это [[галлюцинация]].</p>'
+        '<p>Второй запрос уже дороже первого: в нём вся история.</p>'
+        '<p>И главное правило: ответ модели — не факт, пока его не проверили:</p>'
+        + ex(ASK + '\n\nprint(ask([{"role": "user", "content": "Кто лучший ученик ИТП в 2025 году?"}])["message"]["content"])', files=SERVERS) +
+        '<p>Такого рейтинга нет, а модель уверенно назвала имя и город. Это [[галлюцинация]].</p>'
     )
     return th('Запрос к модели', terms, body)
 
@@ -113,7 +116,8 @@ def code_chat():
         task('Спроси модель. Учебная модель отвечает на POST http://llm.itp/v1/chat с заголовком Authorization: «Bearer КЛЮЧ» и json '
              '{"model": "itp-mini", "messages": [...]}. Ответ: message (в нём content — текст) и usage (prompt_tokens, completion_tokens). '
              'На вход подаётся ключ, затем вопрос. Выведи текст ответа, затем «Токены: P + C = S». Неверный ключ (код 401) — «Неверный ключ».',
-             'headers={"Authorization": "Bearer " + key}; messages — список из одного словаря {"role": "user", "content": вопрос}.',
+             'headers={"Authorization": "Bearer " + key}; messages — список из одного словаря {"role": "user", "content": вопрос}.\n'
+             'Код ответа — r.status_code: проверь его до r.json().',
              'import requests\n\nkey = input()\nquestion = input()\nr = requests.post("http://llm.itp/v1/chat", json={"model": "itp-mini", "messages": [{"role": "user", "content": question}]},\n'
              '                  headers={"Authorization": "Bearer " + key})\nif r.status_code == 401:\n    print("Неверный ключ")\nelse:\n    data = r.json()\n'
              '    print(data["message"]["content"])\n    p, c = data["usage"]["prompt_tokens"], data["usage"]["completion_tokens"]\n    print(f"Токены: {p} + {c} = {p + c}")',
@@ -154,14 +158,16 @@ def th_json():
              '    print(repr(answer))', files=SERVERS) +
         '<p>Второй ответ завёрнут в <code>```json … ```</code> — модели так делают постоянно. Ещё бывает текст до JSON («Вот оценка: {…}»), '
         'выдуманные значения и числа строкой. Правило: ответ модели — непроверенные данные. Его разбирают в <code>try</code> '
-        '(ошибка разбора JSON — это ValueError) и проходят [[валидация]]. Сам JSON вырезают от первой «{» до последней «}» — '
+        '(ошибка разбора JSON — это ValueError), а потом проводят [[валидация|валидацию]]. Сам JSON вырезают от первой «{» до последней «}» — '
         'последнюю ищет [[rfind]]:</p>'
         + ex('import json\n\n\ndef parse(answer):\n    start, end = answer.find("{"), answer.rfind("}")\n    if start == -1 or end == -1:\n        return None\n'
              '    try:\n        data = json.loads(answer[start:end + 1])\n    except ValueError:\n        return None\n'
              '    if data.get("sentiment") not in ("positive", "neutral", "negative"):\n        return None\n'
-             '    if not isinstance(data.get("score"), int) or not 1 <= data["score"] <= 5:\n        return None\n    return data\n\n\n'
+             '    if type(data.get("score")) is not int or not 1 <= data["score"] <= 5:\n        return None\n    return data\n\n\n'
              'for a in [\'```json\\n{"sentiment": "neutral", "score": 3}\\n```\', \'{"sentiment": "strange", "score": 7}\', \'{"score": "5"\', "Не знаю"]:\n'
              '    print(parse(a))') +
+        '<p>Почему <code>type(…) is not int</code>, а не isinstance: True и False в Python — тоже целые числа, и '
+        '<code>isinstance(True, int)</code> истинно. А оценка true нам не нужна.</p>'
         '<p>Не подошло — делают [[повторный запрос]]: добавляют в историю неудачный ответ и просьбу «Ответь только JSON». Так же повторяют '
         'запрос, когда сервер ответил 429 (лимит) или 503 (перегружен), — только с растущей паузой: 1 с, 2 с, 4 с. Попыток всегда '
         'ограниченное число, иначе программа может зависнуть навсегда.</p>'
@@ -184,33 +190,35 @@ def code_json():
     return ts('Структурированный вывод', [
         task('Оценка отзывов. На вход подаются отзывы по одному, последняя строка — «конец». Каждый отправь модели (http://llm.itp/v1/chat, '
              'ключ demo) с системным промптом:\n' + SYS_REVIEW + '\nРазбери ответ json.loads прямо целиком. Выведи «N: SENTIMENT, SCORE» '
-             '(N — номер отзыва с 1); если ответ не разобрался — «N: не JSON»; если sentiment не positive/neutral/negative или score не целое '
-             'от 1 до 5 — «N: неверные поля». В конце — «Разобрано: K из M».',
-             'Разбор — в try … except ValueError. Целое ли число — isinstance(x, int).',
+             '(N — номер отзыва с 1); если ответ не разобрался — «N: не JSON»; если разобрался не в словарь, sentiment не positive/neutral/negative '
+             'или score не целое от 1 до 5 (true/false — не оценка) — «N: неверные поля». В конце — «Разобрано: K из M», где K — сколько отзывов '
+             'с верными полями.',
+             'Разбор — в try … except ValueError. Словарь ли — isinstance(data, dict); целое ли — type(score) is int.',
              'import json\n' + ASK + '\nSYSTEM = ' + json.dumps(SYS_REVIEW, ensure_ascii=False) + '\n\nn = ok = 0\nwhile True:\n    review = input()\n    if review == "конец":\n        break\n    n += 1\n'
              '    answer = ask([{"role": "system", "content": SYSTEM}, {"role": "user", "content": review}])["message"]["content"]\n    try:\n'
              '        data = json.loads(answer)\n    except ValueError:\n        print(f"{n}: не JSON")\n        continue\n'
-             '    s = data.get("sentiment")\n    score = data.get("score")\n    if s not in ("positive", "neutral", "negative") or not isinstance(score, int) or not 1 <= score <= 5:\n'
+             '    if not isinstance(data, dict):\n        print(f"{n}: неверные поля")\n        continue\n'
+             '    s = data.get("sentiment")\n    score = data.get("score")\n    if s not in ("positive", "neutral", "negative") or type(score) is not int or not 1 <= score <= 5:\n'
              '        print(f"{n}: неверные поля")\n        continue\n    ok += 1\n    print(f"{n}: {s}, {score}")\nprint(f"Разобрано: {ok} из {n}")',
              ['Всё отлично, спасибо\nУжасно медленно\nНормально\nконец', 'Странно, но работает\nВкусно!\nСломалось через день\nКто вы?\nконец', 'конец'],
              files=SERVERS),
         task('Достань JSON. Напиши функцию extract_json(text): найди в тексте кусок от первой «{» до последней «}» и разбери его json.loads. '
-             'Верни словарь; если скобок нет, кусок не разбирается или получился не словарь — верни None.',
+             'Верни словарь; если скобок нет или кусок не разбирается — верни None.',
              'find("{") и rfind("}"); если любой из них -1 или конец раньше начала — None. Разбор — в try … except ValueError.',
              'import json\n\n\ndef extract_json(text):\n    start, end = text.find("{"), text.rfind("}")\n    if start == -1 or end < start:\n        return None\n'
-             '    try:\n        data = json.loads(text[start:end + 1])\n    except ValueError:\n        return None\n    return data if isinstance(data, dict) else None\n',
+             '    try:\n        return json.loads(text[start:end + 1])\n    except ValueError:\n        return None\n',
              ['print(extract_json(\'{"a": 1}\'))\nprint(extract_json(\'```json\\n{"ok": true, "n": [1, 2]}\\n```\'))',
               'print(extract_json("Вот: {\\"x\\": \\"y\\"} — готово"))\nprint(extract_json("без скобок"))\nprint(extract_json("{сломано}"))\nprint(extract_json("} {"))'],
              tail=TL),
         task('Повтор при перегрузке. Сервер http://busy.llm.itp/v1/chat (ключ demo) сначала отвечает 429, потом 503 и только третьим запросом — 200. '
-             'На вход подаётся наибольшее число попыток и вопрос. Делай попытки по порядку и выводи «попытка K: КОД». После неудачной попытки, '
+             'Счёт начинается заново при каждом запуске программы. На вход подаётся наибольшее число попыток и вопрос. Делай попытки по порядку и выводи «попытка K: КОД». После неудачной попытки, '
              'если попытки ещё есть, выводи «пауза S с» (S = 1, затем 2, 4… — удваивается; ждать по-настоящему не нужно). Получил 200 — выведи '
-             'текст ответа. Попытки кончились — «Сдаюсь после N попыток».',
-             'for k in range(1, tries + 1); после 200 — break; else у цикла сработает, если break не было.',
-             'import requests\n\ntries = int(input())\nquestion = input()\npause = 1\nfor k in range(1, tries + 1):\n'
+             'текст ответа. Попытки кончились, а 200 так и не было — «Сдаюсь: попытки кончились».',
+             'for k in range(1, tries + 1); после 200 — break. Флаг done = False до цикла, True при 200; после цикла: if not done.',
+             'import requests\n\ntries = int(input())\nquestion = input()\npause = 1\ndone = False\nfor k in range(1, tries + 1):\n'
              '    r = requests.post("http://busy.llm.itp/v1/chat", json={"messages": [{"role": "user", "content": question}]}, headers={"Authorization": "Bearer demo"})\n'
-             '    print(f"попытка {k}: {r.status_code}")\n    if r.status_code == 200:\n        print(r.json()["message"]["content"])\n        break\n'
-             '    if k < tries:\n        print(f"пауза {pause} с")\n        pause *= 2\nelse:\n    print(f"Сдаюсь после {tries} попыток")',
+             '    print(f"попытка {k}: {r.status_code}")\n    if r.status_code == 200:\n        print(r.json()["message"]["content"])\n        done = True\n        break\n'
+             '    if k < tries:\n        print(f"пауза {pause} с")\n        pause *= 2\nif not done:\n    print("Сдаюсь: попытки кончились")',
              ['3\nКакая столица Франции?', '2\nКакая столица Франции?', '5\nСколько будет 2+2?'], files=SERVERS),
     ])
 
@@ -224,10 +232,11 @@ def project():
               'Каждую отправь модели (http://llm.itp/v1/chat, ключ demo) отдельным разговором с системным промптом:\n' + SYS_TICKET + '\n'
               'Ответ разбери: JSON может быть завёрнут в ```json … ``` — бери кусок от первой «{» до последней «}». Если ответ не разобрался, '
               'повтори один раз: добавь в историю ответ модели (assistant) и реплику user «Ответь только JSON.». Не помогло — категория '
-              '«не разобрано». Если category не из четырёх в промпте — «другое».\n'
+              '«не разобрано». Если category не из четырёх в промпте — «другое». Срочной заявка считается, только если urgent равно true.\n'
               'Выводи «N. КАТЕГОРИЯ» и « !», если urgent истинно (N — номер заявки с 1). Затем «Категории: …» — «категория×K» через запятую '
-              'с пробелом по алфавиту, «Срочные: номера через запятую с пробелом» (или «Срочные: нет») и «Токенов: T» — сумма prompt_tokens и '
-              'completion_tokens всех запросов, включая повторные.',
+              'с пробелом по алфавиту (включая «другое» и «не разобрано»), «Срочные: номера через запятую с пробелом» (или «Срочные: нет») и «Токенов: T» — '
+              'сумма prompt_tokens и completion_tokens из usage всех запросов, включая повторные (системный промпт сервер уже посчитал в prompt_tokens). '
+              'Символ × скопируй из условия.',
               'Функция ask(messages) возвращает (текст, потрачено токенов); функция parse(text) — словарь или None\n'
               'Повтор: messages + [{"role": "assistant", "content": text}, {"role": "user", "content": "Ответь только JSON."}]\n'
               'Подсчёт категорий — Counter, вывод — sorted(counts.items())',
