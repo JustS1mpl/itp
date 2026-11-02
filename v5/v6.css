@@ -1606,3 +1606,21 @@ html.exbig .exio pre.cmp,html.exbig .pyex .exio pre.cmp{margin:6px 0 0;padding:1
 .skshw{min-height:120px;margin-top:8px}
 .skshw canvas{display:block;width:auto;max-width:100%;max-height:58vh;margin:0 auto;border-radius:16px;box-shadow:0 8px 28px rgba(0,0,0,.18)}
 .skp .skshb{display:flex;align-items:center;justify-content:center;gap:8px;width:auto;margin:-16px auto 28px}
+/* U1-7: окно «Поделиться умением» во весь экран: затемнение с размытием, картинка 9:16 по центру, кнопки снизу */
+.shov{position:fixed;inset:0;z-index:35;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:calc(64px + env(safe-area-inset-top)) 20px calc(24px + env(safe-area-inset-bottom));background:rgba(10,10,12,.78);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);animation:shin .22s ease-out}
+.shov.out{opacity:0;transition:opacity .2s ease-in}
+@keyframes shin{from{opacity:0}}
+.shov .shx{position:absolute;top:calc(12px + env(safe-area-inset-top));right:12px;color:#fff;background:rgba(255,255,255,.12);border-radius:50%}
+.shcard{position:relative;height:min(calc(100dvh - 210px),720px);aspect-ratio:9/16;max-width:100%;border-radius:22px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.5);background:rgba(255,255,255,.06);animation:shpop .45s var(--e-spring) both}
+@keyframes shpop{from{opacity:0;transform:translateY(24px) scale(.94)}}
+.shcard canvas{display:block;width:100%;height:100%}
+.shcard.rdy canvas{animation:shfd .3s ease-out}
+@keyframes shfd{from{opacity:0}}
+/* пока картинка рисуется — мягкое мерцание вместо пустоты */
+.shsk{position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.08) 50%,transparent 70%);background-size:200% 100%;animation:shsk 1.1s linear infinite}
+@keyframes shsk{from{background-position:150% 0}to{background-position:-50% 0}}
+.shbt{display:flex;gap:12px;width:min(100%,420px)}
+.shbt .btn{flex:1;margin:0;display:flex;align-items:center;justify-content:center;gap:8px}
+.shbt .btn:only-child{flex:0 1 280px;margin:0 auto}
+.shbt .btn .phi{width:22px;height:22px}
+@media (prefers-reduced-motion:reduce){.shov,.shcard,.shcard.rdy canvas{animation:none}.shsk{animation:none}}

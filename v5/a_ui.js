@@ -25,7 +25,7 @@ var IC={
 };
 /* значки Phosphor Icons (MIT, github.com/phosphor-icons/core 2.1.1): duotone — контур и полупрозрачная заливка, check — bold.
    Один стиль для галочек серии, вех «Что ты уже умеешь», подсказки и «Поделиться» */
-var PH={'address-book':'<path d="M208,32H64a8,8,0,0,0-8,8V216a8,8,0,0,0,8,8H208a8,8,0,0,0,8-8V40A8,8,0,0,0,208,32ZM136,144a32,32,0,1,1,32-32A32,32,0,0,1,136,144Z" class="d" opacity="0.2"/><path d="M83.19,174.4a8,8,0,0,0,11.21-1.6,52,52,0,0,1,83.2,0,8,8,0,1,0,12.8-9.6A67.88,67.88,0,0,0,163,141.51a40,40,0,1,0-53.94,0A67.88,67.88,0,0,0,81.6,163.2,8,8,0,0,0,83.19,174.4ZM112,112a24,24,0,1,1,24,24A24,24,0,0,1,112,112Zm96-88H64A16,16,0,0,0,48,40V64H32a8,8,0,0,0,0,16H48v40H32a8,8,0,0,0,0,16H48v40H32a8,8,0,0,0,0,16H48v24a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V40A16,16,0,0,0,208,24Zm0,192H64V40H208Z"/>',
+var PH={'download-simple':'<path d="M216,48V208H40V48A16,16,0,0,1,56,32H200A16,16,0,0,1,216,48Z" class="d" opacity="0.2"/><path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0Zm-101.66,5.66a8,8,0,0,0,11.32,0l40-40a8,8,0,0,0-11.32-11.32L136,124.69V32a8,8,0,0,0-16,0v92.69L93.66,98.34a8,8,0,0,0-11.32,11.32Z"/>','address-book':'<path d="M208,32H64a8,8,0,0,0-8,8V216a8,8,0,0,0,8,8H208a8,8,0,0,0,8-8V40A8,8,0,0,0,208,32ZM136,144a32,32,0,1,1,32-32A32,32,0,0,1,136,144Z" class="d" opacity="0.2"/><path d="M83.19,174.4a8,8,0,0,0,11.21-1.6,52,52,0,0,1,83.2,0,8,8,0,1,0,12.8-9.6A67.88,67.88,0,0,0,163,141.51a40,40,0,1,0-53.94,0A67.88,67.88,0,0,0,81.6,163.2,8,8,0,0,0,83.19,174.4ZM112,112a24,24,0,1,1,24,24A24,24,0,0,1,112,112Zm96-88H64A16,16,0,0,0,48,40V64H32a8,8,0,0,0,0,16H48v40H32a8,8,0,0,0,0,16H48v40H32a8,8,0,0,0,0,16H48v24a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V40A16,16,0,0,0,208,24Zm0,192H64V40H208Z"/>',
  'calculator':'<path d="M176,64v48H80V64Z" class="d" opacity="0.2"/><path d="M80,120h96a8,8,0,0,0,8-8V64a8,8,0,0,0-8-8H80a8,8,0,0,0-8,8v48A8,8,0,0,0,80,120Zm8-48h80v32H88ZM200,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V40A16,16,0,0,0,200,24Zm0,192H56V40H200ZM100,148a12,12,0,1,1-12-12A12,12,0,0,1,100,148Zm40,0a12,12,0,1,1-12-12A12,12,0,0,1,140,148Zm40,0a12,12,0,1,1-12-12A12,12,0,0,1,180,148Zm-80,40a12,12,0,1,1-12-12A12,12,0,0,1,100,188Zm40,0a12,12,0,1,1-12-12A12,12,0,0,1,140,188Zm40,0a12,12,0,1,1-12-12A12,12,0,0,1,180,188Z"/>',
  'chart-bar':'<path d="M208,40V208H152V40Z" class="d" opacity="0.2"/><path d="M224,200h-8V40a8,8,0,0,0-8-8H152a8,8,0,0,0-8,8V80H96a8,8,0,0,0-8,8v40H48a8,8,0,0,0-8,8v64H32a8,8,0,0,0,0,16H224a8,8,0,0,0,0-16ZM160,48h40V200H160ZM104,96h40V200H104ZM56,144H88v56H56Z"/>',
  'chat-circle-text':'<path d="M224,128A96,96,0,0,1,79.93,211.11h0L42.54,223.58a8,8,0,0,1-10.12-10.12l12.47-37.39h0A96,96,0,1,1,224,128Z" class="d" opacity="0.2"/><path d="M128,24A104,104,0,0,0,36.18,176.88L24.83,210.93a16,16,0,0,0,20.24,20.24l34.05-11.35A104,104,0,1,0,128,24Zm0,192a87.87,87.87,0,0,1-44.06-11.81,8,8,0,0,0-4-1.08,7.85,7.85,0,0,0-2.53.42L40,216,52.47,178.6a8,8,0,0,0-.66-6.54A88,88,0,1,1,128,216Zm40-104a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,112Zm0,32a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,144Z"/>',
@@ -601,15 +601,24 @@ function skImg(cb,vr){
     cb(cv)}
   var im=new Image();
   (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(function(){im.onload=function(){draw(im)};im.onerror=function(){draw(null)};im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(PYLOGO)})}
+/* «Поделиться умением» — как в Duolingo: картинка крупно на затемнённом размытом фоне, сверху крестик, снизу «Сохранить» и «Отправить».
+   Закрывается крестиком, Esc, «назад» и нажатием мимо картинки */
 function skShare(){
-  var s=skNow(),m=s.L[s.k],BLOB=null,tx='Я учу Python в ИТП и уже могу '+m.c+'! Пройдено '+s.p+' '+pl(s.p,['островок','островка','островков'])+'.';
-  var btns=[['Сохранить картинку',function(){if(!BLOB){toast('Картинка ещё рисуется');return false}saveFile('itp-skill.png',BLOB);ach('share');toast('Картинка сохранена');return false}]];
-  if(navigator.share)btns.push(['Отправить…',function(){if(!BLOB){toast('Картинка ещё рисуется');return false}
-    var d={text:tx},f;try{f=new File([BLOB],'itp-skill.png',{type:'image/png'})}catch(e){}if(f&&navigator.canShare&&navigator.canShare({files:[f]}))d.files=[f];
-    navigator.share(d).then(function(){ach('share')}).catch(function(){});return false}]);
-  btns.push(['Закрыть',null,1]);
-  modal('<h2>Поделиться умением</h2><div class="skshw" id="skshw"><p class="mu">Рисую картинку…</p></div>',btns);
-  skImg(function(cv){var h=$('skshw');if(!h)return;h.innerHTML='';cv.setAttribute('role','img');cv.setAttribute('aria-label','Картинка: я могу '+m.c);h.appendChild(cv);cv.toBlob(function(b){BLOB=b},'image/png')})}
+  var s=skNow(),m=s.L[s.k],BLOB=null,tx='Я учу Python в ИТП и уже могу '+m.c+'! Пройдено '+s.p+' '+pl(s.p,['островок','островка','островков'])+'.',prev=document.activeElement;
+  var o=document.createElement('div');o.className='shov';o.setAttribute('role','dialog');o.setAttribute('aria-modal','true');o.setAttribute('aria-label','Поделиться умением');
+  o.innerHTML='<button class="icon shx" aria-label="Закрыть">'+ico('x')+'</button><div class="shcard" id="shcard"><i class="shsk" aria-hidden="true"></i></div>'+
+   '<div class="shbt"><button class="btn shs" id="shsv">'+phi('download-simple')+'Сохранить</button>'+(navigator.share?'<button class="btn shs" id="shgo">'+phi('export')+'Отправить</button>':'')+'</div>';
+  document.body.appendChild(o);snd('open');
+  var gone=false;function close(){if(gone)return;gone=true;snd('close');document.removeEventListener('keydown',kd,true);o.classList.add('out');if(prev&&prev.focus)try{prev.focus({preventScroll:true})}catch(e){}setTimeout(function(){o.remove()},RM()?0:200)}
+  function kd(e){if(e.key==='Escape'){e.preventDefault();e.stopPropagation();close()}}
+  document.addEventListener('keydown',kd,true);
+  o.onclick=function(e){if(e.target===o)close()};o.querySelector('.shx').onclick=close;
+  function need(){if(!BLOB){toast('Картинка ещё рисуется');return false}return true}
+  $('shsv').onclick=function(){if(!need())return;saveFile('itp-skill.png',BLOB);ach('share');toast('Картинка сохранена')};
+  if($('shgo'))$('shgo').onclick=function(){if(!need())return;var d={text:tx},f;try{f=new File([BLOB],'itp-skill.png',{type:'image/png'})}catch(e){}if(f&&navigator.canShare&&navigator.canShare({files:[f]}))d.files=[f];
+    navigator.share(d).then(function(){ach('share')}).catch(function(){})};
+  setTimeout(function(){var b=$('shsv');if(b)b.focus({preventScroll:true})},60);
+  skImg(function(cv){var h=$('shcard');if(!h||gone)return;cv.setAttribute('role','img');cv.setAttribute('aria-label','Картинка: я могу '+m.c);h.innerHTML='';h.appendChild(cv);h.classList.add('rdy');cv.toBlob(function(b){BLOB=b},'image/png')})}
 function skills(back){
   var s=skNow(),L=s.L,m=L[s.k];
   var h='<div class="top ls"><button class="icon" id="x" aria-label="Назад">'+ico('back')+'</button><h1>Что ты уже умеешь</h1></div><div class="skp">'+
