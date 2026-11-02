@@ -16,7 +16,7 @@ def th_inherit():
                          'или заменить (переопределить) родительские.\n'
                          'Пример:\nclass Animal:\n    def hi(self):\n        return "..."\n\nclass Cat(Animal):\n    def hi(self):\n        return "мяу"\n\n'
                          'print(Animal().hi(), Cat().hi())\nВывод:\n... мяу'),
-        ('super', 'super() внутри метода — доступ к методам родителя. Чаще всего: super().__init__(...) в начале своего __init__, '
+        ('super', 'super() внутри метода — доступ к методам родителя. Чаще всего: super().__init__(...) — вызов конструктора родителя — в начале своего __init__, '
                   'чтобы родитель задал свои атрибуты.'),
         ('issubclass', 'issubclass(Класс, Родитель) — True, если Класс унаследован от Родителя (напрямую или через цепочку).\n'
                        'Пример:\nprint(issubclass(KeyError, LookupError), issubclass(int, str))\nВывод:\nTrue False'),
@@ -250,12 +250,12 @@ def th_exc():
                             'ловится except по имени класса или по любому его родителю.\n'
                             'Пример:\nclass GameError(Exception):\n    pass\n\ntry:\n    raise GameError("нет хода")\nexcept GameError as e:\n    print("Ошибка:", e)\n'
                             'Вывод:\nОшибка: нет хода'),
-        ('pass', 'Пустая команда: ничего не делает. Нужна там, где Python требует блок, а писать в нём нечего, — например, в теле класса.'),
+        ('pass', 'Пустая команда, знакомая по циклам: ничего не делает. Нужна там, где Python требует блок, а писать в нём нечего, — например, в теле класса.'),
     ]
     body = (
         '<p>Ошибки в Python — тоже классы, и они наследуют друг друга: <code>KeyError</code> — наследник <code>LookupError</code>, '
         'а все обычные ошибки — наследники <code>Exception</code>. Поэтому <code>except LookupError</code> ловит и <code>KeyError</code>.</p>'
-        '<p>Своя ошибка — [[своё исключение]] — это просто класс-наследник <code>Exception</code>. Тело часто пустое, тогда в нём '
+        '<p>Своя ошибка — [[своё исключение]] — это просто класс-наследник <code>Exception</code>. Тело часто пустое, тогда в нём, как в пустом цикле, '
         'пишут [[pass]]:</p>'
         + ex('class BankError(Exception):\n    pass\n\n\nclass NotEnoughMoney(BankError):\n    pass\n\n\nclass CardBlocked(BankError):\n    pass\n\n\n'
              'def pay(balance, amount, blocked=False):\n    if blocked:\n        raise CardBlocked("карта заблокирована")\n    if amount > balance:\n'
