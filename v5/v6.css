@@ -1602,3 +1602,7 @@ html.exbig .exio pre.cmp,html.exbig .pyex .exio pre.cmp{margin:6px 0 0;padding:1
 .xpr .xpt.dt.in::after{animation:xshine .9s .15s cubic-bezier(.4,0,.2,1) both}
 @keyframes xshine{to{transform:translateX(120%)}}
 @media (prefers-reduced-motion:reduce){.xpr .xpt::after{display:none}}
+/* U1-7: «Поделиться умением» — превью картинки и кнопка под репликой кролика */
+.skshw{min-height:120px;margin-top:8px}
+.skshw canvas{display:block;width:auto;max-width:100%;max-height:58vh;margin:0 auto;border-radius:16px;box-shadow:0 8px 28px rgba(0,0,0,.18)}
+.skp .skshb{display:flex;align-items:center;justify-content:center;gap:8px;width:auto;margin:-16px auto 28px}

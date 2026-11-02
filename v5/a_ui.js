@@ -530,19 +530,60 @@ function skNew(){var k=skNow().k;if(S.skk<0){S.skk=k;save();return false}return 
 function skPop(then){
   var s=skNow(),m=s.L[s.k];S.skk=s.k;save();
   var o=modal('<div class="skm"><span class="skd" aria-hidden="true">'+ski(m.e)+'</span><p class="skr">Новое умение</p><h2>'+esc(m.n)+'</h2>'+rbSay('Теперь ты можешь '+esc(m.c)+'!')+'</div>',
-   [['Посмотреть прогресс',function(){var f=then;then=null;setTimeout(function(){skills(f)},RM()?0:200)}],['Дальше',null,1]]);
+   [['Посмотреть прогресс',function(){var f=then;then=null;setTimeout(function(){skills(f)},RM()?0:200)}],['Поделиться',function(){skShare();return false},1],['Дальше',null,1]]);
   var rm=o.remove;o.remove=function(){rm.call(o);if(then){var f=then;then=null;setTimeout(f,RM()?0:200)}};
   snd('ach');return o}
 /* реплика кролика: голова без подложки и пузырь с хвостиком, как у персонажей Duolingo */
 function rbSay(t){var hd=IMG.wowhead||IMG.eat;return'<div class="gsay">'+(hd?'<img class="gav" src="'+hd+'" alt="" draggable="false">':'')+'<p>'+t+'</p></div>'}
 /* back — куда вернуться: в настройки (по умолчанию) или дальше по пути из окна нового умения */
+/* U1-7: картинка «Я могу…» для «Поделиться», как у Duolingo: вертикальная (для историй), глубокий градиент цвета акцента,
+   сверху ИТП, в центре знак-остров с числом пройденных островков и крупно «Я могу …!», снизу ликующий кролик с искрами */
+var SKBG={'':['#0F3A0B','#2B8420','#6BBE49'],carrot:['#5E2C03','#D9730C','#F7A541'],pink:['#4E0E22','#C73B63','#F07C9A'],blue:['#0A2156','#2563D0','#6FA3F2'],violet:['#1E124F','#6C4BD6','#A992FF']};
+function skImg(cb){
+  var s=skNow(),m=s.L[s.k],W=1080,H=1920,cv=document.createElement('canvas');cv.width=W;cv.height=H;
+  var g=cv.getContext('2d'),F='Nunito,system-ui,-apple-system,"Segoe UI",sans-serif',C=SKBG[ST('acc')]||SKBG[''];
+  function star(x,y,r,a){g.save();g.globalAlpha=a;g.fillStyle='#fff';g.beginPath();g.moveTo(x,y-r);g.quadraticCurveTo(x,y,x+r*.42,y);g.quadraticCurveTo(x,y,x,y+r);g.quadraticCurveTo(x,y,x-r*.42,y);g.quadraticCurveTo(x,y,x,y-r);g.fill();
+    var gl=g.createRadialGradient(x,y,0,x,y,r*1.4);gl.addColorStop(0,'rgba(255,255,255,.35)');gl.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=gl;g.beginPath();g.arc(x,y,r*1.4,0,6.283);g.fill();g.restore()}
+  function wrap(t,mw){var w=t.split(' '),L=[],c='';w.forEach(function(x){var n=c?c+' '+x:x;if(g.measureText(n).width>mw&&c){L.push(c);c=x}else c=n});if(c)L.push(c);return L}
+  function draw(rb){
+    /* фон: сверху тёмный тон акцента, к низу — сам акцент; светлое пятно за кроликом */
+    var bg=g.createLinearGradient(0,0,0,H);bg.addColorStop(0,C[0]);bg.addColorStop(.62,C[1]);bg.addColorStop(1,C[2]);g.fillStyle=bg;g.fillRect(0,0,W,H);
+    var gw=g.createRadialGradient(W*.62,H*.8,40,W*.62,H*.8,620);gw.addColorStop(0,'rgba(255,255,255,.28)');gw.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=gw;g.fillRect(0,0,W,H);
+    /* шапка: ИТП и подпись */
+    g.textBaseline='alphabetic';g.fillStyle='rgba(255,255,255,.82)';g.font='900 76px '+F;g.textAlign='left';g.fillText('ИТП',96,180);g.font='700 28px '+F;g.fillStyle='rgba(255,255,255,.6)';g.fillText('И так, программирование',98,224);
+    g.font='800 34px '+F;g.textAlign='right';g.fillStyle='rgba(255,255,255,.7)';g.fillText('ЧТО Я УМЕЮ · PYTHON',W-96,174);
+    /* знак-остров и число */
+    g.font='900 190px '+F;var num=String(s.p),nw=g.measureText(num).width,hw=200,hh=140,gap=44,x0=(W-(hw+gap+nw))/2,yc=520;
+    g.save();g.translate(x0,yc-hh/2);var k=hw/74;
+    g.fillStyle='rgba(0,0,0,.22)';g.beginPath();[[0,20],[18,40],[56,40],[74,20],[74,32],[56,52],[18,52],[0,32]].forEach(function(p,i){g[i?'lineTo':'moveTo'](p[0]*k,p[1]*k*.95)});g.fill();
+    g.fillStyle='#fff';g.beginPath();[[0,20],[18,0],[56,0],[74,20],[56,40],[18,40]].forEach(function(p,i){g[i?'lineTo':'moveTo'](p[0]*k,p[1]*k*.95)});g.fill();g.restore();
+    g.fillStyle='#fff';g.textAlign='left';g.fillText(num,x0+hw+gap,yc+66);
+    g.font='800 38px '+F;g.textAlign='center';g.fillStyle='rgba(255,255,255,.72)';g.fillText(pl(s.p,['островок пройден','островка пройдено','островков пройдено']),W/2,yc+150);
+    /* главное: «Я могу …!» */
+    g.font='900 92px '+F;g.fillStyle='#fff';var L=wrap('Я могу '+m.c+'!',W-180);L.forEach(function(l,i){g.fillText(l,W/2,yc+330+i*112)});
+    /* кролик с искрами и хвост «кометы» */
+    var cy=1540;g.save();g.strokeStyle='rgba(255,255,255,.22)';g.lineWidth=26;g.lineCap='round';g.beginPath();g.moveTo(-40,H-120);g.quadraticCurveTo(W*.45,H-40,W*.98,cy-260);g.stroke();g.restore();
+    if(rb&&rb.width){var bs=760,sc=Math.min(bs/rb.width,bs/rb.height),w=rb.width*sc,h=rb.height*sc;g.drawImage(rb,W/2-w/2+40,H-h-30,w,h)}
+    star(170,1230,46,.95);star(930,1180,36,.9);star(890,1700,58,1);star(120,1760,30,.8);star(1000,1450,22,.7);star(260,1520,18,.6);
+    cb(cv)}
+  var src=IMG.happy||IMG.eat,im=new Image();
+  (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(function(){if(!src)return draw(null);im.onload=function(){draw(im)};im.onerror=function(){draw(null)};im.src=src})}
+function skShare(){
+  var s=skNow(),m=s.L[s.k],BLOB=null,tx='Я учу Python в ИТП и уже могу '+m.c+'! Пройдено '+s.p+' '+pl(s.p,['островок','островка','островков'])+'.';
+  var btns=[['Сохранить картинку',function(){if(!BLOB){toast('Картинка ещё рисуется');return false}saveFile('itp-skill.png',BLOB);ach('share');toast('Картинка сохранена');return false}]];
+  if(navigator.share)btns.push(['Отправить…',function(){if(!BLOB){toast('Картинка ещё рисуется');return false}
+    var d={text:tx},f;try{f=new File([BLOB],'itp-skill.png',{type:'image/png'})}catch(e){}if(f&&navigator.canShare&&navigator.canShare({files:[f]}))d.files=[f];
+    navigator.share(d).then(function(){ach('share')}).catch(function(){});return false}]);
+  btns.push(['Закрыть',null,1]);
+  modal('<h2>Поделиться умением</h2><div class="skshw" id="skshw"><p class="mu">Рисую картинку…</p></div>',btns);
+  skImg(function(cv){var h=$('skshw');if(!h)return;h.innerHTML='';cv.setAttribute('role','img');cv.setAttribute('aria-label','Картинка: я могу '+m.c);h.appendChild(cv);cv.toBlob(function(b){BLOB=b},'image/png')})}
 function skills(back){
   var s=skNow(),L=s.L,m=L[s.k];
   var h='<div class="top ls"><button class="icon" id="x" aria-label="Назад">'+ico('back')+'</button><h1>Что ты уже умеешь</h1></div><div class="skp">'+
    '<div class="skh">'+SKHX+'<b>'+s.p+'</b></div><p class="mu skn">'+pl(s.p,['островок пройден','островка пройдено','островков пройдено'])+', норы тоже считаются</p>'+
-   rbSay(s.k?'Значит, ты уже можешь '+esc(m.c)+'!':'Пройди первую тему, и здесь появится, что ты уже можешь')+
+   rbSay(s.k?'Значит, ты уже можешь '+esc(m.c)+'!':'Пройди первую тему, и здесь появится, что ты уже можешь')+(s.k?'<button class="btn t skshb" id="sksh">'+phi('export')+'Поделиться</button>':'')+
    '<h2 class="skov">Прогресс</h2><ol class="skl">'+L.map(function(x,i){var on=s.p>=x.t,nw=i===s.k;return'<li class="'+(on?'on':'')+(nw?' now':'')+(i+1<L.length&&s.p>=L[i+1].t?' fl':'')+'"><span class="skd">'+ski(x.e)+'</span><span class="sktx"><small>'+SKHX+x.t+'</small><b>'+esc(x.n)+'</b></span></li>'}).join('')+'</ol></div>';
-  scr('skills',h);$('x').onclick=function(){if(typeof back==='function')back();else{SBACK=SBACK||profile;settings()}}}
+  scr('skills',h);if($('sksh'))$('sksh').onclick=skShare;$('x').onclick=function(){if(typeof back==='function')back();else{SBACK=SBACK||profile;settings()}}}
 /* U1-9: цель дня и цель серии выбираются в одном окне (sgChooser в a_screens.js) */
 function goalSheet(){sgChooser(function(){if(CURTAB!=='prof')return;KEEPSCR=1;SKEY='profile';var y=window.scrollY;profile();window.scrollTo(0,y)})}
 function profile(){BACK=profile;
