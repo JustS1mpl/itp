@@ -66,6 +66,12 @@ def code_linear():
              'if first == -1:\n    print("Без мороза")\nelse:\n    last = first\n    for i in range(len(temps) - 1, -1, -1):\n        if temps[i] < 0:\n'
              '            last = i\n            break\n    print(f"Первый мороз: день {first + 1}")\n    print(f"Последний мороз: день {last + 1}")',
              ['3 1 -2 0 -5 4', '5 6 7', '-1']),
+        task('Напиши функцию first_ready(levels, need), которая линейным поиском находит первого бойца с уровнем не ниже need '
+             'и возвращает пару (номер с 0, число сравнений). Если такого нет — (-1, число сравнений).',
+             'Счётчик сравнений увеличивай на каждом шаге цикла; как только нашёл — return i, steps.',
+             'def first_ready(levels, need):\n    steps = 0\n    for i in range(len(levels)):\n        steps += 1\n        if levels[i] >= need:\n'
+             '            return i, steps\n    return -1, steps',
+             ['print(first_ready([3, 8, 12, 5], 10))', 'print(first_ready([1, 2], 5))', 'print(first_ready([9], 9))'], tail=TL),
     ])
 
 
@@ -145,6 +151,14 @@ def code_binary():
              '    print(f"Лучше, чем {bisect.bisect_left(scores, x)} из {len(scores)}")\n    bisect.insort(scores, x)\nn = len(scores)\n'
              'if n % 2 == 1:\n    print(f"Медиана: {scores[n // 2]}")\nelse:\n    print(f"Медиана: {(scores[n // 2 - 1] + scores[n // 2]) / 2}")',
              ['50\n80\n65\n80\nстоп', '7\nстоп', '10\n3\n10\n1\n20\n2\nстоп']),
+        task('Место в рейтинге. Первая строка ввода — очки игроков сервера через пробел (в любом порядке), дальше — запросы, '
+             'по одному числу очков в строке, до слова «стоп». Для каждого запроса выведи место, которое займёт игрок с такими '
+             'очками: 1 плюс число игроков, у кого очков строго больше.',
+             'Отсортируй отрицательные очки: neg = sorted(-x for x in scores). bisect_left(neg, -q) — сколько чисел меньше -q, '
+             'то есть сколько очков больше q.',
+             'from bisect import bisect_left\nneg = sorted(-int(x) for x in input().split())\nwhile True:\n    s = input()\n    if s == "стоп":\n        break\n'
+             '    print(bisect_left(neg, -int(s)) + 1)',
+             ['50 10 70 30 70\n70\n71\n40\n0\nстоп', '5\n5\n6\nстоп', '1 2 3\n0\nстоп']),
     ])
 
 
@@ -291,6 +305,16 @@ def code_stack():
              '        print(f"Обслужен: {queue.popleft()}" if queue else "Очередь пуста")\n    else:\n        queue.append(s[2:])\n'
              'print("В очереди: " + ", ".join(queue) if queue else "В очереди никого")',
              ['+ Аня\n+ Борис\n-\n+ Вика\n-\nстоп', '-\n+ Глеб\nстоп', '+ Дина\n-\n-\nстоп']),
+        task('Отмена и повтор в редакторе карт. На вход подаются команды до «стоп»: «поставить X» — добавить объект X, '
+             '«отменить» — убрать последний поставленный, «повторить» — вернуть последний отменённый. Новая «поставить» '
+             'очищает историю отмен. Отмена или повтор, когда нечего, ничего не делают. Выведи объекты карты через пробел или «Пусто».',
+             'Два стека: placed и undone. отменить: undone.append(placed.pop()); повторить: placed.append(undone.pop()); '
+             'поставить: placed.append(x) и undone.clear().',
+             'placed = []\nundone = []\nwhile True:\n    s = input()\n    if s == "стоп":\n        break\n    if s == "отменить":\n        if placed:\n'
+             '            undone.append(placed.pop())\n    elif s == "повторить":\n        if undone:\n            placed.append(undone.pop())\n    else:\n'
+             '        placed.append(s.split()[1])\n        undone.clear()\nprint(" ".join(placed) if placed else "Пусто")',
+             ['поставить дом\nпоставить дерево\nотменить\nповторить\nотменить\nпоставить забор\nповторить\nстоп', 'отменить\nстоп',
+              'поставить а\nотменить\nотменить\nповторить\nстоп']),
     ])
 
 

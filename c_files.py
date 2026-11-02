@@ -107,6 +107,17 @@ def code_files():
              'import sys\nitems = [s.strip() for s in sys.stdin]\nwith open("list.txt", "w", encoding="utf-8") as f:\n    for i, item in enumerate(items, 1):\n'
              '        f.write(f"{i}. {item}\\n")\nwith open("list.txt", encoding="utf-8") as f:\n    print(f.read(), end="")\nprint(f"Записано: {len(items)}")',
              ['хлеб\nмолоко\nсыр', 'батарейки']),
+        task('Журнал рыбалки. Рядом лежит fish.txt: в каждой строке — название рыбы и вес в граммах через пробел. На вход '
+             'подаётся минимальный вес. Запиши в файл catch.txt только рыбу не легче этого веса — строки как в исходном файле, '
+             'в том же порядке, — потом прочитай catch.txt и выведи его, а последней строкой «Всего: N г».',
+             'with open(...) as f для чтения и отдельный with open("catch.txt", "w", ...) для записи; f.write(line + "\\n"). '
+             'Потом третий with — чтение и вывод.',
+             'limit = int(input())\nwith open("fish.txt", encoding="utf-8") as f:\n    lines = f.read().split("\\n")\ntotal = 0\n'
+             'with open("catch.txt", "w", encoding="utf-8") as out:\n    for line in lines:\n        if line == "":\n            continue\n'
+             '        name, w = line.split()\n        if int(w) >= limit:\n            out.write(line + "\\n")\n            total += int(w)\n'
+             'with open("catch.txt", encoding="utf-8") as f:\n    print(f.read(), end="")\nprint(f"Всего: {total} г")',
+             ['500', '100', '3000'],
+             files={'fish.txt': 'карп 1200\nокунь 300\nщука 2500\nкарась 450\nсом 9000\n'}),
     ])
 
 
@@ -177,6 +188,17 @@ def code_csv():
              'from pathlib import Path\np = Path(input())\ntext = input()\nif p.exists():\n    print(f"Файл занят: {p.name}")\nelse:\n'
              '    p.write_text(text, encoding="utf-8")\n    print(f"Сохранено, символов: {len(text)}")',
              ['idea.txt\nСделать бота для расписания', 'grades.csv\nчто-то'], files={'grades.csv': GRADES}),
+        task('Корпорация «Арасака» отбирает людей для проекта «Козерог». Рядом с программой лежит candidates.csv: имя, '
+             'возраст, совместимость (в процентах) и число имплантов. На вход подаётся порог совместимости. Подходит тот, '
+             'у кого совместимость не ниже порога, а имплантов не больше трёх — иначе риск киберпсихоза. Выведи подходящих '
+             'по убыванию совместимости, при равной — по алфавиту: «ИМЯ — N%», а последней строкой «Подходят: K из M».',
+             'csv.DictReader, числа превращай через int. Сортировка — sorted(ok, key=lambda r: (-r[1], r[0])) по кортежам (имя, совместимость).',
+             'import csv\nlimit = int(input())\nwith open("candidates.csv", encoding="utf-8") as f:\n    rows = list(csv.DictReader(f))\nok = []\n'
+             'for r in rows:\n    if int(r["совместимость"]) >= limit and int(r["импланты"]) <= 3:\n        ok.append((r["имя"], int(r["совместимость"])))\n'
+             'for name, c in sorted(ok, key=lambda p: (-p[1], p[0])):\n    print(f"{name} — {c}%")\nprint(f"Подходят: {len(ok)} из {len(rows)}")',
+             ['90', '95', '100', '0'],
+             files={'candidates.csv': 'имя,возраст,совместимость,импланты\nИра Соколова,19,93,1\nМакс Рэй,24,98,5\nЛука Дарин,17,90,0\n'
+                                      'Нова Ким,21,98,2\nТим Ортега,30,71,3\nСая Ли,18,93,3\nРик Вольф,27,99,4\nЕва Март,22,85,0\n'}),
     ])
 
 
@@ -238,6 +260,18 @@ def code_json():
              'import csv, json\nwith open("grades.csv", encoding="utf-8") as f:\n    rows = [{k: (v if k == "фамилия" else int(v)) for k, v in r.items()} for r in csv.DictReader(f)]\n'
              'print(json.dumps(rows, ensure_ascii=False))',
              [''], files={'grades.csv': GRADES}),
+        task('Сохранение фермы. Рядом лежит farm.json: {"день": число, "монеты": число, "грядки": {культура: количество}}. '
+             'На вход подаются команды до «стоп»: «спать» — день +1, «продать КУЛЬТУРА» — все грядки этой культуры продаются '
+             'по 40 монет за штуку и исчезают из словаря (если культуры нет — «Нет такой культуры»). После команд сохрани '
+             'данные обратно в farm.json и выведи его содержимое через json.dumps(..., ensure_ascii=False, sort_keys=True).',
+             'json.load → словарь, правки, json.dump в тот же файл. Вывод — перечитай файл и сделай dumps с sort_keys.',
+             'import json\nwith open("farm.json", encoding="utf-8") as f:\n    farm = json.load(f)\nwhile True:\n    cmd = input()\n    if cmd == "стоп":\n        break\n'
+             '    if cmd == "спать":\n        farm["день"] += 1\n    else:\n        crop = cmd.split()[1]\n        if crop in farm["грядки"]:\n'
+             '            farm["монеты"] += farm["грядки"][crop] * 40\n            del farm["грядки"][crop]\n        else:\n            print("Нет такой культуры")\n'
+             'with open("farm.json", "w", encoding="utf-8") as f:\n    json.dump(farm, f, ensure_ascii=False)\nwith open("farm.json", encoding="utf-8") as f:\n'
+             '    print(json.dumps(json.load(f), ensure_ascii=False, sort_keys=True))',
+             ['спать\nпродать тыква\nпродать арбуз\nспать\nстоп', 'стоп', 'продать пастернак\nпродать тыква\nстоп'],
+             files={'farm.json': '{"день": 3, "монеты": 120, "грядки": {"пастернак": 6, "тыква": 2}}'}),
     ])
 
 

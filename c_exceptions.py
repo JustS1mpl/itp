@@ -75,6 +75,15 @@ def code_try():
              'except KeyError:\n    print(f"Нет товара: {item}")\nexcept ValueError:\n    print("Количество — целое число")',
              ['ручка\n3', 'ластик\n2', 'пенал\nдва'],
              starter='prices = {"тетрадь": 45, "ручка": 30, "пенал": 350}\n'),
+        task('Файл настроек игры набран вручную. На вход подаются строки «ключ=число» до слова «стоп». Строки с ошибками '
+             '(нет «=», несколько «=», не число) пропусти, выведя для каждой «Строка N: ошибка» (нумерация с 1). '
+             'В конце выведи «Принято: K» и сумму всех принятых чисел: «Сумма: S».',
+             'key, value = s.split("=") падает с ValueError, если частей не две, int(value) — если не число. '
+             'Оба случая ловит один except ValueError.',
+             'n = 0\nok = 0\ntotal = 0\nwhile True:\n    s = input()\n    if s == "стоп":\n        break\n    n += 1\n    try:\n'
+             '        key, value = s.split("=")\n        total += int(value)\n        ok += 1\n    except ValueError:\n        print(f"Строка {n}: ошибка")\n'
+             'print(f"Принято: {ok}")\nprint(f"Сумма: {total}")',
+             ['fps=60\nзвук=громко\nшрифт\nяркость=80\nа=1=2\nстоп', 'стоп', 'x=-5\ny=5\nстоп']),
     ])
 
 
@@ -139,6 +148,15 @@ def code_finally():
              'def describe(x):\n    if isinstance(x, (int, float)):\n        return "число"\n    if isinstance(x, str):\n        return "текст"\n'
              '    if isinstance(x, list):\n        return "список"\n    return "другое"',
              ['print(describe(5), describe(2.5))', 'print(describe("5"), describe([5]))', 'print(describe((5,)), describe({}))'], tail=TL),
+        task('Терминал на двери. На вход подаются попытки ввести код, не больше трёх. На каждую попытку выведи «Попытка N»; '
+             'если введены не цифры — «Это не код»; если код 2077 — «Доступ открыт» и попытки заканчиваются; иначе «Неверно». '
+             'Если после трёх попыток дверь закрыта, выведи «Терминал заблокирован».',
+             'for n in range(1, 4) с try: code = int(input()) / except ValueError / else: проверка кода / finally: «Попытка N» — '
+             'finally выполнится и перед break. Флаг opened для итога.',
+             'opened = False\nfor n in range(1, 4):\n    try:\n        code = int(input())\n    except ValueError:\n        print("Это не код")\n'
+             '    else:\n        if code == 2077:\n            print("Доступ открыт")\n            opened = True\n        else:\n            print("Неверно")\n'
+             '    finally:\n        print(f"Попытка {n}")\n    if opened:\n        break\nif not opened:\n    print("Терминал заблокирован")',
+             ['1234\nкод\n2077', '2077', '1\n2\n3', 'abc\n2077']),
     ])
 
 
@@ -204,6 +222,14 @@ def code_raise():
              'assert last_word("раз два") == "два"\nprint("Все проверки пройдены")', [''],
              starter='def last_word(s):\n    return s.split()[1]\n\nassert last_word("кот") == "кот", "одно слово"\nassert last_word("я люблю Python") == "Python", "три слова"\n'
                      'assert last_word("раз два") == "два", "два слова"\nprint("Все проверки пройдены")', fix=True),
+        task('Напиши функцию buy(balance, price), которая возвращает остаток после покупки. Если цена не больше нуля, '
+             'вызови ValueError с текстом «цена должна быть больше нуля», если денег не хватает — ValueError с текстом '
+             '«не хватает N», где N — недостающая сумма. Перед возвратом проверь assert-ом, что остаток не отрицательный.',
+             'Две проверки с raise ValueError(f"не хватает {price - balance}"), затем rest = balance - price; assert rest >= 0; return rest.',
+             'def buy(balance, price):\n    if price <= 0:\n        raise ValueError("цена должна быть больше нуля")\n    if price > balance:\n'
+             '        raise ValueError(f"не хватает {price - balance}")\n    rest = balance - price\n    assert rest >= 0\n    return rest',
+             ['print(buy(100, 30), buy(50, 50))', 'try:\n    buy(10, 35)\nexcept ValueError as e:\n    print("Ошибка:", e)',
+              'try:\n    buy(10, 0)\nexcept ValueError as e:\n    print("Ошибка:", e)'], tail=TL),
     ])
 
 
