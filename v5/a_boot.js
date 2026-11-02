@@ -248,18 +248,39 @@ var AGT='<p>ИТП («И так, программирование») — уче�
   +'<h3>Изменения</h3><p>Условия могут обновляться вместе с приложением. Если изменится что-то важное, приложение покажет их снова.</p>';
 function agOk(){var a=appGet().agree;return !!(a&&a.v>=AGV)}
 function agSave(){if(typeof DVPV!=='undefined'&&DVPV)return;appSet({agree:{v:AGV,d:day(new Date())}})}
-/* в терминале: карточка поверх экрана; кнопка одна — без согласия дальше не пройти. В просмотре вступления
+/* окно в стиле Windows 98: галочка «Я принимаю соглашение» и кнопка OK (доступна только с галочкой).
+   Слово «соглашение» — ссылка: открывают второе, большое окно 98-го с полным текстом (закрыть — «×»,
+   «Закрыть» или Esc). host — куда положить окно, sn — функция звука; done() — условия приняты */
+function agWin(host,sn,done){
+  var w=document.createElement('div');w.className='w98 w98bg';
+  w.innerHTML='<div class="w98w w98s" role="dialog" aria-modal="true" aria-labelledby="w98t"><div class="w98h"><span class="w98ic" aria-hidden="true"></span><b id="w98t">ИТП</b><span class="w98x" aria-hidden="true">×</span></div>'
+    +'<div class="w98c"><div class="w98m"><span class="w98i" aria-hidden="true">i</span><p>Перед началом работы с ИТП нужно принять условия использования.</p></div>'
+    +'<div class="w98k"><label class="w98kl"><input type="checkbox" id="w98a"><i aria-hidden="true"></i><span>Я принимаю</span></label> <button type="button" class="w98l" aria-label="Открыть пользовательское соглашение">соглашение</button></div>'
+    +'<div class="w98b"><button type="button" class="w98btn" id="w98ok" disabled>OK</button></div></div></div>';
+  host.appendChild(w);sn('beep');
+  var ck=w.querySelector('#w98a'),ok=w.querySelector('#w98ok'),big=null;
+  ck.onchange=function(){ok.disabled=!ck.checked;sn('mv')};
+  function closeBig(){if(!big)return;big.remove();big=null;w.querySelector('.w98l').focus({preventScroll:true})}
+  function kd(e){if(e.key==='Escape'&&big){e.preventDefault();e.stopPropagation();closeBig()}}
+  document.addEventListener('keydown',kd,true);
+  w.querySelector('.w98l').onclick=function(e){e.stopPropagation();sn('mv');
+    big=document.createElement('div');big.className='w98 w98top';
+    big.innerHTML='<div class="w98w w98big" role="dialog" aria-modal="true" aria-labelledby="w98bt"><div class="w98h"><span class="w98ic" aria-hidden="true"></span><b id="w98bt">Пользовательское соглашение</b><button type="button" class="w98x w98cl" aria-label="Закрыть">×</button></div>'
+      +'<div class="w98c"><div class="w98txt" tabindex="0">'+AGT+'</div><div class="w98b"><button type="button" class="w98btn w98cl">Закрыть</button></div></div></div>';
+    w.appendChild(big);big.querySelectorAll('.w98cl').forEach(function(x){x.onclick=function(){sn('mv');closeBig()}});
+    big.querySelector('.w98btn').focus({preventScroll:true})};
+  ok.onclick=function(){if(!ck.checked)return;sn('ok');agSave();document.removeEventListener('keydown',kd,true);w.remove();done()};
+  if(!('ontouchstart' in window))ck.focus({preventScroll:true});
+  return w}
+/* во вступлении: сразу после заставки IT'S THE PROGRAMMING, до разговора с кроликом. В просмотре вступления
    (режим разработчика) показывается всегда и ничего не записывает */
 function crtAgree(){return new Promise(function(res){
   if(!CRT||(agOk()&&!(typeof DVPV!=='undefined'&&DVPV)))return res();
-  var w=document.createElement('div');w.className='agr';w.setAttribute('role','dialog');w.setAttribute('aria-modal','true');w.setAttribute('aria-labelledby','agt');
-  w.innerHTML='<div class="agc"><h2 id="agt">Пользовательское соглашение</h2><div class="agb" tabindex="0">'+AGT+'</div><button type="button" class="agy">Принимаю</button><p class="agn">Нажимая «Принимаю», ты соглашаешься с этими условиями.</p></div>';
-  CRT.el.querySelector('.sc').appendChild(w);bx('beep');
-  var b=w.querySelector('.agy');if(!CRT.touch)b.focus({preventScroll:true});
-  b.onclick=function(){if(!CRT)return;bx('ok');agSave();w.classList.add('out');crtT(function(){w.remove();res()},CRT.rm?0:260)}})}
-/* для тех, кто прошёл вступление до появления соглашения: обычное окно приложения при первом запуске */
+  agWin(CRT.el.querySelector('.sc'),function(n){bx(n)},function(){crtT(res,CRT&&!CRT.rm?200:0)})})}
+/* для тех, кто прошёл вступление до появления соглашения: то же окно один раз при запуске, поверх Пути */
 (function(){var g0=greet;greet=function(){var r=g0.apply(this,arguments);
-  if(!agOk()&&!document.querySelector('.modal.agm'))setTimeout(function(){if(agOk())return;modal('<h2>Пользовательское соглашение</h2><div class="agb">'+AGT+'</div>',[['Принимаю',function(){agSave()}]]);var ms=document.querySelectorAll('.modal');if(ms.length)ms[ms.length-1].classList.add('agm')},300);
+  if(!agOk()&&!document.querySelector('body>.w98'))setTimeout(function(){if(agOk()||document.querySelector('body>.w98'))return;
+    agWin(document.body,function(n){if(n==='ok')snd('ok')},function(){})},300);
   return r}})();
 
 /* --- язык интерфейса (U2-2): до ника; пока язык один, вопроса нет. Ответ — в настройках устройства --- */
