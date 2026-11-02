@@ -1073,10 +1073,38 @@
   {
    "id": "pillow",
    "n": "Pillow: обработка картинок",
-   "after": "files",
+   "after": "modules",
    "run": "pyodide-package",
    "min": 40,
-   "about": "пиксели и цвета, открыть/создать изображение, размер, обрезка, текст и водяной знак, мини-галерея (пакет докачивается при наличии интернета)"
+   "about": "пиксели и цвета RGB, пиксель-арт, фильтры формулами, открыть/сохранить, размер, обрезка, поворот, превью, рисование и подписи, мини-галерея (пакет докачивается при наличии интернета)",
+   "introduces": {
+    "f": [
+     "PIL.Image",
+     "PIL.Image.new",
+     "PIL.Image.open",
+     "PIL.ImageDraw",
+     "PIL.ImageDraw.Draw"
+    ],
+    "m": [
+     "getpixel",
+     "putpixel",
+     "show",
+     "resize",
+     "save",
+     "crop",
+     "rotate",
+     "thumbnail",
+     "paste",
+     "rectangle",
+     "ellipse",
+     "text"
+    ],
+    "k": [],
+    "mod": [
+     "PIL"
+    ],
+    "err": []
+   }
   },
   {
    "id": "tkinter",
