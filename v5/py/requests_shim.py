@@ -172,6 +172,8 @@ class _Server:
         # 7.0: учебный мессенджер для ботов (как Telegram): {"bot": {"token": …, "updates": [{"update_id": 1, "message": {…}}]}}
         self.bot = _json.loads(_json.dumps(spec['bot'])) if 'bot' in spec else None
         self.sent = []
+        # 7.0: учебная языковая модель: {"llm": {"key": "demo", "model": "itp-mini", "rules": [{"if": ["слово", …], "say": ответ}], "default": …}}
+        self.llm = spec.get('llm')
         self.token = spec.get('token')
         self.state = {}
 
@@ -188,6 +190,8 @@ class _Server:
             return self._json(200, {'method': method, 'args': dict(query), 'json': body})
         if self.bot is not None and p in ('/getUpdates', '/sendMessage'):
             return self._bot(p, dict(query), body)
+        if self.llm is not None and p == '/v1/chat':
+            return self._llm(method, body, headers)
         if self.users is not None and (p == self.coll or p.startswith(self.coll + '/')):
             return self._users(method, p, body)
         spec = self.routes.get(p)
@@ -211,6 +215,46 @@ class _Server:
         msg = {'message_id': len(self.sent) + 1, 'chat_id': body['chat_id'], 'text': str(body['text'])}
         self.sent.append(msg)
         return self._json(200, {'ok': True, 'result': msg})
+
+    def _llm(self, method, body, headers):
+        """POST /v1/chat, заголовок Authorization: Bearer КЛЮЧ, json {"messages": [{"role", "content"}], "max_tokens"?}.
+        Ответ детерминированный: первое правило, все слова "if" которого есть в последнем сообщении user (без учёта регистра);
+        "sys" — правило работает, только если эта строка есть в сообщении system; "ctx" — слова, которые должны быть в более ранних
+        сообщениях (модель «помнит» только присланную историю). Токены считаются по словам."""
+        spec = self.llm
+        if method != 'POST':
+            return 405, b'Method Not Allowed', 'text/plain; charset=utf-8'
+        if headers.get('Authorization') != 'Bearer ' + spec.get('key', 'demo'):
+            return self._json(401, {'error': {'type': 'auth', 'message': 'invalid api key'}})
+        if 'statuses' in spec:
+            n = self.state.get('llm#', 0)
+            self.state['llm#'] = n + 1
+            code = spec['statuses'][min(n, len(spec['statuses']) - 1)]
+            if code != 200:
+                return self._json(code, {'error': {'type': 'rate_limit' if code == 429 else 'overloaded', 'message': 'too many requests' if code == 429 else 'try later'}})
+        msgs = body.get('messages') if isinstance(body, dict) else None
+        if not isinstance(msgs, list) or not msgs or not all(isinstance(m, dict) and m.get('role') in ('system', 'user', 'assistant')
+                                                              and isinstance(m.get('content'), str) for m in msgs) or msgs[-1]['role'] != 'user':
+            return self._json(400, {'error': {'type': 'bad_request', 'message': 'messages: список {role, content}, последнее — от user'}})
+        system = ' '.join(m['content'] for m in msgs if m['role'] == 'system').lower()
+        last = msgs[-1]['content'].lower()
+        before = ' '.join(m['content'] for m in msgs[:-1]).lower()
+        answer = spec.get('default', 'Не знаю.')
+        for rule in spec.get('rules', []):
+            if all(w.lower() in last for w in rule.get('if', [])) and rule.get('sys', '').lower() in system \
+                    and all(w.lower() in before for w in rule.get('ctx', [])):
+                answer = rule['say']
+                break
+        if not isinstance(answer, str):
+            answer = _json.dumps(answer, ensure_ascii=False)
+        words = answer.split(' ')
+        finish = 'stop'
+        mt = body.get('max_tokens')
+        if isinstance(mt, int) and 0 < mt < len(words):
+            answer, finish = ' '.join(words[:mt]), 'length'
+        used = sum(len(m['content'].split()) for m in msgs)
+        return self._json(200, {'model': spec.get('model', 'itp-mini'), 'message': {'role': 'assistant', 'content': answer},
+                                'finish_reason': finish, 'usage': {'prompt_tokens': used, 'completion_tokens': len(answer.split())}})
 
     def _users(self, method, p, body):
         rest = p[len(self.coll):].strip('/')
