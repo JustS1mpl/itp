@@ -303,10 +303,10 @@ function doneScreen(o){
      Свой onclick кнопка получает сразу после doneScreen, поэтому оборачиваем его на следующем шаге */
   setTimeout(function(){var gb=$('go');if(!gb)return;var f=gb.onclick;gb.onclick=function(e){if(GOALP||sgAsk())postDone(function(){if(f)f.call(gb,e)});else if(f)f.call(gb,e)}},0);
   var b=document.querySelector('#dock .btn');if(b)setTimeout(function(){b.focus({preventScroll:true})},60)}
-/* очередь после итога островка: цель дня → выбор цели серии → куда шёл ученик */
+/* очередь после итога островка: выбор цели серии → цель дня (уже с полосой выбранной цели) → куда шёл ученик */
 function postDone(then){
-  if(GOALP){GOALP=0;return goalScreen(function(){postDone(then)})}
   if(sgAsk())return sgChooser(function(){postDone(then)});
+  if(GOALP){GOALP=0;return goalScreen(function(){postDone(then)})}
   if(skNew())return skPop(then);
   then()}
 /* выбор цели серии спрашиваем после 2-го пройденного островка (вступление не считается) и после каждой достигнутой цели */
