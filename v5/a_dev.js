@@ -44,7 +44,7 @@ function dvPanel(){
     b+='</div><div class="dvr"><button data-a="cur">Отметить островок пройденным</button></div>';
     h+=dvSec('pin','Сейчас',lab,b,'w cur');
   }
-  h+=dvSec('star','Опыт и уровень','','<div class="dvr"><button data-a="xp50">+50 ⭐</button><button data-a="xp500">+500 ⭐</button><button data-a="lv">+1 уровень</button></div>');
+  h+=dvSec('star','Опыт и уровень','','<div class="dvr"><button data-a="xp50">+50 ⭐</button><button data-a="xp500">+500 ⭐</button><button data-a="lv">+1 уровень</button></div><div class="dvr"><button data-a="xm50">−50 ⭐</button><button data-a="xm500">−500 ⭐</button><button data-a="lvm">−1 уровень</button></div>');
   h+=dvSec('flame','Серия и заморозки','','<div class="dvr"><button data-a="st">Серия +1</button><button data-a="st0">Серия = 0</button><button data-a="fz">Заморозка +1</button><button data-a="fzm">Заморозка −1</button><button data-a="fz0">Заморозки = 0</button></div>');
   h+=dvSec('flag','Прогресс','','<div class="dvr"><button data-a="all">Все островки пройдены</button><button data-a="gl">Цель дня выполнена</button><button class="bad" data-a="none">Сбросить прогресс островков</button></div>');
   h+=dvSec('film','Вступление','Идёт целиком (заставка, знакомство, выбор темы, сбой, синий экран) на копии данных: прогресс, ник и настройки не меняются. Выйти можно кнопкой «✕ Выйти из просмотра».','<div class="dvr"><button data-a="intro"><span class="dvpl noemo">▶\uFE0E</span> Посмотреть вступление</button></div>');
@@ -88,6 +88,9 @@ function dvAct(a){
   if(a==='cur'){dvDone(c.i,c.j);dvClose();return home()}
   if(a==='xp50'){addXp(50);save();dvRe();toast('+50 ⭐');return}
   if(a==='xp500'){addXp(500);save();dvRe();toast('+500 ⭐');return}
+  /* убавить опыт: не ниже нуля; «−1 уровень» — на начало предыдущего уровня (уровень считается из опыта, lvlInfo) */
+  if(a==='xm50'||a==='xm500'){S.xp=Math.max(0,S.xp-(a==='xm50'?50:500));save();dvRe();toast('Опыт: '+S.xp+' ⭐');return}
+  if(a==='lvm'){var l2=lvlInfo(S.xp).l;S.xp=l2>1?50*(l2-1)*(l2-2):0;save();dvRe();toast('Уровень: '+lvlInfo(S.xp).l);return}
   if(a==='lv'){var l=lvlInfo(S.xp).l,n=0;while(lvlInfo(S.xp).l===l&&n++<400)addXp(10);save();dvRe();toast('Уровень: '+lvlInfo(S.xp).l);return}
   if(a==='st'){var t=day(new Date());if(S.last!==t){S.last=t;S.streak=(S.streak||0)+1}else S.streak++;if(S.streak>S.max)S.max=S.streak;save();dvRe();toast('Серия: '+S.streak);return}
   if(a==='st0'){S.streak=0;save();dvRe();toast('Серия сброшена');return}
