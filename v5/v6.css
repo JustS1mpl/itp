@@ -1692,8 +1692,11 @@ button.w98x:active{box-shadow:inset 1px 1px var(--w98k),inset -1px -1px #fff,ins
 .top.sub .ring{width:38px;height:38px;margin-left:auto}
 .top.sub .ring::before{background:var(--bg)}
 @media (max-width:420px){.top.sub .sti{font-size:1.1875rem}.top.sub .stt h1{font-size:1.0625rem}}
-/* шапка вложенных экранов — «лента» (владелец выбрал из четырёх в dev.23): прикреплена к верху окна, скруглена только снизу, заголовок по центру, под ним полоса цвета акцента */
-.top.sub{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;top:0;margin-top:0;padding-top:var(--safe-t);min-height:calc(var(--tbh) + 8px + var(--safe-t));border-radius:0 0 22px 22px;background:color-mix(in srgb,var(--card) 88%,transparent);box-shadow:0 10px 24px -18px var(--gl-drop,rgba(0,0,0,.4))}
-.top.sub::after{content:'';position:absolute;left:22px;right:22px;bottom:0;height:3px;border-radius:3px;background:linear-gradient(90deg,transparent,var(--accent),var(--hero-a,var(--pink-soft)),transparent)}
+/* верхняя панель — «лента» на всех экранах (владелец выбрал в dev.23, в dev.25 — и для вкладок, и для уроков): прикреплена к верху окна,
+   скруглена только снизу, под ней полоса цвета акцента; у вложенных экранов заголовок по центру */
+.top{top:0;margin-top:0;padding-top:var(--safe-t);min-height:calc(var(--tbh) + 8px + var(--safe-t));border-radius:0 0 22px 22px;background:color-mix(in srgb,var(--card) 88%,transparent);box-shadow:0 10px 24px -18px var(--gl-drop,rgba(0,0,0,.4))}
+html.scr .top{box-shadow:0 12px 28px -14px var(--gl-drop,rgba(0,0,0,.4))}
+.top::after{content:'';position:absolute;left:22px;right:22px;bottom:0;height:3px;border-radius:3px;pointer-events:none;background:linear-gradient(90deg,transparent,var(--accent),var(--hero-a,var(--pink-soft)),transparent)}
+.top.sub{display:grid;grid-template-columns:44px minmax(0,1fr) 44px}
 .top.sub .stw{justify-content:center;text-align:center}
 .top.sub .ring{margin:0;justify-self:end}
