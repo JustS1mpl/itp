@@ -17,6 +17,8 @@ WF = {'test.yml': WF_TEST, 'deploy.yml': WF_DEPLOY, 'lint.yml': WF_LINT}
 
 def th_ci():
     terms = [
+        ('git', 'Система контроля версий: хранит историю проекта снимками-коммитами. Коммит — сохранённое изменение с подписью; ветка — '
+                'отдельная линия истории (main — главная); push — отправить коммиты на GitHub; тег — метка на коммите, обычно версия: v1.2.0.'),
         ('CI', 'Continuous Integration — непрерывная интеграция: на каждое изменение кода сервер сам собирает проект и запускает тесты. Сломал — '
                'узнаешь через минуту, а не через месяц.'),
         ('GitHub Actions', 'Встроенный в GitHub CI: по событию (push, pull request) запускает задания на своих серверах по описанию из файла '
@@ -30,15 +32,20 @@ def th_ci():
         ('матрица', 'strategy.matrix — один job запускается для всех сочетаний параметров: версии Python × системы. 3 версии × 2 системы = 6 запусков.'),
     ]
     body = (
+        '<p>Проекты хранят в [[git]]: каждое сохранённое изменение — коммит, работа над новой функцией идёт в своей ветке, а готовую ветку '
+        'вливают в главную, main. На GitHub отправляют командой push; версии помечают тегами. Этого хватит для нашей темы.</p>'
         '<p>В норе «Инструменты» ты писал тесты. Но тесты, которые надо не забыть запустить, однажды забудут. [[CI]] запускает их сам — '
         'на сервере, после каждого изменения. Самый популярный вариант — [[GitHub Actions]]: кладёшь в репозиторий файл [[workflow]], '
         'и GitHub выполняет его на каждый push и [[pull request]]:</p>'
         '<pre class="pc">' + WF_TEST.rstrip('\n') + '</pre>'
         '<p>Читается сверху вниз: на push и pull request запустить [[job]] test на свежей Ubuntu; [[step]]ы — забрать код, поставить Python, '
-        'поставить пакеты, прогнать pytest. Упал хоть один шаг — job красный, и в pull request вместо галочки крестик.</p>'
-        '<p>Код должен работать везде, где им будут пользоваться. [[матрица]] запускает тот же job на разных версиях и системах:</p>'
-        '<pre class="pc">    strategy:\n      matrix:\n        python: ["3.11", "3.12", "3.13"]\n        os: [ubuntu-latest, windows-latest]\n'
-        '    runs-on: ${{ matrix.os }}</pre>'
+        'поставить пакеты, прогнать pytest. Упал хоть один шаг — job красный, и в pull request вместо галочки крестик (а если в настройках '
+        'включена защита ветки main — влить его просто не дадут).</p>'
+        '<p>Код должен работать везде, где им будут пользоваться. Матрица запускает тот же job на разных версиях и системах ([[матрица]]), '
+        'а exclude убирает ненужные сочетания:</p>'
+        '<pre class="pc">    strategy:\n      matrix:\n        python: ["3.11", "3.12", "3.13"]   # в кавычках: иначе 3.10 прочитается как число 3.1\n'
+        '        os: [ubuntu-latest, windows-latest]\n        exclude:\n          - python: "3.11"\n            os: windows-latest\n'
+        '    runs-on: ${{ matrix.os }}\n    steps:\n      - uses: actions/setup-python@v5\n        with:\n          python-version: ${{ matrix.python }}</pre>'
         '<p>Все сочетания — это <code>itertools.product</code>:</p>'
         + ex('from itertools import product\n\nversions = ["3.11", "3.12", "3.13"]\nsystems = ["ubuntu", "windows"]\nruns = list(product(versions, systems))\n'
              'print(len(runs), "запусков")\nfor v, s in runs[:3]:\n    print(f"python {v} на {s}")') +
@@ -54,7 +61,7 @@ def fl_ci():
         q('Когда запустится workflow с on: [pull_request]?', 'Когда открыли или обновили pull request', ['При каждом push в любую ветку',
           'Раз в сутки'], 'on — список событий-триггеров.'),
         q('Матрица: python 3.12, 3.13; os ubuntu, windows, macos. Сколько запусков?', '6', ['5', '3'], 'Все сочетания: 2 × 3.'),
-        q('Шаг «Тесты» упал. Что увидят в pull request?', 'Красный крестик: вливать нельзя', ['Ничего: CI только для main',
+        q('Шаг «Тесты» упал. Что увидят в pull request?', 'Красный крестик: вливать не стоит', ['Ничего: CI только для main',
           'Зелёную галочку с предупреждением'], 'Упавший шаг делает job красным.'),
         q('Чем uses: отличается от run: в шаге?', 'uses — готовое действие, run — команда терминала', ['Ничем', 'uses работает только на Windows'],
           'actions/checkout — готовое действие «забрать код».'),
@@ -65,8 +72,9 @@ def code_ci():
     return ts('Тесты на каждый push', [
         task('Разбор workflow. Рядом лежат test.yml, deploy.yml и lint.yml; на вход подаётся имя файла. Файл упрощённый: строка «name: …» без отступа — имя '
              'workflow; «on: [a, b]» — события; строка с отступом ровно 2 пробела вида «ИМЯ:» — начало job; «runs-on: …» — его машина; «- name: …» или '
-             '«- uses: …» — начало шага (у шага без name имя — «без имени»); «uses: …» и «run: …» — действие текущего шага. Остальные строки пропускай.\n'
-             'Выведи «Workflow: ИМЯ», «События: через запятую с пробелом», потом для каждого job «Job ИМЯ (МАШИНА): N шагов» и шаги '
+             '«- uses: …» (или «- run: …») — начало шага (у шага без name имя — «без имени»); «uses: …» и «run: …» — действие текущего шага. Остальные '
+             'строки пропускай; значения берутся как есть, без кавычек и многострочных команд.\n'
+             'Выведи «Workflow: ИМЯ», «События: через запятую с пробелом» (как внутри скобок), потом для каждого job «Job ИМЯ (МАШИНА), шагов: N» и шаги '
              '«  K. ИМЯ — uses ДЕЙСТВИЕ» или «  K. ИМЯ — run КОМАНДА».',
              'Отступ: len(line) - len(line.lstrip()). Ключ и значение: line.strip().split(":", 1) — но «- name:» начинается с «- ».\n'
              'Job храни словарём {"name", "os", "steps": []}, шаг — списком [имя, вид, действие].',
@@ -74,14 +82,15 @@ def code_ci():
              '    starts_step = text.startswith("- ")\n    if starts_step:\n        text = text[2:]\n    key, value = text.split(":", 1)\n    value = value.strip()\n'
              '    if indent == 0 and key == "name":\n        print("Workflow:", value)\n    elif indent == 0 and key == "on":\n        print("События:", value.strip("[]"))\n'
              '    elif indent == 2 and value == "":\n        jobs.append({"name": key, "os": "?", "steps": []})\n    elif key == "runs-on":\n        jobs[-1]["os"] = value\n'
-             '    elif starts_step:\n        jobs[-1]["steps"].append([value if key == "name" else "без имени", "", ""])\n        if key == "uses":\n'
-             '            jobs[-1]["steps"][-1][1:] = ["uses", value]\n    elif key in ("uses", "run"):\n        jobs[-1]["steps"][-1][1:] = [key, value]\n'
-             'for job in jobs:\n    print(f"Job {job[\'name\']} ({job[\'os\']}): {len(job[\'steps\'])} шагов")\n    for k, (name, kind, action) in enumerate(job["steps"], 1):\n'
+             '    elif starts_step:\n        jobs[-1]["steps"].append([value if key == "name" else "без имени", "", ""])\n        if key in ("uses", "run"):\n'
+             '            jobs[-1]["steps"][-1][1:] = [key, value]\n    elif key in ("uses", "run"):\n        jobs[-1]["steps"][-1][1:] = [key, value]\n'
+             'for job in jobs:\n    print(f"Job {job[\'name\']} ({job[\'os\']}), шагов: {len(job[\'steps\'])}")\n    for k, (name, kind, action) in enumerate(job["steps"], 1):\n'
              '        print(f"  {k}. {name} — {kind} {action}")',
              ['test.yml', 'deploy.yml', 'lint.yml'], files=WF),
         task('Матрица. На вход подаются строки «ПАРАМЕТР: значения через пробел», затем, возможно, строки «exclude: значения через пробел» (сочетание, '
              'которое не запускать, — значения в порядке параметров), последняя — «конец». Выведи все сочетания по порядку product строками '
-             '«значения через « / »», пропуская исключённые, затем «Запусков: N» и «Минут: M» — каждый запуск идёт 3 минуты, но на windows — 6.',
+             '«значения через « / »», пропуская исключённые, затем «Запусков: N» и «Минут: M» — каждый запуск идёт 3 минуты, но если одно из значений '
+             'сочетания равно windows — 6.',
              'Значения параметров — список списков; product(*lists). Исключения храни множеством кортежей.',
              'from itertools import product\n\nparams, excluded = [], set()\nwhile True:\n    line = input()\n    if line == "конец":\n        break\n'
              '    key, values = line.split(":")\n    if key == "exclude":\n        excluded.add(tuple(values.split()))\n    else:\n        params.append(values.split())\n'
@@ -124,8 +133,8 @@ def fl_cd():
           'needs — «только после успешного».'),
         q('Где хранить токен для выкладки?', 'В секретах репозитория, ${{ secrets.ИМЯ }}', ['Прямо в deploy.yml', 'В README.md'],
           'Файлы workflow видны всем с доступом к коду.'),
-        qo('Что выведет программа?', 'import math\nprint(len([n for n in dir(math) if n.startswith("log")]))', ['1', '2', '0'],
-           'log, log10, log1p, log2.'),
+        qo('Что выведет программа?', 'import math\nprint("sqrt" in dir(math), "test_sqrt" in dir(math))', ['True True', 'False False', 'False True'],
+           'sqrt в math есть, test_sqrt — нет.'),
     ])
 
 
@@ -143,7 +152,8 @@ def code_cd():
              ['deploy: build | ok\nlint: | ok\ntest: | ok\nbuild: lint test | ok\nконец', 'deploy: build | ok\nbuild: test | ok\ntest: | fail\ndocs: | ok\nконец',
               'a: | ok\nb: a | fail\nc: b | ok\nконец']),
         task('Что запустится. Правила: тесты (test) идут на любой push и на pull_request; выкладка (deploy) — только на push в ветку main или на '
-             'тег, который начинается с v и дальше состоит из цифр и точек (v1.2.0). На вход подаются события «push ВЕТКА», «pull_request ВЕТКА» или '
+             'тег, который начинается с v и дальше состоит хотя бы из одного символа — только цифр и точек (v1.2.0; «v» и «vbeta» — не версии). '
+             'Отправка тега — отдельное событие tag, тесты на него не запускаются. На вход подаются события «push ВЕТКА», «pull_request ВЕТКА» или '
              '«tag ИМЯ», последняя строка — «конец». Для каждого выведи «СОБЫТИЕ → test, deploy», «СОБЫТИЕ → test», «СОБЫТИЕ → deploy» или '
              '«СОБЫТИЕ → ничего». В конце — «Выкладок: N».',
              'Тег: name.startswith("v") and name[1:] and all(ch.isdigit() or ch == "." for ch in name[1:]).',
@@ -168,7 +178,8 @@ def project():
     return pj('Свой маленький CI',
               'В репозитории две версии проекта: папки v1 и v2, в каждой calc.py и тесты test_calc.py (функции test_… с assert). На вход подаются версия '
               '(v1 или v2) и ветка. Импортируй нужные тесты (from v1 import test_calc или from v2 import test_calc), найди в модуле через dir все имена, '
-              'начинающиеся с test_ (dir отдаёт их по алфавиту), и запусти каждую функцию. Выводи «ok ИМЯ», «FAIL ИМЯ: ТЕКСТ» (текст assert, без него — '
+              'начинающиеся с test_ (dir отдаёт их по алфавиту), и запусти каждую функцию. (Сами тесты внутри делают from v1 import calc — папки v1 и v2 '
+              'работают как пакеты, __init__.py не нужен.) Упавший assert — AssertionError, любая другая ошибка — ловится через Exception. Выводи «ok ИМЯ», «FAIL ИМЯ: ТЕКСТ» (текст assert, без него — '
               '«без сообщения») или «ERROR ИМЯ: ТИП» (имя класса ошибки). Затем строки конвейера: «test: ok» или «test: fail»; «build: ok», если test '
               'ok, иначе «build: пропущен»; «deploy: ok», если build ok и ветка main; «deploy: не нужен» — если build ok, а ветка другая; '
               '«deploy: пропущен» — если build пропущен. Последней — «Итог: зелёный» или «Итог: красный» (красный — если test упал).',

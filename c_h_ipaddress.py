@@ -1,6 +1,6 @@
 from dsl import *
 
-# Нора после «Запросы к серверам»: модуль ipaddress. Две теории: адреса и сети (ip_address, ip_network, маска, hosts, in,
+# Нора после «Классы и объекты»: модуль ipaddress. Две теории: адреса и сети (ip_address, ip_network, маска, hosts, in,
 # strict=False, ValueError); деление на подсети (subnets). Мини-проект — калькулятор подсетей.
 
 

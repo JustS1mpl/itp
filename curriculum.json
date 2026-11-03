@@ -1210,7 +1210,7 @@
   {
    "id": "async",
    "n": "Асинхронность: много дел сразу",
-   "after": "requests",
+   "after": "algorithms",
    "run": "native+read-only",
    "min": 50,
    "about": "asyncio.run, async/await, gather, имитация загрузок через asyncio.sleep; threading и сокеты — объяснение и код для ПК",
@@ -1241,7 +1241,7 @@
   {
    "id": "ipaddress",
    "n": "IP-адреса: сети и подсети",
-   "after": "requests",
+   "after": "classes",
    "run": "native",
    "min": 40,
    "about": "модуль ipaddress: IPv4/IPv6, сети и маски, hosts(), проверка вхождения, strict=False, ValueError; мини-проект: калькулятор подсетей",
