@@ -303,8 +303,11 @@ function agWin(host,sn,done){
 /* условия из настроек («О приложении» → «Условия использования», владелец): вспышка экрана, затем экран как во вступлении —
    чёрный, с падающими символами, зерном и полосами — и на нём большое окно 98-го с текстом; закрытие — снова вспышка и настройки.
    Без анимаций (RM) — без вспышки и движения */
-function agFlash(mid){if(RM()){mid();return}var f=document.createElement('div');f.className='agfl';f.setAttribute('aria-hidden','true');document.body.appendChild(f);
-  setTimeout(mid,110);setTimeout(function(){f.remove()},400)}
+/* вспышка в два шага: экран белеет и держится белым, пока строится новый экран (на слабом телефоне это долго, и раньше
+   вспышка успевала погаснуть до появления условий — владелец), и гаснет только после того, как новый экран нарисован */
+function agFlash(mid){if(RM()){mid();return}var f=document.createElement('div'),n=0;f.className='agfl';f.setAttribute('aria-hidden','true');document.body.appendChild(f);
+  function go(){if(n++)return;mid();requestAnimationFrame(function(){requestAnimationFrame(function(){f.classList.add('out');setTimeout(function(){f.remove()},300)})})}
+  requestAnimationFrame(function(){f.classList.add('in');f.addEventListener('transitionend',go,{once:true});setTimeout(go,160)})}
 function agView(){
   var prev=document.activeElement,o=null,V=null,R=null,gone=false;
   function kd(e){if(e.key==='Escape'){e.preventDefault();e.stopPropagation();close()}}
