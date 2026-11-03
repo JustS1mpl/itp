@@ -526,29 +526,44 @@ function shareTxt(){var n=ND(),h=HD(),s=streakNow();return'Я учу Python в �
 /* --- U1-7: «Что ты уже умеешь» — шкала курса как в Duolingo. Очки — пройденные островки (и в норах тоже, вступление не в счёт);
    веха — конец темы: её порог равен числу островков основного курса до неё включительно --- */
 /* значки вех — из того же набора Phosphor (duotone) */
-var SKI={sprout:'plant',msg:'chat-circle-text',kbd:'keyboard',calc:'calculator',loop:'repeat',list:'address-book',fn:'game-controller',file:'folder-open',sort:'ranking',box:'sword',chart:'chart-bar',bot:'robot',cap:'graduation-cap',bulb:'lightbulb'};
+/* у каждой вехи свой значок. Каких нет в наборе Phosphor выше, нарисованы здесь в том же стиле (контур и полупрозрачная заливка, сетка 256) */
+(function(){var o=' fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"',d=' opacity="0.2"';
+ PH.receipt='<path d="M64 40h128v176l-21.3-16-21.4 16-21.3-16-21.4 16-21.3-16L64 216Z"'+d+'/><path d="M64 40h128v176l-21.3-16-21.4 16-21.3-16-21.4 16-21.3-16L64 216Z"'+o+'/><path d="M96 96h64M96 136h64"'+o+'/>';
+ PH.signpost='<circle cx="128" cy="140" r="24"'+d+'/><path d="M128 224v-84M128 140 72 84M128 140l56-56M72 124V84h40M184 124V84h-40"'+o+'/>';
+ PH.scissors='<circle cx="76" cy="184" r="28"'+d+'/><circle cx="180" cy="184" r="28"'+d+'/><circle cx="76" cy="184" r="28"'+o+'/><circle cx="180" cy="184" r="28"'+o+'/><path d="M96 164 200 40M160 164 56 40"'+o+'/>';
+ PH.braces='<rect x="104" y="104" width="48" height="48" rx="8"'+d+'/><path d="M96 40c-24 0-32 12-32 32v32c0 16-8 24-24 24 16 0 24 8 24 24v32c0 20 8 32 32 32M160 40c24 0 32 12 32 32v32c0 16 8 24 24 24-16 0-24 8-24 24v32c0 20-8 32-32 32"'+o+'/>';
+ PH.shield='<path d="M128 32 208 64v56c0 56-40 92-80 104-40-12-80-48-80-104V64Z"'+d+'/><path d="M128 32 208 64v56c0 56-40 92-80 104-40-12-80-48-80-104V64Z"'+o+'/><path d="m96 128 24 24 44-44"'+o+'/>';
+ PH.cube='<path d="M128 32 216 80 128 128 40 80Z"'+d+'/><path d="M128 32 216 80v96l-88 48-88-48V80ZM40 80l88 48 88-48M128 128v96"'+o+'/>';
+ PH.tree='<rect x="96" y="32" width="64" height="48" rx="8"'+d+'/><rect x="96" y="32" width="64" height="48" rx="8"'+o+'/><rect x="32" y="176" width="64" height="48" rx="8"'+o+'/><rect x="160" y="176" width="64" height="48" rx="8"'+o+'/><path d="M128 80v48M64 176v-24a24 24 0 0 1 24-24h80a24 24 0 0 1 24 24v24"'+o+'/>';
+ PH.grid='<rect x="98" y="98" width="60" height="60"'+d+'/><rect x="40" y="40" width="176" height="176" rx="16"'+o+'/><path d="M40 98h176M40 158h176M98 40v176M158 40v176"'+o+'/>';
+ PH.globe='<circle cx="128" cy="128" r="88"'+d+'/><circle cx="128" cy="128" r="88"'+o+'/><ellipse cx="128" cy="128" rx="38" ry="88"'+o+'/><path d="M40 128h176M56 88h144M56 168h144"'+o+'/>'})();
+var SKI={sprout:'plant',msg:'chat-circle-text',kbd:'keyboard',rcpt:'receipt',fork:'signpost',loop:'repeat',cut:'scissors',list:'address-book',fn:'braces',shield:'shield',file:'folder-open',sort:'ranking',cube:'cube',tree:'tree',grid:'grid',chart:'chart-bar',web:'globe',cap:'graduation-cap'};
 function ski(k){return phi(SKI[k])}
 /* знак-остров: тот же наклонный шестиугольник, что на Пути, плоский, в цвет акцента */
 var SKHX='<svg class="skx" viewBox="6 10 80 56" aria-hidden="true" focusable="false"><path class="s" d="M9 34 L27 54 L65 54 L83 34 L83 44 L65 64 L27 64 L9 44 Z"/><path d="M9 34 L27 14 L65 14 L83 34 L65 54 L27 54 Z"/></svg>';
 /* вехи как в Duolingo: короткое действие из жизни, которое уже по силам; can — то же для реплики «Значит, ты уже можешь…» */
 var SKL=[['','sprout','Начинаем',''],
- ['Начало знакомства','msg','Напиши первую программу','написать свою программу'],
- ['Переменные и ввод','kbd','Поговори с программой','научить программу задавать вопросы'],
- ['Условия','calc','Сделай калькулятор','сделать свой калькулятор'],
- ['Циклы в циклах','fn','Сделай игру «Угадай число»','написать игру «Угадай число»'],
- ['Срезы и кортежи','msg','Перехитри цензора','разбирать и менять строки по кусочкам'],
- ['Словари и множества','list','Собери телефонную книгу','собрать свою телефонную книгу'],
- ['Гибкие функции','loop','Зашифруй сообщение','шифровать сообщения шифром Цезаря'],
- ['Исключения','bulb','Сделай программу, которая не падает','писать программы, которые не падают от ошибок'],
- ['Файлы и форматы данных','file','Веди дневник расходов','вести дневник расходов в файле'],
- ['Поиск и сортировка','sort','Отсортируй рекорды','быстро искать и сортировать данные'],
- ['Классы и объекты','list','Опиши склад классами','описывать вещи из жизни своими классами'],
- ['Наследование','box','Опиши героя игры','описать героя игры классом'],
- ['Массивы и математика','chart','Обработай картинку из чисел','считать по целым массивам чисел'],
- ['Таблицы данных','chart','Найди закономерность в данных','разбирать таблицы с данными'],
- ['Запросы к серверам','bot','Подключись к серверу','общаться с серверами из своей программы'],
- ['Итоговые проекты','cap','Курс пройден','сделать мессенджер и текстовую RPG от идеи до программы']];
-function skPts(){var n=0;TOPICS.forEach(function(t,i){if(t.intro)return;for(var j=0;j<ni(i);j++){var k=i+'-'+j;if(S.d[k]||(!t.opt&&i<S.start)||S.at[k]==='skip'||S.at[k]==='seen')n++}});return n}
+ ['Начало знакомства','msg','Пишу первые программы','писать и запускать свои программы'],
+ ['Переменные и ввод','kbd','Программа меня слушает','запоминать данные и спрашивать их у человека'],
+ ['Оформление вывода','rcpt','Красиво вывожу результат','красиво оформлять то, что печатает программа'],
+ ['Условия','fork','Программа принимает решения','учить программу выбирать, что делать'],
+ ['Циклы в циклах','loop','Повторяю без копипаста','повторять действия циклами, даже вложенными'],
+ ['Срезы и кортежи','cut','Режу строки и списки','вырезать из строк и списков нужные куски'],
+ ['Словари и множества','list','Храню данные по ключам','хранить данные в словарях и множествах'],
+ ['Гибкие функции','fn','Пишу свои функции','писать гибкие функции и передавать их друг другу'],
+ ['Исключения','shield','Программа не падает','ловить ошибки, чтобы программа не падала'],
+ ['Файлы и форматы данных','file','Работаю с файлами','читать и сохранять файлы, CSV и JSON'],
+ ['Поиск и сортировка','sort','Ищу и сортирую быстро','быстро искать и сортировать данные'],
+ ['Классы и объекты','cube','Создаю свои объекты','описывать вещи из жизни своими классами'],
+ ['Наследование','tree','Строю семейства классов','строить одни классы на основе других'],
+ ['Массивы и математика','grid','Считаю целыми массивами','считать сразу по целым массивам чисел'],
+ ['Таблицы данных','chart','Разбираю таблицы данных','разбирать большие таблицы и считать по ним итоги'],
+ ['Запросы к серверам','web','Общаюсь с серверами','получать данные с сервера и отправлять их туда'],
+ ['Итоговые проекты','cap','Курс пройден','собирать большие программы из всего, что знаешь']];
+/* вехи считаются по основному курсу: порог вехи — число его островков до конца темы, поэтому норы сюда не входят (с ними «Курс пройден» открывался раньше конца курса);
+   пропущенные при выборе старта и пропущенные кнопкой островки засчитываются (владелец) */
+function skPts(){var n=0;TOPICS.forEach(function(t,i){if(t.intro||t.opt)return;for(var j=0;j<ni(i);j++){var k=i+'-'+j;if(S.d[k]||i<S.start||S.at[k]==='skip'||S.at[k]==='seen')n++}});return n}
+function skHole(){var n=0;TOPICS.forEach(function(t,i){if(t.opt)for(var j=0;j<ni(i);j++)if(S.d[i+'-'+j])n++});return n}
 function skList(){var c=0,th={};TOPICS.forEach(function(t,i){if(t.intro||t.opt)return;c+=ni(i);th[t.n]=c});
   return SKL.map(function(m){return{t:m[0]?th[m[0]]:0,e:m[1],n:m[2],c:m[3]}}).filter(function(m){return m.t!==undefined})}
 function skNow(){var p=skPts(),L=skList(),k=0;L.forEach(function(m,i){if(p>=m.t)k=i});return{p:p,L:L,k:k}}
@@ -571,19 +586,24 @@ var PYLOGO='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0.21 -0.077 110 110
 /* у каждой вехи — своя маленькая программа и её вывод */
 var SKCODE={msg:['print("Привет, мир!")','Привет, мир!'],
  kbd:['name = input("Как тебя зовут? ")\nprint("Привет,", name)','Как тебя зовут? Влад\nПривет, Влад'],
- calc:['a = float(input())\nb = float(input())\nprint(a * b)','2.5\n4\n10.0'],
+ rcpt:['price = 349.9\nprint(f"Итого: {price:>8.2f} ₽")','Итого:   349.90 ₽'],
+ fork:['age = int(input())\nif age >= 12:\n    print("Заходи!")\nelse:\n    print("Подрасти немного")','13\nЗаходи!'],
  loop:['for i in range(1, 5):\n    print("*" * i)','*\n**\n***\n****'],
- list:['book = {"Аня": "555-01"}\nbook["Макс"] = "555-02"\nprint(book["Макс"])','555-02'],
- fn:['import random\n\ndef roll():\n    return random.randint(1, 6)\n\nprint("Выпало:", roll())','Выпало: 5'],
+ cut:['text = "Привет, мир!"\nprint(text[:6])\nprint(text[::-1])','Привет\n!рим ,тевирП'],
+ list:['count = {}\nfor w in "ля ля ля оу".split():\n    count[w] = count.get(w, 0) + 1\nprint(count)',"{'ля': 3, 'оу': 1}"],
+ fn:['def greet(*names, sep=", "):\n    return "Привет, " + sep.join(names)\n\nprint(greet("Аня", "Макс"))','Привет, Аня, Макс'],
+ shield:['try:\n    n = int("сорок")\nexcept ValueError:\n    print("Это не число!")','Это не число!'],
  file:['with open("scores.csv") as f:\n    for line in f:\n        print(line.strip())','Аня,97\nМакс,85'],
  sort:['scores = [42, 97, 65, 88]\nscores.sort(reverse=True)\nprint(scores[:3])','[97, 88, 65]'],
- box:['class Hero:\n    def __init__(self, name):\n        self.name = name\n        self.hp = 100\n\nprint(Hero("Ви").hp)','100'],
+ cube:['class Item:\n    def __init__(self, name, qty):\n        self.name = name\n        self.qty = qty\n\nprint(Item("мяч", 12).qty)','12'],
+ tree:['class Hero:\n    hp = 100\n\nclass Mage(Hero):\n    mana = 50\n\nprint(Mage().hp, Mage().mana)','100 50'],
+ grid:['import numpy as np\n\nimg = np.zeros((3, 3), int)\nimg[1, 1] = 255\nprint(img.sum())','255'],
  chart:['import pandas as pd\n\ndf = pd.read_csv("games.csv")\nprint(df["score"].mean())','78.4'],
- bot:['import requests\n\nr = requests.get(URL)\nprint(r.json()["temp"])','-3'],
+ web:['import requests\n\nr = requests.get(URL + "/notes")\nprint(len(r.json()), "заметки")','3 заметки'],
  cap:['project = Project("мой бот")\nproject.build()\nproject.share()','Готово!']};
 var SKBG={'':['#0B2E09','#1F6516','#43A034'],carrot:['#4A2302','#B65E08','#F08C1A'],pink:['#3E0A1B','#952746','#D9557A'],blue:['#081A44','#1A479A','#3B7BE6'],violet:['#170D3D','#4E31A8','#7E62E8']};
-function skImg(cb,vr){
-  var s=skNow(),m=s.L[s.k],W=1080,H=1920,cv=document.createElement('canvas');cv.width=W;cv.height=H;
+function skImg(cb,vr,k){
+  var s=skNow(),m=s.L[k==null?s.k:k],P=k==null?s.p:Math.max(m.t,1),W=1080,H=1920,cv=document.createElement('canvas');cv.width=W;cv.height=H;
   var g=cv.getContext('2d'),F='Nunito,system-ui,-apple-system,"Segoe UI",sans-serif',MF='"Cascadia Code","Cascadia Mono",Consolas,ui-monospace,monospace',C=SKBG[ST('acc')]||SKBG[''],cd=SKCODE[m.e]||SKCODE.msg;cd=[cd[0],cd[1].replace(/Влад/g,String(S.nick||'Влад').slice(0,14))];
   function star(x,y,r,a){g.save();g.globalAlpha=a;var gl=g.createRadialGradient(x,y,0,x,y,r*1.6);gl.addColorStop(0,'rgba(255,255,255,.45)');gl.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=gl;g.beginPath();g.arc(x,y,r*1.6,0,6.283);g.fill();
     g.fillStyle='#fff';g.beginPath();g.moveTo(x,y-r);g.quadraticCurveTo(x,y,x+r*.38,y);g.quadraticCurveTo(x,y,x,y+r);g.quadraticCurveTo(x,y,x-r*.38,y);g.quadraticCurveTo(x,y,x,y-r);g.fill();g.restore()}
@@ -609,10 +629,10 @@ function skImg(cb,vr){
     /* раскладка: логотип с числом, подпись, «Я могу…», окно кода — одной группой по центру между шапкой и низом */
     var code=cd[0].split('\n'),out=cd[1].split('\n'),lh=64,pw=W-150,ph=112+code.length*lh+40+out.length*lh+26;
     g.font='900 88px '+F;var L=wrap('Я могу '+m.c+'!',W-160),tot=250+70+L.length*106+90+ph,y0=290+Math.max(0,(H-170-290-tot)/2);
-    var yc=y0+90,ls=170;g.font='900 200px '+F;var num=String(s.p),nw=g.measureText(num).width,x0=(W-(ls+44+nw))/2;
+    var yc=y0+90,ls=170;g.font='900 200px '+F;var num=String(P),nw=g.measureText(num).width,x0=(W-(ls+44+nw))/2;
     if(logo){g.save();g.shadowColor='rgba(0,0,0,.28)';g.shadowBlur=30;g.shadowOffsetY=10;g.drawImage(logo,x0,yc-ls/2-8,ls,ls);g.restore()}
     g.textAlign='left';g.fillStyle='#fff';g.fillText(num,x0+ls+44,yc+70);
-    g.textAlign='center';g.font='800 38px '+F;g.fillStyle='rgba(255,255,255,.72)';g.fillText(pl(s.p,['островок пройден','островка пройдено','островков пройдено'])+' на Python',W/2,yc+168);
+    g.textAlign='center';g.font='800 38px '+F;g.fillStyle='rgba(255,255,255,.72)';g.fillText(pl(P,['островок пройден','островка пройдено','островков пройдено'])+' на Python',W/2,yc+168);
     g.font='900 88px '+F;g.fillStyle='#fff';var hy=y0+250+70+64;L.forEach(function(l,i){g.fillText(l,W/2,hy+i*106)});
     var top=hy+(L.length-1)*106+40+90;
     g.save();g.translate(W/2,top+ph/2);g.rotate(-3*Math.PI/180);g.translate(-pw/2,-ph/2);
@@ -631,8 +651,8 @@ function skImg(cb,vr){
   (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(function(){im.onload=function(){draw(im)};im.onerror=function(){draw(null)};im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(PYLOGO)})}
 /* «Поделиться умением» — как в Duolingo: картинка крупно на затемнённом размытом фоне, сверху крестик, снизу «Сохранить» и «Отправить».
    Закрывается крестиком, Esc, «назад» и нажатием мимо картинки */
-function skShare(){
-  var s=skNow(),m=s.L[s.k],BLOB=null,tx='Я учу Python в ИТП и уже могу '+m.c+'! Пройдено '+s.p+' '+pl(s.p,['островок','островка','островков'])+'.',prev=document.activeElement;
+function skShare(k){
+  var s=skNow(),m=s.L[k==null?s.k:k],BLOB=null,tx='Я учу Python в ИТП и уже могу '+m.c+'! Пройдено '+s.p+' '+pl(s.p,['островок','островка','островков'])+'.',prev=document.activeElement;
   var o=document.createElement('div');o.className='shov';o.setAttribute('role','dialog');o.setAttribute('aria-modal','true');o.setAttribute('aria-label','Поделиться умением');
   o.innerHTML='<button class="icon shx" aria-label="Закрыть">'+ico('x')+'</button><div class="shcard" id="shcard"><i class="shsk" aria-hidden="true"></i></div>'+
    '<div class="shbt"><button class="btn shs" id="shsv">'+phi('download-simple')+'Сохранить</button>'+(navigator.share?'<button class="btn shs" id="shgo">'+phi('export')+'Отправить</button>':'')+'</div>';
@@ -646,14 +666,16 @@ function skShare(){
   if($('shgo'))$('shgo').onclick=function(){if(!need())return;var d={text:tx},f;try{f=new File([BLOB],'itp-skill.png',{type:'image/png'})}catch(e){}if(f&&navigator.canShare&&navigator.canShare({files:[f]}))d.files=[f];
     navigator.share(d).then(function(){ach('share')}).catch(function(){})};
   setTimeout(function(){var b=$('shsv');if(b)b.focus({preventScroll:true})},60);
-  skImg(function(cv){var h=$('shcard');if(!h||gone)return;cv.setAttribute('role','img');cv.setAttribute('aria-label','Картинка: я могу '+m.c);h.innerHTML='';h.appendChild(cv);h.classList.add('rdy');cv.toBlob(function(b){BLOB=b},'image/png')})}
+  skImg(function(cv){var h=$('shcard');if(!h||gone)return;cv.setAttribute('role','img');cv.setAttribute('aria-label','Картинка: я могу '+m.c);h.innerHTML='';h.appendChild(cv);h.classList.add('rdy');cv.toBlob(function(b){BLOB=b},'image/png')},0,k)}
 function skills(back){
   var s=skNow(),L=s.L,m=L[s.k];
   var h=subTop('Что ты уже умеешь','🏆',L[s.k+1]?'Дальше: '+esc(L[s.k+1].n||''):'Все умения открыты','',s.k,L.length-1)+'<div class="skp">'+
-   '<div class="skh"><span class="sklogo" role="img" aria-label="Python">'+PYLOGO+'</span><b>'+s.p+'</b></div><p class="mu skn">'+pl(s.p,['островок пройден','островка пройдено','островков пройдено'])+', пропущенные и норы тоже считаются</p>'+
+   '<div class="skh"><span class="sklogo" role="img" aria-label="Python">'+PYLOGO+'</span><b>'+s.p+'</b></div><p class="mu skn">'+pl(s.p,['островок пройден','островка пройдено','островков пройдено'])+' из '+L[L.length-1].t+', пропущенные тоже считаются'+(skHole()?'. И ещё '+skHole()+' в норах':'')+'</p>'+
    rbSay(s.k?'Значит, ты уже можешь '+esc(m.c)+'!':'Пройди первую тему, и здесь появится, что ты уже можешь')+(s.k?'<button class="btn t skshb" id="sksh">'+phi('export')+'Поделиться</button>':'')+
    '<h2 class="skov">Прогресс</h2><ol class="skl">'+L.map(function(x,i){var on=s.p>=x.t,nw=i===s.k;return'<li class="'+(on?'on':'')+(nw?' now':'')+(i+1<L.length&&s.p>=L[i+1].t?' fl':'')+'"><span class="skd">'+ski(x.e)+'</span><span class="sktx"><small>'+SKHX+x.t+'</small><b>'+esc(x.n)+'</b></span></li>'}).join('')+'</ol></div>';
-  scr('skills',h);if($('sksh'))$('sksh').onclick=skShare;$('x').onclick=function(){if(typeof back==='function')back();else{SBACK=SBACK||profile;settings()}}}
+  scr('skills',h);if($('sksh'))$('sksh').onclick=function(){skShare()};
+  /* режим разработчика: нажми на любую веху — откроется её картинка «Я могу…» */
+  if(DEV())app.querySelectorAll('.skl li').forEach(function(li,i){if(!i)return;li.classList.add('dv');li.setAttribute('role','button');li.tabIndex=0;li.onclick=function(){skShare(i)};li.onkeydown=function(e){if(e.key==='Enter')skShare(i)}});$('x').onclick=function(){if(typeof back==='function')back();else{SBACK=SBACK||profile;settings()}}}
 /* U1-9: цель дня и цель серии выбираются в одном окне (sgChooser в a_screens.js) */
 function goalSheet(){sgChooser(function(){if(CURTAB!=='prof')return;KEEPSCR=1;SKEY='profile';var y=window.scrollY;profile();window.scrollTo(0,y)})}
 function profile(){BACK=profile;

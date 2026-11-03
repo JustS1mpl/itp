@@ -1712,3 +1712,6 @@ html.scr .top{box-shadow:0 12px 28px -14px var(--gl-drop,rgba(0,0,0,.4))}
 .nav button.act{color:var(--ink)}
 .nav button.act::before{content:'';position:absolute;left:50%;bottom:2px;width:34px;height:3px;border-radius:3px;transform:translateX(-50%);background:linear-gradient(90deg,var(--accent),var(--hero-a,var(--pink-soft)))}
 @media (min-width:900px){.nav{left:0;right:auto;top:0;bottom:0;height:auto;width:calc(var(--rail) - 12px);padding:calc(18px + var(--safe-t)) 6px 18px;border-radius:0 22px 22px 0;box-shadow:10px 0 24px -18px var(--gl-drop,rgba(0,0,0,.4))}}
+/* режим разработчика: вехи «Что ты уже умеешь» нажимаются — открывают свою картинку «Я могу…» */
+.skl li.dv{cursor:pointer;border-radius:var(--r);outline-offset:4px}
+.skl li.dv:hover .sktx b{text-decoration:underline;text-underline-offset:3px}

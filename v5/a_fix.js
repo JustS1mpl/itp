@@ -69,7 +69,7 @@ function eggBind(){
     clearTimeout(EGGT);EGGT=setTimeout(function(){EGGN=0},1600);
     if(++EGGN<12){if(!RM())row.animate([{transform:'scale(1)'},{transform:'scale(.985)'},{transform:'scale(1)'}],{duration:120});return}
     EGGN=0;ach('egg');snd('fanfare');vib([20,30,20,30,60]);
-    modal('<div class="egg"><div class="eggi">🪄</div><h2>Ты нашёл секрет!</h2><p>ИТП создал Адрианов Владислав.</p><p class="mu">Спасибо, что дошёл до самого конца настроек.</p></div>',[['Класс!',null,1]]);
+    modal('<div class="egg"><div class="eggi">🪄</div><h2>Ты нашёл секрет!</h2><p>ИТП создал Адрианов Владислав для индивидуального школьного проекта.</p><p class="mu">Спасибо, что дошёл до самого конца настроек.</p></div>',[['Класс!',null,1]]);
   }
 }
 /* --- копирование кода из теории --- */
