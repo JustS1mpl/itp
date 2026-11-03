@@ -90,3 +90,6 @@ scraping, pillow (пакеты Pyodide; для сборки код с ними �
 
 ## Следующий шаг
 Фаза 3 закончена. Фаза 5 — норы по списку holes в curriculum.json. Порядок работы над темой: перечень понятий из `legacy-do-not-read` (только имена, уже есть в `curriculum.json`) → писать с чистого листа → `PY=py bash mk.sh` без нарушений → `xc5` bad 0 → выгрузка текста для «ученика» (`py tests/student_export.py файл.txt "Название темы"`; файл класть в `E:\Program Files\itp-tools\tmp`) → суб-агент на Sonnet 5.5 → правки → коммит. После правок в v5/ — `tests/mobile7.py` (телефон).
+
+## H2 (2026-11-03)
+Пакет H2 из docs/BACKLOG_2026-11-02.md закрыт в ветке claude/itp-holes-ai-2b4f69: 12 нор (llm, rag, aieval, docker, ci, cloud, systems, security, modernpy, pydantic, review, legacycode), «ученик» проверил все три партии, правки внесены. Нор теперь 28; coverage 0, xc5 bad 0, legacy_trace 0. Подробности — DECISIONES §70.
