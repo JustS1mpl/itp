@@ -81,7 +81,7 @@ function head(){
 /* шапка вложенных экранов: значок экрана в плашке, заголовок с подписью, справа — своё для экрана (кольцо прогресса), если есть.
    Серию и опыт тут не показываем: они только на четырёх вкладках (владелец) */
 function subTop(t,em,sub,back,c,n){
-  return'<div class="top ls sub"><button class="icon" id="x" aria-label="'+(back||'Назад')+'">'+ico('back')+'</button><span class="sti" aria-hidden="true">'+em+'</span><div class="stt"><h1>'+esc(t)+'</h1>'+(sub?'<p>'+sub+'</p>':'')+'</div>'+
+  return'<div class="top ls sub"><button class="icon" id="x" aria-label="'+(back||'Назад')+'">'+ico('back')+'</button><div class="stw"><span class="sti" aria-hidden="true">'+em+'</span><div class="stt"><h1>'+esc(t)+'</h1>'+(sub?'<p>'+sub+'</p>':'')+'</div></div>'+
    (n?'<div class="ring" style="--p:'+Math.round(c/n*100)+'" role="img" aria-label="'+c+' из '+n+'"><span>'+c+'/'+n+'</span></div>':'')+'</div>'}
 function ttl(t,sub){return'<div class="ttl"><div><h1>'+esc(t)+'</h1>'+(sub?'<p class="mu">'+sub+'</p>':'')+'</div></div>'}
 function bindHead(re){
@@ -164,6 +164,8 @@ function reveal(){
 
 /* --- линии между островами: считаются по раскладке (offset*), поэтому анимации их не сдвигают --- */
 var LRO=null,LFT=0;
+/* зигзаг тропинки: сдвиг островка по кругу из четырёх (центр, вправо, центр, влево); 56 — изгиб заметнее, чем прежние 46 (владелец) */
+var ZZ=[0,56,0,-56];
 function lkX(el){var m=/translateX\((-?[\d.]+)px\)/.exec(el.style.transform||'');return m?+m[1]:0}
 function links(){curOnce(links0)}
 function links0(){
@@ -177,14 +179,18 @@ function links0(){
        и островком не больше 56 px, а пара стоит по центру колонки (на телефоне это одно и то же).
        Отходит от норы только её островок: если двигать и соседей, сбивается зигзаг тропинки; считается до линий */
     /* нор у темы может быть несколько, по разные стороны: сдвиг считается для островка каждой.
-       Соседи (по три с каждой стороны) плавно перетекают от своего места в зигзаге к месту островка с норой (доли 0,6 / 0,3 / 0,1), чтобы тропинка шла дугой, а не ломалась у норы (владелец: «плавные изгибы») */
-    var ws=[].slice.call(pa.querySelectorAll('.ilw')),B=function(r){return[0,46,0,-46][r%4]},sw=ws.map(function(){return 0}),sx=sw.slice(),own={},hb=[];
+       Положения всех островков темы считаются ниже одной волной */
+    var ws=[].slice.call(pa.querySelectorAll('.ilw')),B=function(r){return ZZ[r%4]},own={},hb=[];
     pa.querySelectorAll('.bur').forEach(function(bu){var aw=bu.parentNode,L=bu.classList.contains('l'),nw=bu.querySelector('.nwr'),g=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--gut'))||16;
       var vb=nw.offsetWidth*80/92,G=Math.min(56,(pw+2*g-vb-106)/3),x0=(pw-vb-106-G)/2,c0=aw.offsetLeft+aw.offsetWidth/2+(+aw.dataset.b);
       var hd=Math.max(-90,Math.min(90,(L?x0+vb+G+53:pw-x0-vb-G-53)-c0)),q=ws.indexOf(aw);
-      var X=B(q)+hd;own[q]=X;[.6,.3,.1].forEach(function(f,d){[q-d-1,q+d+1].forEach(function(r){if(r>=0&&r<ws.length){sw[r]+=f;sx[r]+=f*X}})});
+      own[q]=B(q)+hd;
       hb.push([bu,aw,nw,L,x0,vb])});
-    ws.forEach(function(w,r){if(hb.length)w.style.transform='translateX('+(r in own?own[r]:sw[r]>1?sx[r]/sw[r]:B(r)*(1-sw[r])+sx[r])+'px)'});
+    /* волна: боковые островки — вершины через один (вправо, влево), островок с норой — та же вершина, только дальше, если нора просит места;
+       средний островок — посередине между соседями, поэтому у норы тропинка не ломается и не сплющивается */
+    var xs=ws.map(function(w,r){if(r%2===0)return 0;var sg=r%4===1?1:-1;return r in own?sg*Math.max(sg*own[r],ZZ[1]):sg*ZZ[1]});
+    xs=xs.map(function(x,r){return r%2?x:r in own?own[r]:((r>0?xs[r-1]:0)+(r<xs.length-1?xs[r+1]:0))/2});
+    ws.forEach(function(w,r){w.style.transform='translateX('+Math.round(xs[r])+'px)'});
     hb.forEach(function(a){var bu=a[0],aw=a[1],nw=a[2];bu.style.right='auto';bu.style.left=(a[3]?a[4]:pw-a[4]-a[5])-nw.offsetLeft-nw.offsetWidth*6/92-aw.offsetLeft-lkX(aw)+'px'});
     var sv=document.createElementNS(ns,'svg');sv.setAttribute('class','cn');sv.setAttribute('width',pw);sv.setAttribute('height',ph);sv.setAttribute('aria-hidden','true');
     var fresh=[];
@@ -301,7 +307,7 @@ var ITY={theory:['t','📖','Теория'],flash:['f','✏️','Вопросы'
 function ity(it){return ITY[it.t]||['a','⭐','Островок']}
 function island(i,j,n,dx){
   var o=TOPICS[i].opt,k=i+'-'+j,it=IT(i,j),d=S.d[k],op=isOpen(i,j),c=(o?ocur(i):cur())===k,nx=!c&&!d&&!o&&nxI(i,j),wt=j>0&&S.d[i+'-'+(j-1)]&&!LIT[i+'-'+(j-1)];
-  var ty=ity(it),lb=it.n||'',off=[0,46,0,-46][j%4]+(dx||0),st=d?'пройдено':(op?(c?'ты здесь':'открыто'):'закрыто');
+  var ty=ity(it),lb=it.n||'',off=ZZ[j%4]+(dx||0),st=d?'пройдено':(op?(c?'ты здесь':'открыто'):'закрыто');
   return'<div class="ilw'+(wt?' wait':'')+(c?' cu':'')+'" style="--n:'+Math.min(n||0,9)+';transform:translateX('+off+'px)">'+(c?'<div class="flag" aria-hidden="true">'+(TOPICS[i].intro||o&&!ostarted(i)?'Начни здесь':'🚩 Ты остановился здесь')+'</div>':'')+'<button class="isl ty-'+ty[0]+' '+(d?'dn':(op?'op':'lk'))+(c?' cur':'')+(nx?' nx':'')+'" data-i="'+i+'" data-j="'+j+'" aria-label="'+esc(ty[2]+': '+lb+' ('+st+')')+'"'+(c?' aria-current="step"':'')+'>'+HEX+'<span class="ic">'+ty[1]+'</span>'+(d?'<i class="bd ok"></i>':(op?'':'<i class="bd">🔒</i>'))+'</button><div class="mu">'+esc(lb)+(it.t==='project'?'<br><small>'+(/^(skip|seen)$/.test(S.at[k])?'пропущен':'по желанию')+'</small>':'')+'</div></div>'}
 /* сколько читать теорию: по объёму текста, примерно 160 слов в минуту */
 function readMin(it){var t=String(it.html||'').replace(/<pre[\s\S]*?<\/pre>/g,' ').replace(/<[^>]+>/g,' '),w=t.split(/\s+/).filter(Boolean).length,c=(String(it.html||'').match(/<pre>/g)||[]).length;return Math.max(1,Math.round(w/160+c*.25))}
@@ -331,7 +337,7 @@ function home0(){BACK=home;fzApply();
     for(var j=0;j<ni(i);j++){var hw=j in hp?1:0,
       /* островок с норой отходит от неё (точный сдвиг считает links0; здесь — начальный, чтобы не прыгало) */
       w=island(i,j,j,hw*(j%4===1?1:-1)*34);
-      if(hw)w=w.replace('<div class="ilw','<div data-b="'+[0,46,0,-46][j%4]+'" data-hw="'+hw+'" class="ilw nhb').replace(/<\/div>$/,burrow(hp[j],j%4===1?'l':'r')+'</div>');
+      if(hw)w=w.replace('<div class="ilw','<div data-b="'+ZZ[j%4]+'" data-hw="'+hw+'" class="ilw nhb').replace(/<\/div>$/,burrow(hp[j],j%4===1?'l':'r')+'</div>');
       h+=w}
     h+='</div></section>'});
   scr('home',h+'<aside class="jump" aria-label="Быстрый переход"><button id="jmp" aria-label="К текущему островку">'+ico('arrow')+'</button></aside>','home');bindHead(home);links();
@@ -697,7 +703,8 @@ function settings(){
    SR('😀','Смайлики Windows 11','Встроены и выглядят одинаково на всех устройствах',SW('emo',ST('emo')))+
    SR('🎉','Конфетти','Салют, когда тема пройдена',SW('gc',ST('gc')))+
    SR('🐰','Шапка профиля','Где стоит кролик',SG('ph',[['card','Карточка'],['corner','В углу'],['pop','Из плитки']],ST('ph')))+
-   SR('🌊','Узор на фоне','Точки — как тропинка между островками; пятна — мягкие цветные пятна, как раньше; пусто — ровный фон',SG('bgp',[['dots','Точки'],['blobs','Пятна'],['none','Пусто']],ST('bgp')))+'</div>';
+   SR('🌊','Узор на фоне','Точки — как тропинка между островками; пятна — мягкие цветные пятна, как раньше; пусто — ровный фон',SG('bgp',[['dots','Точки'],['blobs','Пятна'],['none','Пусто']],ST('bgp')))+
+   SR('🧭','Шапка экранов','Как выглядит верх у настроек, норы, умений и других экранов внутри разделов',SG('tb',[['glass','Стекло'],['band','Лента'],['big','Крупно'],['pill','Пилюля']],ST('tb')))+'</div>';
   h+='<div class="sec">Полка достижений</div><div class="lst">'+
    SR('🗄️','Когда дискет много','',SG('sh',[['v','Вторая полка ниже'],['h','Листать вбок']],ST('sh')))+
    SR('💾','Вид дискет','',SG('fl',[['tilt','Объёмные'],['flat','Плоские']],ST('fl')))+'</div>';

@@ -1684,11 +1684,33 @@ button.w98x:active{box-shadow:inset 1px 1px var(--w98k),inset -1px -1px #fff,ins
 @media (min-width:900px){.dock{left:0}.dock>.dki{left:calc(var(--rail)/2 - var(--cx))}.nav{z-index:8}}
 /* 2026-11-03, владелец: шапка вложенных экранов была пустой — значок в плашке акцента, подпись под заголовком, серия и опыт справа */
 .top.sub{gap:10px}
-.top.sub .sti{flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:var(--r-md,12px);font-size:1.25rem;line-height:1;background:linear-gradient(160deg,var(--hero-a,var(--pink-soft)),var(--soft));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 22%,transparent)}
-.top.sub .stt{flex:1 1 auto;min-width:0}
+.top.sub .stw{flex:1 1 auto;min-width:0;display:flex;align-items:center;gap:9px}
+.top.sub .sti{flex:none;font-size:1.375rem;line-height:1}
+.top.sub .stt{min-width:0}
 .top.sub .stt h1{display:block;line-height:1.2}
 .top.sub .stt p{margin:1px 0 0;font-size:.8125rem;font-weight:700;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .top.sub .ring{width:38px;height:38px;margin-left:auto}
 .top.sub .ring::before{background:var(--bg)}
-@media (max-width:420px){.top.sub .sti{width:34px;height:34px;font-size:1.0625rem}.top.sub .stt h1{font-size:1.0625rem}}
-@media (max-width:359px){.top.sub .sti{display:none}}
+@media (max-width:420px){.top.sub .sti{font-size:1.1875rem}.top.sub .stt h1{font-size:1.0625rem}}
+/* варианты шапки на выбор (настройки → «Шапка экранов», data-tb); стекло — обычная парящая плашка выше */
+/* лента: прикреплена к верху окна, скруглена только снизу, под ней полоса цвета акцента; заголовок по центру */
+html[data-tb=band] .top.sub{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;top:0;margin-top:0;padding-top:var(--safe-t);min-height:calc(var(--tbh) + 8px + var(--safe-t));border-radius:0 0 22px 22px;background:color-mix(in srgb,var(--card) 88%,transparent);box-shadow:0 10px 24px -18px var(--gl-drop,rgba(0,0,0,.4))}
+html[data-tb=band] .top.sub::after{content:'';position:absolute;left:22px;right:22px;bottom:0;height:3px;border-radius:3px;background:linear-gradient(90deg,transparent,var(--accent),var(--hero-a,var(--pink-soft)),transparent)}
+html[data-tb=band] .top.sub .stw{justify-content:center;text-align:center}
+html[data-tb=band] .top.sub .ring{margin:0;justify-self:end}
+/* крупно: без плашки, кнопка «назад» — круглая, под ней большой заголовок со значком; шапка не липнет к верху */
+html[data-tb=big] .top.sub{position:relative;top:auto;flex-wrap:wrap;row-gap:4px;min-height:0;padding:10px 4px 4px;background:none;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none}
+html[data-tb=big] .top.sub>.icon{background:var(--card);border-radius:50%;box-shadow:inset 0 0 0 1px var(--line)}
+html[data-tb=big] .top.sub .ring{order:1}
+html[data-tb=big] .top.sub .stw{order:2;flex:1 0 100%;gap:12px;margin-top:4px}
+html[data-tb=big] .top.sub .sti{font-size:2.25rem}
+html[data-tb=big] .top.sub .stt h1{font-size:1.75rem;line-height:1.15;white-space:normal}
+html[data-tb=big] .top.sub .stt p{font-size:.9375rem;margin-top:3px}
+/* пилюля: по центру парит капсула цвета акцента со значком и заголовком, «назад» и кольцо — отдельные круглые кнопки по краям */
+html[data-tb=pill] .top.sub{justify-content:center;background:none;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none}
+html[data-tb=pill] .top.sub>.icon,html[data-tb=pill] .top.sub .ring{position:absolute;top:50%;transform:translateY(-50%)}
+html[data-tb=pill] .top.sub>.icon{left:6px;border-radius:50%;background:color-mix(in srgb,var(--bg) 82%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:inset 0 0 0 1px var(--gl-rim,var(--line)),0 6px 16px -10px var(--gl-drop,rgba(0,0,0,.4))}
+html[data-tb=pill] .top.sub .ring{right:6px;margin:0}
+html[data-tb=pill] .top.sub .stw{flex:0 1 auto;max-width:calc(100% - 120px);padding:7px 20px 7px 14px;border-radius:999px;background:linear-gradient(120deg,var(--soft),var(--hero-a,var(--pink-soft)));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 24%,transparent),0 8px 22px -14px color-mix(in srgb,var(--accent) 60%,transparent)}
+html[data-tb=pill] .top.sub .stt h1{font-size:1rem}
+html[data-tb=pill] .top.sub .stt p{font-size:.75rem}
