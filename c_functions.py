@@ -217,7 +217,7 @@ def code_scope():
              'unlocked = {}\nscore = 0\n\n\ndef unlock(name, points):\n    global score\n    if name in unlocked:\n        return False\n'
              '    unlocked[name] = points\n    score += points\n    return True',
              ['print(unlock("Первая кровь", 10), unlock("Первая кровь", 10), score)',
-              'unlock("Фермер", 5)\nunlock("Рыбак", 7)\nprint(score, unlocked)', 'print(score, unlocked)'], tail=TL),
+              'unlock("Фермер", 5)\nunlock("Рыбак", 7)\nprint(score, unlocked)', 'print(score, unlocked)'], tail=TL, starter='unlocked = {}\nscore = 0\n'),
     ])
 
 
