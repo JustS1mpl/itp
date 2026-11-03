@@ -1063,7 +1063,10 @@ html.scr .top{box-shadow:inset 0 0 0 1px var(--gl-rim),0 12px 28px -14px var(--g
 @supports not (background:color-mix(in srgb,red,blue)){.top,.dock,.nav{background:var(--card)}body::before,body::after{display:none}.nav button.act .ni{background:var(--soft)}}
 @media (prefers-reduced-transparency:reduce){.top,.dock{background:var(--card);-webkit-backdrop-filter:none;backdrop-filter:none}.nav{background:var(--card);-webkit-backdrop-filter:none;backdrop-filter:none}body::before,body::after{display:none}}
 /* настройка «Узор на фоне» */
-html.nobg body::before,html.nobg body::after{display:none}
+/* узор фона — выбор в настройках (data-bgp): точки (по умолчанию), цветные пятна как до 6.9, пусто */
+html[data-bgp=none] body::before,html[data-bgp=none] body::after{display:none}
+html[data-bgp=blobs] body::after{display:none}
+html[data-bgp=blobs] body::before{-webkit-mask-image:none;mask-image:none;background:radial-gradient(60% 32% at 6% 0,color-mix(in srgb,var(--accent) 12%,transparent),transparent 70%),radial-gradient(50% 30% at 100% 22%,color-mix(in srgb,var(--carrot) 10%,transparent),transparent 70%),radial-gradient(70% 38% at 30% 100%,color-mix(in srgb,var(--blue) 10%,transparent),transparent 72%)}
 
 /* v6.4.1: виртуальный вывод программы (v5/a_out.js) */
 pre.vo,.cons pre.out.vo{max-height:min(60vh,520px);overflow:auto;position:relative;padding:0;font-size:14px;line-height:21px;white-space:pre;overscroll-behavior:contain}
@@ -1685,6 +1688,7 @@ button.w98x:active{box-shadow:inset 1px 1px var(--w98k),inset -1px -1px #fff,ins
 .top.sub .stt{flex:1 1 auto;min-width:0}
 .top.sub .stt h1{display:block;line-height:1.2}
 .top.sub .stt p{margin:1px 0 0;font-size:.8125rem;font-weight:700;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.top.sub .chips{margin-left:auto}
+.top.sub .ring{width:38px;height:38px;margin-left:auto}
+.top.sub .ring::before{background:var(--bg)}
 @media (max-width:420px){.top.sub .sti{width:34px;height:34px;font-size:1.0625rem}.top.sub .stt h1{font-size:1.0625rem}}
 @media (max-width:359px){.top.sub .sti{display:none}}
