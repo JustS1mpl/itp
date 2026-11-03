@@ -335,7 +335,7 @@ function goalScreen(then){
    weekRow('a')+
    (sg?'<div class="gsg"><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="'+sg+'" aria-valuenow="'+Math.min(s,sg)+'" aria-label="Цель серии"><i style="width:'+Math.min(100,Math.round(s/sg*100))+'%"></i></div><span class="mu">Цель серии: '+Math.min(s,sg)+' из '+sg+', за неё +'+SGX[sg]+' опыта</span></div>':'')+
    '</div>';
-  scr('goal',h+dockHtml('<button class="btn" id="gz">Закрыть</button><button class="btn t" id="gsh">'+phi('export')+'Поделиться</button>',1));
+  scr('goal',h+dockHtml('<button class="btn" id="gz">Закрыть</button><button class="btn t" id="gsh">'+phi('share-network')+'Поделиться</button>',1));
   snd('streak');vib([20,30,20]);
   $('gz').onclick=function(){then()};$('gsh').onclick=share}
 function sparks(el){
