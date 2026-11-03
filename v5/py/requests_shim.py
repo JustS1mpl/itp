@@ -154,6 +154,8 @@ def _body(spec, state, key, query=()):
         return code, _json.dumps(spec['variants'][v], ensure_ascii=False).encode('utf-8'), 'application/json'
     if 'json' in spec:
         return code, _json.dumps(spec['json'], ensure_ascii=False).encode('utf-8'), 'application/json'
+    if 'html' in spec:  # 7.0: учебные веб-страницы для парсинга
+        return code, str(spec['html']).encode('utf-8'), 'text/html; charset=utf-8'
     if 'seq' in spec:
         n = state.get(key, 0)
         state[key] = n + 1

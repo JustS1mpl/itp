@@ -165,7 +165,7 @@ def is_local(mod):
     """модуль, которого нет ни в Python, ни в пакетах Pyodide, — учебный файл рядом с программой (geo.py, grades.py)"""
     import importlib.util
     root = mod.split('.')[0]
-    if not root or root in ('numpy', 'pandas', 'matplotlib', 'requests', 'PIL', 'bs4', 'turtle'):
+    if not root or root in ('numpy', 'pandas', 'matplotlib', 'requests', 'PIL', 'bs4', 'turtle', 'miniweb'):
         return False
     try:
         return importlib.util.find_spec(root) is None
