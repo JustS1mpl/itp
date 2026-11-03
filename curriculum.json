@@ -1374,6 +1374,47 @@
     "mod": [],
     "err": []
    }
+  },
+  {
+   "id": "security",
+   "n": "Безопасность: закрываем дыры",
+   "after": "comprehensions",
+   "run": "native",
+   "min": 40,
+   "about": "OWASP-минимум: инъекции и параметры, XSS и экранирование, обход пути и белые списки; пароли с солью (hashlib), утечки секретов, контроль доступа и IDOR; мини-проект: заметки с правами",
+   "introduces": {
+    "f": [
+     "hashlib.sha256"
+    ],
+    "m": [
+     "encode",
+     "hexdigest"
+    ],
+    "k": [],
+    "mod": [
+     "hashlib"
+    ],
+    "err": []
+   }
+  },
+  {
+   "id": "modernpy",
+   "n": "Новый Python: t-строки и потоки",
+   "after": "decorators",
+   "run": "read-only+native",
+   "min": 35,
+   "about": "t-строки Python 3.14 и шаблонизаторы (код для ПК, в приложении — модель частей шаблона), free-threading без GIL, гонки и блокировки; мини-проект: безопасный шаблонизатор",
+   "introduces": {
+    "f": [
+     "sys._is_gil_enabled"
+    ],
+    "m": [
+     "version_info"
+    ],
+    "k": [],
+    "mod": [],
+    "err": []
+   }
   }
  ]
 }
