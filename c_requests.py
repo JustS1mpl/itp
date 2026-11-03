@@ -93,14 +93,14 @@ def code_http():
     return ts('Клиент, сервер и HTTP', [
         task('Интернет-магазин отдаёт список товаров по адресу http://shop.itp/products — JSON-список словарей с ключами name, price и '
              'count (сколько на складе). На вход подаётся наибольшая цена. Выведи товары в наличии (count больше нуля) с ценой не выше '
-             'заданной, по возрастанию цены, строками «название — цена ₽», затем «Найдено: N». Если ничего не подошло — только «Найдено: 0».',
+             'заданной, по возрастанию цены (цены у товаров разные), строками «название — цена ₽», затем «Найдено: N». Если ничего не подошло — только «Найдено: 0».',
              'products = requests.get("http://shop.itp/products").json()\nФильтр — списочное выражение с двумя условиями, сортировка — '
              'sorted(..., key=lambda p: p["price"]).',
              'import requests\n\nlimit = int(input())\nproducts = requests.get("http://shop.itp/products").json()\n'
              'found = sorted([p for p in products if p["count"] > 0 and p["price"] <= limit], key=lambda p: p["price"])\nfor p in found:\n'
              '    print(f"{p[\'name\']} — {p[\'price\']} ₽")\nprint(f"Найдено: {len(found)}")',
              ['3000', '100000', '400'], files=SHOP),
-        task('Сервер кубика: каждый GET-запрос к http://dice.itp/roll возвращает текстом следующий бросок. На вход подаётся n — сколько раз '
+        task('Сервер кубика: каждый GET-запрос к http://dice.itp/roll возвращает текстом следующий бросок. На вход подаётся n ≥ 1 — сколько раз '
              'бросить. Выведи броски через пробел, затем «Сумма: S» и «Шестёрок: K».',
              'В цикле n раз: int(requests.get(...).text). Броски собери в список.',
              'import requests\n\nn = int(input())\nrolls = [int(requests.get("http://dice.itp/roll").text) for _ in range(n)]\nprint(" ".join(map(str, rolls)))\n'

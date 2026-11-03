@@ -105,8 +105,9 @@ def code_data():
              ['красный\n3', 'жёлтый\n0', 'синий\n2']),
         task('Редкость лута. Опиши Enum Rarity: COMMON = 1, RARE = 3, LEGENDARY = 10 (значение — множитель цены) и dataclass '
              'Item с полями name, rarity и base_price. На вход подаются предметы «название редкость цена» до «стоп», редкость — '
-             'имя элемента Enum (COMMON, RARE, LEGENDARY). Выведи «НАЗВАНИЕ (редкость) — ЦЕНА» по убыванию итоговой цены '
-             '(base_price × множитель), редкость — именем строчными буквами.',
+             'имя элемента Enum (COMMON, RARE, LEGENDARY); элемент по имени достают квадратными скобками: Rarity["RARE"]. '
+             'Выведи «НАЗВАНИЕ (редкость) — ЦЕНА» по убыванию итоговой цены (base_price × множитель; при равенстве — в порядке ввода), '
+             'редкость — именем строчными буквами.',
              'Элемент по имени — Rarity[name]. Итоговая цена — item.base_price * item.rarity.value; имя — item.rarity.name.lower().',
              'from dataclasses import dataclass\nfrom enum import Enum\n\n\nclass Rarity(Enum):\n    COMMON = 1\n    RARE = 3\n    LEGENDARY = 10\n\n\n'
              '@dataclass\nclass Item:\n    name: str\n    rarity: Rarity\n    base_price: int\n\n\nitems = []\nwhile True:\n    s = input()\n    if s == "стоп":\n        break\n'
@@ -115,7 +116,7 @@ def code_data():
              ['меч COMMON 100\nкольцо LEGENDARY 20\nплащ RARE 50\nстоп', 'палка COMMON 1\nстоп']),
         task('Журнал заданий. Опиши dataclass Quest: title, reward (опыт) и steps — список шагов, по умолчанию пустой '
              '(через field), и done — сколько шагов выполнено, по умолчанию 0. Метод progress() возвращает «НАЗВАНИЕ: D/N», '
-             'а если все шаги выполнены — «НАЗВАНИЕ: готово, +R опыта». У каждого задания свой список шагов.',
+             'а если все шаги выполнены (или шагов нет вовсе) — «НАЗВАНИЕ: готово, +R опыта». У каждого задания свой список шагов.',
              'steps: list = field(default_factory=list) — иначе все задания делили бы один список. done: int = 0.',
              'from dataclasses import dataclass, field\n\n\n@dataclass\nclass Quest:\n    title: str\n    reward: int\n    steps: list = field(default_factory=list)\n'
              '    done: int = 0\n\n    def progress(self):\n        if self.done >= len(self.steps):\n            return f"{self.title}: готово, +{self.reward} опыта"\n'
