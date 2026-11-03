@@ -3,7 +3,7 @@
   "appName": "ИТП",
   "webDir": "www",
   "android": {
-    "adjustMarginsForEdgeToEdge": "force"
+    "adjustMarginsForEdgeToEdge": "disable"
   },
   "plugins": {
     "LocalNotifications": {

@@ -80,3 +80,38 @@ for root, _, files in os.walk(RES):
 save(masked(512, 'r'), H, 'icon.png')
 masked(256, 'r').save(os.path.join(H, 'icon.ico'), sizes=[(16, 16), (24, 24), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)])
 print('иконки готовы')
+
+# --- Windows: картинки установщика в духе Windows 98 (как окно соглашения в ИТП): синяя полоса заголовка 98-го,
+#     серый #C0C0C0, объёмная рамка «кнопки» вокруг мордочки. Боковая — на первой и последней страницах, шапка — на остальных
+from PIL import ImageFont
+FD = 'C:/Windows/Fonts/'
+def fnt(n, s):
+    for f in (n, 'tahomabd.ttf', 'arialbd.ttf'):
+        try:
+            return ImageFont.truetype(FD + f, s)
+        except OSError:
+            pass
+    return ImageFont.load_default()
+def bevel(d, x0, y0, x1, y1):
+    # рамка 98-го: светлый край сверху-слева, тёмный снизу-справа, в два ряда
+    d.line([(x0, y1), (x0, y0), (x1, y0)], fill=(255, 255, 255)); d.line([(x0 + 1, y1 - 1), (x0 + 1, y0 + 1), (x1 - 1, y0 + 1)], fill=(223, 223, 223))
+    d.line([(x0, y1), (x1, y1), (x1, y0)], fill=(0, 0, 0)); d.line([(x0 + 1, y1 - 1), (x1 - 1, y1 - 1), (x1 - 1, y0 + 1)], fill=(128, 128, 128))
+W, Hh = 164, 314
+sb = Image.new('RGB', (W, Hh))
+for y in range(Hh):                       # градиент заголовка 98-го: тёмно-синий → голубой
+    t = y / (Hh - 1); c = tuple(round(a + (b - a) * t) for a, b in zip((0, 0, 128), (16, 132, 208)))
+    ImageDraw.Draw(sb).line([(0, y), (W, y)], fill=c)
+d = ImageDraw.Draw(sb)
+n = 100; x0 = (W - n) // 2 - 3; y0 = 34
+d.rectangle((x0, y0, x0 + n + 6, y0 + n + 6), fill=(192, 192, 192)); bevel(d, x0, y0, x0 + n + 6, y0 + n + 6)
+sb.paste(big(n).convert('RGB'), (x0 + 3, y0 + 3))
+d.text((W // 2, y0 + n + 30), 'ИТП', font=fnt('tahomabd.ttf', 34), fill=(255, 255, 255), anchor='mm')
+d.text((W // 2, y0 + n + 58), 'И так,', font=fnt('tahoma.ttf', 13), fill=(220, 232, 255), anchor='mm')
+d.text((W // 2, y0 + n + 74), 'программирование', font=fnt('tahoma.ttf', 13), fill=(220, 232, 255), anchor='mm')
+d.text((W // 2, Hh - 22), 'Python с нуля', font=fnt('tahoma.ttf', 11), fill=(170, 200, 240), anchor='mm')
+sb.save(os.path.join(H, 'installerSidebar.bmp'))
+hd = Image.new('RGB', (150, 57), (192, 192, 192)); d = ImageDraw.Draw(hd)
+n = 45; x0 = 150 - n - 12; y0 = (57 - n - 6) // 2
+bevel(d, x0, y0, x0 + n + 6, y0 + n + 6); hd.paste(big(n).convert('RGB'), (x0 + 3, y0 + 3))
+hd.save(os.path.join(H, 'installerHeader.bmp'))
+print('картинки установщика готовы')

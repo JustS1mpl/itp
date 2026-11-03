@@ -26,10 +26,40 @@
     "appId": "app.itpcode.itp",
     "productName": "ИТП",
     "executableName": "ITP",
-    "directories": { "output": "dist" },
-    "files": ["desktop/**", "www/**", "package.json"],
-    "win": { "icon": "icons/icon.ico", "target": ["nsis", "portable"] },
-    "nsis": { "oneClick": false, "allowToChangeInstallationDirectory": true, "shortcutName": "ИТП", "artifactName": "ITP-Setup-${version}.exe" },
-    "portable": { "artifactName": "ITP-${version}-portable.exe" }
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "desktop/**",
+      "www/**",
+      "package.json"
+    ],
+    "win": {
+      "icon": "icons/icon.ico",
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "shortcutName": "ИТП",
+      "artifactName": "ITP-Setup-${version}.exe",
+      "installerSidebar": "icons/installerSidebar.bmp",
+      "uninstallerSidebar": "icons/installerSidebar.bmp",
+      "installerHeader": "icons/installerHeader.bmp",
+      "include": "icons/installer.nsh",
+      "installerLanguages": [
+        "ru_RU"
+      ],
+      "language": "1049",
+      "installerIcon": "icons/icon.ico",
+      "uninstallerIcon": "icons/icon.ico",
+      "uninstallDisplayName": "ИТП"
+    },
+    "portable": {
+      "artifactName": "ITP-${version}-portable.exe"
+    }
   }
 }
