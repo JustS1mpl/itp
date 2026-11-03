@@ -96,3 +96,5 @@ scraping, pillow (пакеты Pyodide; для сборки код с ними �
 Проверки: mobile7 bad 0, nick6 чисто, снимки вступления/соглашения/сбоя на 390×844 и 1280×800. `tests/h.py` теперь заранее принимает условия (параметр `agree=False` — показать окно). `tests/sprites6.py` устарел ещё до U2: ждёт `happy` на итоге без ошибок, а там давно `cool`.
 H1 (2026-11-03): норы webserver (учебный фреймворк miniweb), scraping (bs4, robots.txt), pillow (после modules), weeklybot (пояса и расписание),
 paint (после algorithms), «Игра Жизнь» в pygame — coverage 0, xc5 bad 0, legacy_trace 0, «ученик» проверил все. Подробности — DECISIONES §70.
+## H2 (2026-11-03)
+Пакет H2 из docs/BACKLOG_2026-11-02.md закрыт в ветке claude/itp-holes-ai-2b4f69: 12 нор (llm, rag, aieval, docker, ci, cloud, systems, security, modernpy, pydantic, review, legacycode), «ученик» проверил все три партии, правки внесены. Нор теперь 28; coverage 0, xc5 bad 0, legacy_trace 0. Подробности — DECISIONES §70.

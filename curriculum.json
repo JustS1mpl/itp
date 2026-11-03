@@ -1278,7 +1278,7 @@
   {
    "id": "async",
    "n": "Асинхронность: много дел сразу",
-   "after": "requests",
+   "after": "algorithms",
    "run": "native+read-only",
    "min": 50,
    "about": "asyncio.run, async/await, gather, имитация загрузок через asyncio.sleep; threading и сокеты — объяснение и код для ПК",
@@ -1309,7 +1309,7 @@
   {
    "id": "ipaddress",
    "n": "IP-адреса: сети и подсети",
-   "after": "requests",
+   "after": "classes",
    "run": "native",
    "min": 40,
    "about": "модуль ipaddress: IPv4/IPv6, сети и маски, hosts(), проверка вхождения, strict=False, ValueError; мини-проект: калькулятор подсетей",
@@ -1356,6 +1356,221 @@
    "run": "read-only+native",
    "min": 45,
    "about": "рабочий Paint на tkinter Canvas (код для компьютера: кисть, палитра, отмена штриха); логика холста в приложении: сетка, точки, отрезки, рамки, отмена и повтор стеком снимков, заливка обходом в ширину, подсчёт пятен",
+   "introduces": {
+    "f": [],
+    "m": [],
+    "k": [],
+    "mod": [],
+    "err": []
+   }
+  },
+  {
+   "id": "llm",
+   "n": "LLM API: модель по запросу",
+   "after": "requests",
+   "run": "shim",
+   "min": 45,
+   "about": "учебная модель llm.itp: запрос с ролями, история диалога, токены и max_tokens, галлюцинации; JSON-ответы, их разбор и проверка, повтор при 429/503; мини-проект: сортировщик заявок",
+   "introduces": {
+    "f": [],
+    "m": [
+     "rfind"
+    ],
+    "k": [],
+    "mod": [],
+    "err": []
+   }
+  },
+  {
+   "id": "rag",
+   "n": "RAG: поиск по своим данным",
+   "after": "numpy",
+   "run": "pyodide-package",
+   "min": 50,
+   "about": "эмбеддинги и косинусное сходство (np.dot, np.linalg.norm), учебный «мешок слов», векторная база и top-k; RAG: чанки с перекрытием, порог сходства, промпт с источниками; мини-проект: справочная кружка",
+   "introduces": {
+    "f": [
+     "np.dot",
+     "np.linalg.norm"
+    ],
+    "m": [],
+    "k": [],
+    "mod": [],
+    "err": []
+   }
+  },
+  {
+   "id": "aieval",
+   "n": "Оценка ИИ: проверяем ответы",
+   "after": "itertools",
+   "run": "native",
+   "min": 40,
+   "about": "эталонный набор, нормализация, accuracy, precision/recall/F1, матрица ошибок; проверка правилами, рубрика и LLM-судья, сравнение версий и регрессии; мини-проект: экзамен для бота",
+   "introduces": {
+    "f": [],
+    "m": [],
+    "k": [],
+    "mod": [],
+    "err": []
+   }
+  },
+  {
+   "id": "docker",
+   "n": "Docker: контейнер за вечер",
+   "after": "recursion",
+   "run": "read-only+native",
+   "min": 40,
+   "about": "образ и контейнер, Dockerfile, слои и кэш, compose, порты и тома (код и команды для ПК); в приложении — разбор Dockerfile, кэш слоёв, порядок запуска рекурсией; мини-проект: линтер Dockerfile",
+   "introduces": {
+    "f": [],
+    "m": [
+     "partition"
+    ],
+    "k": [],
+    "mod": [],
+    "err": []
+   }
+  },
+  {
+   "id": "systems",
+   "n": "Системы: как всё падает",
+   "after": "exceptions",
+   "run": "native",
+   "min": 45,
+   "about": "доступность цепочки и резерва, единая точка отказа, каскадные отказы; таймауты, шторм повторов, предохранитель, деградация; мини-проект: очередь у перегруженного сервера",
+   "introduces": {
+    "f": [],
+    "m": [],
+    "k": [],
+    "mod": [],
+    "err": []
+   }
+  },
+  {
+   "id": "ci",
+   "n": "CI/CD: тесты сами",
+   "after": "bigproject",
+   "run": "read-only+native",
+   "min": 35,
+   "about": "GitHub Actions: workflow, jobs, steps, матрица (YAML — для ПК); конвейер с needs, секреты, выкладка с main; в приложении — разбор workflow, матрица, конвейер; мини-проект: свой маленький CI на тестах",
+   "introduces": {
+    "f": [
+     "dir"
+    ],
+    "m": [],
+    "k": [],
+    "mod": [],
+    "err": []
+   }
+  },
+  {
+   "id": "cloud",
+   "n": "Облако: выкладываем приложение",
+   "after": "bigproject",
+   "run": "read-only+native",
+   "min": 40,
+   "about": "VPS, PaaS, serverless; настройки из окружения, health check; масштабирование, балансировщик, автомасштаб (команды облаков — для ПК); мини-проект: где дешевле держать приложение",
+   "introduces": {
+    "f": [],
+    "m": [],
+    "k": [],
+    "mod": [],
+    "err": []
+   }
+  },
+  {
+   "id": "security",
+   "n": "Безопасность: закрываем дыры",
+   "after": "comprehensions",
+   "run": "native",
+   "min": 40,
+   "about": "OWASP-минимум: инъекции и параметры, XSS и экранирование, обход пути и белые списки; пароли с солью (hashlib), утечки секретов, контроль доступа и IDOR; мини-проект: заметки с правами",
+   "introduces": {
+    "f": [
+     "hashlib.sha256"
+    ],
+    "m": [
+     "encode",
+     "hexdigest"
+    ],
+    "k": [],
+    "mod": [
+     "hashlib"
+    ],
+    "err": []
+   }
+  },
+  {
+   "id": "modernpy",
+   "n": "Новый Python: t-строки и потоки",
+   "after": "decorators",
+   "run": "read-only+native",
+   "min": 35,
+   "about": "t-строки Python 3.14 и шаблонизаторы (код для ПК, в приложении — модель частей шаблона), free-threading без GIL, гонки и блокировки; мини-проект: безопасный шаблонизатор",
+   "introduces": {
+    "f": [
+     "sys._is_gil_enabled"
+    ],
+    "m": [
+     "version_info"
+    ],
+    "k": [],
+    "mod": [],
+    "err": []
+   }
+  },
+  {
+   "id": "pydantic",
+   "n": "Pydantic: проверяем данные",
+   "after": "inheritance",
+   "run": "pyodide-package",
+   "min": 40,
+   "about": "модель BaseModel, приведение типов, ValidationError с путём к полю, model_validate(_json)/model_dump, вложенные модели; Field с границами, field_validator; мини-проект: каталог игр из кривого ответа сервера",
+   "introduces": {
+    "f": [
+     "pydantic.BaseModel",
+     "pydantic.Field",
+     "pydantic.field_validator",
+     "pydantic.ValidationError",
+     "classmethod"
+    ],
+    "m": [
+     "model_validate",
+     "model_validate_json",
+     "model_dump",
+     "errors"
+    ],
+    "k": [],
+    "mod": [
+     "pydantic"
+    ],
+    "err": [
+     "ValidationError"
+    ]
+   }
+  },
+  {
+   "id": "review",
+   "n": "Code review: читаем и объясняем",
+   "after": "functions",
+   "run": "read-only+native",
+   "min": 30,
+   "about": "как читать чужие изменения, чек-лист ревьюера, тон и пометки замечаний; описание PR, сообщение коммита, ответ на ревью; мини-проект: исправить таблицу лидеров по замечаниям",
+   "introduces": {
+    "f": [],
+    "m": [],
+    "k": [],
+    "mod": [],
+    "err": []
+   }
+  },
+  {
+   "id": "legacycode",
+   "n": "Чужой код: найди баг",
+   "after": "modules",
+   "run": "native",
+   "min": 40,
+   "about": "точка входа и карта модулей, воспроизведение бага, бисекция; тест на баг, минимальная правка, типичные места ошибок; мини-проект: склад после стажёра",
    "introduces": {
     "f": [],
     "m": [],
