@@ -58,7 +58,7 @@ function clean(r){
   var o=clean0(r);o.mv=4;r=(r&&typeof r==='object'&&!Array.isArray(r))?r:{};
   var s=(r.set&&typeof r.set==='object'&&!Array.isArray(r.set))?r.set:{},q={};
   var pick=function(k,list){q[k]=list.indexOf(s[k])>=0?s[k]:defset()[k]},bl=function(k){q[k]=s[k]===0||s[k]===false?0:(s[k]===1||s[k]===true?1:defset()[k])};
-  pick('acc',['','carrot','pink','blue','violet']);pick('tz',[90,100,115,130]);pick('anim',['full','less','off']);pick('cf',[13,15,17,19]);pick('sh',['v','h']);pick('ph',['card','corner','pop']);pick('fl',['tilt','flat']);pick('bgp',['dots','blobs','none']);
+  pick('acc',['','carrot','pink','blue','violet']);pick('tz',[90,100,115,130]);pick('anim',['full','less','off']);pick('cf',[13,15,17,19]);pick('sh',['v','h']);pick('ph',['card','corner','pop']);pick('fl',['tilt','flat']);pick('bgp',['dots','rain','none']);
   q.vol=typeof s.vol==='number'&&s.vol>=0&&s.vol<=100?Math.round(s.vol):defset().vol;
   ['sfx','vib','emo','ty','toc','rep','ln','ac','gc','bg','ks'].forEach(bl);
   /* «Минимализм» убран (6.9.0): у кого он был включён, узор на фоне возвращается таким, каким был до минимализма (mb) */

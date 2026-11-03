@@ -1,6 +1,6 @@
 import re, sys, json, os
 sys.path.insert(0, '.')
-VER = '7.0.0-dev.29'
+VER = '7.0.0-dev.30'
 s = open('base43.html', encoding='utf-8').read()
 
 def rep(a, b, n=1):
