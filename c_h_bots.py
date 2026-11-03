@@ -44,10 +44,10 @@ def th_bot():
         ('sendMessage', 'Запрос «отправь сообщение»: chat_id — в какой чат, text — что написать.'),
     ]
     body = (
-        '<p>[[бот]] в Telegram или другом мессенджере — обычная программа. Она раз за разом спрашивает у сервера мессенджера, не пришло ли '
+        '<p>Бот — [[бот]] в Telegram или другом мессенджере — обычная программа. Она раз за разом спрашивает у сервера мессенджера, не пришло ли '
         'новых сообщений, и отвечает на них. В ИТП вместо Telegram — учебный мессенджер по адресу <code>http://bot.itp</code>: он устроен '
         'так же, но живёт прямо в приложении.</p>'
-        '<p>Каждый запрос бот подписывает [[токен бота]]ом. Новые сообщения отдаёт [[getUpdates]] — список обновлений, у каждого номер '
+        '<p>Каждый запрос бот подписывает [[токен бота|токеном бота]]. Новые сообщения отдаёт [[getUpdates]] — список обновлений, у каждого номер '
         '<code>update_id</code> и само сообщение: чат, автор и текст:</p>'
         + ex('import os\nimport requests\n\nTOKEN = os.environ.get("BOT_TOKEN", "bot-demo")\nAPI = "http://bot.itp"\n\n'
              'updates = requests.get(f"{API}/getUpdates", params={"token": TOKEN}).json()["result"]\nfor u in updates:\n'
@@ -105,7 +105,7 @@ def th_cmds():
                                'находит нужную.'),
     ]
     body = (
-        '<p>Боту пишут [[команда бота]]ми: <code>/start</code>, <code>/help</code>, <code>/sum 2 3</code>. Удобная архитектура — по функции на команду и '
+        '<p>Боту пишут [[команда бота|командами бота]]: <code>/start</code>, <code>/help</code>, <code>/sum 2 3</code>. Удобная архитектура — по функции на команду и '
         'словарь «команда → функция». Каждый [[обработчик команды]] получает аргументы и возвращает текст ответа, а главный цикл только находит нужную '
         'функцию и отправляет её ответ:</p>'
         + ex('def start(args):\n    return "Привет! Я умею /sum"\n\n\ndef add(args):\n    return str(sum(int(a) for a in args))\n\n\n'
@@ -137,10 +137,11 @@ def code_cmds():
              '«/sum ЧИСЛА — сложу целые числа»; «/sum A B …» → сумма; если чисел нет — «Напиши числа после /sum», если какое-то не целое — '
              '«Только целые числа». Сообщение без слеша → «Я понимаю только команды», незнакомая команда → «Не знаю команду /X». Сделай обработчики '
              'функциями в словаре. Выводи отправленные ответы «→ CHAT_ID: ТЕКСТ».',
-             'cmd, *args = text.split(); проверка целого: все ли a.lstrip("-").isdigit().',
+             'cmd, *args = text.split(); целое — необязательный один минус и цифры: (a[1:] if a[:1] == "-" else a).isdigit(). '
+             'Пустых сообщений в проверке нет.',
              'import requests\n\nAPI, TOKEN = "http://bot.itp", "bot-demo"\n\n\ndef start(args):\n    return "Привет! Команды: /sum, /help"\n\n\ndef help_(args):\n'
              '    return "/sum ЧИСЛА — сложу целые числа"\n\n\ndef add(args):\n    if not args:\n        return "Напиши числа после /sum"\n'
-             '    if not all(a.lstrip("-").isdigit() for a in args):\n        return "Только целые числа"\n    return str(sum(int(a) for a in args))\n\n\n'
+             '    if not all((a[1:] if a[:1] == "-" else a).isdigit() for a in args):\n        return "Только целые числа"\n    return str(sum(int(a) for a in args))\n\n\n'
              'HANDLERS = {"/start": start, "/help": help_, "/sum": add}\nfor u in requests.get(f"{API}/getUpdates", params={"token": TOKEN}).json()["result"]:\n'
              '    m = u["message"]\n    cmd, *args = m["text"].split()\n    if not cmd.startswith("/"):\n        reply = "Я понимаю только команды"\n'
              '    elif cmd in HANDLERS:\n        reply = HANDLERS[cmd](args)\n    else:\n        reply = f"Не знаю команду {cmd}"\n'
@@ -150,7 +151,7 @@ def code_cmds():
         task('Напоминалка. Тот же мессенджер. «/remind ЧЧ:ММ ТЕКСТ» сохраняет напоминание этого чата и отвечает «Запомнил: ЧЧ:ММ ТЕКСТ»; если время не в '
              'формате ЧЧ:ММ (две цифры, двоеточие, две цифры) — «Время пиши как ЧЧ:ММ». «/list» отвечает списком напоминаний этого чата по времени, '
              'строками «ЧЧ:ММ ТЕКСТ» через перевод строки, или «Напоминаний нет». Выводи отправленные ответы «→ CHAT_ID: ТЕКСТ» (ответ из нескольких '
-             'строк печатается как есть).',
+             'строк печатается как есть). При равном времени — по тексту; время и текст в командах /remind всегда есть.',
              'Напоминания — словарь chat_id → список пар (время, текст). Разбор: cmd, *args = text.split(); время — args[0], текст — " ".join(args[1:]).\n'
              'Строки «ЧЧ:ММ» сравниваются правильно и как текст.',
              'import requests\n\nAPI, TOKEN = "http://bot.itp", "bot-demo"\nreminders = {}\nfor u in requests.get(f"{API}/getUpdates", params={"token": TOKEN}).json()["result"]:\n'
@@ -175,12 +176,12 @@ def project():
               '— всё остальное → «Не понимаю. Напиши /start».\n'
               'Обработчики — функции в словаре, они получают chat_id и аргументы. Выводи отправленные ответы «→ CHAT_ID: ТЕКСТ», а в конце — «Запросов '
               'погоды: N» (сколько раз бот обращался к сервису погоды).',
-              'Город из нескольких слов собирай " ".join(args)\nПамять — словарь chat_id → город\nЗнак: f"{t:+}" даёт «+14» и «-3»',
+              'Город пиши ровно так, как пришёл в сообщении. Город из нескольких слов собирай " ".join(args)\nПамять — словарь chat_id → город\nЗнак только у положительных: "+" if t > 0 else "" — «+14», «0», «-3»',
               'import os\nimport requests\n\nTOKEN = os.environ.get("BOT_TOKEN", "bot-demo")\nAPI = "http://bot.itp"\ncities = {}\nweather_calls = 0\n\n\n'
               'def start(cid, args):\n    return "Привет! Напиши /weather ГОРОД или выбери город: /city ГОРОД"\n\n\ndef city(cid, args):\n    cities[cid] = " ".join(args)\n'
               '    return f"Запомнил: {cities[cid]}"\n\n\ndef weather(cid, args):\n    global weather_calls\n    name = " ".join(args) or cities.get(cid)\n    if not name:\n'
               '        return "Сначала выбери город: /city ГОРОД"\n    weather_calls += 1\n    r = requests.get("http://api.weather.itp/now", params={"city": name})\n'
-              '    if r.status_code == 404:\n        return f"Не знаю город {name}"\n    w = r.json()\n    return f"{name}: {w[\'temp\']:+}°, {w[\'sky\']}"\n\n\n'
+              '    if r.status_code == 404:\n        return f"Не знаю город {name}"\n    w = r.json()\n    t = w[\'temp\']\n    return f"{name}: {\'+\' if t > 0 else \'\'}{t}°, {w[\'sky\']}"\n\n\n'
               'HANDLERS = {"/start": start, "/city": city, "/weather": weather}\nfor u in requests.get(f"{API}/getUpdates", params={"token": TOKEN}).json()["result"]:\n'
               '    m = u["message"]\n    cmd, *args = m["text"].split()\n    handler = HANDLERS.get(cmd)\n    reply = handler(m["chat_id"], args) if handler else "Не понимаю. Напиши /start"\n'
               '    sent = requests.post(f"{API}/sendMessage", params={"token": TOKEN}, json={"chat_id": m["chat_id"], "text": reply}).json()["result"]\n'
