@@ -502,7 +502,7 @@ function shareTxt(){var n=ND(),h=HD(),s=streakNow();return'Я учу Python в �
 /* --- U1-7: «Что ты уже умеешь» — шкала курса как в Duolingo. Очки — пройденные островки (и в норах тоже, вступление не в счёт);
    веха — конец темы: её порог равен числу островков основного курса до неё включительно --- */
 /* значки вех — из того же набора Phosphor (duotone) */
-var SKI={sprout:'plant',msg:'chat-circle-text',kbd:'keyboard',calc:'calculator',loop:'repeat',list:'address-book',fn:'game-controller',file:'folder-open',sort:'ranking',box:'sword',chart:'chart-bar',bot:'robot',cap:'graduation-cap'};
+var SKI={sprout:'plant',msg:'chat-circle-text',kbd:'keyboard',calc:'calculator',loop:'repeat',list:'address-book',fn:'game-controller',file:'folder-open',sort:'ranking',box:'sword',chart:'chart-bar',bot:'robot',cap:'graduation-cap',bulb:'lightbulb'};
 function ski(k){return phi(SKI[k])}
 /* знак-остров: тот же наклонный шестиугольник, что на Пути, плоский, в цвет акцента */
 var SKHX='<svg class="skx" viewBox="6 10 80 56" aria-hidden="true" focusable="false"><path class="s" d="M9 34 L27 54 L65 54 L83 34 L83 44 L65 64 L27 64 L9 44 Z"/><path d="M9 34 L27 14 L65 14 L83 34 L65 54 L27 54 Z"/></svg>';
@@ -511,16 +511,20 @@ var SKL=[['','sprout','Начинаем',''],
  ['Начало знакомства','msg','Напиши первую программу','написать свою программу'],
  ['Переменные и ввод','kbd','Поговори с программой','научить программу задавать вопросы'],
  ['Условия','calc','Сделай калькулятор','сделать свой калькулятор'],
- ['Циклы в циклах','loop','Нарисуй узор','рисовать узоры кодом'],
+ ['Циклы в циклах','fn','Сделай игру «Угадай число»','написать игру «Угадай число»'],
+ ['Срезы и кортежи','msg','Перехитри цензора','разбирать и менять строки по кусочкам'],
  ['Словари и множества','list','Собери телефонную книгу','собрать свою телефонную книгу'],
- ['Гибкие функции','fn','Напиши мини-игру','написать мини-игру'],
- ['Файлы и форматы данных','file','Разбери файлы с данными','работать с файлами'],
- ['Поиск и сортировка','sort','Отсортируй рекорды','отсортировать таблицу рекордов'],
+ ['Гибкие функции','loop','Зашифруй сообщение','шифровать сообщения шифром Цезаря'],
+ ['Исключения','bulb','Сделай программу, которая не падает','писать программы, которые не падают от ошибок'],
+ ['Файлы и форматы данных','file','Веди дневник расходов','вести дневник расходов в файле'],
+ ['Поиск и сортировка','sort','Отсортируй рекорды','быстро искать и сортировать данные'],
+ ['Классы и объекты','list','Опиши склад классами','описывать вещи из жизни своими классами'],
  ['Наследование','box','Опиши героя игры','описать героя игры классом'],
+ ['Массивы и математика','chart','Обработай картинку из чисел','считать по целым массивам чисел'],
  ['Таблицы данных','chart','Найди закономерность в данных','разбирать таблицы с данными'],
- ['Запросы к серверам','bot','Сделай бота','сделать своего бота'],
- ['Итоговые проекты','cap','Курс пройден','сделать свой проект от идеи до программы']];
-function skPts(){var n=0;TOPICS.forEach(function(t,i){if(t.intro)return;for(var j=0;j<ni(i);j++)if(S.d[i+'-'+j]||(!t.opt&&i<S.start))n++});return n}
+ ['Запросы к серверам','bot','Подключись к серверу','общаться с серверами из своей программы'],
+ ['Итоговые проекты','cap','Курс пройден','сделать мессенджер и текстовую RPG от идеи до программы']];
+function skPts(){var n=0;TOPICS.forEach(function(t,i){if(t.intro)return;for(var j=0;j<ni(i);j++){var k=i+'-'+j;if(S.d[k]||(!t.opt&&i<S.start)||S.at[k]==='skip'||S.at[k]==='seen')n++}});return n}
 function skList(){var c=0,th={};TOPICS.forEach(function(t,i){if(t.intro||t.opt)return;c+=ni(i);th[t.n]=c});
   return SKL.map(function(m){return{t:m[0]?th[m[0]]:0,e:m[1],n:m[2],c:m[3]}}).filter(function(m){return m.t!==undefined})}
 function skNow(){var p=skPts(),L=skList(),k=0;L.forEach(function(m,i){if(p>=m.t)k=i});return{p:p,L:L,k:k}}
@@ -622,7 +626,7 @@ function skShare(){
 function skills(back){
   var s=skNow(),L=s.L,m=L[s.k];
   var h='<div class="top ls"><button class="icon" id="x" aria-label="Назад">'+ico('back')+'</button><h1>Что ты уже умеешь</h1></div><div class="skp">'+
-   '<div class="skh">'+SKHX+'<b>'+s.p+'</b></div><p class="mu skn">'+pl(s.p,['островок пройден','островка пройдено','островков пройдено'])+', норы тоже считаются</p>'+
+   '<div class="skh"><span class="sklogo" role="img" aria-label="Python">'+PYLOGO+'</span><b>'+s.p+'</b></div><p class="mu skn">'+pl(s.p,['островок пройден','островка пройдено','островков пройдено'])+', пропущенные и норы тоже считаются</p>'+
    rbSay(s.k?'Значит, ты уже можешь '+esc(m.c)+'!':'Пройди первую тему, и здесь появится, что ты уже можешь')+(s.k?'<button class="btn t skshb" id="sksh">'+phi('export')+'Поделиться</button>':'')+
    '<h2 class="skov">Прогресс</h2><ol class="skl">'+L.map(function(x,i){var on=s.p>=x.t,nw=i===s.k;return'<li class="'+(on?'on':'')+(nw?' now':'')+(i+1<L.length&&s.p>=L[i+1].t?' fl':'')+'"><span class="skd">'+ski(x.e)+'</span><span class="sktx"><small>'+SKHX+x.t+'</small><b>'+esc(x.n)+'</b></span></li>'}).join('')+'</ol></div>';
   scr('skills',h);if($('sksh'))$('sksh').onclick=skShare;$('x').onclick=function(){if(typeof back==='function')back();else{SBACK=SBACK||profile;settings()}}}
@@ -728,7 +732,7 @@ var TOCS=null;
 function tocKill(){var o=document.getElementById('toc');if(o)o.remove();if(TOCS){window.removeEventListener('scroll',TOCS);TOCS=null}}
 function tocBuild(){
   tocKill();if(!ST('toc'))return;var tb=$('tb');if(!tb)return;
-  var hs=[].slice.call(tb.querySelectorAll('h3'));if(hs.length<4)return;
+  var hs=[].slice.call(tb.querySelectorAll('h3'));if(hs.length<2)return;
   var a=document.createElement('nav');a.id='toc';a.setAttribute('aria-label','Оглавление');
   a.innerHTML='<div class="tct">Оглавление</div>'+hs.map(function(h,k){h.id='tcs'+k;return'<button data-k="'+k+'">'+esc(h.textContent)+'</button>'}).join('');
   document.body.appendChild(a);
