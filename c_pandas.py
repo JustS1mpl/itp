@@ -176,6 +176,15 @@ def code_csv():
              '    d = df[col].describe()\n    print(f"Записей: {int(d[\'count\'])}")\n    print(f"Среднее: {d[\'mean\']:.2f}")\n    print(f"Минимум: {int(d[\'min\'])}")\n'
              '    print(f"Максимум: {int(d[\'max\'])}")',
              ['цена', 'количество', 'товар'], files={'cafe.csv': CAFE}),
+        task('Рядом лежит runs.csv — забеги спидраннеров: игрок, игра, время в секундах (у некоторых время не записано). '
+             'На вход подаётся игра. Выведи три лучших забега по этой игре (меньшее время лучше, при равном — по игроку) '
+             'строками «N. ИГРОК — T с», без забегов без времени. Если забегов нет — «Нет забегов».',
+             'Маска (df["игра"] == game) & ~df["время"].isna() — пустые времена отсеиваются. sort_values(["время", "игрок"]).head(3).',
+             'import pandas as pd\ndf = pd.read_csv("runs.csv")\ngame = input()\nr = df[(df["игра"] == game) & ~df["время"].isna()].sort_values(["время", "игрок"]).head(3)\n'
+             'if len(r) == 0:\n    print("Нет забегов")\nfor i, (p, t) in enumerate(zip(r["игрок"], r["время"]), 1):\n    print(f"{i}. {p} — {int(t)} с")',
+             ['подвал', 'платформер', 'шахматы'],
+             files={'runs.csv': 'игрок,игра,время\nКира,подвал,1820\nZed,подвал,1710\nЯн,подвал,\nЛи,платформер,640\nОля,подвал,1710\n'
+                                'Макс,подвал,2400\nТим,платформер,\n'}),
     ])
 
 
@@ -249,6 +258,24 @@ def code_group():
              '    print(f"Продаж: {len(day)}")\n    print(f"Чашек и штук: {day[\'количество\'].sum()}")\n    by_cat = day.groupby("категория")["количество"].sum()\n'
              '    for cat, k in sorted(zip(by_cat.index, by_cat.values), key=lambda p: (-p[1], p[0])):\n        print(f"{cat}: {k} шт.")',
              ['вт', 'чт', 'пт'], files={'cafe.csv': CAFE}),
+        task('Рядом лежит runs.csv с забегами другого турнира: игрок, игра, время в секундах. Для каждой игры (по алфавиту) выведи строку '
+             '«ИГРА: забегов N, лучшее T с, среднее A с» — среднее с одним знаком после точки, забеги без времени не считаются. '
+             'Затем «Самая быстрая игра: ИГРА» — с наименьшим средним.',
+             'df.groupby("игра")["время"].agg(["count", "min", "mean"]) — count не считает пропуски. Наименьшее среднее — idxmin().',
+             'import pandas as pd\ndf = pd.read_csv("runs.csv")\ng = df.groupby("игра")["время"].agg(["count", "min", "mean"])\n'
+             'for game in g.index:\n    print(f"{game}: забегов {g.loc[game, \'count\']}, лучшее {int(g.loc[game, \'min\'])} с, среднее {g.loc[game, \'mean\']:.1f} с")\n'
+             'print(f"Самая быстрая игра: {g[\'mean\'].idxmin()}")',
+             [''],
+             files={'runs.csv': 'игрок,игра,время\nКира,подвал,1820\nZed,подвал,1710\nЯн,подвал,\nЛи,платформер,640\nОля,платформер,700\n'
+                                'Макс,кубы,3000\nТим,платформер,\n'}),
+        task('Часы в играх. На вход подаются строки «ник игра часы» до «стоп». Собери DataFrame со столбцами ник, игра, часы. '
+             'Выведи строками «ИГРА: N» сколько раз встречается каждая игра (как value_counts — по убыванию), затем «Больше всех '
+             'играл: НИК (H ч)».',
+             'pd.DataFrame(rows, columns=[...]); df["игра"].value_counts(); строка с максимумом — df.loc[df["часы"].idxmax()].',
+             'import pandas as pd\nrows = []\nwhile True:\n    s = input()\n    if s == "стоп":\n        break\n    nick, game, h = s.split()\n    rows.append([nick, game, int(h)])\n'
+             'df = pd.DataFrame(rows, columns=["ник", "игра", "часы"])\nvc = df["игра"].value_counts()\nfor game, n in zip(vc.index, vc.values):\n'
+             '    print(f"{game}: {n}")\nbest = df.loc[df["часы"].idxmax()]\nprint(f"Больше всех играл: {best[\'ник\']} ({best[\'часы\']} ч)")',
+             ['Кира ферма 120\nZed шутер 300\nЯн ферма 40\nЛи ферма 5\nстоп', 'А кубы 1\nстоп', 'А x 5\nБ y 9\nВ y 1\nстоп']),
     ])
 
 

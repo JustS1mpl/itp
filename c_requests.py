@@ -106,6 +106,17 @@ def code_http():
              'import requests\n\nn = int(input())\nrolls = [int(requests.get("http://dice.itp/roll").text) for _ in range(n)]\nprint(" ".join(map(str, rolls)))\n'
              'print(f"Сумма: {sum(rolls)}")\nprint(f"Шестёрок: {rolls.count(6)}")',
              ['3', '6', '8'], files=DICE),
+        task('Таблица лидеров арены: GET http://arena.itp/top возвращает JSON-список словарей с ключами nick и score. '
+             'На вход подаётся n. Выведи n лучших по убыванию очков (при равенстве — по нику) строками «N. НИК — ОЧКИ», '
+             'очки с разделителем разрядов, а затем «Всего игроков: K».',
+             'top = requests.get(...).json(); sorted(top, key=lambda p: (-p["score"], p["nick"]))[:n]; формат :, для очков.',
+             'import requests\n\nn = int(input())\ntop = requests.get("http://arena.itp/top").json()\n'
+             'for i, p in enumerate(sorted(top, key=lambda p: (-p["score"], p["nick"]))[:n], 1):\n    print(f"{i}. {p[\'nick\']} — {p[\'score\']:,}")\n'
+             'print(f"Всего игроков: {len(top)}")',
+             ['3', '1', '10'],
+             files=servers(**{'arena.itp': {'routes': {'/top': {'json': [
+                 {'nick': 'Кира', 'score': 15200}, {'nick': 'Zed', 'score': 99000}, {'nick': 'Ли', 'score': 15200},
+                 {'nick': 'neo', 'score': 870}, {'nick': 'Тень', 'score': 120500}]}}}})),
     ])
 
 
@@ -191,6 +202,15 @@ def code_methods():
              '        continue\n    cmd, arg = s.split(" ", 1)\n    if cmd == "добавить":\n        m = requests.post(base, json={"name": arg}).json()\n        print(f"Добавлен #{m[\'id\']}")\n'
              '    elif cmd == "удалить":\n        r = requests.delete(f"{base}/{arg}")\n        print(f"Удалён #{arg}" if r.status_code == 204 else f"Нет участника #{arg}")',
              ['список\nдобавить Вика\nудалить 1\nсписок\nстоп', 'удалить 7\nудалить 2\nудалить 1\nсписок\nдобавить Глеб\nсписок\nстоп'], files=CLUB),
+        task('Вики рецептов: GET http://craft.itp/recipe с параметром item возвращает JSON-словарь «материал → количество» '
+             'для этого предмета. На вход подаются предмет и сколько штук сделать. Выведи материалы по алфавиту строками '
+             '«МАТЕРИАЛ: N» — на все штуки сразу. Если рецепта нет (код ответа 404), выведи «Рецепт не найден».',
+             'r = requests.get(url, params={"item": item}); проверь r.status_code == 404, иначе r.json() и умножение на количество.',
+             'import requests\n\nitem = input()\nn = int(input())\nr = requests.get("http://craft.itp/recipe", params={"item": item})\n'
+             'if r.status_code == 404:\n    print("Рецепт не найден")\nelse:\n    need = r.json()\n    for m in sorted(need):\n        print(f"{m}: {need[m] * n}")',
+             ['факел\n4', 'кирка\n1', 'бластер\n2'],
+             files=servers(**{'craft.itp': {'routes': {'/recipe': {'param': 'item', 'variants': {
+                 'факел': {'палка': 1, 'уголь': 1}, 'кирка': {'палка': 2, 'камень': 3}}}}}})),
     ])
 
 
@@ -250,6 +270,15 @@ def code_errors():
              'import requests\n\npath = input()\nfor attempt in range(1, 4):\n    r = requests.get("http://flaky.itp" + path)\n    print(f"Попытка {attempt}: код {r.status_code}")\n'
              '    if r.ok:\n        print(f"Данные: {r.text}")\n        break\nelse:\n    print("Сервер недоступен")',
              ['/data', '/down', '/ok', '/nope'], files=FLAKY),
+        task('Мониторинг серверов. На вход подаются адреса до слова «стоп». Для каждого выведи «АДРЕС — OK», если ответ '
+             'успешный, «АДРЕС — код N», если сервер ответил ошибкой, и «АДРЕС — нет связи», если сервера нет. '
+             'В конце — «Работают: K из M».',
+             'try: r = requests.get(url) / except requests.ConnectionError. Успех — r.ok, иначе r.status_code.',
+             'import requests\n\nok = 0\ntotal = 0\nwhile True:\n    url = input()\n    if url == "стоп":\n        break\n    total += 1\n    try:\n'
+             '        r = requests.get(url)\n    except requests.ConnectionError:\n        print(f"{url} — нет связи")\n        continue\n    if r.ok:\n'
+             '        print(f"{url} — OK")\n        ok += 1\n    else:\n        print(f"{url} — код {r.status_code}")\nprint(f"Работают: {ok} из {total}")',
+             ['http://game.itp/\nhttp://game.itp/admin\nhttp://dead.itp/\nстоп', 'http://game.itp/\nстоп', 'http://dead.itp/x\nстоп'],
+             files=servers(**{'game.itp': {'routes': {'/': {'text': 'онлайн'}}}})),
     ])
 
 

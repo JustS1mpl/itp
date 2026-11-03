@@ -148,7 +148,7 @@ def code_finally():
              'def describe(x):\n    if isinstance(x, (int, float)):\n        return "число"\n    if isinstance(x, str):\n        return "текст"\n'
              '    if isinstance(x, list):\n        return "список"\n    return "другое"',
              ['print(describe(5), describe(2.5))', 'print(describe("5"), describe([5]))', 'print(describe((5,)), describe({}))'], tail=TL),
-        task('Терминал на двери. На вход подаются попытки ввести код, не больше трёх. На каждую попытку выведи «Попытка N»; '
+        task('Терминал на двери. На вход подаются попытки ввести код, не больше трёх. На каждую попытку выведи сообщение, а под ним «Попытка N»: '
              'если введены не цифры — «Это не код»; если код 2077 — «Доступ открыт» и попытки заканчиваются; иначе «Неверно». '
              'Если после трёх попыток дверь закрыта, выведи «Терминал заблокирован».',
              'for n in range(1, 4) с try: code = int(input()) / except ValueError / else: проверка кода / finally: «Попытка N» — '
