@@ -62,6 +62,9 @@ _NF = _js.load(open('assets/nunito_static.json'))
 css = ''.join("@font-face{font-family:'Nunito';font-style:normal;font-weight:%s;font-display:block;src:url(data:font/woff2;base64,%s) format('woff2')}\n" % (w, _NF[w]) for w in sorted(_NF)) + css
 a = s.index('<style>'); b = s.index('</style>')
 s = s[:a] + '<style>\n' + css + '\n' + s[b:]
+# приложение для телефона рисуется под системными полосами (ItpSysPlugin): их размер приходит в --sa-top/--sa-bottom/…,
+# а в браузере этих переменных нет и работает обычный env(safe-area-inset-*)
+s = re.sub(r"env\(safe-area-inset-(top|bottom|left|right)((?:,[^()]*)?)\)", r"var(--sa-\1,env(safe-area-inset-\1\2))", s)
 s = s.replace('</style>', "</style><script>try{['400','500','600','700','800','900'].forEach(function(w){document.fonts.load(w+' 16px Nunito')})}catch(e){}</script>", 1)
 
 # --- пакет смайликов

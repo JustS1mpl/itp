@@ -112,3 +112,19 @@ function ntAsk(cb){var L=NP('LocalNotifications');if(!L)return cb&&cb(false);
   window.addEventListener('load',function(){setTimeout(function(){if(!S.nick)return;
     if(ST('nt')&&!appGet().nas){appSet({nas:1});ntAsk(function(){ntSchedule()})}else ntSchedule()},4000)});
 })();
+
+/* телефон: ИТП во весь экран и под системными полосами (ItpSysPlugin в app/android). Размер полос — в --sa-top/…
+   (build5.py подставляет их вместо env(safe-area-inset-*)), цвет значков на полосах — по тому, тёмный ли сейчас экран:
+   тёмная тема, вступление (crt-on), кролик спиной, синий экран — светлые значки; иначе тёмные */
+(function(){
+  var SY=NP('ItpSys');if(NATIVE!=='android'||!SY)return;
+  function sa(o){var r=document.documentElement.style;['top','bottom','left','right'].forEach(function(k){r.setProperty('--sa-'+k,((o&&o[k])||0)+'px')})}
+  try{SY.insets().then(sa);SY.addListener('insets',sa)}catch(e){}
+  var bd=null,t=0;
+  function dark(){var h=document.documentElement;return h.classList.contains('crt-on')||isDark()||!!document.querySelector('body>.bkt,body>.crt')}
+  function upd(){var d=dark();if(d!==bd){bd=d;try{SY.bars({dark:d})}catch(e){}}}
+  function soon(){clearTimeout(t);t=setTimeout(upd,40)}
+  new MutationObserver(soon).observe(document.documentElement,{attributes:true,attributeFilter:['class','data-theme']});
+  function body(){new MutationObserver(soon).observe(document.body,{childList:true});upd()}
+  if(document.body)body();else document.addEventListener('DOMContentLoaded',body);
+})();
