@@ -1415,6 +1415,36 @@
     "mod": [],
     "err": []
    }
+  },
+  {
+   "id": "pydantic",
+   "n": "Pydantic: проверяем данные",
+   "after": "inheritance",
+   "run": "pyodide-package",
+   "min": 40,
+   "about": "модель BaseModel, приведение типов, ValidationError с путём к полю, model_validate(_json)/model_dump, вложенные модели; Field с границами, field_validator; мини-проект: каталог игр из кривого ответа сервера",
+   "introduces": {
+    "f": [
+     "pydantic.BaseModel",
+     "pydantic.Field",
+     "pydantic.field_validator",
+     "pydantic.ValidationError",
+     "classmethod"
+    ],
+    "m": [
+     "model_validate",
+     "model_validate_json",
+     "model_dump",
+     "errors"
+    ],
+    "k": [],
+    "mod": [
+     "pydantic"
+    ],
+    "err": [
+     "ValidationError"
+    ]
+   }
   }
  ]
 }
