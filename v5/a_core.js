@@ -1,5 +1,5 @@
 /* ===================== ИТП — ядро: настройки, сохранение, звук, серия, цели, достижения ===================== */
-function defset(){return{acc:'',exl:'c',tz:100,anim:'full',vol:70,sfx:1,vib:1,emo:1,ty:1,toc:1,rep:1,ln:1,ac:1,cf:15,gc:1,bg:1,bgp:'dots',tb:'glass',ks:0,ph:'card',sh:'v',fl:'tilt'}}
+function defset(){return{acc:'',exl:'c',tz:100,anim:'full',vol:70,sfx:1,vib:1,emo:1,ty:1,toc:1,rep:1,ln:1,ac:1,cf:15,gc:1,bg:1,bgp:'dots',ks:0,ph:'card',sh:'v',fl:'tilt'}}
 function ST(k){return S.set&&S.set[k]!==undefined?S.set[k]:defset()[k]}
 function RM(){return ST('anim')==='off'||matchMedia('(prefers-reduced-motion:reduce)').matches}
 /* --- ключи сохранений и языки (U2-2, U2-3; DECISIONES §70) ---
@@ -58,7 +58,7 @@ function clean(r){
   var o=clean0(r);o.mv=4;r=(r&&typeof r==='object'&&!Array.isArray(r))?r:{};
   var s=(r.set&&typeof r.set==='object'&&!Array.isArray(r.set))?r.set:{},q={};
   var pick=function(k,list){q[k]=list.indexOf(s[k])>=0?s[k]:defset()[k]},bl=function(k){q[k]=s[k]===0||s[k]===false?0:(s[k]===1||s[k]===true?1:defset()[k])};
-  pick('acc',['','carrot','pink','blue','violet']);pick('tz',[90,100,115,130]);pick('anim',['full','less','off']);pick('cf',[13,15,17,19]);pick('sh',['v','h']);pick('ph',['card','corner','pop']);pick('fl',['tilt','flat']);pick('bgp',['dots','blobs','none']);pick('tb',['glass','band','big','pill']);
+  pick('acc',['','carrot','pink','blue','violet']);pick('tz',[90,100,115,130]);pick('anim',['full','less','off']);pick('cf',[13,15,17,19]);pick('sh',['v','h']);pick('ph',['card','corner','pop']);pick('fl',['tilt','flat']);pick('bgp',['dots','blobs','none']);
   q.vol=typeof s.vol==='number'&&s.vol>=0&&s.vol<=100?Math.round(s.vol):defset().vol;
   ['sfx','vib','emo','ty','toc','rep','ln','ac','gc','bg','ks'].forEach(bl);
   /* «Минимализм» убран (6.9.0): у кого он был включён, узор на фоне возвращается таким, каким был до минимализма (mb) */
@@ -93,7 +93,7 @@ function applyPrefs(){
   r.setAttribute('data-theme',th);
   if(ST('acc'))r.setAttribute('data-acc',ST('acc'));else r.removeAttribute('data-acc');
   r.style.setProperty('--tz',ST('tz')/100);r.style.setProperty('--cf',ST('cf')+'px');
-  r.setAttribute('data-anim',ST('anim'));r.setAttribute('data-fl',ST('fl'));r.classList.toggle('noln',!ST('ln'));r.setAttribute('data-ph',ST('ph'));r.setAttribute('data-bgp',ST('bgp'));r.setAttribute('data-tb',ST('tb'));r.classList.toggle('exbig',ST('exl')==='b');
+  r.setAttribute('data-anim',ST('anim'));r.setAttribute('data-fl',ST('fl'));r.classList.toggle('noln',!ST('ln'));r.setAttribute('data-ph',ST('ph'));r.setAttribute('data-bgp',ST('bgp'));r.classList.toggle('exbig',ST('exl')==='b');
   var m=document.querySelector('meta[name=theme-color]');if(!m){m=document.createElement('meta');m.name='theme-color';document.head.appendChild(m)}
   m.content=th==='dark'?'#171315':'#FBF7F5';
 }
