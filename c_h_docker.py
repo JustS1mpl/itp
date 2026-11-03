@@ -39,7 +39,8 @@ def th_image():
         '<pre class="pc"># hello.py\nimport sys\nprint("Привет из контейнера! Python", sys.version.split()[0])\n\n# Dockerfile\nFROM python:3.13-slim\n'
         'COPY hello.py .\nCMD ["python", "hello.py"]\n\n# в терминале, в этой папке:\ndocker build -t hello .\ndocker run hello\n'
         'Привет из контейнера! Python 3.13.9</pre>'
-        '<p>Python на компьютере даже не нужен — он внутри образа. Сервис с портом запускают так же, плюс несколько полезных команд:</p>'
+        '<p>Точка в конце <code>docker build -t hello .</code> — папка, откуда брать файлы для сборки (здесь — текущая): из неё COPY и копирует. '
+        'Python на компьютере даже не нужен — он внутри образа. Сервис с портом запускают так же, плюс несколько полезных команд:</p>'
         '<pre class="pc">docker build -t weather .              # собрать образ с именем weather\ndocker run -p 8000:8000 weather        # запустить: порт 8000 компьютера → 8000 контейнера\n'
         'docker ps                              # какие контейнеры работают\ndocker logs ID                         # что контейнер напечатал\n'
         'docker stop ID                         # остановить</pre>'
@@ -97,7 +98,7 @@ def code_image():
              'начинающиеся на «src/», а источник без «/» в конце — только файл с точно таким именем. Строки нового файла сверх длины старого '
              'всегда собираются. Выведи «N. СТРОКА — кэш» или «N. СТРОКА — сборка», затем «Из кэша: K из M».',
              'changed = input().split()[1:]. Флаг cached = True; как только слой собирается, флаг навсегда False.\n'
-             'Совпадение источника: src == "." or f == src or f.startswith(src) при src, кончающемся на «/».',
+             'Совпадение источника: src == "." or f == src or (src.endswith("/") and f.startswith(src)).',
              'def read(stop):\n    lines = []\n    while True:\n        line = input()\n        if line == stop:\n            return lines\n        lines.append(line)\n\n\n'
              'def touched(src, changed):\n    for f in changed:\n        if src == "." or f == src or (src.endswith("/") and f.startswith(src)):\n            return True\n    return False\n\n\n'
              'changed = input().split()[1:]\nold = read("---")\nnew = read("конец")\ncached = True\nk = 0\nfor i, line in enumerate(new):\n'
@@ -187,7 +188,7 @@ def code_compose():
 def project():
     return pj('Линтер Dockerfile',
               'Напиши проверку Dockerfile, как у настоящих линтеров. Рядом лежат файлы Dockerfile, bot.Dockerfile, old.Dockerfile и tiny.Dockerfile; на вход '
-              'подаётся имя файла. Пустые строки и комментарии пропускай, но номера строк считай по файлу (с 1). Инструкция — первое слово строки. Правила:\n'
+              'подаётся имя файла. Пустые строки и комментарии пропускай, но номера строк считай по файлу (с 1). Инструкция — первое слово строки; образ в FROM — второе слово (вида FROM образ AS имя в файлах нет). Правила:\n'
               '— первая инструкция не FROM → «строка N: первой должна быть FROM»;\n'
               '— у образа в FROM нет тега (нет «:») или тег latest → «строка N: закрепи версию образа»;\n'
               '— в ENV есть переменная, в имени которой (в верхнем регистре) есть KEY, TOKEN, PASSWORD или SECRET → «строка N: секрет в образе — передавай при запуске» '

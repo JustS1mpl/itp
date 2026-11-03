@@ -40,6 +40,9 @@ def th_model():
         '<p>Программы в ИТП в интернет не ходят, но само приложение при первом import pydantic скачивает пакет (как numpy) и запоминает — нужно, чтобы телефон или компьютер был онлайн один раз. Офлайн до первой загрузки будет ModuleNotFoundError.</p>'
         + ex('from pydantic import BaseModel\n\n\nclass Player(BaseModel):\n    name: str\n    level: int\n    hp: float = 100\n    guild: str | None = None\n\n\n'
              'p = Player.model_validate({"name": "Ash", "level": "12"})\nprint(p)\nprint(p.level + 1, p.model_dump())') +
+        '<p>Подсказки типов здесь чуть богаче, чем <code>x: int</code>: <code>str | None</code> — «строка или None», <code>list[Item]</code> — '
+        '«список, где каждый элемент — Item», <code>list[str] = []</code> — список строк, по умолчанию пустой. Значение после = — по умолчанию, '
+        'Pydantic его не проверяет и не приводит.</p>'
         '<p>Строку «12» Pydantic сам привёл к числу: это безопасно, смысл не потерян. А вот «семь» числом не станет — будет [[ValidationError]], '
         'и в нём сказано, где именно проблема. [[errors]] даёт список: путь к полю, код и описание:</p>'
         + ex('from pydantic import BaseModel, ValidationError\n\n\nclass Player(BaseModel):\n    name: str\n    level: int\n\n\ntry:\n'
@@ -69,7 +72,8 @@ def fl_model():
 def code_model():
     return ts('Модель и ошибки', [
         task('Профили игроков. В файле players.jsonl по JSON-объекту в строке — так их прислал сервер. Модель: name — строка, level — целое, hp — дробное '
-             '(по умолчанию 100), guild — строка или None (по умолчанию None). Для каждой строки (N — номер с 1) выведи «N. ИМЯ: ур. L, hp H, гильдия G» (hp — как печатает Python дробное: 100.0) '
+             '(по умолчанию 100), guild — строка или None (по умолчанию None). Для каждой строки (N — номер с 1) выведи «N. ИМЯ: ур. L, hp H, гильдия G» (hp из JSON — дробное и печатается как 87.5 или 100.0, а значение по умолчанию — целое 100 '
+             'и печатается как 100: Pydantic не приводит значения по умолчанию) '
              '(вместо None — «нет») или, если данные не прошли проверку, «N. ошибка: поле/код, поле/код» — по всем ошибкам, где поле — последний '
              'элемент loc. Затем «Принято: K из M». На вход подаётся минимальный уровень: принятые игроки ниже него не выводятся (но считаются).',
              'Player.model_validate_json(line.strip()) в try … except ValidationError as e. Части ошибки: err["loc"][-1], err["type"].',
@@ -81,7 +85,8 @@ def code_model():
              ['1', '10'], files={'players.jsonl': RESP}),
         task('Где именно. На вход подаётся одна строка — JSON инвентаря, который прислал сервер. Модель Item: name — строка, qty — целое; Inventory: owner — '
              'строка, items — список Item. Если всё верно — выведи «ВЛАДЕЛЕЦ: N предм., всего Q шт.». Иначе для каждой ошибки — путь через точку '
-             '(«items.1.qty») и через пробел код ошибки; если JSON вообще не разобрался, путь пустой — выводи «(весь ответ)».',
+             '(«items.1.qty») и через пробел код ошибки, например «items.1.qty int_parsing» или «owner missing»; если JSON вообще не разобрался, '
+             'путь пустой — выводи «(весь ответ) json_invalid».',
              'Путь: ".".join(str(x) for x in err["loc"]) or "(весь ответ)".',
              'from pydantic import BaseModel, ValidationError\n\n\nclass Item(BaseModel):\n    name: str\n    qty: int\n\n\nclass Inventory(BaseModel):\n    owner: str\n'
              '    items: list[Item]\n\n\ntry:\n    inv = Inventory.model_validate_json(input())\nexcept ValidationError as e:\n    for err in e.errors():\n'
@@ -133,7 +138,7 @@ def code_rules():
         task('Заявка на турнир. На вход подаются строки JSON, последняя — «конец». Модель Entry: team — строка от 3 до 20 символов; players — целое '
              'от 2 до 5; nick_captain — строка, своя проверка: убрать пробелы по краям, перевести в нижний регистр, а если в нике не только буквы, '
              'цифры и «_», — ValueError «ник: только буквы, цифры и _». Для верной заявки выведи «N. TEAM (P игр.), капитан NICK», для неверной — '
-             '«N. отклонена: поле — msg» по каждой ошибке (msg — как есть). В конце — «Принято: K».',
+             '«N. отклонена: поле — msg; поле — msg» — все ошибки одной заявки в одной строке через «; » (msg — как есть). В конце — «Принято: K».',
              'Ник без «_» и проверь isalnum: value.replace("_", "").isalnum().',
              'from pydantic import BaseModel, Field, ValidationError, field_validator\n\n\nclass Entry(BaseModel):\n    team: str = Field(min_length=3, max_length=20)\n'
              '    players: int = Field(ge=2, le=5)\n    nick_captain: str\n\n    @field_validator("nick_captain")\n    @classmethod\n    def clean(cls, value):\n'
@@ -163,10 +168,10 @@ def code_rules():
 
 def project():
     return pj('Каталог игр',
-              'Сервер прислал каталог игр — games.json, список объектов. Модель Game: title — строка от 1 символа; year — целое от 1990 до 2026; rating — '
-              'дробное от 0 до 10; tags — список строк (по умолчанию пустой). Своя проверка title: обрезать пробелы по краям. Проверь каждую запись и '
+              'Сервер прислал каталог игр — games.json, список объектов. Модель Game: title — строка, длина от 1 символа после обрезки пробелов; year — целое от 1990 до 2026; rating — '
+              'дробное от 0 до 10; tags — список строк (по умолчанию пустой). Своя проверка title: обрезать пробелы по краям, а если осталась пустая строка — ValueError «пустое название». Проверь каждую запись и '
               'выведи отчёт. На вход подаётся команда:\n'
-              '— «отчёт» → «Принято: K из N», затем по каждой отклонённой «#НОМЕР (с 1): поле/код, поле/код» и «Чаще всего ломается: поле» — поле, '
+              '— «отчёт» → «Принято: K из N», затем по каждой отклонённой «#НОМЕР (с 1): поле/код, поле/код» (поле — первый элемент loc) и «Чаще всего ломается: поле» — поле, '
               'которое встречается в ошибках чаще всех (при равенстве — первое по алфавиту);\n'
               '— «топ M» → M лучших принятых игр строками «RATING TITLE (YEAR)» (рейтинг — как печатает Python дробное: 9.0) по убыванию рейтинга (при равенстве — по названию);\n'
               '— «тег ТЕГ» → названия принятых игр с этим тегом через запятую с пробелом в порядке файла или «Нет игр с тегом ТЕГ».',
@@ -174,7 +179,7 @@ def project():
               'tags: list[str] = [] — Pydantic даёт каждому объекту свою копию значения по умолчанию\nСчётчик полей ошибок — Counter',
               'import json\nfrom collections import Counter\nfrom pydantic import BaseModel, Field, ValidationError, field_validator\n\n\nclass Game(BaseModel):\n'
               '    title: str = Field(min_length=1)\n    year: int = Field(ge=1990, le=2026)\n    rating: float = Field(ge=0, le=10)\n    tags: list[str] = []\n\n'
-              '    @field_validator("title")\n    @classmethod\n    def strip_title(cls, value):\n        return value.strip()\n\n\n'
+              '    @field_validator("title")\n    @classmethod\n    def strip_title(cls, value):\n        value = value.strip()\n        if not value:\n            raise ValueError("пустое название")\n        return value\n\n\n'
               'games, bad = [], []\nfor n, raw in enumerate(json.load(open("games.json", encoding="utf-8")), 1):\n    try:\n        games.append(Game.model_validate(raw))\n'
               '    except ValidationError as e:\n        bad.append((n, [(err["loc"][0], err["type"]) for err in e.errors()]))\n\ncmd = input().split(maxsplit=1)\n'
               'if cmd[0] == "отчёт":\n    print(f"Принято: {len(games)} из {len(games) + len(bad)}")\n    fields = Counter()\n    for n, errs in bad:\n'

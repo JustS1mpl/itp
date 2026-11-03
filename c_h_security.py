@@ -37,7 +37,7 @@ def th_input():
         '<h3>Пути и белые списки</h3>'
         '<p>Сайт отдаёт файлы из папки uploads по имени из адреса. Имя <code>../config.py</code> выведет из папки — это [[обход пути]]. '
         'Пытаться запретить все опасные сочетания бесполезно: их много и они хитрые. Надёжнее [[белый список]]: разрешить только то, что '
-        'точно безопасно:</p>'
+        'точно безопасно (в задаче правила будут строже — по длине и первому символу):</p>'
         + ex('ALLOWED = "abcdefghijklmnopqrstuvwxyz0123456789_-."\n\n\ndef is_safe(name):\n    return name != "" and ".." not in name and all(ch in ALLOWED for ch in name.lower())\n\n\n'
              'for name in ["cat.png", "../config.py", "notes 1.txt", "Report_2.PDF"]:\n    print(name, is_safe(name))')
     )
@@ -102,7 +102,8 @@ def th_secrets():
     body = (
         '<p>Пароли не хранят в открытом виде: базы утекают, и тогда утекут пароли от всего — люди ставят один пароль везде. Хранят [[хэш]] — '
         'отпечаток пароля, по которому пароль не восстановить. При входе считают хэш введённого и сравнивают с сохранённым. В Python есть '
-        'модуль [[hashlib]]; [[hashlib.sha256]] принимает байты — строку переводит в них [[encode]], а [[hexdigest]] даёт хэш строкой:</p>'
+        'модуль [[hashlib]]. Хэш-функции работают с байтами — числами от 0 до 255, из которых на диске и в сети состоит любой текст; '
+        '[[hashlib.sha256]] принимает байты — строку переводит в них [[encode]], а [[hexdigest]] даёт хэш строкой:</p>'
         + ex('import hashlib\n\nprint(hashlib.sha256("qwerty".encode()).hexdigest())\nprint(hashlib.sha256("qwertY".encode()).hexdigest())') +
         '<p>Но у популярных паролей хэши давно собраны в таблицы. Поэтому к паролю добавляют [[соль]] — свою для каждого пользователя:</p>'
         + ex('import hashlib\n\n\ndef password_hash(password, salt):\n    return hashlib.sha256((salt + password).encode()).hexdigest()\n\n\n'
@@ -154,23 +155,27 @@ def code_secrets():
              ['рег vika supersecret a91f\nрег tim 12345 77aa\nрег tim qwerty123 77aa\nвход vika supersecret\nвход vika Supersecret\nвход bob supersecret\n'
               'вход tim qwerty123\nрег vika other123 0000\nконец', 'рег a password a\nрег b password b\nконец']),
         task('Сканер секретов. На вход подаются строки кода, последняя — «КОНЕЦ». Найди в каждой строке подозрения (проверяй по порядку, на строку — '
-             'первое сработавшее): 1) в строковом значении в кавычках (" или \'; значения — сначала в двойных, потом в одинарных, слева направо) '
-             'встречается ghp_ — «токен GitHub», sk- — «ключ API», AKIA — «ключ AWS»; значение — от этого префикса до конца строки в кавычках; '
-             '2) иначе — если в строке есть «=», слева от первого «=» в нижнем регистре есть password, passwd, secret, token или key (как часть имени: '
-             'API_KEY, db_password), а справа есть строка в кавычках — «пароль в коде», значение — первая строка в кавычках справа. Для каждой находки '
-             'выведи «строка N: ПРИЧИНА: ЗНАЧЕНИЕ», где у значения видны только первые 4 символа, остальные заменены звёздочками. В конце — «Найдено: K» '
-             'и, если K > 0, «Отзови ключи и вынеси их в переменные окружения».',
-             'Значения в кавычках: line.split(\'"\')[1::2] — куски с номерами 1, 3, 5… лежат внутри кавычек (то же для \'). Префикс: v.find(prefix).\n'
-             'Маска: value[:4] + "*" * (len(value) - 4).',
-             'def quoted(line):\n    values = []\n    for q in (\'"\', "\'"):\n        values += line.split(q)[1::2]\n    return values\n\n\ndef mask(value):\n'
+             'первое сработавшее): 1) в строковом значении в кавычках (" или \'; значения — по положению в строке, слева направо) встречается '
+             'ghp_ — «токен GitHub», sk- — «ключ API», AKIA — «ключ AWS», причём префикс стоит в начале значения или после пробела (в «risk-free» '
+             'sk- — часть слова, это не ключ); значение — от префикса до конца строки в кавычках; 2) иначе — если в строке есть «=», слева от '
+             'первого «=» в нижнем регистре есть password, passwd, secret, token или key (как часть имени: API_KEY, db_password), а справа есть строка '
+             'в кавычках — «пароль в коде», значение — первая по положению строка в кавычках справа. Для каждой находки выведи «строка N: ПРИЧИНА: '
+             'ЗНАЧЕНИЕ», где у значения видны только первые 4 символа, остальные заменены звёздочками. В конце — «Найдено: K» и, если K > 0, '
+             '«Отзови ключи и вынеси их в переменные окружения».',
+             'Строки в кавычках: иди по символам; встретил " или \' — найди такую же закрывающую через find(кавычка, i + 1) и продолжай после неё.\n'
+             'Префикс в начале или после пробела: v.startswith(p) или " " + p in v. Маска: value[:4] + "*" * (len(value) - 4).',
+             'def quoted(line):\n    values = []\n    i = 0\n    while i < len(line):\n        if line[i] in "\\"\'":\n            end = line.find(line[i], i + 1)\n'
+             '            if end == -1:\n                break\n            values.append(line[i + 1:end])\n            i = end + 1\n        else:\n            i += 1\n'
+             '    return values\n\n\ndef prefix_at(value, prefix):\n    if value.startswith(prefix):\n        return 0\n    k = value.find(" " + prefix)\n'
+             '    return k + 1 if k != -1 else -1\n\n\ndef mask(value):\n'
              '    return value[:4] + "*" * (len(value) - 4)\n\n\nPREFIXES = [("ghp_", "токен GitHub"), ("sk-", "ключ API"), ("AKIA", "ключ AWS")]\n'
              'WORDS = ["password", "passwd", "secret", "token", "key"]\nfound = 0\nn = 0\nwhile True:\n    line = input()\n    if line == "КОНЕЦ":\n        break\n    n += 1\n'
-             '    values = quoted(line)\n    hit = None\n    for v in values:\n        for prefix, reason in PREFIXES:\n            if hit is None and prefix in v:\n'
-             '                hit = (reason, v[v.find(prefix):])\n    if hit is None and "=" in line and values:\n        left, right = line.split("=", 1)\n'
+             '    values = quoted(line)\n    hit = None\n    for v in values:\n        for prefix, reason in PREFIXES:\n            if hit is None and prefix_at(v, prefix) != -1:\n'
+             '                hit = (reason, v[prefix_at(v, prefix):])\n    if hit is None and "=" in line and values:\n        left, right = line.split("=", 1)\n'
              '        if any(w in left.lower() for w in WORDS) and quoted(right):\n            hit = ("пароль в коде", quoted(right)[0])\n    if hit:\n        found += 1\n'
              '        print(f"строка {n}: {hit[0]}: {mask(hit[1])}")\nprint(f"Найдено: {found}")\nif found:\n    print("Отзови ключи и вынеси их в переменные окружения")',
              ['import requests\nAPI_KEY = "sk-live-1234567890"\nheaders = {"Authorization": "token ghp_abcdef123456"}\nurl = "https://api.itp/token"\n'
-              'DB_PASSWORD = \'hunter2hunter2\'\nretries = 3\nКОНЕЦ', 'name = "Вика"\nprint("ключ")\nКОНЕЦ', 'aws = "AKIAIOSFODNN7EXAMPLE"\nКОНЕЦ']),
+              'DB_PASSWORD = \'hunter2hunter2\'\nretries = 3\nКОНЕЦ', 'name = "Вика"\nmode = "risk-free"\nprint(\'ключ\', "sk-test-777")\nКОНЕЦ', 'aws = "AKIAIOSFODNN7EXAMPLE"\nКОНЕЦ']),
     ])
 
 
