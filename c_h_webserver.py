@@ -23,7 +23,7 @@ def th_routes():
         ('веб-сервер', 'Программа, которая ждёт HTTP-запросы и отвечает на них. Клиент (браузер, requests, бот) спрашивает — сервер отвечает кодом и телом.'),
         ('маршрут', 'Пара «метод + путь» и функция, которая отвечает на такой запрос: GET /notes → list_notes.'),
         ('miniweb', 'Учебный веб-фреймворк ИТП: устроен как ядро Flask, но работает без сети. from miniweb import App.'),
-        ('App', 'App() — приложение-сервер miniweb. Маршруты добавляют декораторами @app.get(путь), @app.post(путь), @app.put, @app.delete.'),
+        ('App', 'App() или App("имя") — приложение-сервер miniweb (имя необязательно, его печатает serve). Маршруты добавляют декораторами @app.get(путь), @app.post(путь), @app.put, @app.delete.'),
         ('route', '@app.route(путь, methods=["GET", "POST"]) — один обработчик на несколько методов.'),
         ('параметр пути', 'Изменяемая часть пути в угловых скобках: /hello/<name> или /notes/<int:id>. Значение приходит в обработчик '
                           'аргументом с тем же именем; int: превращает его в число, а нечисло даёт 404.'),
@@ -31,6 +31,8 @@ def th_routes():
                                'req.headers) и параметры пути. Вернёт словарь или список — уйдёт JSON с кодом 200, строку — текст, пару (тело, код) — свой код.'),
         ('test_client', 'app.test_client() — клиент для проверки сервера без сети: client.get(путь), client.post(путь, json=…), client.put, client.delete '
                         'возвращают ответ с status_code, text и json().'),
+        ('request', 'client.request(метод, путь, json=…, headers=…) — запрос тест-клиента методом, заданным строкой: '
+                    'client.request("DELETE", "/notes"). Удобно, когда метод приходит из данных.'),
     ]
     body = (
         '<p>В теме «Запросы к серверам» ты спрашивал чужие серверы. Теперь сделаем свой. [[веб-сервер]] — программа, которая на каждый запрос '
@@ -56,9 +58,10 @@ def th_routes():
              '@app.get("/notes/<int:note_id>")\ndef get_note(req, note_id):\n    for note in notes:\n        if note["id"] == note_id:\n            return note\n'
              '    return {"error": "not found"}, 404\n\n\nclient = app.test_client()\nfor text in ["купить хлеб", "  ", "позвонить Тимуру"]:\n'
              '    r = client.post("/notes", json={"text": text})\n    print(r.status_code, r.text)\nprint(client.get("/notes?limit=1").json())\n'
-             'print(client.get("/notes/2").json(), client.get("/notes/9").status_code, client.get("/notes/abc").status_code)') +
+             'print(client.get("/notes/2").json(), client.get("/notes/9").status_code, client.get("/notes/abc").status_code)\n'
+             'r = client.request("DELETE", "/notes")\nprint(r.status_code, r.json())') +
         '<p><code>&lt;int:note_id&gt;</code> пропускает только целые и сразу превращает их в число: <code>/notes/abc</code> не подходит к маршруту — 404. '
-        'Если запросить существующий путь другим методом (DELETE /notes), сервер ответит 405 — «метод не разрешён». Один обработчик на '
+        'Если запросить существующий путь другим методом (DELETE /notes — его отправил [[request]] с методом-строкой), сервер ответит 405 — «метод не разрешён». Один обработчик на '
         'несколько методов вешают через [[route]].</p>'
     )
     return th('Маршруты и ответы', terms, body)
@@ -81,7 +84,7 @@ def code_routes():
     return ts('Маршруты и ответы', [
         task('Визитка. Сделай сервер на miniweb: GET / → текст «API Лисы»; GET /about → JSON {"name": "Лиса", "skills": ["Python", "API"]}; '
              'GET /square/<int:n> → JSON {"n": n, "square": n²} (в miniweb <int:…> принимает и отрицательные). На вход подаются пути через пробел. Для каждого отправь GET тест-клиентом и выведи '
-             '«КОД ТЕЛО», где тело — r.text.',
+             '«КОД ТЕЛО», где тело — r.text. Путь без маршрута miniweb отвечает сам: 404 и {"error": "not found"}.',
              '@app.get("/square/<int:n>") — n придёт числом. Цикл: for path in input().split().',
              'from miniweb import App\n\napp = App()\n\n\n@app.get("/")\ndef index(req):\n    return "API Лисы"\n\n\n@app.get("/about")\ndef about(req):\n'
              '    return {"name": "Лиса", "skills": ["Python", "API"]}\n\n\n@app.get("/square/<int:n>")\ndef square(req, n):\n    return {"n": n, "square": n * n}\n\n\n'
@@ -106,8 +109,8 @@ def code_routes():
              'с 1, текст без пробелов по краям) и отвечает 201, а пустой текст — 400 {"error": "пустая заметка"}; GET /notes/<int:id> — заметка '
              'или 404 {"error": "not found"}; DELETE /notes/<int:id> — удалить и ответить 204 с пустым телом (return "", 204), нет такой — 404. Номера '
              'удалённых не используются снова. Каждая строка ввода — «МЕТОД ПУТЬ» или «POST ПУТЬ ТЕКСТ»; текст отправляй как json={"text": ТЕКСТ}. '
-             'Выводи «КОД ТЕЛО».',
-             'method, path, *rest = line.strip().split(maxsplit=2); client.post(path, json={"text": rest[0] if rest else ""}).\n'
+             'Выводи «КОД ТЕЛО», а при пустом теле (204) — только код.',
+             'method, path, *rest = line.split(); текст — " ".join(rest): client.post(path, json={"text": " ".join(rest)}).\n'
              'Следующий id храни в переменной — длина списка после удаления не подходит.',
              'import sys\nfrom miniweb import App\n\napp = App()\nnotes = []\nnext_id = 1\n\n\n@app.get("/notes")\ndef list_notes(req):\n    return notes\n\n\n'
              '@app.post("/notes")\ndef add_note(req):\n    global next_id\n    text = req.json.get("text", "").strip()\n    if not text:\n'
@@ -115,9 +118,9 @@ def code_routes():
              'def find(note_id):\n    for note in notes:\n        if note["id"] == note_id:\n            return note\n    return None\n\n\n'
              '@app.get("/notes/<int:note_id>")\ndef get_note(req, note_id):\n    note = find(note_id)\n    return note if note else ({"error": "not found"}, 404)\n\n\n'
              '@app.delete("/notes/<int:note_id>")\ndef delete_note(req, note_id):\n    note = find(note_id)\n    if not note:\n        return {"error": "not found"}, 404\n'
-             '    notes.remove(note)\n    return "", 204\n\n\nclient = app.test_client()\nfor line in sys.stdin:\n    method, path, *rest = line.strip().split(maxsplit=2)\n'
-             '    if method == "POST":\n        r = client.post(path, json={"text": rest[0] if rest else ""})\n    elif method == "DELETE":\n        r = client.delete(path)\n'
-             '    else:\n        r = client.get(path)\n    print(r.status_code, r.text)',
+             '    notes.remove(note)\n    return "", 204\n\n\nclient = app.test_client()\nfor line in sys.stdin:\n    method, path, *rest = line.split()\n'
+             '    if method == "POST":\n        r = client.post(path, json={"text": " ".join(rest)})\n    elif method == "DELETE":\n        r = client.delete(path)\n'
+             '    else:\n        r = client.get(path)\n    if r.text:\n        print(r.status_code, r.text)\n    else:\n        print(r.status_code)',
              ['POST /notes купить хлеб\nPOST /notes позвонить Тимуру\nGET /notes\nGET /notes/2\nDELETE /notes/1\nGET /notes\nPOST /notes сдать проект\nGET /notes/3',
               'POST /notes\nGET /notes/1\nDELETE /notes/5\nPOST /notes   полить кактус  \nGET /notes']),
     ])
@@ -129,8 +132,8 @@ def th_mw():
                     'По-английски middleware — «прослойка».'),
         ('before', '@app.before — мидлвар до обработчика: функция(req). Вернула None — запрос идёт дальше; вернула ответ — обработчик не вызывается.'),
         ('after', '@app.after — мидлвар после обработчика: функция(req, resp). Видит готовый ответ, может записать его в журнал или поменять.'),
-        ('request', 'client.request(метод, путь, json=…, headers=…) — запрос тест-клиента методом, заданным строкой: client.request("PUT", "/tasks/1", '
-                    'json={"done": True}). Удобно, когда метод приходит из данных.'),
+        ('Bearer', 'Слово перед токеном в заголовке Authorization: «Bearer ТОКЕН» — «предъявитель»: у кого токен, тому и доступ. '
+                   'Учебный сервер из темы «Запросы» ждал «OAuth ТОКЕН» — та же идея, другое слово-схема.'),
         ('serve', 'app.serve("адрес") — подключить приложение к учебному requests: запросы на http://адрес/… теперь обработает оно.'),
         ('Flask', 'Популярный веб-фреймворк для Python: pip install flask, маршруты — декораторами, app.run() запускает сервер на компьютере.'),
         ('FastAPI', 'Современный веб-фреймворк: типы параметров из подсказок типов, проверка данных, документация API сама по адресу /docs. '
@@ -146,7 +149,8 @@ def th_mw():
              'client = app.test_client()\nclient.get("/")\nclient.get("/admin/stats")\nprint(client.get("/admin/stats", headers={"X-Token": "s3cret"}).json())\n'
              'print(*log, sep="\\n")') +
         '<p>Второй запрос до обработчика не дошёл: before вернул 401. А журнал записал все три запроса — after видит и ответы мидлваров. '
-        'Имена заголовков не зависят от регистра, поэтому miniweb хранит их строчными: <code>req.headers.get("x-token")</code>.</p>'
+        'Имена заголовков не зависят от регистра, поэтому miniweb хранит их строчными: <code>req.headers.get("x-token")</code>. В настоящих API токен '
+        'обычно передают в заголовке <code>Authorization: Bearer ТОКЕН</code> — слово [[Bearer]] говорит, что дальше идёт токен.</p>'
         '<h3>Сервер и клиент вместе</h3>'
         '<p>Тест-клиент удобен для проверки, но обычно к серверу обращаются по адресу. [[serve]] подключает приложение к учебному requests — и '
         'к своему API можно ходить так же, как к чужим:</p>'
@@ -223,16 +227,18 @@ def code_mw():
 
 def project():
     return pj('API списка дел',
-              'Сервер списка дел на miniweb. Каждый запрос должен нести заголовок Authorization со значением «Bearer demo», иначе — 401 и '
+              'Сервер списка дел на miniweb. Каждый запрос должен нести заголовок Authorization со значением «Bearer ТОКЕН», и токен должен быть demo '
+              '(то есть ровно «Bearer demo»), иначе — 401 и '
               '{"error": "нужен токен"} (мидлвар before). Маршруты:\n'
               '— POST /tasks с JSON {"title": …} → 201 и задача {"id": N, "title": …, "done": false} (id по порядку с 1, без повторов); '
               'нет title или он пустой после strip → 400 {"error": "нужно название"};\n'
               '— GET /tasks → список задач; ?done=1 — только сделанные, ?done=0 — только несделанные;\n'
               '— PUT /tasks/<int:id> с JSON {"done": true или false} → обновлённая задача; нет задачи → 404 {"error": "not found"};\n'
               '— DELETE /tasks/<int:id> → 204 с пустым телом; нет задачи → 404 {"error": "not found"}.\n'
-              'Строка ввода — «ТОКЕН МЕТОД ПУТЬ» или «ТОКЕН МЕТОД ПУТЬ JSON» (JSON-тело одной строкой); токен «-» — запрос без заголовка. '
-              'Токен проверяется для любого пути; другой метод на существующий путь miniweb отклонит сам кодом 405, несуществующий путь — 404; они тоже ошибки. done из тела приводи к bool, а фильтр ?done бывает только 1 или 0. Выводи «КОД ТЕЛО», а в конце — «Запросов: N, ошибок: M» (ошибка — ответ с кодом 400 и выше; считай в мидлваре after).',
-              'Разбор строки: token, method, path, *rest = line.strip().split(maxsplit=3); тело — json.loads(rest[0]) if rest else None\n'
+              'Строка ввода — «ТОКЕН МЕТОД ПУТЬ» или «ТОКЕН МЕТОД ПУТЬ JSON» (JSON-тело одной строкой, слова в нём разделены одним пробелом); '
+              'токен «-» — запрос без заголовка, иначе заголовок {"Authorization": "Bearer ТОКЕН"}. В PUT тело всегда с полем done. '
+              'Токен проверяется для любого пути; другой метод на существующий путь miniweb отклонит сам кодом 405, несуществующий путь — 404; они тоже ошибки. done из тела приводи к bool, а фильтр ?done бывает только 1 или 0. Выводи «КОД ТЕЛО» (при пустом теле — только код), а в конце — «Запросов: N, ошибок: M» (ошибка — ответ с кодом 400 и выше; считай в мидлваре after).',
+              'Разбор строки: token, method, path, *rest = line.split(); тело — json.loads(" ".join(rest)) if rest else None\n'
               'Отправка любым методом — client.request(method, path, json=body, headers=headers)\n'
               'Фильтр done: req.args.get("done") == "1" — сделанные',
               'import json\nimport sys\nfrom miniweb import App\n\napp = App()\ntasks = []\nnext_id = 1\nstats = {"all": 0, "errors": 0}\n\n\n@app.before\ndef auth(req):\n'
@@ -245,9 +251,9 @@ def project():
               '@app.put("/tasks/<int:task_id>")\ndef update(req, task_id):\n    t = find(task_id)\n    if not t:\n        return {"error": "not found"}, 404\n'
               '    t["done"] = bool((req.json or {}).get("done"))\n    return t\n\n\n@app.delete("/tasks/<int:task_id>")\ndef remove(req, task_id):\n    t = find(task_id)\n'
               '    if not t:\n        return {"error": "not found"}, 404\n    tasks.remove(t)\n    return "", 204\n\n\nclient = app.test_client()\nfor line in sys.stdin:\n'
-              '    token, method, path, *rest = line.strip().split(maxsplit=3)\n    body = json.loads(rest[0]) if rest else None\n'
+              '    token, method, path, *rest = line.split()\n    body = json.loads(" ".join(rest)) if rest else None\n'
               '    headers = {} if token == "-" else {"Authorization": f"Bearer {token}"}\n    r = client.request(method, path, json=body, headers=headers)\n'
-              '    print(r.status_code, r.text)\nprint(f"Запросов: {stats[\'all\']}, ошибок: {stats[\'errors\']}")',
+              '    if r.text:\n        print(r.status_code, r.text)\n    else:\n        print(r.status_code)\nprint(f"Запросов: {stats[\'all\']}, ошибок: {stats[\'errors\']}")',
               ['demo POST /tasks {"title": "выучить декораторы"}\ndemo POST /tasks {"title": "  "}\ndemo POST /tasks {"title": "сделать API"}\n'
                '- GET /tasks\ndemo PUT /tasks/1 {"done": true}\ndemo GET /tasks?done=1\ndemo GET /tasks?done=0\ndemo DELETE /tasks/2\ndemo DELETE /tasks/2\n'
                'demo POST /tasks {"title": "отдохнуть"}\ndemo GET /tasks',
