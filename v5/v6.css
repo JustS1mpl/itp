@@ -1679,3 +1679,12 @@ button.w98x:active{box-shadow:inset 1px 1px var(--w98k),inset -1px -1px #fff,ins
 :root[data-theme=dark][data-acc=pink]{--hero-a:#2B2444}
 /* 2026-11-03, владелец: на широком экране нижняя панель начиналась после места под боковую навигацию и выглядела обрезанной слева, когда навигация спрятана (уроки, цель дня) — теперь на всю ширину, кнопки по-прежнему по центру колонки */
 @media (min-width:900px){.dock{left:0}.dock>.dki{left:calc(var(--rail)/2 - var(--cx))}.nav{z-index:8}}
+/* 2026-11-03, владелец: шапка вложенных экранов была пустой — значок в плашке акцента, подпись под заголовком, серия и опыт справа */
+.top.sub{gap:10px}
+.top.sub .sti{flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:var(--r-md,12px);font-size:1.25rem;line-height:1;background:linear-gradient(160deg,var(--hero-a,var(--pink-soft)),var(--soft));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 22%,transparent)}
+.top.sub .stt{flex:1 1 auto;min-width:0}
+.top.sub .stt h1{display:block;line-height:1.2}
+.top.sub .stt p{margin:1px 0 0;font-size:.8125rem;font-weight:700;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.top.sub .chips{margin-left:auto}
+@media (max-width:420px){.top.sub .sti{width:34px;height:34px;font-size:1.0625rem}.top.sub .stt h1{font-size:1.0625rem}}
+@media (max-width:359px){.top.sub .sti{display:none}}

@@ -78,6 +78,10 @@ function scr(key,h,tab){SKEY=key;show(h,tab)}
 function head(){
   var f=S.fz.n,s=streakNow();
   return'<div class="top"><button class="logo" id="ttl" aria-label="ИТП. Открыть настройки">'+'<span class="lgw">ИТП</span>'+'</button><div class="chips"><button class="chip" id="hs" aria-label="Серия: '+s+' '+pl(s,['день','дня','дней'])+(f?', заморозок: '+f:'')+'">🥕 <span>'+s+'</span>'+(f?'<span class="fzm">❄️'+f+'</span>':'')+'</button><button class="chip" id="hx" aria-label="Опыт: '+S.xp+'">⭐ <span>'+S.xp+'</span></button></div></div>'}
+/* шапка вложенных экранов: значок экрана в плашке, заголовок с подписью, справа серия и опыт (только показывают, как на вкладках) */
+function subTop(t,em,sub,back){var s=streakNow();
+  return'<div class="top ls sub"><button class="icon" id="x" aria-label="'+(back||'Назад')+'">'+ico('back')+'</button><span class="sti" aria-hidden="true">'+em+'</span><div class="stt"><h1>'+esc(t)+'</h1>'+(sub?'<p>'+sub+'</p>':'')+'</div>'+
+   '<div class="chips" aria-hidden="true"><span class="chip s">🥕 <span>'+s+'</span></span><span class="chip s">⭐ <span>'+S.xp+'</span></span></div></div>'}
 function ttl(t,sub){return'<div class="ttl"><div><h1>'+esc(t)+'</h1>'+(sub?'<p class="mu">'+sub+'</p>':'')+'</div></div>'}
 function bindHead(re){
   HRE=re;$('hs').onclick=streakSheet;$('hx').onclick=levelSheet;chipFx();
@@ -171,12 +175,16 @@ function links0(){
     /* тема с норой: три равных промежутка — край экрана, нора, островок, край; на широком экране промежуток между норой
        и островком не больше 56 px, а пара стоит по центру колонки (на телефоне это одно и то же).
        Отходит от норы только её островок: если двигать и соседей, сбивается зигзаг тропинки; считается до линий */
-    var bu=pa.querySelector('.bur');
-    if(bu){var aw=bu.parentNode,L=bu.classList.contains('l'),nw=bu.querySelector('.nwr'),g=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--gut'))||16;
+    /* нор у темы может быть несколько, по разные стороны: сдвиг считается для островка каждой.
+       Соседи отходят следом, слабее (владелец: «более плавный изгиб»), чтобы тропинка шла дугой, а не ломалась у норы */
+    var ws=[].slice.call(pa.querySelectorAll('.ilw')),sh=ws.map(function(){return 0}),own={},hb=[];
+    pa.querySelectorAll('.bur').forEach(function(bu){var aw=bu.parentNode,L=bu.classList.contains('l'),nw=bu.querySelector('.nwr'),g=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--gut'))||16;
       var vb=nw.offsetWidth*80/92,G=Math.min(56,(pw+2*g-vb-106)/3),x0=(pw-vb-106-G)/2,c0=aw.offsetLeft+aw.offsetWidth/2+(+aw.dataset.b);
-      var hd=Math.max(-90,Math.min(90,(L?x0+vb+G+53:pw-x0-vb-G-53)-c0));
-      pa.querySelectorAll('.ilw[data-hw]').forEach(function(w){w.style.transform='translateX('+(+w.dataset.b+hd*w.dataset.hw)+'px)'});
-      bu.style.right='auto';bu.style.left=(L?x0:pw-x0-vb)-nw.offsetLeft-nw.offsetWidth*6/92-aw.offsetLeft-lkX(aw)+'px'}
+      var hd=Math.max(-90,Math.min(90,(L?x0+vb+G+53:pw-x0-vb-G-53)-c0)),q=ws.indexOf(aw);
+      own[q]=hd;[.55,.2].forEach(function(f,d){[q-d-1,q+d+1].forEach(function(r){if(r>=0&&r<ws.length)sh[r]+=hd*f})});
+      hb.push([bu,aw,nw,L,x0,vb])});
+    ws.forEach(function(w,r){if(hb.length)w.style.transform='translateX('+([0,46,0,-46][r%4]+(r in own?own[r]:sh[r]))+'px)'});
+    hb.forEach(function(a){var bu=a[0],aw=a[1],nw=a[2];bu.style.right='auto';bu.style.left=(a[3]?a[4]:pw-a[4]-a[5])-nw.offsetLeft-nw.offsetWidth*6/92-aw.offsetLeft-lkX(aw)+'px'});
     var sv=document.createElementNS(ns,'svg');sv.setAttribute('class','cn');sv.setAttribute('width',pw);sv.setAttribute('height',ph);sv.setAttribute('aria-hidden','true');
     var fresh=[];
     for(var j=0;j<it.length-1;j++){
@@ -262,7 +270,7 @@ function burrow(o,side){
 function hole(i){HOLE=i;curOnce(function(){hole0(i)})}
 function hole0(i){BACK=home;fzApply();
   var t=TOPICS[i],p=holePar(i),n=ni(i),c=0;for(var j=0;j<n;j++)if(S.d[i+'-'+j])c++;
-  var h='<div class="top ls"><button class="icon" id="x" aria-label="Назад на Путь">'+ico('back')+'</button><h1>'+esc(holeName(t))+'</h1></div>'+
+  var h=subTop(holeName(t),'🐇','Нора · '+(c===n?'пройдена':c+' из '+n),'Назад на Путь')+
    '<section class="topic hole" aria-label="'+esc('Доп. глава: '+t.n)+'"><div class="hhd'+(c===n?' dn':'')+'"><span class="nwr">'+burrowSvg()+'</span><h2>'+esc(t.n)+'</h2><p class="mu">'+esc(t.s||'')+'</p><p class="hnt">Доп. глава по желанию: открыта всегда, заходи, когда интересно. В счёт тем не входит, опыт за островки начисляется как обычно.</p><div class="hpr"><div class="ring" style="--p:'+Math.round(c/Math.max(1,n)*100)+'" role="img" aria-label="Пройдено '+c+' из '+n+'"><span>'+c+'/'+n+'</span></div><span>'+(c===n?'Глава пройдена':c?'Пройдено '+c+' из '+n:'Ещё не начата')+'</span></div></div>'+
    '<div class="path'+(RM()?'':' stg')+'" data-i="'+i+'">';
   for(var j2=0;j2<n;j2++)h+=island(i,j2,j2);
@@ -307,13 +315,16 @@ function home0(){BACK=home;fzApply();
     h+='<section class="topic'+(t.intro?' intro':'')+(REV&&!t.intro?' rv':'')+'" aria-label="'+esc(t.intro?t.n:'Тема '+num+': '+t.n)+'">'+(t.intro?'<div class="ihead"><h2>'+esc(t.n)+'</h2><p class="mu">'+esc(t.s||'')+'</p></div>':'<div class="thead'+(dn?' done':'')+(i===ci?' now':'')+'"><div class="tn'+(dn?' ok':'')+'" aria-hidden="true">'+(dn?'':num)+'</div><div class="tt"><h2>'+esc(t.n)+'</h2><div class="mu">'+esc(t.s||'')+((i<S.start||i<FRN()[0])&&!dn?' · пропущено':'')+'</div></div><div class="ring" style="--p:'+pc+'" role="img" aria-label="Пройдено '+c+' из '+ni(i)+'"><span>'+c+'/'+ni(i)+'</span></div></div>')+'<div class="path'+(RM()?'':' stg')+'" data-i="'+i+'">';
     /* нора — примерно за пять островков до конца темы, у островка, сдвинутого вбок (нечётный), в свободном месте с другой стороны */
     if(!HOP){HOP={};TOPICS.forEach(function(x,o){if(x.opt&&holeVis(o))HOP[o]=1})}
-    /* островок посередине тропинки (чётный) места сбоку не оставляет — тогда нора у следующего, сдвинутого вбок; открывается всё равно после своего */
-    var hs=holesOf(i),l=ni(i)-1,an=hs.length?holeAt(hs[0]):-1;if(an>=0&&an%2===0&&an<l)an++;
-    /* островок с норой отходит от неё (точный сдвиг считает links0; здесь — начальный, чтобы не прыгало) */
-    var hd=hs.length?(an%4===1?1:-1)*34:0;
-    for(var j=0;j<ni(i);j++){var dj=Math.abs(j-an),hw=hs.length&&!dj?1:0,w=island(i,j,j,hd*hw);
-      if(hw)w=w.replace('<div class="ilw','<div data-b="'+[0,46,0,-46][j%4]+'" data-hw="'+hw+'" class="ilw');
-      if(j===an&&hs.length)w=w.replace('class="ilw','class="ilw nhb').replace(/<\/div>$/,burrow(hs[0],an%4===1?'l':'r')+'</div>');
+    /* островок посередине тропинки (чётный) места сбоку не оставляет — тогда нора у следующего, сдвинутого вбок; открывается всё равно после своего.
+       У темы бывает несколько нор с одним местом (чаще всего — последний островок): каждой свой островок, следующие — выше по тропинке через один, стороны чередуются */
+    var hs=holesOf(i),l=ni(i)-1,hp={};
+    hs.forEach(function(o){var a=holeAt(o);if(a%2===0&&a<l)a++;
+      for(var c=a;c>=0;c-=(c===a&&a%2===0?1:2))if(!(c in hp)){hp[c]=o;return}
+      for(c=a+1;c<=l;c++)if(!(c in hp)){hp[c]=o;return}});
+    for(var j=0;j<ni(i);j++){var hw=j in hp?1:0,
+      /* островок с норой отходит от неё (точный сдвиг считает links0; здесь — начальный, чтобы не прыгало) */
+      w=island(i,j,j,hw*(j%4===1?1:-1)*34);
+      if(hw)w=w.replace('<div class="ilw','<div data-b="'+[0,46,0,-46][j%4]+'" data-hw="'+hw+'" class="ilw nhb').replace(/<\/div>$/,burrow(hp[j],j%4===1?'l':'r')+'</div>');
       h+=w}
     h+='</div></section>'});
   scr('home',h+'<aside class="jump" aria-label="Быстрый переход"><button id="jmp" aria-label="К текущему островку">'+ico('arrow')+'</button></aside>','home');bindHead(home);links();
@@ -625,7 +636,7 @@ function skShare(){
   skImg(function(cv){var h=$('shcard');if(!h||gone)return;cv.setAttribute('role','img');cv.setAttribute('aria-label','Картинка: я могу '+m.c);h.innerHTML='';h.appendChild(cv);h.classList.add('rdy');cv.toBlob(function(b){BLOB=b},'image/png')})}
 function skills(back){
   var s=skNow(),L=s.L,m=L[s.k];
-  var h='<div class="top ls"><button class="icon" id="x" aria-label="Назад">'+ico('back')+'</button><h1>Что ты уже умеешь</h1></div><div class="skp">'+
+  var h=subTop('Что ты уже умеешь','🏆','')+'<div class="skp">'+
    '<div class="skh"><span class="sklogo" role="img" aria-label="Python">'+PYLOGO+'</span><b>'+s.p+'</b></div><p class="mu skn">'+pl(s.p,['островок пройден','островка пройдено','островков пройдено'])+', пропущенные и норы тоже считаются</p>'+
    rbSay(s.k?'Значит, ты уже можешь '+esc(m.c)+'!':'Пройди первую тему, и здесь появится, что ты уже можешь')+(s.k?'<button class="btn t skshb" id="sksh">'+phi('export')+'Поделиться</button>':'')+
    '<h2 class="skov">Прогресс</h2><ol class="skl">'+L.map(function(x,i){var on=s.p>=x.t,nw=i===s.k;return'<li class="'+(on?'on':'')+(nw?' now':'')+(i+1<L.length&&s.p>=L[i+1].t?' fl':'')+'"><span class="skd">'+ski(x.e)+'</span><span class="sktx"><small>'+SKHX+x.t+'</small><b>'+esc(x.n)+'</b></span></li>'}).join('')+'</ol></div>';
@@ -670,7 +681,7 @@ function setSet(k,v){
   if(k==='emo'){if(ST('emo')){emoLoad();if(EM.map)emoOn()}else emoOff()}
   if(k==='goal')goalCheck()}
 function settings(){
-  var h='<div class="top ls"><button class="icon" id="x" aria-label="Назад">'+ico('back')+'</button><h1>Настройки</h1></div>';
+  var h=subTop('Настройки','⚙️',S.nick?esc(S.nick):'');
   h+='<div class="sec">Внешний вид</div><div class="lst">'+
    SR('🎨','Тема','',SG('theme',[['','Авто'],['light','Светлая'],['dark','Тёмная']],S.theme))+
    SR('🖌️','Цвет акцента','Кнопки, полоски, выделение','<div class="swa" role="radiogroup" aria-label="Цвет акцента">'+[['','#2B8420','Зелёный'],['carrot','#F08C1A','Морковный'],['pink','#C73B63','Розовый'],['blue','#2563D0','Синий'],['violet','#6C4BD6','Фиолетовый']].map(function(c){var on=ST('acc')===c[0];return'<button role="radio" aria-checked="'+on+'" data-k="acc" data-v="'+c[0]+'" style="background:'+c[1]+';color:'+c[1]+'" class="'+(on?'on':'')+'" aria-label="'+c[2]+'"></button>'}).join('')+'</div>')+

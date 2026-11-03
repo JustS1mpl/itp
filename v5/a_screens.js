@@ -513,7 +513,7 @@ function editor(){
 var EMPTY='<svg viewBox="0 0 120 96" aria-hidden="true"><ellipse cx="60" cy="88" rx="44" ry="5" fill="var(--line)"/><rect x="30" y="14" width="60" height="70" rx="10" fill="var(--card)" stroke="var(--line2)" stroke-width="3"/><path d="M42 34h36M42 46h26M42 58h32" stroke="var(--line2)" stroke-width="5" stroke-linecap="round"/><path d="M76 66l10 10" stroke="var(--accent)" stroke-width="5" stroke-linecap="round"/><circle cx="70" cy="60" r="10" fill="none" stroke="var(--accent)" stroke-width="5"/></svg>';
 function codes(){
   var L=S.sv.slice().sort(function(a,b){return b.t-a.t});
-  var h='<div class="top ls"><button class="icon" id="x" aria-label="Назад">'+ico('back')+'</button><h1>Мои коды</h1></div>';
+  var h=subTop('Мои коды','💾',L.length?L.length+' '+pl(L.length,['программа','программы','программ']):'');
   if(!L.length)h+='<div class="empty">'+EMPTY+'<p>Пока пусто. Открой меню файла в разделе «Код» и нажми «Сохранить».</p></div>';
   L.forEach(function(s){
     var ln=s.c.replace(/\s+$/,'').split('\n').length;
@@ -537,7 +537,7 @@ function codes(){
 var DOPEN=Object.create(null),DNOTE=0;
 function dict(){
   var L=learned();L.sort(S.dsort?function(a,b){return a.ti-b.ti}:function(a,b){return a.n.localeCompare(b.n,'ru')});
-  var h='<div class="top ls"><button class="icon" id="x" aria-label="Назад">'+ico('back')+'</button><h1>Изученные функции</h1></div>';
+  var h=subTop('Изученные функции','📚',L.length?L.length+' '+pl(L.length,['функция','функции','функций']):'');
   if(!L.length){scr('dict',h+'<div class="empty">'+EMPTY+'<p>Пока пусто. Прочитай теорию, и функции из неё появятся здесь.</p></div>','prof');$('x').onclick=profile;return}
   h+='<div class="srch">'+ico('search')+'<input class="f dq" id="dq" type="search" placeholder="Найти функцию или заметку" autocomplete="off" aria-label="Поиск по функциям"></div><div class="dtools">'+SG('ds',[[0,'А–Я'],[1,'По темам']],S.dsort?1:0)+'<button class="chip tgl" id="sf" aria-pressed="'+(DNOTE?'true':'false')+'">📝 Заметки</button></div><div class="dm" id="dm" aria-live="polite"></div>';
   var lt=-1,open=false;
