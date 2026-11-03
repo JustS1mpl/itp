@@ -57,6 +57,12 @@ s = s[:a] + '<style>\n' + css + '\n' + s[b:]
 
 # --- пакет смайликов
 pack = open('assets/emoji_pack.b64').read()
+# U2-6: убрать мелкие подкрашивающие слои по краям (пятна у звезды и др.), см. emofix.py
+import gzip as _egz, base64 as _eb
+from emofix import emo_clean
+_ep, _es = emo_clean(json.loads(_egz.decompress(_eb.b64decode(pack))))
+pack = _eb.b64encode(_egz.compress(json.dumps(_ep, ensure_ascii=False, separators=(',', ':')).encode('utf-8'), 9, mtime=0)).decode()
+print('смайлики: убрано слоёв', _es[0], 'у', _es[1])
 rep('<script type="text/plain" id="sk-lib">', '<script type="text/plain" id="emo-pack">' + pack + '</script>\n<script type="text/plain" id="sk-lib">')
 
 # --- reduced-motion -> RM()
@@ -170,9 +176,9 @@ for extra in ('v5/a_fix.js','v5/a_fix2.js','v5/a_fix3.js','v5/a_fix4.js','v5/a_m
     try: core += '\n' + open(extra, encoding='utf-8').read()
     except FileNotFoundError: pass
 anchor = "seedLit();window.addEventListener('resize',function(){if(app.querySelector('.path'))links()});\napplyTheme();"
-# --- настроения кролика: ликующий (состояние happy: итоги, курс пройден, карточка «Поделиться») и хмурый: grump — целиком, grumphead — голова (реакция на первую ошибку); по аналогии с wow и wowhead
+# --- настроения кролика: ликующий прыжок (состояние happy: итоги, курс пройден, карточка «Поделиться»; cheer.webp — новый рисунок 2026-11-02), плачущий cry/cryhead (U2-5) и хмурый: grump — целиком, grumphead — голова (реакция на первую ошибку); по аналогии с wow и wowhead
 import base64 as _mb
-_mood = ''.join("IMG.%s='data:image/webp;base64,%s';\n" % (k, _mb.b64encode(open('assets/mascot/%s.webp' % f, 'rb').read()).decode()) for k, f in (('eat', 'lovecarrot'), ('happy', 'cheer'), ('grumphead', 'grump_head'), ('grump', 'grump'), ('rolled', 'rolled'), ('wow', 'wow'), ('cool', 'cool'), ('wowhead', 'wow_head')) if os.path.exists('assets/mascot/%s.webp' % f))
+_mood = ''.join("IMG.%s='data:image/webp;base64,%s';\n" % (k, _mb.b64encode(open('assets/mascot/%s.webp' % f, 'rb').read()).decode()) for k, f in (('eat', 'lovecarrot'), ('happy', 'cheer'), ('grumphead', 'grump_head'), ('grump', 'grump'), ('rolled', 'rolled'), ('wow', 'wow'), ('cool', 'cool'), ('wowhead', 'wow_head'), ('cry', 'cry'), ('cryhead', 'cry_head')) if os.path.exists('assets/mascot/%s.webp' % f))
 core = 'var EXIMG=' + EXIMG + ';\n' + _mood + core
 core = core.replace('/*ITPY*/{}', _json.dumps(_py, ensure_ascii=False))
 rep(anchor, core + "\nseedLit();window.addEventListener('resize',function(){if(app.querySelector('.path'))links()});\napplyTheme();if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',emoLoad);else emoLoad();")
@@ -203,5 +209,8 @@ rep('<title>ИТП v' + VER + '</title>', '<title>ИТП — И так, прог
 # пробные сборки 7.0 хранят сохранения под своим ключом: не портят настоящий прогресс 6.x и не берут его себе
 if '-dev' in VER:
     rep("var KEY='pyshag2',", "var KEY='pyshag7dev',")
+# U2-3: у каждого языка программирования свой ключ прогресса (saveKey в v5/a_core.js; у Python ключ прежний)
+s = re.sub(r"var KEY='(pyshag[^']*)',", r"var KEY=saveKey('\1'),", s)
+assert "var KEY=saveKey(" in s
 open('out5.html', 'w', encoding='utf-8').write(s)
 print('ok', len(s))

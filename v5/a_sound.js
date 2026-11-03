@@ -228,10 +228,14 @@ function snd(x,a){
   try{sxVol(VOLK());sxPlay(v,a)}catch(e){}}
 
 /* касание любой кнопки: короткий чистый звук (вариант чередуется). Другие звуки того же события (ответ, окно, переход, переключатель) его заменяют:
-   проверка отложена на конец события. «Запустить» играет свой тик. */
+   проверка отложена на конец события. «Запустить» играет свой тик.
+   U2-8: у кнопок, чей звук приходит не сразу, а после работы (SXOWN: «Проверить» — «верно»/«неверно» после запуска тестов,
+   кнопки с атрибутом data-snd), общий щелчок не играет вовсе: у каждого действия один звук */
+var SXOWN='#chk,[data-snd]';
 document.addEventListener('click',function(e){
   var b=e.target&&e.target.closest&&e.target.closest('button,[role=button],a[href],summary');
   if(!b||b.disabled||b.getAttribute('aria-disabled')==='true')return;
+  if(b.matches&&b.matches(SXOWN))return;
   var t=performance.now(),nv=b.closest&&b.closest('.nav'),run=b.id==='run'&&!b.classList.contains('stp');
   setTimeout(function(){
     if(SX.la>=t)return;

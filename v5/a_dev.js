@@ -44,7 +44,7 @@ function dvPanel(){
     b+='</div><div class="dvr"><button data-a="cur">Отметить островок пройденным</button></div>';
     h+=dvSec('pin','Сейчас',lab,b,'w cur');
   }
-  h+=dvSec('star','Опыт и уровень','','<div class="dvr"><button data-a="xp50">+50 ⭐</button><button data-a="xp500">+500 ⭐</button><button data-a="lv">+1 уровень</button></div>');
+  h+=dvSec('star','Опыт и уровень','','<div class="dvr"><button data-a="xp50">+50 ⭐</button><button data-a="xp500">+500 ⭐</button><button data-a="lv">+1 уровень</button></div><div class="dvr"><button data-a="xm50">−50 ⭐</button><button data-a="xm500">−500 ⭐</button><button data-a="lvm">−1 уровень</button></div>');
   h+=dvSec('flame','Серия и заморозки','','<div class="dvr"><button data-a="st">Серия +1</button><button data-a="st0">Серия = 0</button><button data-a="fz">Заморозка +1</button><button data-a="fzm">Заморозка −1</button><button data-a="fz0">Заморозки = 0</button></div>');
   h+=dvSec('flag','Прогресс','','<div class="dvr"><button data-a="all">Все островки пройдены</button><button data-a="gl">Цель дня выполнена</button><button class="bad" data-a="none">Сбросить прогресс островков</button></div>');
   h+=dvSec('film','Вступление','Идёт целиком (заставка, знакомство, выбор темы, сбой, синий экран) на копии данных: прогресс, ник и настройки не меняются. Выйти можно кнопкой «✕ Выйти из просмотра».','<div class="dvr"><button data-a="intro"><span class="dvpl noemo">▶\uFE0E</span> Посмотреть вступление</button></div>');
@@ -62,11 +62,15 @@ function dvPanel(){
   var c=o.querySelector('.dvbd');if(old){c.scrollTop=top;var fb=fid&&o.querySelector('.dvk[data-id="'+fid+'"]');if(fb)fb.focus({preventScroll:true})}else document.getElementById('dvx').focus({preventScroll:true});
   o.onclick=function(e){if(e.target===o)dvClose()};
   document.getElementById('dvx').onclick=dvClose;
-  o.querySelectorAll('.dvk').forEach(function(b){b.onclick=function(){var id=b.dataset.id;if(S.ach[id]){delete S.ach[id];save()}else ach(id);dvPanel()}});
+  o.querySelectorAll('.dvk').forEach(function(b){b.onclick=function(){var id=b.dataset.id;if(S.ach[id]){delete S.ach[id];save()}else ach(id);dvRe();dvPanel()}});
   o.querySelectorAll('[data-s]').forEach(function(b){b.onclick=function(){
-    try{if(typeof sxShow==='function')sxShow();sxVol(VOLK());sxPlay(b.dataset.s,{k:3})}catch(e){toast('Звук недоступен: коснись экрана и попробуй снова')}}});
+    try{if(typeof sxShow==='function')sxShow();SX.la=performance.now();sxVol(VOLK());sxPlay(b.dataset.s,{k:3})}catch(e){toast('Звук недоступен: коснись экрана и попробуй снова')}}});
   o.querySelectorAll('[data-a]').forEach(function(b){b.onclick=function(){dvAct(b.dataset.a)}});
 }
+/* U2-7: изменения из панели видны сразу, без перезагрузки: экран под панелью (Путь, Практика, Код, Профиль, Настройки —
+   у них есть HRE, та же перерисовка, что при смене темы) строится заново на той же прокрутке. Экраны заданий не
+   перерисовываются (там нет опыта и серии, а перерисовка сбросила бы ход решения) */
+function dvRe(){if(typeof HRE!=='function'||!HRE)return;var y=window.scrollY;try{KEEPSCR=1;HRE();window.scrollTo(0,y)}catch(e){}}
 function dvAct(a){
   var c=DVC;
   if(a==='tp'||a==='tn'){dvClose();return task(c.i,c.j,c.k+(a==='tn'?1:-1))}
@@ -82,20 +86,23 @@ function dvAct(a){
     document.querySelectorAll('.opt').forEach(function(b){if(b.textContent.trim()===String(hit.o[hit.a]).trim())b.classList.add('sel')});
     return toast('Верно: '+hit.o[hit.a])}
   if(a==='cur'){dvDone(c.i,c.j);dvClose();return home()}
-  if(a==='xp50'){addXp(50);save();toast('+50 ⭐');return}
-  if(a==='xp500'){addXp(500);save();toast('+500 ⭐');return}
-  if(a==='lv'){var l=lvlInfo(S.xp).l,n=0;while(lvlInfo(S.xp).l===l&&n++<400)addXp(10);save();toast('Уровень: '+lvlInfo(S.xp).l);return}
-  if(a==='st'){var t=day(new Date());if(S.last!==t){S.last=t;S.streak=(S.streak||0)+1}else S.streak++;if(S.streak>S.max)S.max=S.streak;save();toast('Серия: '+S.streak);return}
-  if(a==='st0'){S.streak=0;save();toast('Серия сброшена');return}
-  if(a==='fz'){S.fz.n=Math.min(2,S.fz.n+1);save();toast('Заморозок: '+S.fz.n);return}
-  if(a==='fzm'){S.fz.n=Math.max(0,S.fz.n-1);save();toast('Заморозок: '+S.fz.n);return}
-  if(a==='fz0'){S.fz.n=0;S.fz.p=0;save();toast('Заморозок: 0');return}
+  if(a==='xp50'){addXp(50);save();dvRe();toast('+50 ⭐');return}
+  if(a==='xp500'){addXp(500);save();dvRe();toast('+500 ⭐');return}
+  /* убавить опыт: не ниже нуля; «−1 уровень» — на начало предыдущего уровня (уровень считается из опыта, lvlInfo) */
+  if(a==='xm50'||a==='xm500'){S.xp=Math.max(0,S.xp-(a==='xm50'?50:500));save();dvRe();toast('Опыт: '+S.xp+' ⭐');return}
+  if(a==='lvm'){var l2=lvlInfo(S.xp).l;S.xp=l2>1?50*(l2-1)*(l2-2):0;save();dvRe();toast('Уровень: '+lvlInfo(S.xp).l);return}
+  if(a==='lv'){var l=lvlInfo(S.xp).l,n=0;while(lvlInfo(S.xp).l===l&&n++<400)addXp(10);save();dvRe();toast('Уровень: '+lvlInfo(S.xp).l);return}
+  if(a==='st'){var t=day(new Date());if(S.last!==t){S.last=t;S.streak=(S.streak||0)+1}else S.streak++;if(S.streak>S.max)S.max=S.streak;save();dvRe();toast('Серия: '+S.streak);return}
+  if(a==='st0'){S.streak=0;save();dvRe();toast('Серия сброшена');return}
+  if(a==='fz'){S.fz.n=Math.min(2,S.fz.n+1);save();dvRe();toast('Заморозок: '+S.fz.n);return}
+  if(a==='fzm'){S.fz.n=Math.max(0,S.fz.n-1);save();dvRe();toast('Заморозок: '+S.fz.n);return}
+  if(a==='fz0'){S.fz.n=0;S.fz.p=0;save();dvRe();toast('Заморозок: 0');return}
   if(a==='all'){TOPICS.forEach(function(t,i){t.items.forEach(function(x,j){dvDone(i,j)})});toast('Все островки пройдены');dvClose();return home()}
   if(a==='none'){S.d={};S.es={};S.at={};S.dr={};S.tk={};S.hu={};save();toast('Прогресс островков сброшен');dvClose();return home()}
   if(a==='intro')return dvIntro();
-  if(a==='gl'){var t2=day(new Date());S.hist[t2]=S.hist[t2]||{les:0};S.hist[t2].les=Math.max(S.hist[t2].les||0,S.goal);goalCheck();save();toast('Цель дня засчитана');return}
-  if(a==='aa'){ACH.forEach(function(x){if(x.id!=='all'&&!S.ach[x.id])ach(x.id)});return dvPanel()}
-  if(a==='an'){S.ach={};save();return dvPanel()}
+  if(a==='gl'){var t2=day(new Date());S.hist[t2]=S.hist[t2]||{les:0};S.hist[t2].les=Math.max(S.hist[t2].les||0,S.goal);goalCheck();save();dvRe();toast('Цель дня засчитана');return}
+  if(a==='aa'){ACH.forEach(function(x){if(x.id!=='all'&&!S.ach[x.id])ach(x.id)});dvRe();return dvPanel()}
+  if(a==='an'){S.ach={};save();dvRe();return dvPanel()}
 }
 (function(){
   function sync(){var b=document.getElementById('dvb');if(DEV()){if(!b){b=document.createElement('button');b.id='dvb';b.className='dvb';b.setAttribute('aria-label','Режим разработчика');b.innerHTML=dvIco('tool');b.onclick=dvPanel;document.body.appendChild(b)}}else{if(b)b.remove();dvClose()}}
