@@ -225,7 +225,9 @@ function kbBar(){
   var b=document.createElement('div');b.className='kbar';b.hidden=true;
   /* над строкой символов — условие задачи: раскрывается кнопкой «Условие», клавиатура при этом не закрывается */
   b.innerHTML='<div class="kbq" id="kbq" hidden role="region" aria-label="Условие задачи"></div><div class="kbr" role="toolbar" aria-label="Символы для кода"><button type="button" tabindex="-1" data-k="cond" class="kx kq" aria-expanded="false" aria-controls="kbq">Условие</button>'+
-   ['⇥','⇤','←','→','(',')',':','"',"'",'=','[',']','{','}','+','-','*','/','%','<','>','#','_',',','.'].map(function(k){return'<button type="button" tabindex="-1" data-k="'+esc(k)+'"'+(nm[k]?' class="kx" aria-label="'+nm[k]+'"':'')+'>'+esc(k)+'</button>'}).join('')+'</div>';
+   /* размер кода прямо отсюда (владелец): те же шаги, что в настройках «Размер кода» */
+   '<button type="button" tabindex="-1" data-k="fz-" class="kx kz" aria-label="Код мельче">A−</button><button type="button" tabindex="-1" data-k="fz+" class="kx kz" aria-label="Код крупнее">A+</button>'+
+   ['⇥','⇤','←','→','(',')',':','"',"'",'=','[',']','{','}','+','-','*','/','\\','%','<','>','#','_',',','.'].map(function(k){return'<button type="button" tabindex="-1" data-k="'+esc(k)+'"'+(nm[k]?' class="kx" aria-label="'+nm[k]+'"':'')+'>'+esc(k)+'</button>'}).join('')+'</div>';
   /* нажатие не должно забирать фокус у поля, иначе клавиатура закроется */
   b.addEventListener('pointerdown',function(e){e.preventDefault()});
   b.addEventListener('mousedown',function(e){e.preventDefault()});
@@ -233,10 +235,15 @@ function kbBar(){
     if(document.activeElement!==KB.c)KB.c.focus({preventScroll:true});
     if(t.closest('.kbq'))return;
     if(t.dataset.k==='cond'){kbCond(!KB.q);return}
+    if(t.dataset.k==='fz-'||t.dataset.k==='fz+'){kbFz(t.dataset.k==='fz+'?1:-1);return}
     KB.ins(t.dataset.k);if(ST('vib')&&navigator.vibrate)navigator.vibrate(5)});
   document.body.appendChild(b);KB.el=b;
   if(window.visualViewport){visualViewport.addEventListener('resize',kbPlace);visualViewport.addEventListener('scroll',kbPlace)}
   return b}
+var CFS=[11,13,15,17,19];
+function kbFz(d){var i=CFS.indexOf(+ST('cf'));if(i<0)i=2;var n=Math.max(0,Math.min(CFS.length-1,i+d));
+  if(n===i){toast(d>0?'Это самый крупный код':'Это самый мелкий код');return}
+  S.set=S.set||{};S.set.cf=CFS[n];save();applyPrefs();if(KB.c)KB.c.dispatchEvent(new Event('input'));kbPlace()}
 function kbPlace(){
   var b=KB.el,c=KB.c;if(!b)return;
   var on=!KBD&&!!c&&c.isConnected&&document.activeElement===c,vv=window.visualViewport;
@@ -412,6 +419,41 @@ function quiz(i,j){
       g.textContent='Дальше';g.focus({preventScroll:true})}}
   nextq()}
 
+/* --- телефон боком (владелец): в заданиях с кодом и проектах условие слева, код справа, границу между ними можно двигать.
+   Разметка одна на все положения: условие и подсказка — в .spa, редактор, вывод и ответ проверки — в .spb. Стоймя и на
+   широком экране обёртки «прозрачные» (display:contents), и экран такой же, как был; телефон боком (низкий экран в
+   горизонтальной ориентации, CSS) — две колонки, каждая прокручивается сама. Граница — палец/мышь или стрелки, ширина
+   левой колонки запоминается (itp-app spl, в процентах) */
+var SPLQ=matchMedia('(orientation:landscape) and (max-height:540px) and (min-width:600px)');
+function splitOn(){return SPLQ.matches&&!!app.querySelector('.spl')}
+/* телефон боком весь экран — две колонки (владелец: верхняя лента и широкая «Проверить» съедали почти всё): шапка урока
+   (крестик, полоска заданий, подсказка) переезжает тонкой строкой в верх левой колонки, панель с «Проверить» — компактной
+   строкой под редактор в правую. Стоймя — всё обратно на свои места. Высоту колонок задаёт CSS (экран — колонка flex) */
+function splitFit(){var sp=app.querySelector('.spl');if(!sp)return;var a=sp.querySelector('.spa'),b=sp.querySelector('.spb'),d=$('dock'),t=app.querySelector('.top.ls')||sp.querySelector('.top.ls');
+  if(SPLQ.matches){window.scrollTo(0,0);if(d&&d.parentNode!==b)b.appendChild(d);if(t&&t.parentNode!==a)a.insertBefore(t,a.firstChild)}
+  else{if(d&&d.parentNode===b)app.appendChild(d);if(t&&t.parentNode===a)app.insertBefore(t,app.firstChild)}}
+function splitSet(sp,v){v=Math.max(25,Math.min(75,Math.round(v)));sp.style.setProperty('--spl',v+'%');var h=sp.querySelector('.sph');if(h)h.setAttribute('aria-valuenow',v);return v}
+function splitWrap(){
+  var l=app.querySelector('.tcard,.pj'),e=app.querySelector('.edc');if(!l||!e)return;
+  var sp=document.createElement('div'),a=document.createElement('div'),b=document.createElement('div'),h=document.createElement('div');
+  sp.className='spl';a.className='spa';b.className='spb';h.className='sph';
+  h.setAttribute('role','separator');h.setAttribute('aria-orientation','vertical');h.setAttribute('aria-label','Граница между условием и кодом');h.setAttribute('aria-valuemin','25');h.setAttribute('aria-valuemax','75');h.tabIndex=0;
+  l.parentNode.insertBefore(sp,l);
+  [$('tip0'),l,$('hint')].forEach(function(x){if(x)a.appendChild(x)});
+  [e,$('cons'),app.querySelector('div#fb')].forEach(function(x){if(x&&x.parentNode!==b&&!x.closest('.dock'))b.appendChild(x)});
+  sp.appendChild(a);sp.appendChild(h);sp.appendChild(b);app.classList.add('spw');
+  var v=+appGet().spl||45;v=splitSet(sp,v);
+  function save(){appSet({spl:v})}
+  h.addEventListener('pointerdown',function(ev){if(!splitOn())return;ev.preventDefault();h.setPointerCapture(ev.pointerId);h.classList.add('drag');
+    var r=sp.getBoundingClientRect();
+    function mv(m){v=splitSet(sp,(m.clientX-r.left)/r.width*100)}
+    function up(){h.classList.remove('drag');h.removeEventListener('pointermove',mv);h.removeEventListener('pointerup',up);h.removeEventListener('pointercancel',up);save()}
+    h.addEventListener('pointermove',mv);h.addEventListener('pointerup',up);h.addEventListener('pointercancel',up)});
+  h.addEventListener('keydown',function(ev){var d=ev.key==='ArrowLeft'?-5:ev.key==='ArrowRight'?5:0;if(!d)return;ev.preventDefault();v=splitSet(sp,v+d);save()});
+  requestAnimationFrame(splitFit)}
+window.addEventListener('resize',function(){if(app.querySelector('.spl'))splitFit()});
+try{SPLQ.addEventListener('change',function(){if(app.querySelector('.spl'))setTimeout(splitFit,60)})}catch(e){}
+
 /* --- задания с кодом --- */
 function task(i,j,k){
   var it=IT(i,j),T=it.tasks,q=T[k],key=i+'-'+j,tk=key+'-'+k;islStart(key);
@@ -422,7 +464,7 @@ function task(i,j,k){
   var dots='<div class="sbar" role="group" aria-label="Задание '+(k+1)+' из '+T.length+'">'+T.map(function(x,n){var ok=S.tk[key+'-'+n],go=n!==k&&(ok||n===fu);
     return'<button type="button" class="'+(ok?'ok':'')+(n===k?' cu':'')+'" data-n="'+n+'"'+(go?' title="Задание '+(n+1)+'"':' disabled')+' aria-label="Задание '+(n+1)+(ok?', решено':'')+'"'+(n===k?' aria-current="step"':'')+'></button>'}).join('')+'</div>';
   scr('task',lessonTop(dots,'<span class="lstep" aria-hidden="true">'+(k+1)+' / '+T.length+'</span>'+(q.h?'<button class="icon hbe" id="hb" aria-label="Подсказка (опыт будет вдвое меньше)" aria-keyshortcuts="Control+H">'+phi('lightbulb','hbl')+'</button>':''))+'<h1 class="sr-only">'+esc(it.n||'Задания с кодом')+', задание '+(k+1)+' из '+T.length+'</h1>'+(k>0&&!S.tp&&S.tk[key+'-'+(k-1)]?'<div class="tip0" id="tip0" role="note"><span>Решённое задание можно открыть снова: нажми на его полоску сверху. Там твой код и «как задумано».</span><button class="btn t" id="tip0b">Понятно</button></div>':'')+taskCard(q)+'<div id="hint"></div>'+edCard('Решение',dc,0,'# Пиши код здесь\n'+(q.starter||''))+conHtml()+'<div id="fb" aria-live="polite"></div>'+dockHtml('<button class="btn" id="chk">Проверить</button>'));
-  $('x').onclick=goBack;
+  splitWrap();$('x').onclick=goBack;
   if($('tip0')){S.tp=1;save();$('tip0b').onclick=function(){var t=$('tip0');if(t)t.remove()}}
   app.querySelectorAll('.top .sbar button[data-n]').forEach(function(b){b.onclick=function(){if(!b.disabled)task(i,j,+b.dataset.n)}});
   var c=$('code'),sync=initEd(c,function(){drc(i,j,k).codes[k]=c.value.slice(0,3000);lazySave()});sync();
@@ -467,7 +509,7 @@ function project(i,j){
   var it=IT(i,j),key=i+'-'+j,done=S.d[key];islStart(key);var seen=S.at[key]==='seen',sk=S.at[key]==='skip'||seen,bonus=it.bonus>0?it.bonus|0:40;
   var dc=((S.dr[key]||{}).codes||{})[0]||'# Пиши код здесь\n'+(it.starter||''),hs=String(it.h||'').split('\n').filter(Boolean);
   scr('project',lessonTop('<span class="lstep">🚀 Мини-проект · по желанию</span>',done?'':'<button class="btn t" id="sk" style="margin:0">Пропустить</button>')+'<div class="pj"><h1>'+esc(it.n)+'</h1>'+(String(it.q||'').length>QLONG?'<div class="card pjl">'+QTB+qSec('Цель',condHtml(it.q,true),true)+(hs.length?qSec('Что пригодится',hs.map(function(l){return'<p class="qi">'+hintTx(l)+'</p>'}).join(''),false):'')+(it.ex?qSec('Пример',exHtml(it.ex,it.strict),true):'')+filesHtml(it.f)+'</div>':'<div class="card"><b>Цель</b><p>'+qfmt(it.q).replace(/\n/g,'</p><p>')+'</p>'+(hs.length?'<b>Что пригодится</b><p>'+hs.map(function(l){return hintTx(l)}).join('<br>')+'</p>':'')+(it.ex?'<b>Пример</b>'+(it.strict?'<pre class="cmp">'+esc(it.ex)+'</pre>':exHtml(it.ex,false)):'')+filesHtml(it.f)+'</div>')+'<p class="mu" style="margin:0 4px 14px">'+(seen?'Эталон открыт, поэтому опыт за проект не начисляется. Решить его всё равно можно.':sk?'Этот проект пропущен. Сделай его сейчас и получи бонус +'+bonus+' ⭐. Или посмотри эталон, но тогда уже без опыта.':done?'Проект уже выполнен, бонус за него получен.':'Проект можно пропустить, тема всё равно засчитается. За выполнение бонус +'+bonus+' ⭐.')+'</p></div>'+edCard('Решение',dc,0,'# Пиши код здесь\n'+(it.starter||''))+conHtml()+'<div id="fb" aria-live="polite"></div>'+dockHtml('<button class="btn" id="chk">Проверить</button>'+(sk&&it.sol?'<button class="btn t" id="pjs">Посмотреть эталон</button>':'')));
-  $('x').onclick=home;qBind(app);
+  splitWrap();$('x').onclick=home;qBind(app);
   var c=$('code'),ed=c.closest('.ed');ed.dataset.min=300;var sync=initEd(c,function(){drc(i,j,0).codes[0]=c.value.slice(0,3000);lazySave()});sync();
   skReady();chkPulse();runBind(c);
   $('chk').onclick=async function(){

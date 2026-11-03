@@ -417,7 +417,7 @@ function crtDialog(full,reboot){
     NK=v;return crtSay((v==='Морковка'&&NKBAD>1?[]:['Приятно познакомиться, '+v+'.']).concat(['Ты парень или девушка? Это нужно, чтобы окончания в тексте были правильными.']))}).then(function(){
     return crtMenu([['m','Парень'],['f','Девушка'],['','Не указывать']].map(function(x,k){return{c:'tgd',a:' data-g="'+x[0]+'"',h:'<span class="tno">['+(k+1)+']</span>'+x[1]}}),'Как к тебе обращаться')}).then(function(k){
     S.nick=NK;S.g=['m','f',''][k];if(!S.reg)S.reg=day(new Date());save();crtYou('> '+['Парень','Девушка','Не указывать'][k])}).then(crtPlang);
-  else p=p.then(function(){return crtSay(['С возвращением, '+S.nick+'.'])});
+  else p=p.then(function(){return crtSay(['С возвращением, '+nkv(S.nick)+'.'])});
   p.then(function(){if(CRT)return crtSay(['С чего начнём?','Выбери первую тему, которую ещё не знаешь. Пропущенные можно пройти потом.'])}).then(function(){
     if(!CRT)return;
     var f=TOPICS[0]&&TOPICS[0].intro?1:0,ix=[],n=0;
@@ -451,7 +451,7 @@ function bsQr(){
   for(var y=0;y<N;y++)for(var x=0;x<N;x++)if((BSQR[y]>>(N-1-x))&1)d+='M'+x+' '+y+'h1v1h-1z';
   return'<svg viewBox="-2 -2 29 29" shape-rendering="crispEdges" aria-hidden="true" focusable="false"><rect x="-2" y="-2" width="29" height="29" fill="#fff"/><path fill="#0b63ce" d="'+d+'"/></svg>'}
 function bsod(){
-  var b=document.createElement('div'),tms=[],gone=0,nm=S.nick||'';b.id='bsod';b.className='blk';b.setAttribute('role','alert');
+  var b=document.createElement('div'),tms=[],gone=0,nm=nkv(S.nick||'');b.id='bsod';b.className='blk';b.setAttribute('role','alert');
   b.innerHTML='<div class="bsv"><div class="bsi"><div class="sad" aria-hidden="true">:(</div><p class="bm">В ИТП возникла проблема, и его нужно перезапустить. Мы лишь подготовим островки'+(nm?', '+esc(nm)+',':'')+' и всё заработает.</p><p class="bp"><b>0</b>% выполнено</p><div class="bq">'+bsQr()+'<div><p>Это не настоящая ошибка, а начало курса.</p><p>Код остановки: HELLO_WORLD</p></div></div></div></div>';
   document.body.appendChild(b);
   /* QR той же картинкой — для снимка синего экрана перед осыпанием (bsSnap) */

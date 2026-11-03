@@ -45,6 +45,10 @@ function phi(n,cls){return'<svg class="phi'+(cls?' '+cls:'')+'" viewBox="0 0 256
 function ico(n,cls){return'<svg class="'+(cls||'')+'" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">'+IC[n]+'</svg>'}
 /* знак приложения: тот же наклонный шестиугольник-остров, что и на Пути */
 
+/* ник разработчика показывается как «Creator» (владелец: чтобы по скриншотам с функциями разработчика нельзя было узнать
+   настоящий ник, по которому включается режим). Хранится и проверяется — настоящий */
+function nkv(n){n=String(n==null?'':n);return n==='TheCreatorOfNothing'?'Creator':n}
+nk=(function(f){return function(n){return f(nkv(n))}})(nk);
 /* --- кролик (картинка встроена в файл) --- */
 function rabbit(st){var s=IMG[st]||(st==='rolled'?IMG.grump||IMG.grumphead:IMG.eat);return'<div class="rw im '+st+'"><img src="'+s+'" alt="" draggable="false"></div>'}
 /* тень под лапами: где стоят лапы, считается по пикселям каждого спрайта (нижние непрозрачные ряды), а не подгоняется
@@ -592,10 +596,11 @@ var SKCODE={msg:['print("Привет, мир!")','Привет, мир!'],
  cap:['project = Project("мой бот")\nproject.build()\nproject.share()','Готово!']};
 var SKBG={'':['#0B2E09','#1F6516','#43A034'],carrot:['#4A2302','#B65E08','#F08C1A'],pink:['#3E0A1B','#952746','#D9557A'],blue:['#081A44','#1A479A','#3B7BE6'],violet:['#170D3D','#4E31A8','#7E62E8']};
 function skImg(cb,vr,k){
-  var s=skNow(),m=s.L[k==null?s.k:k],P=k==null?s.p:Math.max(m.t,1),W=1080,H=1920,cv=document.createElement('canvas');cv.width=W;cv.height=H;
-  var g=cv.getContext('2d'),F='Nunito,system-ui,-apple-system,"Segoe UI",sans-serif',MF='"Cascadia Code","Cascadia Mono",Consolas,ui-monospace,monospace',C=SKBG[ST('acc')]||SKBG[''],cd=SKCODE[m.e]||SKCODE.msg;cd=[cd[0],cd[1].replace(/Влад/g,String(S.nick||'Влад').slice(0,14))];
+  var s=skNow(),m=s.L[k==null?s.k:k],P=k==null||s.p>=m.t?s.p:Math.max(m.t,1),W=1080,H=1920,cv=document.createElement('canvas');cv.width=W;cv.height=H;
+  var g=cv.getContext('2d'),F='Nunito,system-ui,-apple-system,"Segoe UI",sans-serif',MF='"Cascadia Code","Cascadia Mono",Consolas,ui-monospace,monospace',C=SKBG[ST('acc')]||SKBG[''],cd=SKCODE[m.e]||SKCODE.msg;cd=[cd[0],cd[1].replace(/Влад/g,nkv(S.nick||'Влад').slice(0,14))];
   function star(x,y,r,a){g.save();g.globalAlpha=a;var gl=g.createRadialGradient(x,y,0,x,y,r*1.6);gl.addColorStop(0,'rgba(255,255,255,.45)');gl.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=gl;g.beginPath();g.arc(x,y,r*1.6,0,6.283);g.fill();
-    g.fillStyle='#fff';g.beginPath();g.moveTo(x,y-r);g.quadraticCurveTo(x,y,x+r*.38,y);g.quadraticCurveTo(x,y,x,y+r);g.quadraticCurveTo(x,y,x-r*.38,y);g.quadraticCurveTo(x,y,x,y-r);g.fill();g.restore()}
+    /* четыре луча одной длины, вогнутые края (раньше поперечные лучи были втрое короче — звезда выходила вытянутой, владелец) */
+    var q=r*.16;g.fillStyle='#fff';g.beginPath();g.moveTo(x,y-r);g.quadraticCurveTo(x+q,y-q,x+r,y);g.quadraticCurveTo(x+q,y+q,x,y+r);g.quadraticCurveTo(x-q,y+q,x-r,y);g.quadraticCurveTo(x-q,y-q,x,y-r);g.fill();g.restore()}
   function rr(x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
   function wrap(t,mw){var w=t.split(' '),L=[],c='';w.forEach(function(x){var n=c?c+' '+x:x;if(g.measureText(n).width>mw&&c){L.push(c);c=x}else c=n});if(c)L.push(c);return L}
   /* подсветка: те же роли, что в редакторе ИТП — ключевые слова, строки, числа, вызовы, комментарии */
@@ -607,6 +612,8 @@ function skImg(cb,vr,k){
       g.fillStyle=col;g.fillText(tx,x,y);x+=g.measureText(tx).width}}
   function draw(logo){
     /* фон: тёмный тон акента сверху, светлее к низу; мягкое свечение за окном кода */
+    /* углы картинки скруглены (владелец): всё рисуется внутри скруглённого прямоугольника, уголки PNG прозрачные */
+    rr(0,0,W,H,72);g.clip();
     var bg=g.createLinearGradient(0,0,W*.3,H);bg.addColorStop(0,C[0]);bg.addColorStop(.55,C[1]);bg.addColorStop(1,C[2]);g.fillStyle=bg;g.fillRect(0,0,W,H);
     var gw=g.createRadialGradient(W*.5,H*.74,60,W*.5,H*.74,760);gw.addColorStop(0,'rgba(255,255,255,.22)');gw.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=gw;g.fillRect(0,0,W,H);
     /* знаки кода, рассыпанные по фону, как конфетти */
@@ -634,7 +641,7 @@ function skImg(cb,vr,k){
     var oy=98+24+code.length*lh;g.save();rr(0,0,pw,ph,38);g.clip();g.fillStyle='rgba(255,255,255,.05)';g.fillRect(0,oy,pw,ph-oy);g.restore();g.fillStyle='rgba(255,255,255,.08)';g.fillRect(0,oy,pw,2);
     g.font='600 38px '+MF;out.forEach(function(l,i){g.fillStyle='#E6E1D8';g.fillText(l,112,oy+58+i*lh)});g.fillStyle='#7CD06A';g.fillText('›',62,oy+58);
     g.restore();
-    star(110,top-30,38,.9);star(985,top-80,30,.85);star(990,1830,46,.9);star(70,1790,24,.7);star(880,y0-20,18,.6);
+    star(110,top-30,50,.9);star(985,top-80,42,.85);star(990,1830,58,.9);star(70,1790,34,.75);star(880,y0-20,26,.65);
     cb(cv)}
   var im=new Image();
   (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(function(){im.onload=function(){draw(im)};im.onerror=function(){draw(null)};im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(PYLOGO)})}
@@ -660,11 +667,12 @@ function skills(back){
   var s=skNow(),L=s.L,m=L[s.k];
   var h=subTop('Что ты уже умеешь','🏆',L[s.k+1]?'Дальше: '+esc(L[s.k+1].n||''):'Все умения открыты','',s.k,L.length-1)+'<div class="skp">'+
    '<div class="skh"><span class="sklogo" role="img" aria-label="Python">'+PYLOGO+'</span><b>'+s.p+'</b></div><p class="mu skn">'+pl(s.p,['островок пройден','островка пройдено','островков пройдено'])+' из '+L[L.length-1].t+', пропущенные тоже считаются'+(skHole()?'. И ещё '+skHole()+' в норах':'')+'</p>'+
-   rbSay(s.k?'Значит, ты уже можешь '+esc(m.c)+'!':'Пройди первую тему, и здесь появится, что ты уже можешь')+(s.k?'<button class="btn t skshb" id="sksh">'+phi('share-network')+'Поделиться</button>':'')+
+   rbSay(s.k?'Значит, ты уже можешь '+esc(m.c)+'!':'Пройди первую тему, и здесь появится, что ты уже можешь')+(s.k?'<button class="btn t skshb" id="sksh">'+phi('share-network')+'Поделиться</button>'+(s.k>1?'<p class="mu skhint">Или нажми на любое открытое умение ниже, чтобы поделиться им</p>':''):'')+
    '<h2 class="skov">Прогресс</h2><ol class="skl">'+L.map(function(x,i){var on=s.p>=x.t,nw=i===s.k;return'<li class="'+(on?'on':'')+(nw?' now':'')+(i+1<L.length&&s.p>=L[i+1].t?' fl':'')+'"><span class="skd">'+ski(x.e)+'</span><span class="sktx"><small>'+SKHX+x.t+'</small><b>'+esc(x.n)+'</b></span></li>'}).join('')+'</ol></div>';
   scr('skills',h);if($('sksh'))$('sksh').onclick=function(){skShare()};
-  /* режим разработчика: нажми на любую веху — откроется её картинка «Я могу…» */
-  if(DEV())app.querySelectorAll('.skl li').forEach(function(li,i){if(!i)return;li.classList.add('dv');li.setAttribute('role','button');li.tabIndex=0;li.onclick=function(){skShare(i)};li.onkeydown=function(e){if(e.key==='Enter')skShare(i)}});$('x').onclick=function(){if(typeof back==='function')back();else{SBACK=SBACK||profile;settings()}}}
+  /* поделиться можно любым открытым умением, не только последним (владелец): нажми на веху — откроется её картинка «Я могу…».
+     В режиме разработчика — любой вехой, и ещё не открытой */
+  app.querySelectorAll('.skl li').forEach(function(li,i){if(!i||!(DEV()||s.p>=L[i].t))return;li.classList.add('dv');li.setAttribute('aria-label','Поделиться: '+L[i].n);li.insertAdjacentHTML('beforeend','<span class="skgo" aria-hidden="true">'+phi('share-network')+'</span>');li.setAttribute('role','button');li.tabIndex=0;li.onclick=function(){skShare(i)};li.onkeydown=function(e){if(e.key==='Enter')skShare(i)}});$('x').onclick=function(){if(typeof back==='function')back();else{SBACK=SBACK||profile;settings()}}}
 /* U1-9: цель дня и цель серии выбираются в одном окне (sgChooser в a_screens.js) */
 function goalSheet(){sgChooser(function(){if(CURTAB!=='prof')return;KEEPSCR=1;SKEY='profile';var y=window.scrollY;profile();window.scrollTo(0,y)})}
 function profile(){BACK=profile;
@@ -705,7 +713,7 @@ function setSet(k,v){
   if(k==='emo'){if(ST('emo')){emoLoad();if(EM.map)emoOn()}else emoOff()}
   if(k==='goal')goalCheck()}
 function settings(){
-  var h=subTop('Настройки','⚙️',S.nick?esc(S.nick):'');
+  var h=subTop('Настройки','⚙️',S.nick?esc(nkv(S.nick)):'');
   h+='<div class="sec">Внешний вид</div><div class="lst">'+
    SR('🎨','Тема','',SG('theme',[['','Авто'],['light','Светлая'],['dark','Тёмная']],S.theme))+
    SR('🖌️','Цвет акцента','Кнопки, полоски, выделение','<div class="swa" role="radiogroup" aria-label="Цвет акцента">'+[['','#2B8420','Зелёный'],['carrot','#F08C1A','Морковный'],['pink','#C73B63','Розовый'],['blue','#2563D0','Синий'],['violet','#6C4BD6','Фиолетовый']].map(function(c){var on=ST('acc')===c[0];return'<button role="radio" aria-checked="'+on+'" data-k="acc" data-v="'+c[0]+'" style="background:'+c[1]+';color:'+c[1]+'" class="'+(on?'on':'')+'" aria-label="'+c[2]+'"></button>'}).join('')+'</div>')+
@@ -732,7 +740,7 @@ function settings(){
    SR('🔁','Повторение после перерыва','3 вопроса, если не заходил 3 дня и больше',SW('rep',ST('rep')))+
    SR('💡','Спрашивать про подсказку','Напомнить, что опыт будет вдвое меньше',SW('hc',!S.hc))+'</div>';
   h+='<div class="sec">Редактор кода</div><div class="lst">'+
-   SR('🔠','Размер кода','',SG('cf',[[13,'S'],[15,'M'],[17,'L'],[19,'XL']],ST('cf')))+
+   SR('🔠','Размер кода','',SG('cf',[[11,'XS'],[13,'S'],[15,'M'],[17,'L'],[19,'XL']],ST('cf')))+
    SR('🔢','Номера строк','',SW('ln',ST('ln')))+
    SR('🧩','Закрывать скобки и кавычки','Сама допишет пару',SW('ac',ST('ac')))+'</div>';
   var skn=skNow();
@@ -754,7 +762,7 @@ function settings(){
   eggBind();
   var v=$('vol');v.oninput=function(){S.set.vol=+v.value;save();sxVol(VOLK())};v.onchange=function(){snd('ok')};
   app.querySelectorAll('.lst button.li').forEach(function(b){b.onclick=function(){var a=b.dataset.a;
-    if(a==='nick')askName('Никнейм',S.nick,function(n){n=Array.from(n).slice(0,20).join('');if(nkBad(n)){snd('bad');toast('🐰 Так ник назвать нельзя');return false}S.nick=n;save();again();toast('Никнейм изменён')},20);
+    if(a==='nick')askName('Никнейм',nkv(S.nick),function(n){n=Array.from(n).slice(0,20).join('');if(n===nkv(S.nick)&&n!==S.nick){again();return}if(nkBad(n)){snd('bad');toast('🐰 Так ник назвать нельзя');return false}S.nick=n;save();again();toast('Никнейм изменён')},20);
     else if(a==='bk')backup();
     else if(a==='skl')skills();
     else if(a==='kb')keys();

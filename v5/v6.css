@@ -998,8 +998,7 @@ button.li:hover{background:var(--card2)}
 /* ---------- 9. Адаптивность ---------- */
 @media (pointer:coarse){
  input.f,input:not([type]),select{font-size:max(16px,1rem)}
- /* поле и подсветка должны совпадать по размеру, иначе курсор уедет; меньше 16px iOS увеличивает страницу */
- .ed pre,.ed textarea,.gt{font-size:max(16px,var(--cf,15px))}
+ /* код — ровно выбранного размера (S и XS на телефоне раньше всё равно были 16 px): автоувеличение iPhone выключено в a_core.js */
  .note,.dq{font-size:16px}
 }
 @media (max-width:380px){
@@ -1467,6 +1466,8 @@ pre,code,textarea,#hl,.pyex p,.qv,.cmp{font-variant-ligatures:none;font-feature-
 .kbr button.kx{font-family:inherit;font-size:17px;color:var(--accent-ink);background:color-mix(in srgb,var(--accent) 12%,var(--card))}
 .kbr button.kq{font-size:15px;font-weight:800;padding:0 14px}
 .kbr button.kq.on{background:var(--accent);color:var(--on)}
+.kbr button.kz{font-size:15px;font-weight:800;padding:0 8px;min-width:40px}
+.kbr button.kz+button:not(.kz){margin-left:6px}
 .kbr button:active{background:var(--soft);transform:translateY(1px)}
 /* условие задачи поверх кода, пока пишешь: прокручивается само по себе, не больше 45% видимой части экрана */
 .kbq{margin:0 8px 8px;max-height:var(--kbqh,45vh);overflow:auto;overscroll-behavior:contain;border-radius:var(--r);background:var(--card);box-shadow:0 10px 32px rgba(0,0,0,.22),0 0 0 1px var(--line2);animation:fbin var(--d2) var(--e-out)}
@@ -1745,3 +1746,69 @@ html.lite .top{background:color-mix(in srgb,var(--card) 97%,transparent)}
 html.lite .shov{background:rgba(10,10,12,.92)}
 /* Путь под падающими осколками проступает из-под слоя цвета фона (только прозрачность; щели между осколками остаются светлыми, как было) (раньше — filter:brightness по всей странице на каждом кадре) */
 #shards .shdim{position:absolute;inset:0;background:var(--bg);opacity:0;pointer-events:none}
+/* «Поделиться» любым открытым умением: значок справа у вехи */
+.skl li .skgo{margin-left:auto;flex:none;display:grid;place-items:center;width:36px;height:36px;border-radius:50%;color:var(--muted);transition:color var(--d1),background var(--d1)}
+.skl li .skgo .phi{width:20px;height:20px}
+.skl li.dv:hover .skgo,.skl li.dv:focus-visible .skgo{color:var(--accent);background:var(--soft)}
+.skhint{margin:8px 0 0;text-align:center;font-size:.875rem}
+/* выбор достижений для карточки профиля (share в a_more.js) */
+.shpkb{margin-top:12px}
+.shpl{margin-top:10px}
+.shpn{margin:0 0 8px;font-size:.875rem}
+.shpg{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px;max-height:32vh;overflow:auto;padding:2px}
+.shch{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border:0;border-radius:14px;background:var(--card2);color:var(--ink);font:inherit;cursor:pointer;opacity:.55;transition:opacity var(--d1),box-shadow var(--d1)}
+.shch[aria-pressed=true]{opacity:1;box-shadow:inset 0 0 0 2px var(--accent)}
+.shch[aria-pressed=true]::after{content:attr(data-n);position:absolute;top:-6px;right:-4px;min-width:20px;height:20px;border-radius:10px;background:var(--accent);color:var(--on);font-size:12px;font-weight:900;line-height:20px;text-align:center}
+.shce{display:grid;place-items:center;width:40px;height:40px;border-radius:10px;background:var(--c);font-size:22px}
+.shcn{font-size:11px;font-weight:700;line-height:1.15;text-align:center;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+/* телефон боком: условие слева, код справа (splitWrap в a_screens.js). Стоймя и на широком экране обёртки не видны — всё как было.
+   Боком экран низкий (~360–430 px), поэтому весь он — две колонки: ни верхней ленты, ни широкой панели снизу. Шапка урока —
+   тонкой строкой в верху левой колонки, «Проверить» — компактной строкой под редактором. Каждая колонка — одна цельная
+   карточка от верха до низа экрана (без обрезанных скруглений) со своей прокруткой; граница — тонкая «ручка» посередине */
+.spl,.spa,.spb{display:contents}
+.sph{display:none}
+@media (orientation:landscape) and (max-height:540px) and (min-width:600px){
+ #app.spw{max-width:none;display:flex;flex-direction:column;height:100vh;height:100dvh;min-height:0;overflow:hidden;
+   padding:max(10px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left))}
+ #app.spw .spl{flex:1;min-height:0;display:grid;grid-template-columns:max(200px,min(var(--spl,45%),calc(100% - 358px))) 22px minmax(0,1fr)}
+ /* левая колонка — сама карточка; карточки внутри без своих рамок */
+ #app.spw .spa{display:block;min-width:0;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;
+   background:var(--card);border-radius:var(--r-lg);box-shadow:inset 0 0 0 1.5px var(--line2);padding:0 16px 14px}
+ /* шапка урока внутри колонки: тонкая строка, при прокрутке условия остаётся сверху */
+ #app.spw .spa>.top.ls{position:sticky;top:0;z-index:3;min-height:0;height:auto;margin:0 -16px 8px;padding:6px 8px 6px 4px;gap:8px;
+   border-radius:var(--r-lg) var(--r-lg) 0 0;background:var(--card);box-shadow:0 1px 0 var(--line);-webkit-backdrop-filter:none;backdrop-filter:none}
+ #app.spw .spa>.top.ls::after{display:none}
+ #app.spw .spa>.top.ls .icon{width:36px;height:36px}
+ #app.spw .spa>.top.ls .icon svg{width:20px;height:20px}
+ #app.spw .spa>.top.ls>.btn{min-height:34px;padding:4px 12px;font-size:.875rem}
+ #app.spw .spa .tcard,#app.spw .spa .pj .card{margin:0;padding:0;background:none;box-shadow:none;border:0;border-radius:0}
+ #app.spw .spa .tcard>.ov{margin-top:4px}
+ #app.spw .spa .pj h1{margin:2px 0 10px;font-size:1.25rem}
+ #app.spw .spa .pj>p{margin:12px 0 0}
+ #app.spw .spa #hint:not(:empty){margin-top:12px}
+ #app.spw .spa .tip0{margin:0 0 12px}
+ /* правая колонка: редактор до низа, вывод и ответ проверки — под ним, кнопки — компактной строкой внизу колонки */
+ #app.spw .spb{display:flex;flex-direction:column;gap:8px;min-width:0;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin}
+ #app.spw .spb>*{margin:0}
+ #app.spw .spb .edc{flex:1 1 auto;display:flex;flex-direction:column;min-height:150px}
+ #app.spw .spb .edh{min-height:42px;padding:2px 4px 2px 12px}
+ #app.spw .spb .edh .btn{min-height:34px;padding:4px 12px;font-size:.875rem}
+ #app.spw .spb .ed{flex:1}
+ #app.spw .ed textarea{min-height:100px}
+ #app.spw .spb .cons{flex:none}
+ #app.spw .spb #fb:empty{display:none}
+ #app.spw .spb .dock{position:sticky;bottom:0;left:auto;right:auto;z-index:2;flex:none;padding:6px 0 0;margin:-6px 0 0;background:var(--bg);border:0;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+ #app.spw .spb .dock>.dki{max-width:none;left:auto;gap:6px}
+ #app.spw .spb .dock .dkb{display:flex;gap:8px}
+ #app.spw .spb .dock .btn{min-height:40px;padding:6px 14px;margin:0;flex:1;font-size:.9375rem;border-radius:14px}
+ #app.spw .spb .dock .btn.t{flex:0 1 auto}
+ /* граница: тонкая вертикальная ручка посередине, как у разделённого экрана; при касании — цвет акцента */
+ #app.spw .sph{display:flex;align-items:center;justify-content:center;cursor:col-resize;touch-action:none;outline:none;position:relative}
+ #app.spw .sph::before{content:'';width:5px;height:44px;border-radius:3px;background:color-mix(in srgb,var(--ink) 28%,transparent);transition:background var(--d1),height var(--d2),width var(--d1)}
+ #app.spw .sph::after{content:'';position:absolute;inset:0 -6px}
+ #app.spw .sph:hover::before,#app.spw .sph.drag::before,#app.spw .sph:focus-visible::before{background:var(--accent);height:72px;width:6px}
+ #app.spw .spl:has(.sph.drag){user-select:none;-webkit-user-select:none}
+ /* кнопка режима разработчика — маленькой в левом нижнем углу, не поверх условия */
+ #app.spw~.dvb,.spw .dvb,body:has(#app.spw) .dvb{left:4px;bottom:4px;width:34px;height:34px;opacity:.7}
+ #app.spw~.dvb svg,body:has(#app.spw) .dvb svg{width:18px;height:18px}
+}
