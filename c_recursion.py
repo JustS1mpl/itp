@@ -81,6 +81,11 @@ def code_self():
              'def is_pal(s):\n    if len(s) <= 1:\n        return True\n    return s[0] == s[-1] and is_pal(s[1:-1])\n\n\n'
              'phrase = input()\ns = "".join(c for c in phrase.lower() if c.isalpha())\nprint("Палиндром" if is_pal(s) else "Не палиндром")',
              ['А роза упала на лапу Азора', 'Привет, мир!', 'Я иду с мечем судия']),
+        task('Пирамида из блоков: верхний ярус — 1 × 1 блок, следующий — 2 × 2 и так далее. Напиши рекурсивную функцию '
+             'blocks(n), которая возвращает, сколько блоков нужно на пирамиду из n ярусов (для n = 0 — ноль). Цикл не используй.',
+             'Базовый случай: if n == 0: return 0. Иначе n * n + blocks(n - 1).',
+             'def blocks(n):\n    if n == 0:\n        return 0\n    return n * n + blocks(n - 1)',
+             ['print(blocks(3))', 'print(blocks(0), blocks(1))', 'print(blocks(20))'], tail=TL),
     ])
 
 
@@ -161,6 +166,12 @@ def code_stack():
              'def biggest(nums):\n    if len(nums) == 1:\n        return nums[0]\n    rest = biggest(nums[1:])\n    return nums[0] if nums[0] > rest else rest\n\n\n'
              'nums = list(map(int, input().split()))\nprint(biggest(nums) if nums else "Пусто")',
              ['3 9 -2 7', '\n', '-5 -1 -8']),
+        task('Напиши рекурсивную функцию depth(x), которая возвращает глубину вложенности списка: у не-списка глубина 0, '
+             'у пустого списка — 1, у списка — 1 плюс наибольшая глубина его элементов.',
+             'if not isinstance(x, list): return 0. Иначе заведи best = 0 и пройди по элементам: best = max(best, depth(e)). '
+             'Для пустого списка цикл не выполнится, best останется 0 — и ответ 1 + 0 = 1.',
+             'def depth(x):\n    if not isinstance(x, list):\n        return 0\n    best = 0\n    for e in x:\n        best = max(best, depth(e))\n    return 1 + best',
+             ['print(depth([1, [2, [3]]]))', 'print(depth(5), depth([]))', 'print(depth([[[]], 1, [2]]))'], tail=TL),
     ])
 
 
@@ -237,6 +248,12 @@ def code_nested():
              'with open("disk.json", encoding="utf-8") as f:\n    node = json.load(f)\ntry:\n    for part in [p for p in input().split("/") if p]:\n'
              '        node = node[part]\n    print(f"Размер: {size(node)} КБ")\nexcept (KeyError, TypeError):\n    print("Нет такого пути")',
              ['фото/лето', '/', 'документы/класс', 'музыка', 'readme.txt/старое'], files={'disk.json': DISK}),
+        task('Папки игры описаны вложенными словарями: у папки значение — словарь, у файла — размер в КБ. Напиши функцию '
+             'scan(folder), которая возвращает кортеж (число файлов, общий размер) во всех вложенных папках.',
+             'Для каждого значения: если это словарь — сложи результат scan(значение), иначе файл: +1 к числу и размер к сумме.',
+             'def scan(folder):\n    count = 0\n    size = 0\n    for v in folder.values():\n        if isinstance(v, dict):\n            c, s = scan(v)\n'
+             '            count += c\n            size += s\n        else:\n            count += 1\n            size += v\n    return count, size',
+             ['print(scan({"save1.dat": 300, "mods": {"a.zip": 120, "b": {"c.txt": 1}}}))', 'print(scan({}))', 'print(scan({"x": {"y": {}}}))'], tail=TL),
     ])
 
 

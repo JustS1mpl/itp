@@ -70,6 +70,14 @@ def code_random():
              'beats = {"камень": "ножницы", "ножницы": "бумага", "бумага": "камень"}\nprint(f"Компьютер: {comp}")\n'
              'if me == comp:\n    print("Ничья")\nelif beats[me] == comp:\n    print("Победа")\nelse:\n    print("Поражение")',
              ['1\nкамень', '2\nбумага', '5\nножницы', '9\nкамень']),
+        task('Сундук с лутом. На вход подаются число seed и число открытий n. Задай random.seed(seed) и для каждого открытия '
+             'брось число от 1 до 100: от 95 — «легендарный», от 70 — «редкий», иначе «обычный». Выведи «N: ЧИСЛО — РЕДКОСТЬ», '
+             'а в конце «Легендарных: K».',
+             'random.randint(1, 100) в цикле, редкость — цепочкой if/elif. Seed задай один раз до цикла.',
+             'import random\nseed = int(input())\nn = int(input())\nrandom.seed(seed)\nlegend = 0\nfor i in range(1, n + 1):\n'
+             '    x = random.randint(1, 100)\n    if x >= 95:\n        kind = "легендарный"\n        legend += 1\n    elif x >= 70:\n        kind = "редкий"\n'
+             '    else:\n        kind = "обычный"\n    print(f"{i}: {x} — {kind}")\nprint(f"Легендарных: {legend}")',
+             ['7\n5', '42\n3', '2077\n10']),
     ])
 
 
@@ -138,6 +146,14 @@ def code_datetime():
              'from datetime import datetime, timedelta\nstart = datetime.strptime(input(), "%d.%m.%Y")\nd = start + timedelta(days=int(input()))\n'
              'while d.weekday() >= 5:\n    d += timedelta(days=1)\nprint(d.strftime("%d.%m.%Y"))',
              ['01.09.2026\n10', '01.09.2026\n4', '25.12.2026\n7']),
+        task('Серия входов в игру. На вход подаются даты входа «ДД.ММ.ГГГГ» по возрастанию, до слова «стоп»; в один день '
+             'можно войти несколько раз. Выведи «Лучшая серия: N дн.» — самое длинное число дней подряд с входами.',
+             'datetime.strptime(s, "%d.%m.%Y").date(). Разница соседних дат: 0 дней — тот же день, 1 день — серия растёт, '
+             'больше — серия начинается заново.',
+             'from datetime import datetime, timedelta\nprev = None\ncur = 0\nbest = 0\nwhile True:\n    s = input()\n    if s == "стоп":\n        break\n'
+             '    d = datetime.strptime(s, "%d.%m.%Y").date()\n    if prev is None or d - prev > timedelta(days=1):\n        cur = 1\n'
+             '    elif d - prev == timedelta(days=1):\n        cur += 1\n    prev = d\n    best = max(best, cur)\nprint(f"Лучшая серия: {best} дн.")',
+             ['30.12.2026\n31.12.2026\n31.12.2026\n01.01.2027\n05.01.2027\nстоп', '01.03.2026\nстоп', '01.02.2024\n28.02.2024\n29.02.2024\n01.03.2024\nстоп']),
     ])
 
 
@@ -209,6 +225,12 @@ def code_own():
              ['5 km\n20 C\nстоп', '-40 C\nстоп', '42.195 km\n0 C\nстоп'],
              files={'units.py': 'def km_to_miles(km):\n    return km / 1.609344\n\n\ndef c_to_f(c):\n    return c * 9 / 5 + 32\n\n\n'
                                 'if __name__ == "__main__":\n    print("проверка:", km_to_miles(1.609344), c_to_f(100))\n'}),
+        task('Ник из любого текста. На вход подаётся строка. Сделай из неё ник: латинские буквы и цифры оставь (буквы — '
+             'строчными), каждый другой символ замени на «_». Если ник начинается с цифры, допиши в начало «p». Выведи ник.',
+             'Проверка символа: c in string.ascii_letters + string.digits. Собирай ник в строку, в конце — lower().',
+             'import string\nnick = ""\nfor c in input():\n    if c in string.ascii_letters + string.digits:\n        nick += c\n    else:\n        nick += "_"\n'
+             'nick = nick.lower()\nif nick[0] in string.digits:\n    nick = "p" + nick\nprint(nick)',
+             ['Dark Knight!', '2077 Night', 'Кира pro', 'ok']),
     ])
 
 

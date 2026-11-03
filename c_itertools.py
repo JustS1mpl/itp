@@ -55,6 +55,13 @@ def code_iter():
              'Символ с номером i повторяется, если он есть в s[:i]. Первый такой — next((c for i, c in enumerate(s) if c in s[:i]), "Повторов нет").',
              's = input()\nprint(next((c for i, c in enumerate(s) if c in s[:i]), "Повторов нет"))',
              ['программа', 'кот', 'абвгдб', 'aa']),
+        task('Пошаговое обучение. Первая строка ввода — шаги обучения через «;». Дальше подаются команды до слова «стоп»: '
+             'на «дальше» выведи следующий шаг, а когда шаги закончились — «Обучение пройдено» (и на все следующие «дальше» '
+             'тоже). Другие команды пропускай.',
+             'it = iter(steps); следующий шаг — next(it, None): второй аргумент вернётся вместо StopIteration.',
+             'it = iter(input().split(";"))\nwhile True:\n    cmd = input()\n    if cmd == "стоп":\n        break\n    if cmd == "дальше":\n'
+             '        step = next(it, None)\n        print(step if step is not None else "Обучение пройдено")',
+             ['Ходьба;Прыжок;Удар\nдальше\nдальше\nпрыг\nдальше\nдальше\nстоп', 'Старт\nдальше\nдальше\nдальше\nстоп', 'А;Б\nдальше\nстоп']),
     ])
 
 
@@ -126,6 +133,14 @@ def code_itertools():
              'from itertools import accumulate\nweeks = list(map(int, input().split()))\ngoal = int(input())\n'
              'w = next((i for i, s in enumerate(accumulate(weeks), 1) if s >= goal), None)\nprint(w if w else "Цель не достигнута")',
              ['100 200 150 300\n400', '50 50\n1000', '500\n500']),
+        task('Пары артефактов. Первая строка ввода — артефакты «имя:сила» через пробел, вторая — нужная сила пары. '
+             'Выведи все пары разных артефактов с такой суммарной силой, по одной в строке: «А + Б», в каждой паре и между '
+             'парами — в порядке появления в списке. Если пар нет, выведи «Нет пар».',
+             'Разбери в список кортежей (имя, сила). combinations(items, 2) даёт пары в порядке списка без повторов.',
+             'from itertools import combinations\nitems = []\nfor p in input().split():\n    name, power = p.split(":")\n    items.append((name, int(power)))\n'
+             'need = int(input())\nfound = False\nfor a, b in combinations(items, 2):\n    if a[1] + b[1] == need:\n        print(f"{a[0]} + {b[0]}")\n        found = True\n'
+             'if not found:\n    print("Нет пар")',
+             ['кольцо:3 амулет:7 меч:5 щит:5 перо:2\n10', 'а:1 б:2\n5', 'x:4 y:4 z:4\n8']),
     ])
 
 
@@ -192,6 +207,14 @@ def code_collections():
              'from collections import defaultdict\ngroups = defaultdict(list)\nfor w in input().split():\n    groups["".join(sorted(w))].append(w)\nfor g in groups.values():\n'
              '    if len(g) > 1:\n        print(*g)',
              ['кот ток пила липа кто апельсин', 'рост сорт торс трос', 'сон нос лес']),
+        task('Лента убийств. На вход подаются события «УБИЙЦА ЖЕРТВА» до слова «стоп». На экране матча видно только три '
+             'последних события. Выведи их — самое новое первым — в виде «УБИЙЦА ✕ ЖЕРТВА», а последней строкой лидера матча '
+             '«Лидер: НИК (N)»; при равенстве — того, кто раньше других впервые появился в ленте как убийца.',
+             'deque(maxlen=3) сам выбрасывает старое; новое — appendleft, тогда вывод идёт по порядку. Счёт — Counter, '
+             'лидер — most_common(1): при равенстве он оставляет того, кто встретился раньше.',
+             'from collections import deque, Counter\nfeed = deque(maxlen=3)\nkills = Counter()\nwhile True:\n    s = input()\n    if s == "стоп":\n        break\n'
+             '    a, b = s.split()\n    feed.appendleft(f"{a} ✕ {b}")\n    kills[a] += 1\nfor e in feed:\n    print(e)\nname, n = kills.most_common(1)[0]\nprint(f"Лидер: {name} ({n})")',
+             ['Кира Zed\nZed Ян\nКира Ян\nЛи Кира\nстоп', 'А Б\nстоп', 'Б А\nА Б\nстоп']),
     ])
 
 

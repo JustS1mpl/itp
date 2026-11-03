@@ -75,6 +75,13 @@ def code_traceback():
              'n = 0\nwhile True:\n    name = input()\n    if name == "стоп":\n        break\n    n += 1\n    print(f"Игрок {n}: {name}")',
              ['Аня\nТимур\nстоп', 'Ким\nстоп', 'Ли\nОля\nМакс\nстоп'],
              starter='n = 0\nwhile True:\n    name = input()\n    if name == "стоп":\n        break\n    N += 1\n    print("Игрок " + n + ": " + name)', fix=True),
+        task('Программа читает здоровье героя и число зелий и выводит здоровье после всех зелий (каждое +25), но не '
+             'запускается. Исправь все ошибки — Python будет показывать их по одной.',
+             'Сначала SyntaxError: после for нужно двоеточие. Потом TypeError: строку и число не склеить — '
+             'выведи через f-строку или запятую.',
+             'hp = int(input())\npotions = int(input())\nfor i in range(potions):\n    hp = hp + 25\nprint(f"HP: {hp}")',
+             ['50\n2', '100\n0', '1\n4'],
+             starter='hp = int(input())\npotions = int(input())\nfor i in range(potions)\n    hp = hp + 25\nprint("HP: " + hp)', fix=True),
     ])
 
 
@@ -142,6 +149,15 @@ def code_logic():
              'age = int(input())\nif age >= 18:\n    print("взрослый")\nelif age >= 14:\n    print("подросток")\nelse:\n    print("ребёнок")',
              ['10', '15', '14', '18', '30'],
              starter='age = int(input())\nif age < 18:\n    print("ребёнок")\nelif age >= 14:\n    print("подросток")\nelse:\n    print("взрослый")', fix=True),
+        task('Метеостанция ищет самую холодную ночь. На вход подаются число ночей (не меньше 1), затем температуры, по одной в строке. '
+             'Программа иногда отвечает 0, хотя такой температуры не было. Найди логическую ошибку и исправь.',
+             'Трассировка на входе 2, 5, 7: coldest с самого начала 0, и 5 и 7 его не меньше. Начальное значение должно '
+             'быть первой температурой — прочитай её до цикла.',
+             'n = int(input())\ncoldest = int(input())\nfor i in range(n - 1):\n    t = int(input())\n    if t < coldest:\n'
+             '        coldest = t\nprint(coldest)',
+             ['3\n-5\n2\n-12', '2\n5\n7', '1\n-3', '4\n10\n8\n9\n11'],
+             starter='n = int(input())\ncoldest = 0\nfor i in range(n):\n    t = int(input())\n    if t < coldest:\n'
+                     '        coldest = t\nprint(coldest)', fix=True),
     ])
 
 
@@ -157,6 +173,13 @@ def code_final():
              ['4\n-2\n5\n0', '-1\n-5\n0', '0', '3\n0'],
              starter='total = 0\ncount = 0\nwhile True\n    x = int(input())\n    if x == 0:\n        break\n    total += x\n    count += 1\n'
                      'print(f"{total / count:.2f}")', fix=True),
+        task('Программа должна выводить слово задом наперёд, но падает с IndexError, а когда это исправишь — теряет '
+             'первую букву. Найди обе ошибки в range и исправь.',
+             'Индексы слова — от 0 до len(s) - 1. Идти назад нужно с len(s) - 1 до 0 включительно, '
+             'а конец range не входит, поэтому стоп — -1: range(len(s) - 1, -1, -1).',
+             's = input()\nresult = ""\nfor i in range(len(s) - 1, -1, -1):\n    result += s[i]\nprint(result)',
+             ['привет', 'а', 'level', 'Python'],
+             starter='s = input()\nresult = ""\nfor i in range(len(s), 0, -1):\n    result += s[i]\nprint(result)', fix=True),
     ])
 
 

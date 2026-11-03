@@ -98,3 +98,6 @@ H1 (2026-11-03): норы webserver (учебный фреймворк miniweb),
 paint (после algorithms), «Игра Жизнь» в pygame — coverage 0, xc5 bad 0, legacy_trace 0, «ученик» проверил все. Подробности — DECISIONES §70.
 ## H2 (2026-11-03)
 Пакет H2 из docs/BACKLOG_2026-11-02.md закрыт в ветке claude/itp-holes-ai-2b4f69: 12 нор (llm, rag, aieval, docker, ci, cloud, systems, security, modernpy, pydantic, review, legacycode), «ученик» проверил все три партии, правки внесены. Нор теперь 28; coverage 0, xc5 bad 0, legacy_trace 0. Подробности — DECISIONES §70.
+## Пакет K (2026-11-03)
+Правки основного курса по списку владельца (docs/BACKLOG_2026-11-02.md, K1–K8) — DECISIONES §70. Задач в основном пути: 335 → 422 (вместе с норами; в основных темах по +3). coverage 0, legacy_trace 0, xc5 bad 0.
+

@@ -63,6 +63,11 @@ def code_def():
              'def leaderboard(names, scores):\n    pairs = []\n    for n, s in zip(names, scores):\n        pairs.append((-s, n))\n'
              '    for place, (s, n) in enumerate(sorted(pairs), 1):\n        print(f"{place}. {n:<12}{-s:>5}")',
              ['leaderboard(["Ира", "Ли", "Тимур"], [40, 75, 60])', 'leaderboard(["Ким"], [7])'], tail=TL, strict=True),
+        task('Напиши функцию hp_bar(hp, max_hp), которая печатает полоску здоровья из 10 клеток: «[####......] 40/100». '
+             'Заполненных клеток — hp * 10 // max_hp.',
+             'full = hp * 10 // max_hp, затем print("[" + "#" * full + "." * (10 - full) + "]", f"{hp}/{max_hp}").',
+             'def hp_bar(hp, max_hp):\n    full = hp * 10 // max_hp\n    print("[" + "#" * full + "." * (10 - full) + "]", f"{hp}/{max_hp}")',
+             ['hp_bar(40, 100)', 'hp_bar(100, 100)\nhp_bar(0, 7)', 'hp_bar(5, 9)'], tail=TL),
     ])
 
 
@@ -123,6 +128,14 @@ def code_return():
              'for i, w in enumerate(words): if w == target: return i. После цикла — return None.',
              'def find_word(words, target):\n    for i, w in enumerate(words):\n        if w == target:\n            return i\n    return None',
              ['print(find_word(["кот", "пёс", "кот"], "кот"))', 'print(find_word(["а", "б"], "в"))', 'print(find_word(["x", "y", "z"], "z"))'], tail=TL),
+        task('Напиши функцию rank(points), которая по числу очков возвращает звание: меньше 100 — «новичок», меньше 500 — '
+             '«боец», меньше 2000 — «ветеран», иначе — «легенда». И функцию report(names_points), которая получает список '
+             'пар (ник, очки) и возвращает список строк «НИК — ЗВАНИЕ», вызывая rank.',
+             'rank — цепочка if с return в каждой ветке. report: собери result.append(f"{name} — {rank(p)}") и верни result.',
+             'def rank(points):\n    if points < 100:\n        return "новичок"\n    if points < 500:\n        return "боец"\n'
+             '    if points < 2000:\n        return "ветеран"\n    return "легенда"\n\n\ndef report(names_points):\n    result = []\n'
+             '    for name, p in names_points:\n        result.append(f"{name} — {rank(p)}")\n    return result',
+             ['print(rank(99), rank(100), rank(2000))', 'print(report([("Кира", 450), ("Zed", 3000)]))', 'print(report([]))'], tail=TL),
     ])
 
 
@@ -197,6 +210,14 @@ def code_scope():
              'd = {}; for w in text.lower().split(): d[w] = d.get(w, 0) + 1; return d.',
              'def word_count(text: str) -> dict:\n    d = {}\n    for w in text.lower().split():\n        d[w] = d.get(w, 0) + 1\n    return d',
              ['print(word_count("Мама мыла раму мама"))', 'd = word_count("a A a b")\nprint(d["a"], d.get("c", 0))'], tail=TL),
+        task('Счётчик достижений. В программе есть глобальный словарь unlocked и глобальный счётчик score. Напиши функцию '
+             'unlock(name, points): если достижение name ещё не открыто, запиши его в словарь с очками, прибавь очки '
+             'к score и верни True; иначе верни False.',
+             'Словарь меняется методами и без global, а вот score += … внутри функции требует global score.',
+             'unlocked = {}\nscore = 0\n\n\ndef unlock(name, points):\n    global score\n    if name in unlocked:\n        return False\n'
+             '    unlocked[name] = points\n    score += points\n    return True',
+             ['print(unlock("Первая кровь", 10), unlock("Первая кровь", 10), score)',
+              'unlock("Фермер", 5)\nunlock("Рыбак", 7)\nprint(score, unlocked)', 'print(score, unlocked)'], tail=TL, starter='unlocked = {}\nscore = 0\n'),
     ])
 
 

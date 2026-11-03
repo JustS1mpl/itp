@@ -16,7 +16,7 @@ def th_inherit():
                          'или заменить (переопределить) родительские.\n'
                          'Пример:\nclass Animal:\n    def hi(self):\n        return "..."\n\nclass Cat(Animal):\n    def hi(self):\n        return "мяу"\n\n'
                          'print(Animal().hi(), Cat().hi())\nВывод:\n... мяу'),
-        ('super', 'super() внутри метода — доступ к методам родителя. Чаще всего: super().__init__(...) в начале своего __init__, '
+        ('super', 'super() внутри метода — доступ к методам родителя. Чаще всего: super().__init__(...) — вызов конструктора родителя — в начале своего __init__, '
                   'чтобы родитель задал свои атрибуты.'),
         ('issubclass', 'issubclass(Класс, Родитель) — True, если Класс унаследован от Родителя (напрямую или через цепочку).\n'
                        'Пример:\nprint(issubclass(KeyError, LookupError), issubclass(int, str))\nВывод:\nTrue False'),
@@ -116,6 +116,19 @@ def code_inherit():
              '    if kind not in kinds:\n        print(f"Не знаю, кто такой {kind}")\n        continue\n    print(kinds[kind](name).speak())\n    count += 1\n'
              'print(f"Всего животных: {count}")',
              ['кот Мурка\nпёс Рекс\nутка Кряка\nстоп', 'ёж Колючка\nкот Барсик\nстоп']),
+        task('Враги. Опиши класс Enemy: имя и здоровье; метод take_hit(dmg) уменьшает здоровье и возвращает строку '
+             '«ИМЯ: осталось N» (не меньше 0). Наследник Boss в конструкторе получает ещё броню, вызывает конструктор родителя '
+             'через super() и переопределяет take_hit: урон уменьшается на броню (но не меньше 1), а когда здоровье впервые '
+             'падает до половины от начального или ниже, к строке добавляется « — вторая фаза!».',
+             'Boss.take_hit: dmg = max(1, dmg - self.armor); text = super().take_hit(dmg). Флаг self.phase2 и начальное здоровье '
+             'запомни в конструкторе.',
+             'class Enemy:\n    def __init__(self, name, hp):\n        self.name = name\n        self.hp = hp\n\n    def take_hit(self, dmg):\n'
+             '        self.hp = max(0, self.hp - dmg)\n        return f"{self.name}: осталось {self.hp}"\n\n\nclass Boss(Enemy):\n'
+             '    def __init__(self, name, hp, armor):\n        super().__init__(name, hp)\n        self.armor = armor\n        self.start = hp\n        self.phase2 = False\n\n'
+             '    def take_hit(self, dmg):\n        text = super().take_hit(max(1, dmg - self.armor))\n'
+             '        if not self.phase2 and self.hp <= self.start // 2:\n            self.phase2 = True\n            text += " — вторая фаза!"\n        return text',
+             ['for e in [Enemy("Слизень", 10), Boss("Рыцарь", 100, 5)]:\n    print(e.take_hit(30))\n    print(e.take_hit(30))',
+              'b = Boss("Голем", 10, 50)\nprint(b.take_hit(3))\nprint(isinstance(b, Enemy))', 'b = Boss("Дракон", 60, 0)\nfor i in range(3):\n    print(b.take_hit(20))'], tail=TL),
     ])
 
 
@@ -241,6 +254,16 @@ def code_ops():
              '    def __eq__(self, other):\n        return self.percent == other.percent\n\n    def __repr__(self):\n        return f"Tax({self.percent}%)"\n',
              ['ndfl = Tax(13)\nprint(ndfl(50000), ndfl(1234.5))\nprint(ndfl)', 'taxes = [Tax(20), Tax(6), Tax(20)]\nprint(taxes, taxes[0] == taxes[2], taxes[0] == taxes[1])\n'
               'print([t(999) for t in taxes])'], tail=TL),
+        task('Эдди. Опиши класс Eddies: сумма денег. Сложение двух сумм даёт новую сумму, sum по списку сумм тоже работает. '
+             'Суммы сравниваются по величине, а печатаются с разделителем разрядов: «1,500 эдди».',
+             '__add__ возвращает Eddies(self.amount + other.amount); __radd__ нужен для sum, который начинает с 0 — '
+             'сложи с 0 как с числом. __eq__, __lt__ — по amount, __str__ — f"{self.amount:,} эдди".',
+             'class Eddies:\n    def __init__(self, amount):\n        self.amount = amount\n\n    def __add__(self, other):\n'
+             '        return Eddies(self.amount + other.amount)\n\n    def __radd__(self, other):\n        return Eddies(self.amount + other)\n\n'
+             '    def __eq__(self, other):\n        return self.amount == other.amount\n\n    def __lt__(self, other):\n        return self.amount < other.amount\n\n'
+             '    def __str__(self):\n        return f"{self.amount:,} эдди"',
+             ['a = Eddies(1500)\nb = Eddies(250)\nprint(a + b)\nprint(a < b, a == Eddies(1500))',
+              'pay = [Eddies(10000), Eddies(500), Eddies(75000)]\nprint(sum(pay))\nprint(max(pay), min(pay))', 'print(sorted([Eddies(3), Eddies(1)])[0])'], tail=TL),
     ])
 
 
@@ -250,12 +273,12 @@ def th_exc():
                             'ловится except по имени класса или по любому его родителю.\n'
                             'Пример:\nclass GameError(Exception):\n    pass\n\ntry:\n    raise GameError("нет хода")\nexcept GameError as e:\n    print("Ошибка:", e)\n'
                             'Вывод:\nОшибка: нет хода'),
-        ('pass', 'Пустая команда: ничего не делает. Нужна там, где Python требует блок, а писать в нём нечего, — например, в теле класса.'),
+        ('pass', 'Пустая команда, знакомая по циклам: ничего не делает. Нужна там, где Python требует блок, а писать в нём нечего, — например, в теле класса.'),
     ]
     body = (
         '<p>Ошибки в Python — тоже классы, и они наследуют друг друга: <code>KeyError</code> — наследник <code>LookupError</code>, '
         'а все обычные ошибки — наследники <code>Exception</code>. Поэтому <code>except LookupError</code> ловит и <code>KeyError</code>.</p>'
-        '<p>Своя ошибка — [[своё исключение]] — это просто класс-наследник <code>Exception</code>. Тело часто пустое, тогда в нём '
+        '<p>Своя ошибка — [[своё исключение]] — это просто класс-наследник <code>Exception</code>. Тело часто пустое, тогда в нём, как в пустом цикле, '
         'пишут [[pass]]:</p>'
         + ex('class BankError(Exception):\n    pass\n\n\nclass NotEnoughMoney(BankError):\n    pass\n\n\nclass CardBlocked(BankError):\n    pass\n\n\n'
              'def pay(balance, amount, blocked=False):\n    if blocked:\n        raise CardBlocked("карта заблокирована")\n    if amount > balance:\n'
@@ -309,6 +332,21 @@ def code_exc():
              '    nick = input()\n    if nick == "стоп":\n        break\n    try:\n        check(nick, taken)\n    except NickError as e:\n        print(f"Ошибка: {e}")\n'
              '    else:\n        taken.add(nick.lower())\n        print(f"Добро пожаловать, {nick}")',
              ['Zed\nzed\nкот\nx\nтоп-1\nnew_player7\nстоп', 'ab\nabc\nABC\nстоп']),
+        task('Верстак. Опиши ошибки CraftError (наследник Exception), NotEnough и UnknownRecipe (наследники CraftError). '
+             'Напиши функцию craft(recipe, inventory): рецепты — словарь RECIPES = {"факел": {"палка": 1, "уголь": 1}, '
+             '"кирка": {"палка": 2, "камень": 3}}. Неизвестный рецепт — UnknownRecipe с названием; если чего-то не хватает — '
+             'NotEnough с текстом «нужно N МАТЕРИАЛ», где N — сколько требует рецепт (материалы проверяй в порядке рецепта, сообщай о первом нехватающем); иначе материалы списываются из inventory и возвращается название.',
+             'Сначала проверь все материалы, потом списывай — иначе при нехватке часть уже пропадёт. '
+             'В тестах ошибки ловят except CraftError и печатают type(e).__name__.',
+             'class CraftError(Exception):\n    pass\n\n\nclass NotEnough(CraftError):\n    pass\n\n\nclass UnknownRecipe(CraftError):\n    pass\n\n\n'
+             'RECIPES = {"факел": {"палка": 1, "уголь": 1}, "кирка": {"палка": 2, "камень": 3}}\n\n\ndef craft(recipe, inventory):\n'
+             '    if recipe not in RECIPES:\n        raise UnknownRecipe(recipe)\n    need = RECIPES[recipe]\n    for item, n in need.items():\n'
+             '        if inventory.get(item, 0) < n:\n            raise NotEnough(f"нужно {n} {item}")\n    for item, n in need.items():\n'
+             '        inventory[item] -= n\n    return recipe',
+             ['inv = {"палка": 3, "уголь": 1, "камень": 2}\nfor r in ["факел", "кирка", "меч"]:\n    try:\n        print(craft(r, inv))\n'
+              '    except CraftError as e:\n        print(type(e).__name__, e)\nprint(inv)',
+              'print(issubclass(NotEnough, CraftError), issubclass(UnknownRecipe, Exception))',
+              'inv = {"палка": 9, "камень": 9}\nprint(craft("кирка", inv), craft("кирка", inv), inv)'], tail=TL),
     ])
 
 

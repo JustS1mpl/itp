@@ -10,7 +10,8 @@ def th_class():
         ('class', 'Создаёт свой тип данных — класс: шаблон, по которому делаются объекты. Внутри — методы (функции класса).\n'
                   'Пример:\nclass Dog:\n    def __init__(self, name):\n        self.name = name\n\n    def bark(self):\n        return self.name + ": гав!"\n\n'
                   'print(Dog("Шарик").bark())\nВывод:\nШарик: гав!'),
-        ('__init__', 'Метод, который Python вызывает сам при создании объекта: Класс(аргументы). В нём объекту задают начальные атрибуты.'),
+        ('__init__', 'Конструктор — метод, который Python вызывает сам при создании объекта: Класс(аргументы). В нём объекту задают начальные атрибуты. '
+                     'Аргументы из скобок при создании попадают в параметры __init__ после self. Конструктор ничего не возвращает (return не нужен).'),
         ('self', 'Первый параметр каждого метода — сам объект, у которого метод вызвали. Через self.имя метод читает и меняет атрибуты '
                  'именно этого объекта. При вызове obj.метод() его не передают — Python подставляет obj сам.'),
         ('метод', 'Функция внутри класса. Вызывается через объект: obj.метод(аргументы). Методы строк и списков (upper, append) — '
@@ -23,7 +24,7 @@ def th_class():
         'Такие значения называют <b>объектами</b>, а их тип — <b>классом</b>. Свой класс создаёт [[class]]:</p>'
         + ex('class Pet:\n    def __init__(self, name):\n        self.name = name\n        self.hunger = 5\n\n    def feed(self):\n        self.hunger = max(0, self.hunger - 3)\n\n'
              '    def status(self):\n        return f"{self.name}: голод {self.hunger}"\n\n\ncat = Pet("Мурка")\ndog = Pet("Бобик")\ncat.feed()\nprint(cat.status())\nprint(dog.status())') +
-        '<p><code>Pet("Мурка")</code> создаёт новый объект и сразу вызывает [[__init__]] — в нём объекту задают начальные '
+        '<p><code>Pet("Мурка")</code> создаёт новый объект и сразу вызывает [[__init__]] — <b>конструктор</b>, в нём объекту задают начальные '
         '<b>атрибуты</b>: переменные, которые живут внутри объекта. У каждого объекта атрибуты свои: накормили кошку — голод собаки '
         'не изменился.</p>'
         '<p>[[метод]] — функция внутри класса. Его первый параметр [[self]] — сам объект, на котором метод вызвали. Запись '
@@ -46,7 +47,9 @@ def fl_class():
         q('Что попадает в self, когда вызывают pet.feed()?', 'Сам объект pet', ['Класс Pet', 'Ничего, self нужно передать вручную'],
           'Python подставляет объект, на котором вызвали метод.'),
         q('Когда выполняется __init__?', 'Сразу при создании объекта: Pet("Мурка")',
-          ['При первом вызове любого метода', 'Только если вызвать pet.__init__() вручную'], '__init__ задаёт новому объекту начальные атрибуты.'),
+          ['При первом вызове любого метода', 'Только если вызвать pet.__init__() вручную'], '__init__ — конструктор: задаёт новому объекту начальные атрибуты.'),
+        q('Как ещё называют метод __init__?', 'Конструктор', ['Деструктор', 'Декоратор', 'Генератор'],
+          'Он «конструирует» новый объект — задаёт ему начальные атрибуты.'),
     ])
 
 
@@ -83,6 +86,15 @@ def code_class():
              '        p = pets[parts[1]]\n        p.feed()\n        print(f"{p.name}: голод {p.hunger}")\n    else:\n        p = pets[parts[1]]\n        p.play()\n'
              '        print(f"{p.name}: голод {p.hunger}, радость {p.joy}")',
              ['новый Мурка\nиграй Мурка\nкорми Мурка\nкорми Мурка\nновый Рекс\nстатус\nстоп', 'корми Бобик\nновый Бобик\nиграй Бобик\nстоп']),
+        task('Грядка. Опиши класс Plant: конструктор принимает название культуры и сколько дней она растёт; у новой грядки '
+             'прошло 0 дней. Методы: water() — прошёл ещё один день (не больше срока роста); is_ready() — созрела ли; '
+             'status() — строка «НАЗВАНИЕ: D/N дн.» и через пробел «готово», если созрела.',
+             'В __init__: self.name, self.days_total, self.days = 0. water: self.days = min(self.days + 1, self.days_total).',
+             'class Plant:\n    def __init__(self, name, days_total):\n        self.name = name\n        self.days_total = days_total\n        self.days = 0\n\n'
+             '    def water(self):\n        self.days = min(self.days + 1, self.days_total)\n\n    def is_ready(self):\n        return self.days == self.days_total\n\n'
+             '    def status(self):\n        s = f"{self.name}: {self.days}/{self.days_total} дн."\n        if self.is_ready():\n            s += " готово"\n        return s',
+             ['p = Plant("пастернак", 4)\nfor i in range(5):\n    p.water()\n    print(p.status())',
+              'a = Plant("тыква", 2)\nb = Plant("клубника", 3)\na.water()\nprint(a.status(), b.status(), a.is_ready())', 'print(Plant("лук", 0).status())'], tail=TL),
     ])
 
 
@@ -156,6 +168,17 @@ def code_attrs():
              'def describe(obj, names):\n    parts = []\n    for name in names:\n        parts.append(f"{name}: {getattr(obj, name, \'—\')}")\n    return "; ".join(parts)\n',
              ['class Hero:\n    def __init__(self):\n        self.name = "Рыцарь"\n        self.hp = 30\n\nprint(describe(Hero(), ["name", "hp", "mana"]))',
               'class Box:\n    size = 3\n\nprint(describe(Box(), ["size"]))\nprint(describe(Box(), []))\nprint(describe(Box(), ["color", "size", "size"]))'], tail=TL),
+        task('Импланты. Опиши класс Implant: атрибут класса LIMIT = 100 — сколько «человечности» можно потратить, и атрибут '
+             'класса installed — сколько имплантов создано всего. Конструктор принимает название и цену в человечности. '
+             'Напиши функцию risk(implants), которая возвращает «норма», если сумма цен не больше LIMIT, иначе «киберпсихоз». '
+             'Если у объекта есть атрибут legendary со значением True, его цена считается дважды — читай его через getattr '
+             'с запасным значением.',
+             'В __init__: Implant.installed += 1. В risk: cost = getattr(i, "legendary", False) и сумма i.price * (2 if … else 1).',
+             'class Implant:\n    LIMIT = 100\n    installed = 0\n\n    def __init__(self, name, price):\n        self.name = name\n        self.price = price\n'
+             '        Implant.installed += 1\n\n\ndef risk(implants):\n    total = 0\n    for i in implants:\n        total += i.price * (2 if getattr(i, "legendary", False) else 1)\n'
+             '    return "норма" if total <= Implant.LIMIT else "киберпсихоз"',
+             ['a = Implant("оптика", 30)\nb = Implant("клинки", 50)\nprint(risk([a, b]), Implant.installed)',
+              'a = Implant("сандевистан", 60)\na.legendary = True\nprint(risk([a]), risk([]))', 'print(Implant.LIMIT, Implant.installed)'], tail=TL),
     ])
 
 
@@ -234,6 +257,15 @@ def code_property():
              ['a = Account("Ира")\na.deposit(500)\na.withdraw(200)\nprint(a.balance, a.history)',
               'a = Account("Лёша")\nfor op, x in [("withdraw", 10), ("deposit", 0), ("deposit", 30)]:\n    try:\n        getattr(a, op)(x)\n    except ValueError as e:\n        print(e)\n'
               'h = a.history\nh.append("+1000000")\nprint(a.balance, a.history)'], tail=TL),
+        task('Герой. Опиши класс Hero: конструктор принимает имя и максимум здоровья, здоровье сначала полное. Свойство hp '
+             'с setter-ом: значение не может стать меньше 0 или больше максимума — лишнее обрезается. Свойство alive — '
+             'жив ли герой (hp больше 0), только для чтения.',
+             'В __init__ сначала задай self.max_hp, потом self.hp — setter читает максимум. Храни здоровье в self._hp. В setter: self._hp = max(0, min(value, self.max_hp)). alive — @property без setter.',
+             'class Hero:\n    def __init__(self, name, max_hp):\n        self.name = name\n        self.max_hp = max_hp\n        self.hp = max_hp\n\n'
+             '    @property\n    def hp(self):\n        return self._hp\n\n    @hp.setter\n    def hp(self, value):\n        self._hp = max(0, min(value, self.max_hp))\n\n'
+             '    @property\n    def alive(self):\n        return self.hp > 0',
+             ['h = Hero("Тарни", 100)\nh.hp -= 30\nprint(h.hp, h.alive)\nh.hp += 500\nprint(h.hp)\nh.hp -= 1000\nprint(h.hp, h.alive)',
+              'h = Hero("Ли", 5)\nprint(h.hp, h.alive)', 'h = Hero("А", 10)\nh.hp = -1\nprint(h.hp)'], tail=TL),
     ])
 
 

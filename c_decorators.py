@@ -86,6 +86,15 @@ def code_closure():
              '    return log\n\n\nloggers = {}\nwhile True:\n    s = input()\n    if s == "стоп":\n        break\n    i = s.find(": ")\n    nick = s[:i]\n'
              '    if nick not in loggers:\n        loggers[nick] = make_logger(nick)\n    loggers[nick](s[i + 2:])',
              ['zed: всем привет\nаня: привет!\nzed: кто в игру?\nzed: ау\nаня: я: через 5 минут\nстоп', 'одинокий: тут кто-нибудь есть?\nстоп']),
+        task('Перезарядка способности. Напиши функцию make_skill(name, cooldown), которая возвращает функцию use(). '
+             'Первый вызов use() возвращает «NAME!», а следующие cooldown вызовов — «перезарядка (осталось K)», где K — '
+             'сколько ещё ждать; после этого способность снова доступна. У каждой способности свой счётчик.',
+             'Внутри make_skill — переменная wait = 0 и вложенная use с nonlocal wait: если wait == 0 — wait = cooldown и имя; '
+             'иначе wait -= 1 и сообщение с прежним значением.',
+             'def make_skill(name, cooldown):\n    wait = 0\n\n    def use():\n        nonlocal wait\n        if wait == 0:\n            wait = cooldown\n'
+             '            return name + "!"\n        left = wait\n        wait -= 1\n        return f"перезарядка (осталось {left})"\n\n    return use',
+             ['dash = make_skill("Рывок", 2)\nfor i in range(5):\n    print(dash())',
+              'a = make_skill("А", 1)\nb = make_skill("Б", 0)\nprint(a(), b(), a(), b(), a())', 'x = make_skill("Щит", 3)\nprint(x())'], tail=TL),
     ])
 
 
@@ -167,6 +176,16 @@ def code_decorator():
              '                return "Лимит исчерпан"\n            used += 1\n            return func(*args, **kwargs)\n\n        return wrapper\n\n    return decorator\n',
              ['@limit(2)\ndef hint(k):\n    return f"Подсказка {k}"\n\nfor k in range(1, 5):\n    print(hint(k))',
               '@limit(0)\ndef never():\n    return "ок"\n\n@limit(1)\ndef once(x):\n    return x * 2\n\nprint(never(), once(4), once(5))'], tail=TL),
+        task('Мана. В начале программы объяви глобальный словарь pool = {"mana": 100}. Напиши декоратор с настройкой mana(cost): '
+             'обёрнутое заклинание срабатывает, только если маны хватает, — тогда мана уменьшается на cost и возвращается '
+             'результат заклинания; иначе печатается «Мало маны для ИМЯ» и возвращается None. Имя функции сохрани через wraps.',
+             'Три уровня: mana(cost) → deco(func) → wrapper(*args, **kwargs). Имя — func.__name__, словарь меняется без global.',
+             'from functools import wraps\n\npool = {"mana": 100}\n\n\ndef mana(cost):\n    def deco(func):\n        @wraps(func)\n'
+             '        def wrapper(*args, **kwargs):\n            if pool["mana"] < cost:\n                print(f"Мало маны для {func.__name__}")\n'
+             '                return None\n            pool["mana"] -= cost\n            return func(*args, **kwargs)\n        return wrapper\n    return deco',
+             ['@mana(40)\ndef fireball(target):\n    return f"огонь по {target}"\n\n\nprint(fireball("волку"))\nprint(fireball("слизню"))\nprint(fireball("боссу"))\nprint(pool)',
+              '@mana(0)\ndef rest():\n    return "отдых"\n\n\nprint(rest(), rest.__name__, pool["mana"])',
+              '@mana(150)\ndef meteor():\n    return "бум"\n\n\nprint(meteor())'], tail=TL),
     ])
 
 
@@ -232,6 +251,15 @@ def code_gen():
              'from itertools import islice\n\n\ndef primes():\n    x = 2\n    while True:\n        if all(x % d != 0 for d in range(2, int(x ** 0.5) + 1)):\n'
              '            yield x\n        x += 1\n\n\nfirst = list(islice(primes(), int(input())))\nprint(" ".join(map(str, first)))\nprint(f"Сумма: {sum(first)}")',
              ['10', '1', '25']),
+        task('Доход фермы. Напиши бесконечный генератор income(base, growth): первый день приносит base монет, каждый следующий — '
+             'на growth больше. И генератор totals(numbers), который принимает любой поток чисел (список или генератор) и выдаёт накопленные суммы: '
+             'totals(income(100, 20)) даёт 100, 220, 360, 520, 700, ….',
+             'income: while True: yield base; base += growth. totals: s = 0; for x in numbers: s += x; yield s. '
+             'Бесконечный поток обрезай islice.',
+             'def income(base, growth):\n    while True:\n        yield base\n        base += growth\n\n\ndef totals(numbers):\n    s = 0\n'
+             '    for x in numbers:\n        s += x\n        yield s',
+             ['from itertools import islice\nprint(list(islice(income(100, 20), 5)))',
+              'from itertools import islice\nprint(list(islice(totals(income(10, 0)), 4)))', 'print(list(totals([5, -2, 7])))'], tail=TL),
     ])
 
 
