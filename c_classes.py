@@ -260,7 +260,7 @@ def code_property():
         task('Герой. Опиши класс Hero: конструктор принимает имя и максимум здоровья, здоровье сначала полное. Свойство hp '
              'с setter-ом: значение не может стать меньше 0 или больше максимума — лишнее обрезается. Свойство alive — '
              'жив ли герой (hp больше 0), только для чтения.',
-             'Храни здоровье в self._hp. В setter: self._hp = max(0, min(value, self.max_hp)). alive — @property без setter.',
+             'В __init__ сначала задай self.max_hp, потом self.hp — setter читает максимум. Храни здоровье в self._hp. В setter: self._hp = max(0, min(value, self.max_hp)). alive — @property без setter.',
              'class Hero:\n    def __init__(self, name, max_hp):\n        self.name = name\n        self.max_hp = max_hp\n        self.hp = max_hp\n\n'
              '    @property\n    def hp(self):\n        return self._hp\n\n    @hp.setter\n    def hp(self, value):\n        self._hp = max(0, min(value, self.max_hp))\n\n'
              '    @property\n    def alive(self):\n        return self.hp > 0',

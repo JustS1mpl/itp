@@ -335,7 +335,7 @@ def code_exc():
         task('Верстак. Опиши ошибки CraftError (наследник Exception), NotEnough и UnknownRecipe (наследники CraftError). '
              'Напиши функцию craft(recipe, inventory): рецепты — словарь RECIPES = {"факел": {"палка": 1, "уголь": 1}, '
              '"кирка": {"палка": 2, "камень": 3}}. Неизвестный рецепт — UnknownRecipe с названием; если чего-то не хватает — '
-             'NotEnough с текстом «нужно N МАТЕРИАЛ»; иначе материалы списываются из inventory и возвращается название.',
+             'NotEnough с текстом «нужно N МАТЕРИАЛ», где N — сколько требует рецепт (материалы проверяй в порядке рецепта, сообщай о первом нехватающем); иначе материалы списываются из inventory и возвращается название.',
              'Сначала проверь все материалы, потом списывай — иначе при нехватке часть уже пропадёт. '
              'В тестах ошибки ловят except CraftError и печатают type(e).__name__.',
              'class CraftError(Exception):\n    pass\n\n\nclass NotEnough(CraftError):\n    pass\n\n\nclass UnknownRecipe(CraftError):\n    pass\n\n\n'

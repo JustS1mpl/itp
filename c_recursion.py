@@ -168,7 +168,8 @@ def code_stack():
              ['3 9 -2 7', '\n', '-5 -1 -8']),
         task('Напиши рекурсивную функцию depth(x), которая возвращает глубину вложенности списка: у не-списка глубина 0, '
              'у пустого списка — 1, у списка — 1 плюс наибольшая глубина его элементов.',
-             'if not isinstance(x, list): return 0. Иначе пройди по элементам и найди max(depth(e)); для пустого — 1.',
+             'if not isinstance(x, list): return 0. Иначе заведи best = 0 и пройди по элементам: best = max(best, depth(e)). '
+             'Для пустого списка цикл не выполнится, best останется 0 — и ответ 1 + 0 = 1.',
              'def depth(x):\n    if not isinstance(x, list):\n        return 0\n    best = 0\n    for e in x:\n        best = max(best, depth(e))\n    return 1 + best',
              ['print(depth([1, [2, [3]]]))', 'print(depth(5), depth([]))', 'print(depth([[[]], 1, [2]]))'], tail=TL),
     ])

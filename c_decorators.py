@@ -176,7 +176,7 @@ def code_decorator():
              '                return "Лимит исчерпан"\n            used += 1\n            return func(*args, **kwargs)\n\n        return wrapper\n\n    return decorator\n',
              ['@limit(2)\ndef hint(k):\n    return f"Подсказка {k}"\n\nfor k in range(1, 5):\n    print(hint(k))',
               '@limit(0)\ndef never():\n    return "ок"\n\n@limit(1)\ndef once(x):\n    return x * 2\n\nprint(never(), once(4), once(5))'], tail=TL),
-        task('Мана. В программе есть глобальный словарь pool = {"mana": 100}. Напиши декоратор с настройкой mana(cost): '
+        task('Мана. В начале программы объяви глобальный словарь pool = {"mana": 100}. Напиши декоратор с настройкой mana(cost): '
              'обёрнутое заклинание срабатывает, только если маны хватает, — тогда мана уменьшается на cost и возвращается '
              'результат заклинания; иначе печатается «Мало маны для ИМЯ» и возвращается None. Имя функции сохрани через wraps.',
              'Три уровня: mana(cost) → deco(func) → wrapper(*args, **kwargs). Имя — func.__name__, словарь меняется без global.',
@@ -252,11 +252,12 @@ def code_gen():
              '            yield x\n        x += 1\n\n\nfirst = list(islice(primes(), int(input())))\nprint(" ".join(map(str, first)))\nprint(f"Сумма: {sum(first)}")',
              ['10', '1', '25']),
         task('Доход фермы. Напиши бесконечный генератор income(base, growth): первый день приносит base монет, каждый следующий — '
-             'на growth больше. И генератор totals(days), который принимает любой генератор чисел и выдаёт накопленные суммы.',
-             'income: while True: yield base; base += growth. totals: s = 0; for x in days: s += x; yield s. '
+             'на growth больше. И генератор totals(numbers), который принимает любой поток чисел (список или генератор) и выдаёт накопленные суммы: '
+             'totals(income(100, 20)) даёт 100, 220, 360, 520, 700, ….',
+             'income: while True: yield base; base += growth. totals: s = 0; for x in numbers: s += x; yield s. '
              'Бесконечный поток обрезай islice.',
-             'def income(base, growth):\n    while True:\n        yield base\n        base += growth\n\n\ndef totals(days):\n    s = 0\n'
-             '    for x in days:\n        s += x\n        yield s',
+             'def income(base, growth):\n    while True:\n        yield base\n        base += growth\n\n\ndef totals(numbers):\n    s = 0\n'
+             '    for x in numbers:\n        s += x\n        yield s',
              ['from itertools import islice\nprint(list(islice(income(100, 20), 5)))',
               'from itertools import islice\nprint(list(islice(totals(income(10, 0)), 4)))', 'print(list(totals([5, -2, 7])))'], tail=TL),
     ])

@@ -96,21 +96,23 @@ def code_files():
              'with open("poem.txt", encoding="utf-8") as f:\n    lines = [s.rstrip("\\n") for s in f]\nwords = sum(len(s.split()) for s in lines)\n'
              'print(f"Строк: {len(lines)}, слов: {words}, самая длинная строка: {max(len(s) for s in lines)} символов")',
              [''], files={'poem.txt': POEM}),
-        task('Ввод — целые числа по одному в строке, хотя бы одно, без стоп-слова. Выведи количество, сумму и максимум: '
+        task('Ввод — целые числа по одному в строке, хотя бы одно, без стоп-слова и без пустых строк. Выведи количество, сумму и максимум: '
              '«N чисел, сумма S, максимум M».',
-             'import sys; nums = [int(line) for line in sys.stdin].',
+             'import sys; nums = [int(line) for line in sys.stdin] — int сам отбросит перевод строки в конце.',
              'import sys\nnums = [int(line) for line in sys.stdin]\nprint(f"{len(nums)} чисел, сумма {sum(nums)}, максимум {max(nums)}")',
              ['5\n10\n-3', '42', '1\n1\n1\n1']),
         task('Список покупок. На вход подаются товары по одному в строке до конца ввода. Запиши их в файл list.txt с номерами '
              '«1. товар», затем прочитай файл и выведи его содержимое и последней строкой — «Записано: N».',
-             'Запись: for i, item in enumerate(items, 1): f.write(f"{i}. {item}\\n"). Чтение — второй with и print(f.read(), end="").',
+             'Строки из sys.stdin приходят с переводом строки — убирай его: items = [s.strip() for s in sys.stdin]. Запись: for i, item in enumerate(items, 1): f.write(f"{i}. {item}\\n"). Чтение — второй with и print(f.read(), end="").',
              'import sys\nitems = [s.strip() for s in sys.stdin]\nwith open("list.txt", "w", encoding="utf-8") as f:\n    for i, item in enumerate(items, 1):\n'
              '        f.write(f"{i}. {item}\\n")\nwith open("list.txt", encoding="utf-8") as f:\n    print(f.read(), end="")\nprint(f"Записано: {len(items)}")',
              ['хлеб\nмолоко\nсыр', 'батарейки']),
         task('Журнал рыбалки. Рядом лежит fish.txt: в каждой строке — название рыбы и вес в граммах через пробел. На вход '
              'подаётся минимальный вес. Запиши в файл catch.txt только рыбу не легче этого веса — строки как в исходном файле, '
-             'в том же порядке, — потом прочитай catch.txt и выведи его, а последней строкой «Всего: N г».',
-             'with open(...) as f для чтения и отдельный with open("catch.txt", "w", ...) для записи; f.write(line + "\\n"). '
+             'в том же порядке, — потом прочитай catch.txt и выведи его, а последней строкой «Всего: N г» (если ничего не подошло — '
+             'только «Всего: 0 г»).',
+             'Прочитай fish.txt целиком и раздели на строки: f.read().split("\\n") — так в строках нет перевода строки, '
+             'и при записи его добавляют сами: out.write(line + "\\n"). Пустую последнюю строку пропусти. '
              'Потом третий with — чтение и вывод.',
              'limit = int(input())\nwith open("fish.txt", encoding="utf-8") as f:\n    lines = f.read().split("\\n")\ntotal = 0\n'
              'with open("catch.txt", "w", encoding="utf-8") as out:\n    for line in lines:\n        if line == "":\n            continue\n'
@@ -176,7 +178,7 @@ def code_csv():
              '        if all(row[s] == "5" for s in ("математика", "физика", "информатика")):\n            best.append(row["фамилия"])\nprint("\\n".join(best) if best else "Отличников нет")',
              [''], files={'grades.csv': GRADES}),
         task('По файлу grades.csv выведи средний балл класса по предмету, название которого подаётся на вход, с двумя знаками: '
-             '«ПРЕДМЕТ: X». Если это не одна из колонок математика, физика, информатика (в том числе «фамилия»), — «Нет предмета: ...».',
+             '«ПРЕДМЕТ: X». Если это не одна из колонок математика, физика, информатика (в том числе «фамилия»), — «Нет предмета: ПРЕДМЕТ», где ПРЕДМЕТ — введённая строка.',
              'Прочитай строки DictReader в список. Проверь предмет по кортежу («математика», «физика», «информатика»). Среднее — sum(int(r[p]) ...) / len(rows).',
              'import csv\nsubj = input()\nwith open("grades.csv", encoding="utf-8") as f:\n    rows = list(csv.DictReader(f))\nif subj not in ("математика", "физика", "информатика"):\n'
              '    print(f"Нет предмета: {subj}")\nelse:\n    print(f"{subj}: {sum(int(r[subj]) for r in rows) / len(rows):.2f}")',
@@ -188,11 +190,12 @@ def code_csv():
              'from pathlib import Path\np = Path(input())\ntext = input()\nif p.exists():\n    print(f"Файл занят: {p.name}")\nelse:\n'
              '    p.write_text(text, encoding="utf-8")\n    print(f"Сохранено, символов: {len(text)}")',
              ['idea.txt\nСделать бота для расписания', 'grades.csv\nчто-то'], files={'grades.csv': GRADES}),
-        task('Корпорация «Арасака» отбирает людей для проекта «Козерог». Рядом с программой лежит candidates.csv: имя, '
-             'возраст, совместимость (в процентах) и число имплантов. На вход подаётся порог совместимости. Подходит тот, '
+        task('Корпорация «Арасака» отбирает людей для проекта «Козерог». Рядом с программой лежит candidates.csv со столбцами '
+             'имя, возраст, совместимость, импланты: имя с фамилией — в одном столбце, совместимость — целое число процентов '
+             'без знака %. На вход подаётся порог совместимости. Подходит тот, '
              'у кого совместимость не ниже порога, а имплантов не больше трёх — иначе риск киберпсихоза. Выведи подходящих '
-             'по убыванию совместимости, при равной — по алфавиту: «ИМЯ — N%», а последней строкой «Подходят: K из M».',
-             'csv.DictReader, числа превращай через int. Сортировка — sorted(ok, key=lambda r: (-r[1], r[0])) по кортежам (имя, совместимость).',
+             'по убыванию совместимости, при равной — по алфавиту: «ИМЯ — N%», а последней строкой «Подходят: K из M», где M — все кандидаты в файле.',
+             'csv.DictReader, числа превращай через int. Подходящих складывай парами (имя, совместимость), сортировка — sorted(ok, key=lambda p: (-p[1], p[0])).',
              'import csv\nlimit = int(input())\nwith open("candidates.csv", encoding="utf-8") as f:\n    rows = list(csv.DictReader(f))\nok = []\n'
              'for r in rows:\n    if int(r["совместимость"]) >= limit and int(r["импланты"]) <= 3:\n        ok.append((r["имя"], int(r["совместимость"])))\n'
              'for name, c in sorted(ok, key=lambda p: (-p[1], p[0])):\n    print(f"{name} — {c}%")\nprint(f"Подходят: {len(ok)} из {len(rows)}")',
