@@ -193,7 +193,8 @@ function links0(){
     /* волна: боковые островки — вершины через один (вправо, влево), островок с норой — та же вершина, только дальше, если нора просит места;
        средний островок — посередине между соседями, поэтому у норы тропинка не ломается и не сплющивается */
     var xs=ws.map(function(w,r){if(r%2===0)return 0;var sg=r%4===1?1:-1;return r in own?sg*Math.max(sg*own[r],ZZ[1]):sg*ZZ[1]});
-    xs=xs.map(function(x,r){return r%2?x:r in own?own[r]:((r>0?xs[r-1]:0)+(r<xs.length-1?xs[r+1]:0))/2});
+    /* первый и последний островок темы — по центру: соседа с одной стороны нет, и «посередине» уводило их на полшага вбок (владелец) */
+    xs=xs.map(function(x,r){return r%2?x:r in own?own[r]:r===0||r===xs.length-1?0:(xs[r-1]+xs[r+1])/2});
     ws.forEach(function(w,r){w.style.transform='translateX('+Math.round(xs[r])+'px)'});
     hb.forEach(function(a){var bu=a[0],aw=a[1],nw=a[2];bu.style.right='auto';bu.style.left=(a[3]?a[4]:pw-a[4]-a[5])-nw.offsetLeft-nw.offsetWidth*6/92-aw.offsetLeft-lkX(aw)+'px'});
     var sv=document.createElementNS(ns,'svg');sv.setAttribute('class','cn');sv.setAttribute('width',pw);sv.setAttribute('height',ph);sv.setAttribute('aria-hidden','true');

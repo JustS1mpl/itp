@@ -933,19 +933,22 @@ input.f.dq{min-height:48px;padding-left:42px;border-radius:var(--pill)}
 @keyframes scrIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @keyframes scrFwd{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
 @keyframes scrBack{from{opacity:0;transform:translateX(-28px)}to{opacity:1;transform:none}}
-@keyframes scrTab{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:none}}
+/* dev 7.0.0 (владелец: «слетает шрифт»): у всего, где есть текст, анимации — только прозрачность и сдвиг, без scale.
+   Пока слой с текстом масштабируется, Chrome на Android ставит буквы по целым пикселям уменьшенного слоя — текст на
+   долю секунды выглядит как другой, «моноширинный» шрифт (карточка островка, окна, заставка IT'S THE PROGRAMMING) */
+@keyframes scrTab{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 @keyframes scrNx{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
 @keyframes mbg{from{opacity:0}to{opacity:1}}
 @keyframes mbgout{to{opacity:0}}
 @keyframes sheet{from{transform:translateY(60px);opacity:.4}to{transform:none;opacity:1}}
 @keyframes sheetout{to{transform:translateY(80px);opacity:0}}
-@keyframes pop2{from{transform:scale(.95);opacity:0}to{transform:none;opacity:1}}
-@keyframes pop2out{to{transform:scale(.96);opacity:0}}
-@keyframes ipop{from{opacity:0;transform:translateY(-6px) scale(.92)}to{opacity:1;transform:none}}
-@keyframes ipopout{to{opacity:0;transform:translateY(-4px) scale(.95)}}
+@keyframes pop2{from{transform:translateY(10px);opacity:0}to{transform:none;opacity:1}}
+@keyframes pop2out{to{transform:translateY(6px);opacity:0}}
+@keyframes ipop{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+@keyframes ipopout{to{opacity:0;transform:translateY(-6px)}}
 @keyframes fbin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-@keyframes toast{0%{opacity:0;transform:translate(-50%,-14px) scale(.96)}10%,84%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,-8px)}}
-@keyframes toastA{0%{opacity:0;transform:translate(-50%,-24px) scale(.9)}9%{opacity:1;transform:translate(-50%,0) scale(1.03)}14%,88%{opacity:1;transform:translate(-50%,0) scale(1)}100%{opacity:0;transform:translate(-50%,-10px)}}
+@keyframes toast{0%{opacity:0;transform:translate(-50%,-14px)}10%,84%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,-8px)}}
+@keyframes toastA{0%{opacity:0;transform:translate(-50%,-24px)}9%{opacity:1;transform:translate(-50%,2px)}14%,88%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,-10px)}}
 @keyframes shine{to{transform:translateX(120%)}}
 @keyframes popup{0%{opacity:0;transform:translate(-50%,24px) scale(.4)}25%{opacity:1;transform:translate(-50%,0) scale(1.15)}100%{opacity:0;transform:translate(-50%,-80px) scale(1)}}
 @keyframes bounce{0%{transform:scale(1)}40%{transform:scale(1.03) translateY(-2px)}100%{transform:none}}
@@ -1317,7 +1320,7 @@ html.crt-on{scrollbar-gutter:auto}
 @keyframes splIgn{0%{opacity:0}8%{opacity:.75}12%{opacity:.08}20%{opacity:.9}24%{opacity:.2}34%{opacity:1}38%{opacity:.55}46%,100%{opacity:1}}
 @keyframes splBr{from{opacity:1}to{opacity:.8}}
 @keyframes splGlow{from{opacity:0}to{opacity:1}}
-@keyframes splOut{0%{opacity:1;filter:none}30%{opacity:1;filter:brightness(1.8)}100%{opacity:0;filter:brightness(2.4) blur(3px);transform:scale(1.04)}}
+@keyframes splOut{0%{opacity:1;filter:none}30%{opacity:1;filter:brightness(1.8)}100%{opacity:0;filter:brightness(2.4) blur(3px)}}
 @keyframes vhsTrk{0%,62%{transform:translateY(-120%);opacity:0}64%{opacity:1}96%{opacity:1}100%{transform:translateY(1500%);opacity:0}}
 @keyframes vhsSnow{0%{opacity:.2}20%{opacity:.7}40%{opacity:.35}60%{opacity:.9}80%{opacity:.6}100%{opacity:1}}
 @keyframes crtGl{0%{transform:none;filter:none}
@@ -1388,7 +1391,7 @@ html.crt-on{scrollbar-gutter:auto}
 .dvsp img{width:64px;height:64px;object-fit:contain}
 .dvsp figcaption{max-width:100%;font:500 .6875rem/1.2 var(--mono);color:var(--muted);text-align:center;overflow-wrap:anywhere}
 .dvf{grid-column:1/-1;margin:2px 4px 0;font-size:.8125rem;line-height:1.45;color:var(--muted)}
-@keyframes dvin{from{transform:translateY(14px) scale(.985);opacity:0}to{transform:none;opacity:1}}
+@keyframes dvin{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
 @media (min-width:760px){
  .dvp{align-items:center;padding:24px}
  .dvc{width:min(820px,100%);max-height:min(86vh,86dvh);border-radius:var(--r-xl);animation:dvin var(--d3) var(--e-out)}
@@ -1527,7 +1530,7 @@ html.exbig .exio pre.cmp,html.exbig .pyex .exio pre.cmp{margin:6px 0 0;padding:1
 .gst{display:flex;align-items:center;justify-content:center;gap:12px;animation:gin .35s cubic-bezier(.2,.8,.2,1) both}
 .gnum{font-size:5.5rem;font-weight:900;line-height:1;letter-spacing:-.03em;color:var(--carrot-ink);font-variant-numeric:tabular-nums}
 .gcar{font-size:4.5rem;line-height:1}.gcar .em{width:5rem;height:5rem}
-@keyframes gin{from{opacity:0;transform:translateY(12px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes gin{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 .glab{margin:4px 0 24px;font-size:1.25rem;font-weight:900;color:var(--carrot-ink)}
 .gday .wk{width:100%;max-width:400px}
 .gsg{width:100%;max-width:400px;margin:20px 0 0;display:flex;flex-direction:column;gap:8px}
@@ -1630,7 +1633,7 @@ html.exbig .exio pre.cmp,html.exbig .pyex .exio pre.cmp{margin:6px 0 0;padding:1
 @keyframes shin{from{opacity:0}}
 .shov .shx{position:absolute;top:calc(12px + env(safe-area-inset-top));right:12px;color:#fff;background:rgba(255,255,255,.12);border-radius:50%}
 .shcard{position:relative;height:min(calc(100dvh - 210px),720px);aspect-ratio:9/16;max-width:100%;border-radius:22px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.5);background:rgba(255,255,255,.06);animation:shpop .45s var(--e-spring) both}
-@keyframes shpop{from{opacity:0;transform:translateY(24px) scale(.94)}}
+@keyframes shpop{from{opacity:0;transform:translateY(24px)}}
 .shcard canvas{display:block;width:100%;height:100%}
 .shcard.rdy canvas{animation:shfd .3s ease-out}
 @keyframes shfd{from{opacity:0}}
