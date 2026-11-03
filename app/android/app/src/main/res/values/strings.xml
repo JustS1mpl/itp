@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">ИТП</string>
+    <string name="title_activity_main">ИТП</string>
+    <string name="package_name">app.itpcode.itp</string>
+    <string name="custom_url_scheme">app.itpcode.itp</string>
+</resources>

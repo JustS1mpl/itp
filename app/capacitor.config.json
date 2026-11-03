@@ -1,0 +1,14 @@
+{
+  "appId": "app.itpcode.itp",
+  "appName": "ИТП",
+  "webDir": "www",
+  "android": {
+    "adjustMarginsForEdgeToEdge": "force"
+  },
+  "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_itp",
+      "iconColor": "#2B8420"
+    }
+  }
+}

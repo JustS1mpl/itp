@@ -1816,3 +1816,27 @@ html.lite .shov{background:rgba(10,10,12,.92)}
  #app.spw~.dvb,.spw .dvb,body:has(#app.spw) .dvb{left:4px;bottom:4px;width:34px;height:34px;opacity:.7}
  #app.spw~.dvb svg,body:has(#app.spw) .dvb svg{width:18px;height:18px}
 }
+/* dev.36: кролик спиной — не было 7+ дней (a_mood.js). Тёмный экран, строки монолога появляются по одной,
+   на последней кролик оборачивается */
+.bkt{position:fixed;inset:0;z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;
+  padding:max(24px,env(safe-area-inset-top)) max(20px,env(safe-area-inset-right)) max(24px,env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left));
+  background:#0d0b0e;color:#ece6e9;animation:bkIn .9s ease-out both}
+.bkt.out{opacity:0;transition:opacity .3s}
+.bkt .bkr{position:relative;padding:6% 10%}
+/* пятно света: на чёрном не видно тёмного «…» рядом с кроликом */
+.bkt .bkr::before{content:'';position:absolute;inset:-12% -6%;border-radius:50%;background:radial-gradient(closest-side,rgba(255,236,242,.42),rgba(255,236,242,.12) 60%,transparent)}
+.bkt .bkr img{position:relative;display:block;height:min(32vh,240px);width:auto;filter:brightness(.92)}
+.bkt .bkr.turn img{animation:bkTurn .5s ease-in-out;filter:none}
+.bkt .bkrain{position:absolute;inset:0;width:100%;height:100%;opacity:.55;font-family:var(--mono);pointer-events:none}
+.bkt>*:not(.bkrain){position:relative}
+.bkt .bkd{display:flex;flex-direction:column;align-items:center;gap:2px;color:rgba(236,230,233,.5);font-weight:800;letter-spacing:.12em;text-transform:uppercase;font-size:.75rem}
+.bkt .bkd b{font-size:3.25rem;line-height:1;letter-spacing:0;color:rgba(255,236,242,.85);font-variant-numeric:tabular-nums;text-shadow:0 0 24px rgba(255,120,150,.35)}
+.bkt .bkl{width:min(100%,420px);min-height:9.5em;display:flex;flex-direction:column;justify-content:flex-start;text-align:center;font-weight:700;font-size:1.0625rem;line-height:1.45}
+.bkt .bkl p{margin:6px 0 0;opacity:0;transform:translateY(6px);transition:opacity .6s,transform .6s}
+.bkt .bkl p.on{opacity:1;transform:none}
+.bkt .bkl p.old{opacity:.32}
+.bkt .bkn{min-width:160px;background:rgba(255,255,255,.1);color:#ece6e9;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.22)}
+.bkt.rm,.bkt.rm .bkr.turn img{animation:none}
+.bkt.rm .bkl p{transition:none;transform:none}
+@keyframes bkIn{from{opacity:0}}
+@keyframes bkTurn{0%,100%{transform:scaleX(1)}50%{transform:scaleX(0)}}

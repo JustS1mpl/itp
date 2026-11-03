@@ -1,5 +1,5 @@
 /* ===================== ИТП — ядро: настройки, сохранение, звук, серия, цели, достижения ===================== */
-function defset(){return{acc:'',exl:'c',tz:100,anim:'full',vol:70,sfx:1,vib:1,emo:1,ty:1,toc:1,rep:1,ln:1,ac:1,cf:15,gc:1,bg:1,bgp:'dots',ks:0,ph:'card',sh:'v',fl:'tilt'}}
+function defset(){return{acc:'',exl:'c',tz:100,anim:'full',vol:70,sfx:1,vib:1,emo:1,ty:1,toc:1,rep:1,ln:1,ac:1,cf:15,gc:1,nt:1,ni:2,nh:19,bg:1,bgp:'dots',ks:0,ph:'card',sh:'v',fl:'tilt'}}
 function ST(k){return S.set&&S.set[k]!==undefined?S.set[k]:defset()[k]}
 /* слабое устройство (мало памяти или ядер, экономия трафика): без размытия под панелями, Python — только когда открыт урок */
 function WEAK(){var n=navigator,c=n.connection;return !!((n.deviceMemory&&n.deviceMemory<=3)||(n.hardwareConcurrency&&n.hardwareConcurrency<=4)||(c&&c.saveData))}
@@ -64,14 +64,21 @@ function migr(r){
     Object.keys(x).forEach(function(key){var p=key.split('-');if(!/^\d+$/.test(p[0]))return;p[0]=String(m(+p[0]));y[p.join('-')]=x[key]});o[f]=y});
   if(Number.isInteger(r.start)&&r.start>=0)o.start=m(r.start);
   return o}
+/* 7.0.0 (владелец): сохранение 6.x (метка mv меньше 5 — у 7.0 она 5 и больше) — темы курса другие, острова не
+   переносятся. Остаётся всё личное: ник, обращение, настройки, опыт и уровень, серия, заморозки, рекорд, календарь,
+   достижения, коды, заметки к терминам. Путь — с начала: тема не выбрана, и вступление сразу спрашивает, с какой начать */
+function from6(r){
+  if(!r||typeof r!=='object'||Array.isArray(r)||r.mv>=5||!r.nick)return r;
+  var o={};for(var k in r)if(Object.prototype.hasOwnProperty.call(r,k)&&['d','tk','at','es','dr','hu','start','skk','rp','lt','cur'].indexOf(k)<0)o[k]=r[k];
+  o.mv=5;try{appSet({from6:1})}catch(e){}return o}
 function clean(r){
-  r=migr(r);
-  var o=clean0(r);o.mv=5;r=(r&&typeof r==='object'&&!Array.isArray(r))?r:{};
+  r=migr(from6(r));
+  var o=clean0(r);o.mv=6;r=(r&&typeof r==='object'&&!Array.isArray(r))?r:{};
   var s=(r.set&&typeof r.set==='object'&&!Array.isArray(r.set))?r.set:{},q={};
   var pick=function(k,list){q[k]=list.indexOf(s[k])>=0?s[k]:defset()[k]},bl=function(k){q[k]=s[k]===0||s[k]===false?0:(s[k]===1||s[k]===true?1:defset()[k])};
-  pick('acc',['','carrot','pink','blue','violet']);pick('tz',[90,100,115,130]);pick('anim',['full','less','off']);pick('cf',[11,13,15,17,19]);pick('sh',['v','h']);pick('ph',['card','corner','pop']);pick('fl',['tilt','flat']);pick('bgp',['dots','rain','none']);
+  pick('acc',['','carrot','pink','blue','violet']);pick('tz',[90,100,115,130]);pick('anim',['full','less','off']);pick('cf',[11,13,15,17,19]);pick('ni',[1,2,3]);pick('nh',[9,13,17,19,21]);pick('sh',['v','h']);pick('ph',['card','corner','pop']);pick('fl',['tilt','flat']);pick('bgp',['dots','rain','none']);
   q.vol=typeof s.vol==='number'&&s.vol>=0&&s.vol<=100?Math.round(s.vol):defset().vol;
-  ['sfx','vib','emo','ty','toc','rep','ln','ac','gc','bg','ks'].forEach(bl);
+  ['sfx','vib','emo','ty','toc','rep','ln','ac','gc','bg','ks','nt'].forEach(bl);
   /* «Минимализм» убран (6.9.0): у кого он был включён, узор на фоне возвращается таким, каким был до минимализма (mb) */
   if(s.mn===1||s.mn===true)q.bg=s.mb===0||s.mb===false?0:1;
   /* узор фона стал выбором (dev.22): у кого «Узор на фоне» был выключен — ровный фон */

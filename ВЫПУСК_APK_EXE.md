@@ -142,3 +142,41 @@ npm-кэш можно поставить на E. Visual Studio Build Tools (ну
 6. Windows через Tauri → Microsoft Store или установщик на сайте.
 
 Обновления потом — та же сборка `ИТП.html` → `www/index.html` → `versionCode + 1` → новый AAB/EXE.
+
+---
+
+## 7. Что уже сделано (dev.36)
+
+Проект приложений — в папке `app/` репозитория:
+
+| Что | Где |
+|---|---|
+| Android (Capacitor 7) | `app/android/` — проект Android Studio; `app/capacitor.config.json` |
+| Windows (Electron) | `app/desktop/main.js`, `app/desktop/preload.js`; настройки установщика — `app/package.json` → `build` |
+| Иконки | `app/icons/logo.png` (логотип) → `python icons/make_icons.py` делает все значки Android, значок уведомлений, заставку, `icon.ico` |
+| Сборка всего | `bash app/build.sh` (после `python build5.py`) → `app/dist/android/ITP.apk`, `ITP.aab`, `app/dist/ITP-Setup-*.exe`, `ITP-*-portable.exe` |
+
+**Ключ подписи Android** — `app/android/itp-release.keystore`, пароль — в `app/android/keystore.properties`. Оба файла
+**не попадают в git** (так и надо: ключ — секрет). Сделай их копию в двух местах (флешка + облако). Для Google Play
+этот ключ — «ключ загрузки», его можно сбросить через поддержку; для RuStore и раздачи APK файлом без него новую версию
+поверх старой не поставить.
+
+**Инструменты сборки** (JDK 21, Android SDK, кэши) лежат в `E:\Program Files\itp-tools` и будут удалены вместе с
+ней после твоего «да». Чтобы потом собрать заново: снова скачать JDK 21 (Temurin) и Android command-line tools в
+`itp-tools`, создать `itp-tools/env.sh` (пути — в начале `app/build.sh`), `npm install` в `app/`.
+
+## 8. Название на разных языках и язык системы
+
+**Название приложения можно менять по языку.** На Android это обычное дело: строка `app_name` лежит в
+`android/app/src/main/res/values/strings.xml` (название по умолчанию), а для других языков — в
+`values-en/strings.xml`, `values-uk/strings.xml` и т. д. Телефон сам покажет нужное под значком. Сейчас там «ИТП» —
+добавить `values-en` с «ITP» — пара строк. В Google Play и RuStore название и описание страницы тоже задаются отдельно
+для каждого языка. На Windows имя файла и ярлыка одно, но заголовок окна ИТП может ставить сам по языку.
+
+**Определять язык по системе — да, работает.** Внутри приложения `navigator.language` (и список `navigator.languages`)
+отдаёт язык телефона/Windows: на Android WebView это язык системы, в Electron — язык Windows. Правильно делать так:
+1. первый запуск — язык из системы, если он есть среди переведённых, иначе английский (или русский);
+2. в настройках — выбор языка вручную, и он важнее системного;
+3. сохранять выбор в прогрессе, чтобы он переносился резервной копией.
+Подводный камень один: у части людей система на английском, а учиться они хотят на русском — поэтому ручной выбор
+обязателен, и его стоит показать в самом начале вступления.

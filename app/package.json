@@ -1,0 +1,35 @@
+{
+  "name": "itp",
+  "productName": "ИТП",
+  "version": "7.0.0",
+  "description": "ИТП — И так, программирование: курс Python",
+  "author": "ИТП",
+  "main": "desktop/main.js",
+  "private": true,
+  "scripts": {
+    "sync": "cap sync android",
+    "win": "electron-builder --win nsis portable"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^7.4.0",
+    "@capacitor/app": "^7.0.0",
+    "@capacitor/cli": "^7.4.0",
+    "@capacitor/core": "^7.4.0",
+    "@capacitor/filesystem": "^7.1.0",
+    "@capacitor/haptics": "^7.0.0",
+    "@capacitor/local-notifications": "^7.0.0",
+    "@capacitor/share": "^7.0.0",
+    "electron": "^37.2.0",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "app.itpcode.itp",
+    "productName": "ИТП",
+    "executableName": "ITP",
+    "directories": { "output": "dist" },
+    "files": ["desktop/**", "www/**", "package.json"],
+    "win": { "icon": "icons/icon.ico", "target": ["nsis", "portable"] },
+    "nsis": { "oneClick": false, "allowToChangeInstallationDirectory": true, "shortcutName": "ИТП", "artifactName": "ITP-Setup-${version}.exe" },
+    "portable": { "artifactName": "ITP-${version}-portable.exe" }
+  }
+}

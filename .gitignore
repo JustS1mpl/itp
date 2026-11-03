@@ -13,3 +13,7 @@ pyo
 tests/_wav/
 !tests/sound_spectrograms.png
 .turtle_shim/
+
+# приложения: значки и заставка Android, иконки ПК — нужны в git
+!app/icons/*.png
+!app/android/app/src/main/res/**/*.png
