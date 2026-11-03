@@ -1,6 +1,6 @@
 import re, sys, json, os
 sys.path.insert(0, '.')
-VER = '7.0.0-dev.34'
+VER = '7.0.0-dev.35'
 s = open('base43.html', encoding='utf-8').read()
 
 def rep(a, b, n=1):
@@ -41,7 +41,6 @@ rep("window.addEventListener('load',function(){setTimeout(skReady,2500);", "wind
 s = s.replace('4.3.0', VER)
 
 # --- шрифт Nunito встроен
-FONT = open('assets/nunito.b64').read()
 rep("var l=document.createElement('link');l.rel='stylesheet';l.href='https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&display=swap';document.head.appendChild(l)", "")
 # --- замена CSS целиком: v6 — одна дизайн-система для обеих тем (v5.css, v5b.css, v5c.css больше не нужны)
 css = open('v5/v6.css', encoding='utf-8').read()
@@ -54,9 +53,16 @@ rep("""'<div class="q">'+esc(q.q)+'</div>'+(q.c?'<pre>'+hl(q.c)+'</pre>':'');
 """'<div class="q">'+esc(q.q)+'</div>'+(q.v||'')+(q.c?'<pre>'+hl(q.c)+'</pre>':'');
     ord.forEach(function(k){h+='<button class="opt" data-k="'+k+'">'+esc(q.o[k])+'</button>'});
     show(h+'<div id="fb"></div><button class="btn" id="go" disabled>Проверить</button>');if(q.v)imgZoom(app);""")
-css = "@font-face{font-family:'Nunito';font-style:normal;font-weight:200 1000;font-display:swap;src:url(data:font/woff;base64," + FONT + ") format('woff')}\n" + css
+# Nunito — шесть готовых начертаний (400–900, woff2, assets/nunito_static.json из переменного nunito.b64 через fontTools),
+# а не один переменный шрифт: на телефонах Chrome во время анимаций (прозрачность, сдвиг) временами рисовал текст
+# переменного шрифта запасным (владелец, dev.35). block вместо swap и загрузка всех начертаний сразу — чтобы начертание,
+# впервые нужное посреди анимации, не мелькнуло запасным шрифтом
+import json as _js
+_NF = _js.load(open('assets/nunito_static.json'))
+css = ''.join("@font-face{font-family:'Nunito';font-style:normal;font-weight:%s;font-display:block;src:url(data:font/woff2;base64,%s) format('woff2')}\n" % (w, _NF[w]) for w in sorted(_NF)) + css
 a = s.index('<style>'); b = s.index('</style>')
 s = s[:a] + '<style>\n' + css + '\n' + s[b:]
+s = s.replace('</style>', "</style><script>try{['400','500','600','700','800','900'].forEach(function(w){document.fonts.load(w+' 16px Nunito')})}catch(e){}</script>", 1)
 
 # --- пакет смайликов
 pack = open('assets/emoji_pack.b64').read()
