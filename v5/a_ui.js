@@ -759,7 +759,7 @@ function settings(){
     else if(a==='skl')skills();
     else if(a==='kb')keys();
     else if(a==='mail'){location.href='mailto:'+AGM+'?subject='+encodeURIComponent('ИТП '+ITPV)}
-    else if(a==='agr')modal('<h2>Условия использования</h2><div class="agt">'+AGT+'</div>',[['Закрыть',null]]);
+    else if(a==='agr')agView();
     else if(a==='intro'){BACK=function(){settings()};theory(0,0)}
     else if(a==='rs1')modal('<h2>Сбросить оформление?</h2><p>Тема, цвет, размер текста, звук и другие настройки станут как в начале. Прогресс не изменится.</p>',[['Сбросить',function(){themeSwap(function(){S.set=clean({}).set;S.theme='';S.mute=0;save();applyPrefs();emoLoad();again()});toast('Настройки сброшены')},0,1],['Отмена',null,1]]);
     else if(a==='rs2')modal('<h2>Сбросить весь прогресс?</h2><p>Опыт, серия, пройденные островки, достижения и настройки оформления удалятся, знакомство начнётся заново. Сохранённые коды и звук останутся. Отменить это нельзя.</p>',[['Да, сбросить',function(){S=clean({mute:S.mute,sv:S.sv,ec:S.ec,cur:S.cur,nick:''});applyTheme();seedLit();save();nick()},0,1],['Отмена',null,1]])}});

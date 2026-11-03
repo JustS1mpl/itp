@@ -290,6 +290,27 @@ function agWin(host,sn,done){
   ok.onclick=function(){if(!ck.checked)return;sn('ok');agSave();document.removeEventListener('keydown',kd,true);w.remove();done()};
   if(!('ontouchstart' in window))ck.focus({preventScroll:true});
   return w}
+/* условия из настроек («О приложении» → «Условия использования», владелец): вспышка экрана, затем экран как во вступлении —
+   чёрный, с падающими символами, зерном и полосами — и на нём большое окно 98-го с текстом; закрытие — снова вспышка и настройки.
+   Без анимаций (RM) — без вспышки и движения */
+function agFlash(mid){if(RM()){mid();return}var f=document.createElement('div');f.className='agfl';f.setAttribute('aria-hidden','true');document.body.appendChild(f);
+  setTimeout(mid,230);setTimeout(function(){f.remove()},700)}
+function agView(){
+  var prev=document.activeElement,o=null,V=null,R=null,gone=false;
+  function kd(e){if(e.key==='Escape'){e.preventDefault();e.stopPropagation();close()}}
+  function close(){if(gone)return;gone=true;document.removeEventListener('keydown',kd,true);snd('close');
+    agFlash(function(){if(V)V.stop();if(R)R.stop();if(o)o.remove();document.documentElement.classList.remove('crt-on');if(prev&&prev.focus)try{prev.focus({preventScroll:true})}catch(e){}})}
+  snd('open');
+  agFlash(function(){
+    o=document.createElement('div');o.className='crt on live agvw';
+    o.innerHTML='<div class="sc"><div class="sci"><canvas class="rain" aria-hidden="true"></canvas></div><i class="fx" aria-hidden="true"></i><canvas class="grn" aria-hidden="true"></canvas><i class="trk" aria-hidden="true"></i></div>'
+      +'<div class="w98 w98top"><div class="w98w w98big" role="dialog" aria-modal="true" aria-labelledby="agvt"><div class="w98h"><span class="w98ic" aria-hidden="true"></span><b id="agvt">Пользовательское соглашение</b><button type="button" class="w98x w98cl" aria-label="Закрыть">×</button></div>'
+      +'<div class="w98c"><div class="w98txt" tabindex="0">'+AGT+'</div><div class="w98b"><button type="button" class="w98btn w98cl">Закрыть</button></div></div></div></div>';
+    document.body.appendChild(o);document.documentElement.classList.add('crt-on');
+    V=vhsStart(o);if(!RM())R=rainStart(o.querySelector('.rain'));
+    o.querySelectorAll('.w98cl').forEach(function(b){b.onclick=close});
+    document.addEventListener('keydown',kd,true);
+    o.querySelector('.w98btn').focus({preventScroll:true})})}
 /* во вступлении: сразу после заставки IT'S THE PROGRAMMING, до разговора с кроликом. В просмотре вступления
    (режим разработчика) показывается всегда и ничего не записывает */
 function crtAgree(){return new Promise(function(res){
