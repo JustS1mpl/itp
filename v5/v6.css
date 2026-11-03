@@ -1663,7 +1663,8 @@ button.w98x:active{box-shadow:inset 1px 1px var(--w98k),inset -1px -1px #fff,ins
 .w98kl{display:flex;align-items:center;gap:7px;cursor:pointer}
 .w98k input{position:absolute;opacity:0;width:1px;height:1px}
 .w98k i{flex:none;position:relative;width:13px;height:13px;background:#fff;box-shadow:inset -1px -1px #fff,inset 1px 1px var(--w98d),inset -2px -2px var(--w98l),inset 2px 2px var(--w98k)}
-.w98k input:checked+i::after{content:'';position:absolute;left:4px;top:1px;width:3px;height:7px;border:solid #000;border-width:0 2px 2px 0;transform:rotate(40deg)}
+/* галочка по центру квадрата (владелец: с left/top в пикселях съезжала влево вверх); -62% по высоте — у повёрнутой «L» видимый центр выше рамки */
+.w98k input:checked+i::after{content:'';position:absolute;left:50%;top:50%;width:3px;height:7px;border:solid #000;border-width:0 2px 2px 0;transform:translate(-50%,-62%) rotate(40deg)}
 .w98k input:focus-visible~span{outline:1px dotted #000;outline-offset:1px}
 .w98l{display:inline;padding:0;margin:0;border:0;background:none;color:#0000ee;font:inherit;font-weight:700;text-decoration:underline;cursor:pointer;text-align:left}
 .w98l:focus-visible{outline:1px dotted #000}
@@ -1736,3 +1737,11 @@ html.scr .top{box-shadow:0 12px 28px -14px var(--gl-drop,rgba(0,0,0,.4))}
 .agvw .grn{opacity:.08}
 .agvw .w98top{z-index:6}
 .agvw .w98big{max-height:min(86vh,640px)}
+/* слабое устройство (html.lite, WEAK() в a_core.js): размытие под панелями пересчитывается на каждом кадре листания — убираем его,
+   а фон панелей делаем почти непрозрачным, чтобы вид остался прежним (стекло на 70 % без размытия просвечивало бы) */
+html.lite .top,html.lite .nav,html.lite .dock,html.lite .kbr,html.lite .shov{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+html.lite{--gl-a:96%}
+html.lite .top{background:color-mix(in srgb,var(--card) 97%,transparent)}
+html.lite .shov{background:rgba(10,10,12,.92)}
+/* Путь под падающими осколками проступает из-под слоя цвета фона (только прозрачность; щели между осколками остаются светлыми, как было) (раньше — filter:brightness по всей странице на каждом кадре) */
+#shards .shdim{position:absolute;inset:0;background:var(--bg);opacity:0;pointer-events:none}

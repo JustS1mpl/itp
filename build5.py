@@ -1,6 +1,6 @@
 import re, sys, json, os
 sys.path.insert(0, '.')
-VER = '7.0.0-dev.30'
+VER = '7.0.0-dev.31'
 s = open('base43.html', encoding='utf-8').read()
 
 def rep(a, b, n=1):
@@ -34,6 +34,9 @@ rep("it.html.split(/(<pre>[\\s\\S]*?<\\/pre>)/).map(function(p){return /^<pre>/.
 rep("replace(/<pre>[\\s\\S]*?<\\/pre>/g,'').match", "replace(/<pre[^>]*>[\\s\\S]*?<\\/pre>/g,'').match")
 # --- звук касаний теперь делает v5/a_sound.js (после обработчиков события, чтобы не дублировать другие звуки)
 rep("document.addEventListener('click',function(e){if(e.target.closest('button'))snd([600])});", "")
+# --- Python не поднимать всем через 2,5 с после загрузки (это шло во время вступления и тормозило слабые телефоны):
+#     на нормальных устройствах — в простое после вступления, на слабых — когда открыт урок (pyWarm, v5/a_py.js)
+rep("window.addEventListener('load',function(){setTimeout(skReady,2500);", "window.addEventListener('load',function(){if(!WEAK())setTimeout(function(){if(window.pyWarm)pyWarm()},6000);")
 # --- версия
 s = s.replace('4.3.0', VER)
 
@@ -179,6 +182,29 @@ anchor = "seedLit();window.addEventListener('resize',function(){if(app.querySele
 # --- настроения кролика: ликующий прыжок (состояние happy: итоги, курс пройден, карточка «Поделиться»; cheer.webp — новый рисунок 2026-11-02), плачущий cry/cryhead (U2-5) и хмурый: grump — целиком, grumphead — голова (реакция на первую ошибку); по аналогии с wow и wowhead
 import base64 as _mb
 _mood = ''.join("IMG.%s='data:image/webp;base64,%s';\n" % (k, _mb.b64encode(open('assets/mascot/%s.webp' % f, 'rb').read()).decode()) for k, f in (('eat', 'lovecarrot'), ('happy', 'cheer'), ('grumphead', 'grump_head'), ('grump', 'grump'), ('rolled', 'rolled'), ('wow', 'wow'), ('cool', 'cool'), ('wowhead', 'wow_head'), ('cry', 'cry'), ('cryhead', 'cry_head')) if os.path.exists('assets/mascot/%s.webp' % f))
+# --- тени под лапами кролика — готовыми, посчитанными при сборке (раньше браузер на каждом запуске раскодировал 6 картинок
+#     и перебирал их пиксели, feetOf в a_ui.js). Тот же расчёт: нижний непрозрачный ряд и ширина лап в полосе 6 % над ним
+from PIL import Image as _FI
+def _feet(f):
+    im = _FI.open('assets/mascot/%s.webp' % f).convert('RGBA')
+    W = min(240, im.width); H = round(W * im.height / im.width)
+    a = im.resize((W, H), _FI.BILINEAR).getchannel('A').load()
+    yb = next((y for y in range(H - 1, -1, -1) if any(a[x, y] > 140 for x in range(W))), -1)
+    if yb < 0:
+        return None
+    band = max(2, round(H * .06)); xs = [x for y in range(yb, max(-1, yb - band), -1) for x in range(W) if a[x, y] > 140]
+    return min(xs) / W, (max(xs) + 1) / W, (yb + 1) / H
+_fc = ''
+for _st, _f in (('eat', 'lovecarrot'), ('happy', 'cheer'), ('grump', 'grump'), ('rolled', 'grump'), ('wow', 'wow'), ('cool', 'cool')):
+    if not os.path.exists('assets/mascot/%s.webp' % _f):
+        continue
+    _r = _feet(_f)
+    if not _r:
+        continue
+    _l, _rr, _y = _r; _pad = (_rr - _l) * .12
+    _fc += ':root:not([data-theme=dark]) .rw.im.%s::after{left:%.1f%%;right:%.1f%%;bottom:%.1f%%}\n' % (_st, max(0, _l - _pad) * 100, max(0, 1 - _rr - _pad) * 100, (1 - _y) * 100 - 4)
+_si = s.index('</style>'); s = s[:_si] + '\n/* тени под лапами кролика — посчитаны при сборке (build5.py) */\n' + _fc + s[_si:]
+print('тени под лапами: готовые,', _fc.count('\n'), 'спрайтов')
 core = 'var EXIMG=' + EXIMG + ';\n' + _mood + core
 core = core.replace('/*ITPY*/{}', _json.dumps(_py, ensure_ascii=False))
 rep(anchor, core + "\nseedLit();window.addEventListener('resize',function(){if(app.querySelector('.path'))links()});\napplyTheme();if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',emoLoad);else emoLoad();")

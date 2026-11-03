@@ -66,7 +66,7 @@ function feetCss(){
     feetOf(s,function(f){var pad=(f.r-f.l)*.12,L=Math.max(0,f.l-pad),R=Math.max(0,1-f.r-pad);
       css+=':root:not([data-theme=dark]) .rw.im.'+st+'::after{left:'+(L*100).toFixed(1)+'%;right:'+(R*100).toFixed(1)+'%;bottom:'+((1-f.y)*100-4).toFixed(1)+'%}\n';
       var el=document.getElementById('feet');if(!el){el=document.createElement('style');el.id='feet';document.head.appendChild(el)}el.textContent=css})})}
-feetCss();
+/* тени для встроенных спрайтов посчитаны при сборке и уже лежат в CSS (build5.py); feetOf остаётся для новых картинок */
 /* окончания по выбранному обращению: m — парень, f — девушка, n — нейтрально (если не указано) */
 function G(m,f,n){return S.g==='f'?f:S.g==='m'?m:(n===undefined?m:n)}
 function tabFn(){return({home:home,pr:practice,ed:editor,prof:profile})[CURTAB]||home}

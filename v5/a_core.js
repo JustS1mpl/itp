@@ -1,6 +1,8 @@
 /* ===================== ИТП — ядро: настройки, сохранение, звук, серия, цели, достижения ===================== */
 function defset(){return{acc:'',exl:'c',tz:100,anim:'full',vol:70,sfx:1,vib:1,emo:1,ty:1,toc:1,rep:1,ln:1,ac:1,cf:15,gc:1,bg:1,bgp:'dots',ks:0,ph:'card',sh:'v',fl:'tilt'}}
 function ST(k){return S.set&&S.set[k]!==undefined?S.set[k]:defset()[k]}
+/* слабое устройство (мало памяти или ядер, экономия трафика): без размытия под панелями, Python — только когда открыт урок */
+function WEAK(){var n=navigator,c=n.connection;return !!((n.deviceMemory&&n.deviceMemory<=3)||(n.hardwareConcurrency&&n.hardwareConcurrency<=4)||(c&&c.saveData))}
 function RM(){return ST('anim')==='off'||matchMedia('(prefers-reduced-motion:reduce)').matches}
 /* --- ключи сохранений и языки (U2-2, U2-3; DECISIONES §70) ---
    Два уровня данных. 1) Настройки устройства — отдельный ключ ITPAPP, вне прогресса: согласие с условиями, язык
@@ -34,7 +36,7 @@ function vdate(x){if(typeof x!=='string'||!/^\d{4}-\d\d-\d\d$/.test(x))return'';
 function clean0_(r){return clean0(r)}
 /* v5.7.0: раздел ЕГЭ удалён. В старых сохранениях номера тем 15-20 выбрасываются, 21 и выше сдвигаются на -6.
    Метка mv=2 (число, а не переменная: clean() вызывается при загрузке раньше, чем выполняются var) нужна, чтобы сдвиг не применился дважды. */
-function migr(r){
+function migr4(r){
   /* mv:2 — удалён раздел ЕГЭ (темы 15–20 выброшены, 21+ сдвинуты на −6); mv:3 — между темами 8 и 9 вставлена доп. глава «Черепаха» (9+ сдвинуты на +1);
      mv:4 — после темы «Строки, кортежи, списки» вставлена доп. глава «Системы счисления» (11+ сдвинуты на +1) */
   if(!r||typeof r!=='object'||Array.isArray(r)||r.mv>=4)return r;
@@ -53,9 +55,18 @@ function migr(r){
     if(r.mv>=3)o.start=m3(s);
     else{if(r.mv!==2)s=s<15?s:(s>=21?s-6:15);o.start=m3(m2(s))}}
   return o}
+/* mv:5 (dev.31) — перед «Итоговыми проектами» встала тема «От задачи к программе»: темы и норы с номером 54 и дальше сдвинуты на +1
+   (прогресс хранится по номеру темы: ключи «тема-островок» в d, tk, at, es, dr, hu и S.start) */
+function migr(r){
+  r=migr4(r);if(!r||typeof r!=='object'||Array.isArray(r)||r.mv>=5)return r;
+  var o={},m=function(i){return i<54?i:i+1};for(var k in r)if(Object.prototype.hasOwnProperty.call(r,k))o[k]=r[k];
+  ['d','tk','at','es','dr','hu'].forEach(function(f){var x=r[f];if(!x||typeof x!=='object'||Array.isArray(x))return;var y={};
+    Object.keys(x).forEach(function(key){var p=key.split('-');if(!/^\d+$/.test(p[0]))return;p[0]=String(m(+p[0]));y[p.join('-')]=x[key]});o[f]=y});
+  if(Number.isInteger(r.start)&&r.start>=0)o.start=m(r.start);
+  return o}
 function clean(r){
   r=migr(r);
-  var o=clean0(r);o.mv=4;r=(r&&typeof r==='object'&&!Array.isArray(r))?r:{};
+  var o=clean0(r);o.mv=5;r=(r&&typeof r==='object'&&!Array.isArray(r))?r:{};
   var s=(r.set&&typeof r.set==='object'&&!Array.isArray(r.set))?r.set:{},q={};
   var pick=function(k,list){q[k]=list.indexOf(s[k])>=0?s[k]:defset()[k]},bl=function(k){q[k]=s[k]===0||s[k]===false?0:(s[k]===1||s[k]===true?1:defset()[k])};
   pick('acc',['','carrot','pink','blue','violet']);pick('tz',[90,100,115,130]);pick('anim',['full','less','off']);pick('cf',[13,15,17,19]);pick('sh',['v','h']);pick('ph',['card','corner','pop']);pick('fl',['tilt','flat']);pick('bgp',['dots','rain','none']);
@@ -93,7 +104,7 @@ function applyPrefs(){
   r.setAttribute('data-theme',th);
   if(ST('acc'))r.setAttribute('data-acc',ST('acc'));else r.removeAttribute('data-acc');
   r.style.setProperty('--tz',ST('tz')/100);r.style.setProperty('--cf',ST('cf')+'px');
-  r.setAttribute('data-anim',ST('anim'));r.setAttribute('data-fl',ST('fl'));r.classList.toggle('noln',!ST('ln'));r.setAttribute('data-ph',ST('ph'));r.setAttribute('data-bgp',ST('bgp'));r.classList.toggle('exbig',ST('exl')==='b');
+  r.setAttribute('data-anim',ST('anim'));r.setAttribute('data-fl',ST('fl'));r.classList.toggle('noln',!ST('ln'));r.setAttribute('data-ph',ST('ph'));r.setAttribute('data-bgp',ST('bgp'));r.classList.toggle('lite',WEAK());r.classList.toggle('exbig',ST('exl')==='b');
   var m=document.querySelector('meta[name=theme-color]');if(!m){m=document.createElement('meta');m.name='theme-color';document.head.appendChild(m)}
   m.content=th==='dark'?'#171315':'#FBF7F5';
 }

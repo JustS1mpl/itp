@@ -345,7 +345,7 @@ function sparks(el){
     (function(s){s.animate([{transform:'translate(0,0) rotate(0) scale(1)',opacity:1},{transform:'translate('+Math.cos(a)*d+'px,'+(Math.sin(a)*d-20)+'px) rotate('+(Math.random()*360)+'deg) scale(.4)',opacity:0}],{duration:700+Math.random()*300,easing:'cubic-bezier(.2,.8,.3,1)'}).onfinish=function(){s.remove()}})(s)}}
 
 /* --- теория --- */
-function theory(i,j){
+function theory(i,j){if(window.pyWarm)setTimeout(pyWarm,1200);
   var it=IT(i,j),T={},fresh=!S.d[i+'-'+j],rm=RM();(it.terms||[]).forEach(function(x){T[x.n]=x});
   var h=it.html.split(/(<pre[^>]*>[\s\S]*?<\/pre>)/).map(function(p){return /^<pre /.test(p)?p:/^<pre>/.test(p)?'<div class="cpw"><button type="button" class="cp" aria-label="Копировать код"></button><pre>'+hl(p.slice(5,-6))+'</pre></div>':p.replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g,function(m,n,l){return T[n]?'<button class="term'+(fcol(n)?' fn':'')+'"'+(fcol(n)?' style="color:'+fcol(n)+'"':'')+' data-n="'+esc(n)+'" aria-haspopup="dialog">'+(l||esc(n))+'</button>':(l||esc(n))})}).join('');
   scr('theory',lessonTop('<div class="rprog" role="progressbar" aria-label="Прочитано" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="rpb"></i></div>','<span class="lstep">≈ '+readMin(it)+' мин</span>')+'<article class="th"><p class="ov tov">'+esc(TOPICS[i].n)+'</p><h1 class="tt">'+esc(it.n)+'</h1><div id="tb">'+h+'</div><p class="mu tm" id="tm">'+(fresh&&!rm&&ST('ty')?TMSK:TMT)+'</p></article><button class="btn" id="go">'+(S.d[i+'-'+j]?'Готово':G('Я прочитал','Я прочитала','Прочитано')+', открыть дальше')+'</button>');

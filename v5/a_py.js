@@ -5,12 +5,15 @@ var HSEED=String(1+Math.floor(Math.random()*4294967294));
 var execOld=exec,skOld=skReady,fixOld=fixErr;
 function txt(id){var e=document.getElementById(id);return e?e.textContent:''}
 function u8(id){var s=atob(txt(id).replace(/\s+/g,'')),a=new Uint8Array(s.length);for(var i=0;i<s.length;i++)a[i]=s.charCodeAt(i);return a}
+/* base64 и gzip — встроенными средствами браузера (fetch data:-адреса и DecompressionStream), а не циклом по 7 МБ строки в JS:
+   быстрее и без лишних копий в памяти. Если fetch data: недоступен — старый путь */
+function bin(id){var s=txt(id).replace(/\s+/g,'');return fetch('data:application/octet-stream;base64,'+s).then(function(r){return r.arrayBuffer()}).then(function(b){return new Uint8Array(b)},function(){return u8(id)})}
 function gunzip(a){return new Response(new Blob([a]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer().then(function(b){return new Uint8Array(b)})}
 function loadData(){
   if(!PY.data)PY.data=(function(){
     if(!window.Worker||!window.WebAssembly||typeof DecompressionStream==='undefined'||!txt('py-wasm'))return Promise.reject(new Error('no wasm'));
-    return Promise.all([gunzip(u8('py-wasm')),gunzip(u8('py-asm'))]).then(function(r){
-      return{wasm:r[0],asm:new TextDecoder().decode(r[1]),zip:u8('py-zip'),lock:txt('py-lock'),loader:txt('py-loader'),glue:txt('py-glue'),worker:txt('py-worker')}})})();
+    return Promise.all([bin('py-wasm').then(gunzip),bin('py-asm').then(gunzip),bin('py-zip')]).then(function(r){
+      return{wasm:r[0],asm:new TextDecoder().decode(r[1]),zip:r[2],lock:txt('py-lock'),loader:txt('py-loader'),glue:txt('py-glue'),worker:txt('py-worker')}})})();
   return PY.data}
 function spawn(){
   var rec={w:null,dead:false,onmsg:null,state:0,maker:false},maker=false;
@@ -35,6 +38,12 @@ function pyReady(){
   if(!PY.readyP)PY.readyP=ensureAct().ready.then(function(ok){if(ok){PY.ok=true;SKOK=true}else PY.bad=true;return ok});
   return PY.readyP}
 window.PYINFO=PY;
+/* поднять Python заранее (раньше — всем через 2,5 с после загрузки, прямо во время вступления: распаковка 7 МБ, свой поток и
+   компиляция WebAssembly — на слабом телефоне это и тормозило). Теперь — в простое и не во время вступления, синего экрана и стекла;
+   на слабых устройствах — только когда открыт урок (pyWarm из theory) */
+window.pyWarm=function(){if(PY.ok||PY.bad||PY.readyP)return;
+  var busy=function(){return document.getElementById('crt')||document.getElementById('bsod')||document.getElementById('shards')||document.hidden};
+  (function tr(){if(PY.readyP)return;if(busy()){setTimeout(tr,3000);return}(window.requestIdleCallback||function(f){setTimeout(f,300)})(function(){if(!busy())pyReady();else setTimeout(tr,3000)},{timeout:3000})})()};
 skReady=function(){return pyReady().then(function(ok){return ok?true:skOld()})};
 lint=function(){return null};
 fixErr=function(e,code){

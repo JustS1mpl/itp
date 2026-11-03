@@ -163,19 +163,23 @@ function rbHalftone(cv){
 /* --- дождь символов за текстом терминала: еле заметный, 20 кадров в секунду --- */
 function rainStart(cv){
   if(RM())return null;
-  var x=cv.getContext('2d'),R={on:1,raf:0,last:0,cols:[]},fs=14,dpr=1,W=0,H=0;
+  var x=cv.getContext('2d'),R={on:1,raf:0,last:0,cols:[]},fs=14,dpr=1,W=0,H=0,GC={},FF='monospace';
+  /* символ — готовая картинка: нарисован шрифтом один раз, потом только копируется (drawImage) с нужной прозрачностью.
+     Раньше каждый кадр — fillText с новым цветом для каждого символа на экране */
+  function gl(ch){var g=GC[ch];if(g)return g;g=document.createElement('canvas');g.width=Math.ceil(fs*1.3*dpr);g.height=Math.ceil(fs*1.35*dpr);
+    var y=g.getContext('2d');y.scale(dpr,dpr);y.font=fs+'px '+FF;y.textBaseline='top';y.fillStyle='rgb(120,255,160)';y.fillText(ch,0,0);return GC[ch]=g}
   function rc(){return CRTG[Math.floor(Math.random()*CRTG.length)]}
   function col(init){var n=8+Math.floor(Math.random()*18),ch=[];for(var k=0;k<n;k++)ch.push(rc());
     return{y:init?Math.random()*(H/fs+n)-n:-Math.random()*30,sp:.12+Math.random()*.32,n:n,ch:ch,a:.04+Math.random()*.07}}
   function fit(){dpr=Math.min(2,window.devicePixelRatio||1);W=cv.clientWidth;H=cv.clientHeight;cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);
-    fs=W<600?13:15;R.cols=[];for(var i=0,m=Math.ceil(W/fs);i<m;i++)R.cols.push(col(true))}
+    fs=W<600?13:15;FF=getComputedStyle(cv).fontFamily;GC={};R.cols=[];for(var i=0,m=Math.ceil(W/fs);i<m;i++)R.cols.push(col(true))}
   function fr(t){
     if(!R.on)return;R.raf=requestAnimationFrame(fr);if(t-R.last<50)return;R.last=t;
-    x.setTransform(dpr,0,0,dpr,0,0);x.clearRect(0,0,W,H);x.font=fs+'px '+getComputedStyle(cv).fontFamily;x.textBaseline='top';
+    x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,cv.width,cv.height);
     for(var i=0;i<R.cols.length;i++){var c=R.cols[i];c.y+=c.sp;if(Math.random()<.05)c.ch[Math.floor(Math.random()*c.n)]=rc();
       var hy=Math.floor(c.y);if((hy-c.n)*fs>H){R.cols[i]=col(false);continue}
       for(var k=0;k<c.n;k++){var yy=hy-k;if(yy<0||yy*fs>H)continue;
-        x.fillStyle='rgba(120,255,160,'+(k?c.a*(1-k/c.n):Math.min(.3,c.a*2.8)).toFixed(3)+')';x.fillText(c.ch[yy%c.n],i*fs,yy*fs)}}}
+        x.globalAlpha=k?c.a*(1-k/c.n):Math.min(.3,c.a*2.8);x.drawImage(gl(c.ch[yy%c.n]),Math.round(i*fs*dpr),Math.round(yy*fs*dpr))}}x.globalAlpha=1}
   fit();R.fit=fit;window.addEventListener('resize',fit);R.raf=requestAnimationFrame(fr);
   R.stop=function(){R.on=0;cancelAnimationFrame(R.raf);window.removeEventListener('resize',fit)};
   return R}
@@ -184,9 +188,13 @@ function rainStart(cv){
 function vhsStart(o){
   var cv=o.querySelector('.grn'),sci=o.querySelector('.sci'),x=cv.getContext('2d'),W=0,H=0,im=null,V={on:1,raf:0,last:0,jt:0};
   /* размер зерна — по пропорциям экрана: точки квадратные (~4 px), а не вытянутые полосы на высоком экране телефона */
-  function fit(){var s=Math.max(3,Math.round(Math.max(innerWidth,innerHeight)/320));W=Math.max(1,Math.ceil(innerWidth/s));H=Math.max(1,Math.ceil(innerHeight/s));cv.width=W;cv.height=H;im=x.createImageData(W,H)}
+  /* шум — 6 готовых кадров, посчитанных один раз; дальше кадры только чередуются (раньше — случайное число на каждую точку
+     каждого кадра). Глазом не отличить, а процессору почти бесплатно */
+  var FR=[],fi=0;
+  function fit(){var s=Math.max(3,Math.round(Math.max(innerWidth,innerHeight)/320));W=Math.max(1,Math.ceil(innerWidth/s));H=Math.max(1,Math.ceil(innerHeight/s));cv.width=W;cv.height=H;
+    FR=[];for(var k=0;k<6;k++){var d=x.createImageData(W,H),u=new Uint32Array(d.data.buffer);for(var i=0;i<u.length;i++){var g=Math.random()*255|0;u[i]=0xff000000|g<<16|g<<8|g}FR.push(d)}}
   fit();window.addEventListener('resize',fit);
-  function grain(){for(var i=0;i<W*H;i++){var g=Math.random()*255|0;im.data[i*4]=im.data[i*4+1]=im.data[i*4+2]=g;im.data[i*4+3]=255}x.putImageData(im,0,0)}
+  function grain(){fi=(fi+1)%FR.length;x.putImageData(FR[fi],0,0)}
   grain();
   if(!RM()){(function fr(t){if(!V.on)return;V.raf=requestAnimationFrame(fr);if(t-V.last<80)return;V.last=t;grain()})(0);
     (function jit(){V.jt=setTimeout(function(){if(!V.on)return;sci.classList.add('jt');setTimeout(function(){sci.classList.remove('jt')},80+Math.random()*60);jit()},7000+Math.random()*8000)})()}
@@ -446,9 +454,11 @@ function bsod(){
   var b=document.createElement('div'),tms=[],gone=0,nm=S.nick||'';b.id='bsod';b.className='blk';b.setAttribute('role','alert');
   b.innerHTML='<div class="bsv"><div class="bsi"><div class="sad" aria-hidden="true">:(</div><p class="bm">В ИТП возникла проблема, и его нужно перезапустить. Мы лишь подготовим островки'+(nm?', '+esc(nm)+',':'')+' и всё заработает.</p><p class="bp"><b>0</b>% выполнено</p><div class="bq">'+bsQr()+'<div><p>Это не настоящая ошибка, а начало курса.</p><p>Код остановки: HELLO_WORLD</p></div></div></div></div>';
   document.body.appendChild(b);
+  /* QR той же картинкой — для снимка синего экрана перед осыпанием (bsSnap) */
+  b._qr=new Image();b._qr.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(bsQr().replace('<svg ','<svg xmlns="http://www.w3.org/2000/svg" width="290" height="290" '));
   function T(f,ms){tms.push(setTimeout(f,ms))}
   /* касание — сразу к Пути */
-  function end(){if(gone)return;gone=1;tms.forEach(clearTimeout);b.remove();var x=document.getElementById('shards');if(x)x.remove();document.documentElement.classList.remove('crt-on')}
+  function end(){if(gone)return;gone=1;tms.forEach(clearTimeout);b.remove();if(b._snap)setTimeout(function(){URL.revokeObjectURL(b._snap)},100);var x=document.getElementById('shards');if(x)x.remove();document.documentElement.classList.remove('crt-on')}
   b.onclick=end;
   /* 1,1 с темноты (в центре гаснет точка кинескопа), потом синий экран; проценты ползут неровно ~4,8 с */
   var pc=b.querySelector('.bp b'),steps=[0,0,2,5,5,9,14,14,20,27,33,33,41,48,55,55,62,70,76,83,88,88,94,100],B=1100,ST=200;
@@ -472,6 +482,23 @@ function bsCells(w,h,cx,cy){
     pts.forEach(function(q,j){if(i===j||pl.length<3)return;var nx=q[0]-p[0],ny=q[1]-p[1];pl=bsClip(pl,nx,ny,(nx*(p[0]+q[0])+ny*(p[1]+q[1]))/2)});
     return pl}).filter(function(pl){return pl.length>2})}
 
+/* снимок синего экрана в картинку — один раз, перед осыпанием. Раньше каждый из 36–56 осколков нёс полную копию экрана
+   (текст, QR) во весь размер: десятки полноэкранных слоёв и ~8 тысяч элементов — на слабом телефоне стекло падало рывками.
+   Теперь осколок — небольшой блок с куском этой картинки. Текст рисуется словами точно там, где их расставил браузер
+   (Range.getClientRects), тем же шрифтом; QR — той же svg-картинкой. Не вышло — осколки по-старому, с копией экрана */
+function bsSnap(v,qr,w,h,cb){try{
+  var r=Math.min(2,window.devicePixelRatio||1),c=document.createElement('canvas'),x,vb=v.getBoundingClientRect(),tw,n,rg=document.createRange();
+  c.width=Math.round(w*r);c.height=Math.round(h*r);x=c.getContext('2d');x.scale(r,r);
+  x.fillStyle=getComputedStyle(v).backgroundColor;x.fillRect(0,0,w,h);x.textBaseline='alphabetic';
+  tw=document.createTreeWalker(v,NodeFilter.SHOW_TEXT);
+  while((n=tw.nextNode())){var el=n.parentElement;if(!el||el.closest('svg'))continue;var cs=getComputedStyle(el);if(cs.visibility==='hidden'||cs.display==='none')continue;
+    x.font=cs.fontStyle+' '+cs.fontWeight+' '+cs.fontSize+' '+cs.fontFamily;x.fillStyle=cs.color;
+    var re=/\S+/g,m;while((m=re.exec(n.data))){rg.setStart(n,m.index);rg.setEnd(n,m.index+m[0].length);var q=rg.getClientRects()[0];if(!q)continue;
+      var mt=x.measureText(m[0]),fs=parseFloat(cs.fontSize),a=mt.fontBoundingBoxAscent||fs*.8,d=mt.fontBoundingBoxDescent||fs*.25;
+      x.fillText(m[0],q.left-vb.left,q.top-vb.top+(q.height-a-d)/2+a)}}
+  var sv=v.querySelector('.bq svg');if(sv&&qr&&qr.complete&&qr.naturalWidth){var qb=sv.getBoundingClientRect();x.drawImage(qr,qb.left-vb.left,qb.top-vb.top,qb.width,qb.height)}
+  c.toBlob(function(bl){cb(bl?URL.createObjectURL(bl):null)},'image/png')}catch(e){cb(null)}}
+
 /* один удар (U2-4): вспышка и встряска в месте удара, и стекло трескается сразу целиком — трещины разбегаются от удара
    до краёв за ~0,15 с, вместе с сухим треском в звуке. Секунду стекло держится в рамке, потом осыпается. Трещины
    рисуются через WAAPI (а не CSS): до своей очереди каждая гарантированно скрыта */
@@ -485,6 +512,7 @@ function bsCrack(b,T,end){
   var sv='';
   ed.forEach(function(q,k){var p=' d="M'+q.a[0].toFixed(1)+' '+q.a[1].toFixed(1)+'L'+q.c[0].toFixed(1)+' '+q.c[1].toFixed(1)+'" data-k="'+k+'" style="stroke-dasharray:'+q.L+';stroke-dashoffset:'+q.L+'"/>';sv+='<path class="cu2"'+p+'<path class="cl"'+p});
   var bv=b.querySelector('.bsv');
+  bsSnap(bv,b._qr,w,h,function(u){b._snap=u});
   bv.insertAdjacentHTML('beforeend','<svg class="ck" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none" aria-hidden="true"><circle class="imp" cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="14"/>'+sv+'</svg>');
   [].forEach.call(bv.querySelectorAll('.ck path'),function(pe){var q=ed[+pe.getAttribute('data-k')];
     pe.animate([{strokeDashoffset:q.L},{strokeDashoffset:0}],{duration:40+q.L*.3,delay:q.d*240+Math.random()*25,easing:'ease-out',fill:'both'})});
@@ -505,8 +533,9 @@ function bsShatter(b,cells,cx,cy,w,h,D,T,end){
     var d=document.createElement('div'),inn=document.createElement('div'),sh=document.createElement('i'),pp=pl.map(function(p){return(p[0]-x0).toFixed(1)+' '+(p[1]-y0).toFixed(1)});
     d.className='shd';inn.className='shi';sh.className='shg';
     d.style.cssText='left:'+x0+'px;top:'+y0+'px;width:'+(x1-x0)+'px;height:'+(y1-y0)+'px;clip-path:polygon('+pp.map(function(q){return q.replace(' ','px ')+'px'}).join(',')+')';
-    inn.style.cssText='left:'+(-x0)+'px;top:'+(-y0)+'px;width:'+w+'px;height:'+h+'px';
-    inn.appendChild(v.cloneNode(true));d.appendChild(inn);d.appendChild(sh);
+    if(b._snap)d.style.background='url('+b._snap+') '+(-x0)+'px '+(-y0)+'px/'+w+'px '+h+'px no-repeat';
+    else{inn.style.cssText='left:'+(-x0)+'px;top:'+(-y0)+'px;width:'+w+'px;height:'+h+'px';inn.appendChild(v.cloneNode(true));d.appendChild(inn)}
+    d.appendChild(sh);
     /* тонкая светлая кромка скола */
     d.insertAdjacentHTML('beforeend','<svg class="she" viewBox="0 0 '+(x1-x0)+' '+(y1-y0)+'" aria-hidden="true"><polygon points="'+pp.join(' ')+'"/></svg>');
     box.appendChild(d);
@@ -524,10 +553,11 @@ function bsShatter(b,cells,cx,cy,w,h,D,T,end){
       {transform:'translate3d('+dx.toFixed(1)+'px,'+(dy+py).toFixed(1)+'px,'+tz.toFixed(0)+'px) rotateX('+rx.toFixed(1)+'deg) rotateZ('+rz.toFixed(1)+'deg)'}],
       {duration:tot,delay:dl,fill:'both'}));
     sh.animate([{opacity:0},{opacity:0,offset:P/tot},{opacity:.55}],{duration:tot,delay:dl,fill:'both',easing:'ease-in'})});
+  var dim=document.createElement('i');dim.className='shdim';box.insertBefore(dim,box.firstChild);
   document.body.appendChild(box);b.remove();
   ts.sort(function(a,b2){return a-b2});bx('shatter',{t:ts});
   document.documentElement.classList.remove('crt-on');
-  app.animate([{filter:'brightness(.45)'},{filter:'brightness(.45)',offset:.2},{filter:'brightness(1)'}],{duration:Math.min(2400,last),easing:'ease-out'});
+  dim.animate([{opacity:.55},{opacity:.55,offset:.2},{opacity:0}],{duration:Math.min(2400,last),easing:'ease-out',fill:'forwards'});
   T(function(){snd('level')},Math.min(1800,last*.75));
   /* сцена заканчивается, когда упал последний кусок; таймер — только запасной */
   Promise.all(an.map(function(a){return a.finished})).then(end,end);
