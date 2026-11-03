@@ -90,3 +90,6 @@ scraping, pillow (пакеты Pyodide; для сборки код с ними �
 
 ## Следующий шаг
 Фаза 3 закончена. Фаза 5 — норы по списку holes в curriculum.json. Порядок работы над темой: перечень понятий из `legacy-do-not-read` (только имена, уже есть в `curriculum.json`) → писать с чистого листа → `PY=py bash mk.sh` без нарушений → `xc5` bad 0 → выгрузка текста для «ученика» (`py tests/student_export.py файл.txt "Название темы"`; файл класть в `E:\Program Files\itp-tools\tmp`) → суб-агент на Sonnet 5.5 → правки → коммит. После правок в v5/ — `tests/mobile7.py` (телефон).
+
+H1 (2026-11-03): норы webserver (учебный фреймворк miniweb), scraping (bs4, robots.txt), pillow (после modules), weeklybot (пояса и расписание),
+paint (после algorithms), «Игра Жизнь» в pygame — coverage 0, xc5 bad 0, legacy_trace 0, «ученик» проверил все. Подробности — DECISIONES §70.
