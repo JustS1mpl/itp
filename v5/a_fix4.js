@@ -24,7 +24,8 @@ liveRun=function(code){
       if(tail)V.push((/\n$/.test(tx)?'':'\n')+tail);
       V.flush();
       if(V.dropped())st('Начало вывода (первые '+V.dropped()+' строк) удалено: не хватает памяти. '+(r.err?'Программа завершилась с ошибкой':'Программа завершена'),'bad')}
-    else o.textContent=(tx+(tail?((!tx||/\n$/.test(tx))?'':'\n')+tail:'')).trim()||'(программа ничего не вывела)';
+    /* U1-3: вывод как есть — пробелы в начале первой строки значимы (ёлочки, таблицы); убираем только пустые строки в конце */
+    else{var ft=(tx+(tail?((!tx||/\n$/.test(tx))?'':'\n')+tail:'')).replace(/\s+$/,'');o.textContent=ft.trim()?ft:'(программа ничего не вывела)'}
     try{o.scrollIntoView({block:'nearest'})}catch(e){}
   });
 };

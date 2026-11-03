@@ -23,6 +23,25 @@ var IC={
  search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/>',
  gear:'<circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7"/>'
 };
+/* значки Phosphor Icons (MIT, github.com/phosphor-icons/core 2.1.1): duotone — контур и полупрозрачная заливка, check — bold.
+   Один стиль для галочек серии, вех «Что ты уже умеешь», подсказки и «Поделиться» */
+var PH={'download-simple':'<path d="M216,48V208H40V48A16,16,0,0,1,56,32H200A16,16,0,0,1,216,48Z" class="d" opacity="0.2"/><path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0Zm-101.66,5.66a8,8,0,0,0,11.32,0l40-40a8,8,0,0,0-11.32-11.32L136,124.69V32a8,8,0,0,0-16,0v92.69L93.66,98.34a8,8,0,0,0-11.32,11.32Z"/>','address-book':'<path d="M208,32H64a8,8,0,0,0-8,8V216a8,8,0,0,0,8,8H208a8,8,0,0,0,8-8V40A8,8,0,0,0,208,32ZM136,144a32,32,0,1,1,32-32A32,32,0,0,1,136,144Z" class="d" opacity="0.2"/><path d="M83.19,174.4a8,8,0,0,0,11.21-1.6,52,52,0,0,1,83.2,0,8,8,0,1,0,12.8-9.6A67.88,67.88,0,0,0,163,141.51a40,40,0,1,0-53.94,0A67.88,67.88,0,0,0,81.6,163.2,8,8,0,0,0,83.19,174.4ZM112,112a24,24,0,1,1,24,24A24,24,0,0,1,112,112Zm96-88H64A16,16,0,0,0,48,40V64H32a8,8,0,0,0,0,16H48v40H32a8,8,0,0,0,0,16H48v40H32a8,8,0,0,0,0,16H48v24a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V40A16,16,0,0,0,208,24Zm0,192H64V40H208Z"/>',
+ 'calculator':'<path d="M176,64v48H80V64Z" class="d" opacity="0.2"/><path d="M80,120h96a8,8,0,0,0,8-8V64a8,8,0,0,0-8-8H80a8,8,0,0,0-8,8v48A8,8,0,0,0,80,120Zm8-48h80v32H88ZM200,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V40A16,16,0,0,0,200,24Zm0,192H56V40H200ZM100,148a12,12,0,1,1-12-12A12,12,0,0,1,100,148Zm40,0a12,12,0,1,1-12-12A12,12,0,0,1,140,148Zm40,0a12,12,0,1,1-12-12A12,12,0,0,1,180,148Zm-80,40a12,12,0,1,1-12-12A12,12,0,0,1,100,188Zm40,0a12,12,0,1,1-12-12A12,12,0,0,1,140,188Zm40,0a12,12,0,1,1-12-12A12,12,0,0,1,180,188Z"/>',
+ 'chart-bar':'<path d="M208,40V208H152V40Z" class="d" opacity="0.2"/><path d="M224,200h-8V40a8,8,0,0,0-8-8H152a8,8,0,0,0-8,8V80H96a8,8,0,0,0-8,8v40H48a8,8,0,0,0-8,8v64H32a8,8,0,0,0,0,16H224a8,8,0,0,0,0-16ZM160,48h40V200H160ZM104,96h40V200H104ZM56,144H88v56H56Z"/>',
+ 'chat-circle-text':'<path d="M224,128A96,96,0,0,1,79.93,211.11h0L42.54,223.58a8,8,0,0,1-10.12-10.12l12.47-37.39h0A96,96,0,1,1,224,128Z" class="d" opacity="0.2"/><path d="M128,24A104,104,0,0,0,36.18,176.88L24.83,210.93a16,16,0,0,0,20.24,20.24l34.05-11.35A104,104,0,1,0,128,24Zm0,192a87.87,87.87,0,0,1-44.06-11.81,8,8,0,0,0-4-1.08,7.85,7.85,0,0,0-2.53.42L40,216,52.47,178.6a8,8,0,0,0-.66-6.54A88,88,0,1,1,128,216Zm40-104a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,112Zm0,32a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,144Z"/>',
+ 'check':'<path d="M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z"/>',
+ 'export':'<path d="M208,104V216H48V104Z" class="d" opacity="0.2"/><path d="M216,112v96a16,16,0,0,1-16,16H56a16,16,0,0,1-16-16V112A16,16,0,0,1,56,96H80a8,8,0,0,1,0,16H56v96H200V112H176a8,8,0,0,1,0-16h24A16,16,0,0,1,216,112ZM93.66,69.66,120,43.31V136a8,8,0,0,0,16,0V43.31l26.34,26.35a8,8,0,0,0,11.32-11.32l-40-40a8,8,0,0,0-11.32,0l-40,40A8,8,0,0,0,93.66,69.66Z"/>',
+ 'folder-open':'<path d="M208,88v24H69.77a8,8,0,0,0-7.59,5.47L32,208V64a8,8,0,0,1,8-8H93.33a8,8,0,0,1,4.8,1.6L128,80h72A8,8,0,0,1,208,88Z" class="d" opacity="0.2"/><path d="M245,110.64A16,16,0,0,0,232,104H216V88a16,16,0,0,0-16-16H130.67L102.94,51.2a16.14,16.14,0,0,0-9.6-3.2H40A16,16,0,0,0,24,64V208a8,8,0,0,0,8,8H211.1a8,8,0,0,0,7.59-5.47l28.49-85.47A16.05,16.05,0,0,0,245,110.64ZM93.34,64,123.2,86.4A8,8,0,0,0,128,88h72v16H69.77a16,16,0,0,0-15.18,10.94L40,158.7V64Zm112,136H43.1l26.67-80H232Z"/>',
+ 'game-controller':'<path d="M216.86,207.57a28,28,0,0,1-24.66-7.77L150.09,152H172a51.94,51.94,0,0,0,51.2-61h0l16.36,84.17A28,28,0,0,1,216.86,207.57Z" class="d" opacity="0.2"/><path d="M176,112H152a8,8,0,0,1,0-16h24a8,8,0,0,1,0,16ZM104,96H96V88a8,8,0,0,0-16,0v8H72a8,8,0,0,0,0,16h8v8a8,8,0,0,0,16,0v-8h8a8,8,0,0,0,0-16ZM241.48,200.65a36,36,0,0,1-54.94,4.81c-.12-.12-.24-.24-.35-.37L146.48,160h-37L69.81,205.09l-.35.37A36.08,36.08,0,0,1,44,216,36,36,0,0,1,8.56,173.75a.68.68,0,0,1,0-.14L24.93,89.52A59.88,59.88,0,0,1,83.89,40H172a60.08,60.08,0,0,1,59,49.25c0,.06,0,.12,0,.18l16.37,84.17a.68.68,0,0,1,0,.14A35.74,35.74,0,0,1,241.48,200.65ZM172,144a44,44,0,0,0,0-88H83.89A43.9,43.9,0,0,0,40.68,92.37l0,.13L24.3,176.59A20,20,0,0,0,58,194.3l41.92-47.59a8,8,0,0,1,6-2.71Zm59.7,32.59-8.74-45A60,60,0,0,1,172,160h-4.2L198,194.31a20.09,20.09,0,0,0,17.46,5.39,20,20,0,0,0,16.23-23.11Z"/>',
+ 'graduation-cap':'<path d="M216,113.07v53.22a8,8,0,0,1-2,5.31c-11.3,12.59-38.9,36.4-86,36.4s-74.68-23.81-86-36.4a8,8,0,0,1-2-5.31V113.07L128,160Z" class="d" opacity="0.2"/><path d="M251.76,88.94l-120-64a8,8,0,0,0-7.52,0l-120,64a8,8,0,0,0,0,14.12L32,117.87v48.42a15.91,15.91,0,0,0,4.06,10.65C49.16,191.53,78.51,216,128,216a130,130,0,0,0,48-8.76V240a8,8,0,0,0,16,0V199.51a115.63,115.63,0,0,0,27.94-22.57A15.91,15.91,0,0,0,224,166.29V117.87l27.76-14.81a8,8,0,0,0,0-14.12ZM128,200c-43.27,0-68.72-21.14-80-33.71V126.4l76.24,40.66a8,8,0,0,0,7.52,0L176,143.47v46.34C163.4,195.69,147.52,200,128,200Zm80-33.75a97.83,97.83,0,0,1-16,14.25V134.93l16-8.53ZM188,118.94l-.22-.13-56-29.87a8,8,0,0,0-7.52,14.12L171,128l-43,22.93L25,96,128,41.07,231,96Z"/>',
+ 'keyboard':'<path d="M232,64V192a8,8,0,0,1-8,8H32a8,8,0,0,1-8-8V64a8,8,0,0,1,8-8H224A8,8,0,0,1,232,64Z" class="d" opacity="0.2"/><path d="M224,48H32A16,16,0,0,0,16,64V192a16,16,0,0,0,16,16H224a16,16,0,0,0,16-16V64A16,16,0,0,0,224,48Zm0,144H32V64H224V192Zm-16-64a8,8,0,0,1-8,8H56a8,8,0,0,1,0-16H200A8,8,0,0,1,208,128Zm0-32a8,8,0,0,1-8,8H56a8,8,0,0,1,0-16H200A8,8,0,0,1,208,96ZM72,160a8,8,0,0,1-8,8H56a8,8,0,0,1,0-16h8A8,8,0,0,1,72,160Zm96,0a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,160Zm40,0a8,8,0,0,1-8,8h-8a8,8,0,0,1,0-16h8A8,8,0,0,1,208,160Z"/>',
+ 'lightbulb':'<path d="M208,104a79.86,79.86,0,0,1-30.59,62.92A24.29,24.29,0,0,0,168,186v6a8,8,0,0,1-8,8H96a8,8,0,0,1-8-8v-6a24.11,24.11,0,0,0-9.3-19A79.87,79.87,0,0,1,48,104.45C47.76,61.09,82.72,25,126.07,24A80,80,0,0,1,208,104Z" class="d" opacity="0.2"/><path d="M176,232a8,8,0,0,1-8,8H88a8,8,0,0,1,0-16h80A8,8,0,0,1,176,232Zm40-128a87.55,87.55,0,0,1-33.64,69.21A16.24,16.24,0,0,0,176,186v6a16,16,0,0,1-16,16H96a16,16,0,0,1-16-16v-6a16,16,0,0,0-6.23-12.66A87.59,87.59,0,0,1,40,104.49C39.74,56.83,78.26,17.14,125.88,16A88,88,0,0,1,216,104Zm-16,0a72,72,0,0,0-73.74-72c-39,.92-70.47,33.39-70.26,72.39a71.65,71.65,0,0,0,27.64,56.3A32,32,0,0,1,96,186v6h64v-6a32.15,32.15,0,0,1,12.47-25.35A71.65,71.65,0,0,0,200,104Zm-16.11-9.34a57.6,57.6,0,0,0-46.56-46.55,8,8,0,0,0-2.66,15.78c16.57,2.79,30.63,16.85,33.44,33.45A8,8,0,0,0,176,104a9,9,0,0,0,1.35-.11A8,8,0,0,0,183.89,94.66Z"/>',
+ 'plant':'<path d="M138.54,149.46C106.62,96.25,149.18,43.05,239.63,48.37,245,138.82,191.75,181.39,138.54,149.46ZM16.26,88.26c-3.8,64.61,34.21,95,72.21,72.21C111.27,122.47,80.87,84.46,16.26,88.26Z" class="d" opacity="0.2"/><path d="M247.63,47.89a8,8,0,0,0-7.52-7.52c-51.76-3-93.32,12.74-111.18,42.22-11.8,19.48-11.78,43.16-.16,65.74a71.37,71.37,0,0,0-14.17,26.95L98.33,159c7.82-16.33,7.52-33.36-1-47.49C84.09,89.73,53.62,78,15.79,80.27a8,8,0,0,0-7.52,7.52c-2.23,37.83,9.46,68.3,31.25,81.5A45.82,45.82,0,0,0,63.44,176,54.58,54.58,0,0,0,87,170.33l25,25V224a8,8,0,0,0,16,0V194.51a55.61,55.61,0,0,1,12.27-35,73.91,73.91,0,0,0,33.31,8.4,60.9,60.9,0,0,0,31.83-8.86C234.89,141.21,250.67,99.65,247.63,47.89ZM86.06,146.74l-24.41-24.4a8,8,0,0,0-11.31,11.31l24.41,24.41c-9.61,3.18-18.93,2.39-26.94-2.46C32.47,146.31,23.79,124.32,24,96c28.31-.25,50.31,8.47,59.6,23.81C88.45,127.82,89.24,137.14,86.06,146.74Zm111.06-1.36c-13.4,8.11-29.15,8.73-45.15,2l53.69-53.7a8,8,0,0,0-11.31-11.32L140.65,136c-6.76-16-6.15-31.76,2-45.15,13.94-23,47-35.8,89.33-34.83C232.94,98.34,220.14,131.44,197.12,145.38Z"/>',
+ 'ranking':'<path d="M40,96H88V208H32V104A8,8,0,0,1,40,96Zm176,40H168v72h56V144A8,8,0,0,0,216,136Z" class="d" opacity="0.2"/><path d="M112.41,102.53a8,8,0,0,1,5.06-10.12l12-4A8,8,0,0,1,140,96v40a8,8,0,0,1-16,0V107.1l-1.47.49A8,8,0,0,1,112.41,102.53ZM248,208a8,8,0,0,1-8,8H16a8,8,0,0,1,0-16h8V104A16,16,0,0,1,40,88H80V56A16,16,0,0,1,96,40h64a16,16,0,0,1,16,16v72h40a16,16,0,0,1,16,16v56h8A8,8,0,0,1,248,208Zm-72-64v56h40V144ZM96,200h64V56H96Zm-56,0H80V104H40Z"/>',
+ 'repeat':'<path d="M224,64v64a64,64,0,0,1-64,64H32V128A64,64,0,0,1,96,64Z" class="d" opacity="0.2"/><path d="M24,128A72.08,72.08,0,0,1,96,56H204.69L194.34,45.66a8,8,0,0,1,11.32-11.32l24,24a8,8,0,0,1,0,11.32l-24,24a8,8,0,0,1-11.32-11.32L204.69,72H96a56.06,56.06,0,0,0-56,56,8,8,0,0,1-16,0Zm200-8a8,8,0,0,0-8,8,56.06,56.06,0,0,1-56,56H51.31l10.35-10.34a8,8,0,0,0-11.32-11.32l-24,24a8,8,0,0,0,0,11.32l24,24a8,8,0,0,0,11.32-11.32L51.31,200H160a72.08,72.08,0,0,0,72-72A8,8,0,0,0,224,120Z"/>',
+ 'robot':'<path d="M200,56H56A24,24,0,0,0,32,80V192a24,24,0,0,0,24,24H200a24,24,0,0,0,24-24V80A24,24,0,0,0,200,56ZM164,184H92a20,20,0,0,1,0-40h72a20,20,0,0,1,0,40Z" class="d" opacity="0.2"/><path d="M200,48H136V16a8,8,0,0,0-16,0V48H56A32,32,0,0,0,24,80V192a32,32,0,0,0,32,32H200a32,32,0,0,0,32-32V80A32,32,0,0,0,200,48Zm16,144a16,16,0,0,1-16,16H56a16,16,0,0,1-16-16V80A16,16,0,0,1,56,64H200a16,16,0,0,1,16,16ZM72,108a12,12,0,1,1,12,12A12,12,0,0,1,72,108Zm88,0a12,12,0,1,1,12,12A12,12,0,0,1,160,108Zm4,28H92a28,28,0,0,0,0,56h72a28,28,0,0,0,0-56Zm-24,16v24H116V152ZM80,164a12,12,0,0,1,12-12h8v24H92A12,12,0,0,1,80,164Zm84,12h-8V152h8a12,12,0,0,1,0,24Z"/>',
+ 'sword':'<path d="M141.66,201,129,213.66a8,8,0,0,1-11.32,0L92,188,58.35,221.66a8,8,0,0,1-11.32,0L34.34,209a8,8,0,0,1,0-11.31L68,164,42.34,138.36a8,8,0,0,1,0-11.32L55,114.34a8,8,0,0,1,11.32,0l75.3,75.3A8,8,0,0,1,141.66,201Z" class="d" opacity="0.2"/><path d="M216,32H152a8,8,0,0,0-6.34,3.12l-64,83.21L72,108.69a16,16,0,0,0-22.64,0l-12.69,12.7a16,16,0,0,0,0,22.63l20,20-28,28a16,16,0,0,0,0,22.63l12.69,12.68a16,16,0,0,0,22.62,0l28-28,20,20a16,16,0,0,0,22.64,0l12.69-12.7a16,16,0,0,0,0-22.63l-9.64-9.64,83.21-64A8,8,0,0,0,224,104V40A8,8,0,0,0,216,32ZM52.69,216,40,203.32l28-28L80.68,188Zm70.61-8L48,132.71,60.7,120,136,195.31ZM208,100.06l-81.74,62.88L115.32,152l50.34-50.34a8,8,0,0,0-11.32-11.31L104,140.68,93.07,129.74,155.94,48H208Z"/>'};
+function phi(n,cls){return'<svg class="phi'+(cls?' '+cls:'')+'" viewBox="0 0 256 256" width="24" height="24" fill="currentColor" aria-hidden="true" focusable="false">'+PH[n]+'</svg>'}
 function ico(n,cls){return'<svg class="'+(cls||'')+'" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">'+IC[n]+'</svg>'}
 /* знак приложения: тот же наклонный шестиугольник-остров, что и на Пути */
 
@@ -68,12 +87,14 @@ function bindHead(re){
   if(window.IntersectionObserver)new IntersectionObserver(function(e){document.documentElement.classList.toggle('scr',!e[0].isIntersecting)}).observe(m)})();
 
 /* --- серия, заморозки, уровень --- */
+/* U1-12: галочка дня серии — значок check из Phosphor (bold), без символа ✓ из шрифта */
+var WCHK=phi('check','wck');
 function weekRow(mode){
   var w=wkStart(),t=day(new Date()),nm=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'],h='<div class="wk" role="list" aria-label="Эта неделя">';
   for(var i=0;i<7;i++){
     var d=dadd(w,i),a=S.hist[d]&&S.hist[d].les>0,fz=S.fz.u.indexOf(d)>=0&&!a,g=!!S.gm[d],cl,ic,st;
-    if(mode==='g'){cl=g?'on':(d>t?'fu':'');ic=g?'✓':'';st=g?'цель выполнена':'нет'}
-    else{cl=a?'on':fz?'fz':(d>t?'fu':'');ic=a?'✓':fz?'❄️':'';st=a?'занимался':fz?'заморозка':'нет'}
+    if(mode==='g'){cl=g?'on':(d>t?'fu':'');ic=g?WCHK:'';st=g?'цель выполнена':'нет'}
+    else{cl=a?'on':fz?'fz':(d>t?'fu':'');ic=a?WCHK:fz?'❄️':'';st=a?'занимался':fz?'заморозка':'нет'}
     h+='<div class="wd '+cl+(d===t?' td':'')+'" role="listitem" aria-label="'+nm[i]+': '+st+'"><span aria-hidden="true">'+nm[i]+'</span><i aria-hidden="true">'+ic+'</i></div>'}
   return h+'</div>'}
 function fzLeft(){return 15-S.fz.p}
@@ -241,9 +262,8 @@ function burrow(o,side){
 function hole(i){HOLE=i;curOnce(function(){hole0(i)})}
 function hole0(i){BACK=home;fzApply();
   var t=TOPICS[i],p=holePar(i),n=ni(i),c=0;for(var j=0;j<n;j++)if(S.d[i+'-'+j])c++;
-  var pn=0;for(var x=0;x<=p;x++)if(!TOPICS[x].intro&&!TOPICS[x].opt)pn++;
   var h='<div class="top ls"><button class="icon" id="x" aria-label="Назад на Путь">'+ico('back')+'</button><h1>'+esc(holeName(t))+'</h1></div>'+
-   '<section class="topic hole" aria-label="'+esc('Доп. глава: '+t.n)+'"><div class="hhd'+(c===n?' dn':'')+'"><span class="nwr">'+burrowSvg()+'</span><h2>'+esc(t.n)+'</h2><p class="mu">'+esc(t.s||'')+'</p><p class="hnt">Доп. глава по желанию, открывается после островка «'+esc(p>=0?IT(p,holeAt(i)).n||'':'')+'» темы '+pn+'. В счёт тем не входит, опыт за островки начисляется как обычно.</p><div class="hpr"><div class="ring" style="--p:'+Math.round(c/Math.max(1,n)*100)+'" role="img" aria-label="Пройдено '+c+' из '+n+'"><span>'+c+'/'+n+'</span></div><span>'+(c===n?'Глава пройдена':c?'Пройдено '+c+' из '+n:'Ещё не начата')+'</span></div></div>'+
+   '<section class="topic hole" aria-label="'+esc('Доп. глава: '+t.n)+'"><div class="hhd'+(c===n?' dn':'')+'"><span class="nwr">'+burrowSvg()+'</span><h2>'+esc(t.n)+'</h2><p class="mu">'+esc(t.s||'')+'</p><p class="hnt">Доп. глава по желанию: открыта всегда, заходи, когда интересно. В счёт тем не входит, опыт за островки начисляется как обычно.</p><div class="hpr"><div class="ring" style="--p:'+Math.round(c/Math.max(1,n)*100)+'" role="img" aria-label="Пройдено '+c+' из '+n+'"><span>'+c+'/'+n+'</span></div><span>'+(c===n?'Глава пройдена':c?'Пройдено '+c+' из '+n:'Ещё не начата')+'</span></div></div>'+
    '<div class="path'+(RM()?'':' stg')+'" data-i="'+i+'">';
   for(var j2=0;j2<n;j2++)h+=island(i,j2,j2);
   scr('hole',h+'</div></section>','home');links();
@@ -475,10 +495,139 @@ function fdOpen(btn){
   },RM()?0:230)}
 
 /* --- профиль --- */
-function goalSheet(){
-  var m=modal('<h2>Цель дня</h2><p class="mu">Сколько островков проходить в день. Выполни цель в 5 днях недели и получи +50 ⭐.</p>'+SG('goal',[[1,'1 островок'],[2,'2'],[3,'3']],S.goal),[['Готово',function(){KEEPSCR=1;SKEY='profile';var y=window.scrollY;profile();window.scrollTo(0,y)}]]);
-  segInit(m);
-  m.querySelectorAll('.segc button').forEach(function(b){b.onclick=function(){var g=b.parentNode;g.querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x===b)});setSet('goal',b.dataset.v);snd('click');segPos(g,true)}})}
+/* U1-13: кроличьи норы — сколько пройдено целиком (в профиле и в «Поделиться» — только когда пройдена хотя бы одна) */
+function HN(){return TOPICS.filter(function(t){return t.opt}).length}
+function HD(){return TOPICS.filter(function(t,i){if(!t.opt||!ni(i))return false;for(var j=0;j<ni(i);j++)if(!S.d[i+'-'+j])return false;return true}).length}
+function shareTxt(){var n=ND(),h=HD(),s=streakNow();return'Я учу Python в ИТП! Уже '+G('прошёл','прошла','пройдено')+' '+n+' '+pl(n,['тему','темы','тем'])+(h?' и '+h+' '+pl(h,['кроличью нору','кроличьи норы','кроличьих нор'])+' из '+HN():'')+(s?', '+s+' '+pl(s,['день','дня','дней'])+' подряд':'')+', '+S.xp+' XP. Попробуй и ты!'}
+/* --- U1-7: «Что ты уже умеешь» — шкала курса как в Duolingo. Очки — пройденные островки (и в норах тоже, вступление не в счёт);
+   веха — конец темы: её порог равен числу островков основного курса до неё включительно --- */
+/* значки вех — из того же набора Phosphor (duotone) */
+var SKI={sprout:'plant',msg:'chat-circle-text',kbd:'keyboard',calc:'calculator',loop:'repeat',list:'address-book',fn:'game-controller',file:'folder-open',sort:'ranking',box:'sword',chart:'chart-bar',bot:'robot',cap:'graduation-cap'};
+function ski(k){return phi(SKI[k])}
+/* знак-остров: тот же наклонный шестиугольник, что на Пути, плоский, в цвет акцента */
+var SKHX='<svg class="skx" viewBox="6 10 80 56" aria-hidden="true" focusable="false"><path class="s" d="M9 34 L27 54 L65 54 L83 34 L83 44 L65 64 L27 64 L9 44 Z"/><path d="M9 34 L27 14 L65 14 L83 34 L65 54 L27 54 Z"/></svg>';
+/* вехи как в Duolingo: короткое действие из жизни, которое уже по силам; can — то же для реплики «Значит, ты уже можешь…» */
+var SKL=[['','sprout','Начинаем',''],
+ ['Начало знакомства','msg','Напиши первую программу','написать свою программу'],
+ ['Переменные и ввод','kbd','Поговори с программой','научить программу задавать вопросы'],
+ ['Условия','calc','Сделай калькулятор','сделать свой калькулятор'],
+ ['Циклы в циклах','loop','Нарисуй узор','рисовать узоры кодом'],
+ ['Словари и множества','list','Собери телефонную книгу','собрать свою телефонную книгу'],
+ ['Гибкие функции','fn','Напиши мини-игру','написать мини-игру'],
+ ['Файлы и форматы данных','file','Разбери файлы с данными','работать с файлами'],
+ ['Поиск и сортировка','sort','Отсортируй рекорды','отсортировать таблицу рекордов'],
+ ['Наследование','box','Опиши героя игры','описать героя игры классом'],
+ ['Таблицы данных','chart','Найди закономерность в данных','разбирать таблицы с данными'],
+ ['Запросы к серверам','bot','Сделай бота','сделать своего бота'],
+ ['Итоговые проекты','cap','Курс пройден','сделать свой проект от идеи до программы']];
+function skPts(){var n=0;TOPICS.forEach(function(t,i){if(t.intro)return;for(var j=0;j<ni(i);j++)if(S.d[i+'-'+j]||(!t.opt&&i<S.start))n++});return n}
+function skList(){var c=0,th={};TOPICS.forEach(function(t,i){if(t.intro||t.opt)return;c+=ni(i);th[t.n]=c});
+  return SKL.map(function(m){return{t:m[0]?th[m[0]]:0,e:m[1],n:m[2],c:m[3]}}).filter(function(m){return m.t!==undefined})}
+function skNow(){var p=skPts(),L=skList(),k=0;L.forEach(function(m,i){if(p>=m.t)k=i});return{p:p,L:L,k:k}}
+/* U1-7: новое умение — окно после итога островка (как в Duolingo «теперь ты можешь…») с переходом на страницу.
+   S.skk — последнее показанное; -1 у старых сохранений: тогда запоминаем текущее молча, без окна за прошлое */
+function skNew(){var k=skNow().k;if(S.skk<0){S.skk=k;save();return false}return k>S.skk}
+function skPop(then){
+  var s=skNow(),m=s.L[s.k];S.skk=s.k;save();
+  var o=modal('<div class="skm"><span class="skd" aria-hidden="true">'+ski(m.e)+'</span><p class="skr">Новое умение</p><h2>'+esc(m.n)+'</h2>'+rbSay('Теперь ты можешь '+esc(m.c)+'!')+'</div>',
+   [['Посмотреть прогресс',function(){var f=then;then=null;setTimeout(function(){skills(f)},RM()?0:200)}],['Поделиться',function(){skShare();return false},1],['Дальше',null,1]]);
+  var rm=o.remove;o.remove=function(){rm.call(o);if(then){var f=then;then=null;setTimeout(f,RM()?0:200)}};
+  snd('ach');return o}
+/* реплика кролика: голова без подложки и пузырь с хвостиком, как у персонажей Duolingo */
+function rbSay(t){var hd=IMG.wowhead||IMG.eat;return'<div class="gsay">'+(hd?'<img class="gav" src="'+hd+'" alt="" draggable="false">':'')+'<p>'+t+'</p></div>'}
+/* back — куда вернуться: в настройки (по умолчанию) или дальше по пути из окна нового умения */
+/* U1-7: картинка «Я могу…» для «Поделиться». Без кролика и островка: логотип Python рядом с числом (как флаг у Duolingo),
+   крупно «Я могу …!», а внизу — окно редактора с маленькой программой, которая и есть это умение, и её вывод.
+   Логотип Python — товарный знак Python Software Foundation, используется без изменений, чтобы назвать язык (правила PSF это разрешают) */
+var PYLOGO='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0.21 -0.077 110 110"><linearGradient id="a" gradientUnits="userSpaceOnUse" x1="63.8159" y1="56.6829" x2="118.4934" y2="1.8225" gradientTransform="matrix(1 0 0 -1 -53.2974 66.4321)"><stop offset="0" stop-color="#387EB8"/><stop offset="1" stop-color="#366994"/></linearGradient><path fill="url(#a)" d="M55.023-0.077c-25.971,0-26.25,10.081-26.25,12.156c0,3.148,0,12.594,0,12.594h26.75v3.781c0,0-27.852,0-37.375,0c-7.949,0-17.938,4.833-17.938,26.25c0,19.673,7.792,27.281,15.656,27.281c2.335,0,9.344,0,9.344,0s0-9.765,0-13.125c0-5.491,2.721-15.656,15.406-15.656c15.91,0,19.971,0,26.531,0c3.902,0,14.906-1.696,14.906-14.406c0-13.452,0-17.89,0-24.219C82.054,11.426,81.515-0.077,55.023-0.077z M40.273,8.392c2.662,0,4.813,2.150,4.813,4.813c0,2.661-2.151,4.813-4.813,4.813s-4.813-2.151-4.813-4.813C35.46,10.542,37.611,8.392,40.273,8.392z"/><linearGradient id="b" gradientUnits="userSpaceOnUse" x1="97.0444" y1="21.6321" x2="155.6665" y2="-34.5308" gradientTransform="matrix(1 0 0 -1 -53.2974 66.4321)"><stop offset="0" stop-color="#FFE052"/><stop offset="1" stop-color="#FFC331"/></linearGradient><path fill="url(#b)" d="M55.397,109.923c25.959,0,26.282-10.271,26.282-12.156c0-3.148,0-12.594,0-12.594H54.897v-3.781c0,0,28.032,0,37.375,0c8.009,0,17.938-4.954,17.938-26.25c0-23.322-10.538-27.281-15.656-27.281c-2.336,0-9.344,0-9.344,0s0,10.216,0,13.125c0,5.491-2.631,15.656-15.406,15.656c-15.91,0-19.476,0-26.532,0c-3.892,0-14.906,1.896-14.906,14.406c0,14.475,0,18.265,0,24.219C28.366,100.497,31.562,109.923,55.397,109.923z M70.148,101.454c-2.662,0-4.813-2.151-4.813-4.813s2.150-4.813,4.813-4.813c2.661,0,4.813,2.151,4.813,4.813S72.809,101.454,70.148,101.454z"/></svg>';
+/* у каждой вехи — своя маленькая программа и её вывод */
+var SKCODE={msg:['print("Привет, мир!")','Привет, мир!'],
+ kbd:['name = input("Как тебя зовут? ")\nprint("Привет,", name)','Как тебя зовут? Влад\nПривет, Влад'],
+ calc:['a = float(input())\nb = float(input())\nprint(a * b)','2.5\n4\n10.0'],
+ loop:['for i in range(1, 5):\n    print("*" * i)','*\n**\n***\n****'],
+ list:['book = {"Аня": "555-01"}\nbook["Макс"] = "555-02"\nprint(book["Макс"])','555-02'],
+ fn:['import random\n\ndef roll():\n    return random.randint(1, 6)\n\nprint("Выпало:", roll())','Выпало: 5'],
+ file:['with open("scores.csv") as f:\n    for line in f:\n        print(line.strip())','Аня,97\nМакс,85'],
+ sort:['scores = [42, 97, 65, 88]\nscores.sort(reverse=True)\nprint(scores[:3])','[97, 88, 65]'],
+ box:['class Hero:\n    def __init__(self, name):\n        self.name = name\n        self.hp = 100\n\nprint(Hero("Ви").hp)','100'],
+ chart:['import pandas as pd\n\ndf = pd.read_csv("games.csv")\nprint(df["score"].mean())','78.4'],
+ bot:['import requests\n\nr = requests.get(URL)\nprint(r.json()["temp"])','-3'],
+ cap:['project = Project("мой бот")\nproject.build()\nproject.share()','Готово!']};
+var SKBG={'':['#0B2E09','#1F6516','#43A034'],carrot:['#4A2302','#B65E08','#F08C1A'],pink:['#3E0A1B','#952746','#D9557A'],blue:['#081A44','#1A479A','#3B7BE6'],violet:['#170D3D','#4E31A8','#7E62E8']};
+function skImg(cb,vr){
+  var s=skNow(),m=s.L[s.k],W=1080,H=1920,cv=document.createElement('canvas');cv.width=W;cv.height=H;
+  var g=cv.getContext('2d'),F='Nunito,system-ui,-apple-system,"Segoe UI",sans-serif',MF='"Cascadia Code","Cascadia Mono",Consolas,ui-monospace,monospace',C=SKBG[ST('acc')]||SKBG[''],cd=SKCODE[m.e]||SKCODE.msg;cd=[cd[0],cd[1].replace(/Влад/g,String(S.nick||'Влад').slice(0,14))];
+  function star(x,y,r,a){g.save();g.globalAlpha=a;var gl=g.createRadialGradient(x,y,0,x,y,r*1.6);gl.addColorStop(0,'rgba(255,255,255,.45)');gl.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=gl;g.beginPath();g.arc(x,y,r*1.6,0,6.283);g.fill();
+    g.fillStyle='#fff';g.beginPath();g.moveTo(x,y-r);g.quadraticCurveTo(x,y,x+r*.38,y);g.quadraticCurveTo(x,y,x,y+r);g.quadraticCurveTo(x,y,x-r*.38,y);g.quadraticCurveTo(x,y,x,y-r);g.fill();g.restore()}
+  function rr(x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
+  function wrap(t,mw){var w=t.split(' '),L=[],c='';w.forEach(function(x){var n=c?c+' '+x:x;if(g.measureText(n).width>mw&&c){L.push(c);c=x}else c=n});if(c)L.push(c);return L}
+  /* подсветка: те же роли, что в редакторе ИТП — ключевые слова, строки, числа, вызовы, комментарии */
+  var KW=/^(def|class|return|for|in|if|elif|else|import|from|as|with|while|True|False|None|and|or|not|print)$/;
+  function line(t,x,y){var re=/(#.*$)|("[^"]*"|'[^']*')|(\b\d+(?:\.\d+)?\b)|([A-Za-z_]\w*)|(\s+)|([^\sA-Za-z_\d"'#]+)/g,mm;
+    while((mm=re.exec(t))){var tx=mm[0],col='#E6E1D8';
+      if(mm[1])col='#7F8794';else if(mm[2])col='#A8DC76';else if(mm[3])col='#F5A35C';
+      else if(mm[4]){col=tx==='print'?'#E68BD8':KW.test(tx)?'#C99BFF':t.slice(re.lastIndex).trimStart().charAt(0)==='('?'#7EB8FF':'#E6E1D8'}else if(mm[6])col='#9AA3AF';
+      g.fillStyle=col;g.fillText(tx,x,y);x+=g.measureText(tx).width}}
+  function draw(logo){
+    /* фон: тёмный тон акента сверху, светлее к низу; мягкое свечение за окном кода */
+    var bg=g.createLinearGradient(0,0,W*.3,H);bg.addColorStop(0,C[0]);bg.addColorStop(.55,C[1]);bg.addColorStop(1,C[2]);g.fillStyle=bg;g.fillRect(0,0,W,H);
+    var gw=g.createRadialGradient(W*.5,H*.74,60,W*.5,H*.74,760);gw.addColorStop(0,'rgba(255,255,255,.22)');gw.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=gw;g.fillRect(0,0,W,H);
+    /* знаки кода, рассыпанные по фону, как конфетти */
+    g.save();g.fillStyle='rgba(255,255,255,.07)';g.font='800 120px '+MF;g.textAlign='center';[['{ }',150,330,-12],['( )',930,300,10],[':',990,760,0],['#',90,820,-8],['[ ]',940,1090,8],['=',120,1180,0],['"',980,1500,-6]].forEach(function(q){g.save();g.translate(q[1],q[2]);g.rotate(q[3]*Math.PI/180);g.fillText(q[0],0,0);g.restore()});g.restore();
+    /* шапка */
+    g.textBaseline='alphabetic';g.textAlign='left';g.fillStyle='#fff';g.font='900 72px '+F;g.fillText('ИТП',96,170);
+    g.font='700 28px '+F;g.fillStyle='rgba(255,255,255,.62)';g.fillText('И так, программирование',98,212);
+    g.textAlign='right';g.font='800 30px '+F;g.fillStyle='rgba(255,255,255,.7)';g.fillText('ЧТО Я УМЕЮ',W-96,166);
+    /* раскладка: логотип с числом, подпись, «Я могу…», окно кода — одной группой по центру между шапкой и низом */
+    var code=cd[0].split('\n'),out=cd[1].split('\n'),lh=64,pw=W-150,ph=112+code.length*lh+40+out.length*lh+26;
+    g.font='900 88px '+F;var L=wrap('Я могу '+m.c+'!',W-160),tot=250+70+L.length*106+90+ph,y0=290+Math.max(0,(H-170-290-tot)/2);
+    var yc=y0+90,ls=170;g.font='900 200px '+F;var num=String(s.p),nw=g.measureText(num).width,x0=(W-(ls+44+nw))/2;
+    if(logo){g.save();g.shadowColor='rgba(0,0,0,.28)';g.shadowBlur=30;g.shadowOffsetY=10;g.drawImage(logo,x0,yc-ls/2-8,ls,ls);g.restore()}
+    g.textAlign='left';g.fillStyle='#fff';g.fillText(num,x0+ls+44,yc+70);
+    g.textAlign='center';g.font='800 38px '+F;g.fillStyle='rgba(255,255,255,.72)';g.fillText(pl(s.p,['островок пройден','островка пройдено','островков пройдено'])+' на Python',W/2,yc+168);
+    g.font='900 88px '+F;g.fillStyle='#fff';var hy=y0+250+70+64;L.forEach(function(l,i){g.fillText(l,W/2,hy+i*106)});
+    var top=hy+(L.length-1)*106+40+90;
+    g.save();g.translate(W/2,top+ph/2);g.rotate(-3*Math.PI/180);g.translate(-pw/2,-ph/2);
+    g.shadowColor='rgba(0,0,0,.42)';g.shadowBlur=64;g.shadowOffsetY=26;rr(0,0,pw,ph,38);g.fillStyle='#16181C';g.fill();g.shadowColor='transparent';
+    g.strokeStyle='rgba(255,255,255,.1)';g.lineWidth=2;rr(1,1,pw-2,ph-2,37);g.stroke();
+    /* заголовок окна: маленький логотип и имя файла */
+    if(logo)g.drawImage(logo,42,30,42,42);g.font='700 32px '+F;g.fillStyle='rgba(255,255,255,.55)';g.textAlign='left';g.fillText('skill.py',98,63);
+    g.fillStyle='rgba(255,255,255,.08)';g.fillRect(0,98,pw,2);
+    g.font='600 40px '+MF;code.forEach(function(l,i){var y=98+60+i*lh;g.fillStyle='rgba(255,255,255,.25)';g.textAlign='right';g.fillText(String(i+1),80,y);g.textAlign='left';line(l,112,y)});
+    var oy=98+24+code.length*lh;g.save();rr(0,0,pw,ph,38);g.clip();g.fillStyle='rgba(255,255,255,.05)';g.fillRect(0,oy,pw,ph-oy);g.restore();g.fillStyle='rgba(255,255,255,.08)';g.fillRect(0,oy,pw,2);
+    g.font='600 38px '+MF;out.forEach(function(l,i){g.fillStyle='#E6E1D8';g.fillText(l,112,oy+58+i*lh)});g.fillStyle='#7CD06A';g.fillText('›',62,oy+58);
+    g.restore();
+    star(110,top-30,38,.9);star(985,top-80,30,.85);star(990,1830,46,.9);star(70,1790,24,.7);star(880,y0-20,18,.6);
+    cb(cv)}
+  var im=new Image();
+  (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(function(){im.onload=function(){draw(im)};im.onerror=function(){draw(null)};im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(PYLOGO)})}
+/* «Поделиться умением» — как в Duolingo: картинка крупно на затемнённом размытом фоне, сверху крестик, снизу «Сохранить» и «Отправить».
+   Закрывается крестиком, Esc, «назад» и нажатием мимо картинки */
+function skShare(){
+  var s=skNow(),m=s.L[s.k],BLOB=null,tx='Я учу Python в ИТП и уже могу '+m.c+'! Пройдено '+s.p+' '+pl(s.p,['островок','островка','островков'])+'.',prev=document.activeElement;
+  var o=document.createElement('div');o.className='shov';o.setAttribute('role','dialog');o.setAttribute('aria-modal','true');o.setAttribute('aria-label','Поделиться умением');
+  o.innerHTML='<button class="icon shx" aria-label="Закрыть">'+ico('x')+'</button><div class="shcard" id="shcard"><i class="shsk" aria-hidden="true"></i></div>'+
+   '<div class="shbt"><button class="btn shs" id="shsv">'+phi('download-simple')+'Сохранить</button>'+(navigator.share?'<button class="btn shs" id="shgo">'+phi('export')+'Отправить</button>':'')+'</div>';
+  document.body.appendChild(o);snd('open');
+  var gone=false;function close(){if(gone)return;gone=true;snd('close');document.removeEventListener('keydown',kd,true);o.classList.add('out');if(prev&&prev.focus)try{prev.focus({preventScroll:true})}catch(e){}setTimeout(function(){o.remove()},RM()?0:200)}
+  function kd(e){if(e.key==='Escape'){e.preventDefault();e.stopPropagation();close()}}
+  document.addEventListener('keydown',kd,true);
+  o.onclick=function(e){if(e.target===o)close()};o.querySelector('.shx').onclick=close;
+  function need(){if(!BLOB){toast('Картинка ещё рисуется');return false}return true}
+  $('shsv').onclick=function(){if(!need())return;saveFile('itp-skill.png',BLOB);ach('share');toast('Картинка сохранена')};
+  if($('shgo'))$('shgo').onclick=function(){if(!need())return;var d={text:tx},f;try{f=new File([BLOB],'itp-skill.png',{type:'image/png'})}catch(e){}if(f&&navigator.canShare&&navigator.canShare({files:[f]}))d.files=[f];
+    navigator.share(d).then(function(){ach('share')}).catch(function(){})};
+  setTimeout(function(){var b=$('shsv');if(b)b.focus({preventScroll:true})},60);
+  skImg(function(cv){var h=$('shcard');if(!h||gone)return;cv.setAttribute('role','img');cv.setAttribute('aria-label','Картинка: я могу '+m.c);h.innerHTML='';h.appendChild(cv);h.classList.add('rdy');cv.toBlob(function(b){BLOB=b},'image/png')})}
+function skills(back){
+  var s=skNow(),L=s.L,m=L[s.k];
+  var h='<div class="top ls"><button class="icon" id="x" aria-label="Назад">'+ico('back')+'</button><h1>Что ты уже умеешь</h1></div><div class="skp">'+
+   '<div class="skh">'+SKHX+'<b>'+s.p+'</b></div><p class="mu skn">'+pl(s.p,['островок пройден','островка пройдено','островков пройдено'])+', норы тоже считаются</p>'+
+   rbSay(s.k?'Значит, ты уже можешь '+esc(m.c)+'!':'Пройди первую тему, и здесь появится, что ты уже можешь')+(s.k?'<button class="btn t skshb" id="sksh">'+phi('export')+'Поделиться</button>':'')+
+   '<h2 class="skov">Прогресс</h2><ol class="skl">'+L.map(function(x,i){var on=s.p>=x.t,nw=i===s.k;return'<li class="'+(on?'on':'')+(nw?' now':'')+(i+1<L.length&&s.p>=L[i+1].t?' fl':'')+'"><span class="skd">'+ski(x.e)+'</span><span class="sktx"><small>'+SKHX+x.t+'</small><b>'+esc(x.n)+'</b></span></li>'}).join('')+'</ol></div>';
+  scr('skills',h);if($('sksh'))$('sksh').onclick=skShare;$('x').onclick=function(){if(typeof back==='function')back();else{SBACK=SBACK||profile;settings()}}}
+/* U1-9: цель дня и цель серии выбираются в одном окне (sgChooser в a_screens.js) */
+function goalSheet(){sgChooser(function(){if(CURTAB!=='prof')return;KEEPSCR=1;SKEY='profile';var y=window.scrollY;profile();window.scrollTo(0,y)})}
 function profile(){BACK=profile;
   var n=ND(),LV=lvlInfo(S.xp),d=goalDone(),g=S.goal,gp=Math.min(100,Math.round(d/g*100)),f=S.fz,s=streakNow();
   var rows=TOPICS.map(function(t,i){var c=0,l=[];(t.items||[]).forEach(function(x,j){var e=S.es[i+'-'+j]||0;c+=e;if(e>0)l.push({j:j,n:x.n,e:e,ic:ity(x)[1]})});return{i:i,n:t.n,c:c,l:l}}).filter(function(r){return r.c>0}).sort(function(a,b){return b.c-a.c});
@@ -486,8 +635,8 @@ function profile(){BACK=profile;
   function erow(r,k){return'<div class="eg2"'+(k>=EM?' hidden':'')+'><div class="erow"><span>'+esc(r.n)+'</span><b aria-label="ошибок: '+r.c+'">'+r.c+'</b></div><div class="elist">'+r.l.map(function(x){return'<button class="elink" data-i="'+r.i+'" data-j="'+x.j+'"><span class="et">'+x.ic+'&nbsp;'+esc(x.n)+'<small>ошибок: '+x.e+'</small></span><span class="eg">Отработать</span></button>'}).join('')+'</div></div>'}
   scr('profile',head()+'<h1 class="sr-only">Профиль</h1><div class="pf">'+
    '<div class="hero"><div class="pav" aria-hidden="true">'+rabbit('eat')+'</div><div class="hn"><b class="nmx">'+nk(S.nick)+'</b><div class="lvp"><span class="pill">Уровень '+LV.l+'</span><span class="mu">до '+(LV.l+1)+': ещё '+LV.left+' ⭐</span></div><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+LV.p+'" aria-label="Прогресс уровня"><i class="grow" style="width:'+LV.p+'%"></i></div></div></div>'+
-   '<div class="tiles"><button class="tile tbig" id="tst"><span aria-hidden="true">🥕</span><span><b>'+s+'</b><small>'+pl(s,['день','дня','дней'])+' подряд</small></span>'+(f.n?'<i class="fzm" aria-label="заморозок: '+f.n+'">❄️'+f.n+'</i>':'')+'</button><div class="tcol"><div class="tile"><span aria-hidden="true">🏆</span><span><b>'+Math.max(S.max,s)+'</b><small>рекорд серии</small></span></div><button class="tile" id="txp"><span aria-hidden="true">⭐</span><span><b>'+S.xp+'</b><small>опыта</small></span></button><div class="tile"><span aria-hidden="true">📚</span><span><b>'+n+' из '+NT()+'</b><small>тем пройдено</small></span></div></div></div>'+
-   '<section class="psec"><div class="ch2"><b>Цель дня</b><button class="btn t" id="gset">'+g+' '+pl(g,['островок','островка','островков'])+' ›</button></div><div class="psf"><div class="bar gbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+gp+'" aria-label="Цель дня: '+d+' из '+g+'"><i class="grow" style="width:'+gp+'%"></i></div>'+weekRow('g')+'<p class="mu gnote">Цель в 5 днях недели даёт +50 ⭐. Сейчас: '+wkCount()+' из 5.</p></div></section>'+
+   '<div class="tiles"><button class="tile tbig'+(s>=100?' d3':s>=10?' d2':'')+'" id="tst"><span aria-hidden="true">🥕</span><span><b>'+s+'</b><small>'+pl(s,['день','дня','дней'])+' подряд</small></span>'+(f.n?'<i class="fzm" aria-label="заморозок: '+f.n+'">❄️'+f.n+'</i>':'')+'</button><div class="tcol"><div class="tile"><span aria-hidden="true">🏆</span><span><b>'+Math.max(S.max,s)+'</b><small>рекорд серии</small></span></div><button class="tile" id="txp"><span aria-hidden="true">⭐</span><span><b>'+S.xp+'</b><small>опыта</small></span></button><div class="tile"><span aria-hidden="true">📚</span><span><b>'+n+' из '+NT()+'</b><small>тем пройдено</small></span></div>'+(HD()?'<div class="tile"><span aria-hidden="true">🐰</span><span><b>'+HD()+' из '+HN()+'</b><small>нор пройдено</small></span></div>':'')+'</div></div>'+
+   '<section class="psec"><div class="ch2"><b>Цель дня</b><button class="btn t" id="gset">'+g+' '+pl(g,['островок','островка','островков'])+' ›</button></div><div class="psf"><div class="bar gbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+gp+'" aria-label="Цель дня: '+d+' из '+g+'"><i class="grow" style="width:'+gp+'%"></i></div>'+weekRow('g')+(S.sg.n?'<p class="mu gnote">Цель серии: '+Math.min(s,S.sg.n)+' из '+S.sg.n+' '+pl(S.sg.n,['дня','дней','дней'])+' подряд, за неё +'+SGX[S.sg.n]+' ⭐.</p>':'<p class="mu gnote">Цель серии не выбрана. Нажми на цель дня, чтобы выбрать.</p>')+'</div></section>'+
    shelf()+
    '<section class="psec"><div class="ch2"><b>Активность</b></div><div class="psf">'+calHtml()+'</div></section>'+
    (rows.length?'<section class="psec"><div class="ch2"><b>Работа над ошибками</b></div><div class="psf">'+rows.map(erow).join('')+(more?'<button class="btn t emore" id="emr">Показать все темы ('+rows.length+')</button>':'')+'<p class="mu enote">Пройди островок без ошибок, и он исчезнет из списка.</p></div></section>':'')+
@@ -547,7 +696,9 @@ function settings(){
    SR('🔠','Размер кода','',SG('cf',[[13,'S'],[15,'M'],[17,'L'],[19,'XL']],ST('cf')))+
    SR('🔢','Номера строк','',SW('ln',ST('ln')))+
    SR('🧩','Закрывать скобки и кавычки','Сама допишет пару',SW('ac',ST('ac')))+'</div>';
+  var skn=skNow();
   h+='<div class="sec">Профиль и данные</div><div class="lst">'+
+   SR('🌱','Что ты уже умеешь',skn.k?esc(skn.L[skn.k].n)+', '+skn.p+' '+pl(skn.p,['островок','островка','островков']):'Шкала умений курса','','skl')+
    SR('🐰','Никнейм',nk(S.nick),'','nick')+
    SR('🙂','Обращение','Для правильных окончаний в тексте',SG('g',[['m','Парень'],['f','Девушка'],['','Не указывать']],S.g||''))+
    SR('💾','Резервная копия','Сохранить или загрузить прогресс','','bk')+
@@ -566,6 +717,7 @@ function settings(){
   app.querySelectorAll('.lst button.li').forEach(function(b){b.onclick=function(){var a=b.dataset.a;
     if(a==='nick')askName('Никнейм',S.nick,function(n){n=Array.from(n).slice(0,20).join('');if(nkBad(n)){snd('bad');toast('🐰 Так ник назвать нельзя');return false}S.nick=n;save();again();toast('Никнейм изменён')},20);
     else if(a==='bk')backup();
+    else if(a==='skl')skills();
     else if(a==='kb')keys();
     else if(a==='intro'){BACK=function(){settings()};theory(0,0)}
     else if(a==='rs1')modal('<h2>Сбросить оформление?</h2><p>Тема, цвет, размер текста, звук и другие настройки станут как в начале. Прогресс не изменится.</p>',[['Сбросить',function(){themeSwap(function(){S.set=clean({}).set;S.theme='';S.mute=0;save();applyPrefs();emoLoad();again()});toast('Настройки сброшены')},0,1],['Отмена',null,1]]);
