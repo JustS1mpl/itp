@@ -1,6 +1,6 @@
 import re, sys, json, os
 sys.path.insert(0, '.')
-VER = '7.0.0'
+VER = '7.1.0'
 s = open('base43.html', encoding='utf-8').read()
 
 def rep(a, b, n=1):
@@ -186,13 +186,13 @@ rep('g[0]=g[0].replace(/\\B(?=(\\d{3})+(?!\\d))/g,",")', 'g[0]=g[0].replace(/\\B
 exec(open('msgs.py',encoding='utf-8').read())
 # --- вставка ядра и интерфейса
 core = open('v5/a_core.js', encoding='utf-8').read() + '\n' + open('v5/a_sound.js', encoding='utf-8').read() + '\n' + open('v5/a_ui.js', encoding='utf-8').read()
-for extra in ('v5/a_fix.js','v5/a_fix2.js','v5/a_fix3.js','v5/a_fix4.js','v5/a_more.js','v5/a_dev.js','v5/a_img.js','v5/a_mood.js','v5/a_notify.js','v5/a_out.js','v5/a_py.js','v5/a_turtle.js','v5/a_ux.js','v5/a_screens.js','v5/a_boot.js','v5/a_upd.js'):
+for extra in ('v5/a_fix.js','v5/a_fix2.js','v5/a_fix3.js','v5/a_fix4.js','v5/a_more.js','v5/a_dev.js','v5/a_img.js','v5/a_mood.js','v5/a_notify.js','v5/a_out.js','v5/a_py.js','v5/a_turtle.js','v5/a_ux.js','v5/a_screens.js','v5/a_boot.js','v5/a_upd.js','v5/a_launch.js'):
     try: core += '\n' + open(extra, encoding='utf-8').read()
     except FileNotFoundError: pass
 anchor = "seedLit();window.addEventListener('resize',function(){if(app.querySelector('.path'))links()});\napplyTheme();"
 # --- настроения кролика: ликующий прыжок (состояние happy: итоги, курс пройден, карточка «Поделиться»; cheer.webp — новый рисунок 2026-11-02), плачущий cry/cryhead (U2-5) и хмурый: grump — целиком, grumphead — голова (реакция на первую ошибку); по аналогии с wow и wowhead
 import base64 as _mb
-_mood = ''.join("IMG.%s='data:image/webp;base64,%s';\n" % (k, _mb.b64encode(open('assets/mascot/%s.webp' % f, 'rb').read()).decode()) for k, f in (('eat', 'lovecarrot'), ('happy', 'cheer'), ('grumphead', 'grump_head'), ('grump', 'grump'), ('rolled', 'rolled'), ('wow', 'wow'), ('cool', 'cool'), ('wowhead', 'wow_head'), ('cry', 'cry'), ('cryhead', 'cry_head'), ('sleep', 'sleep'), ('angry', 'angry'), ('back', 'back'), ('wink', 'wink'), ('angryhead', 'angry_head')) if os.path.exists('assets/mascot/%s.webp' % f))
+_mood = ''.join("IMG.%s='data:image/webp;base64,%s';\n" % (k, _mb.b64encode(open('assets/mascot/%s.webp' % f, 'rb').read()).decode()) for k, f in (('eat', 'lovecarrot'), ('happy', 'cheer'), ('grumphead', 'grump_head'), ('grump', 'grump'), ('rolled', 'rolled'), ('wow', 'wow'), ('cool', 'cool'), ('wowhead', 'wow_head'), ('cry', 'cry'), ('cryhead', 'cry_head'), ('sleep', 'sleep'), ('angry', 'angry'), ('back', 'back'), ('wink', 'wink'), ('angryhead', 'angry_head'), ('logo', 'logo'), ('wordmark', 'wordmark')) if os.path.exists('assets/mascot/%s.webp' % f))
 # --- тени под лапами кролика — готовыми, посчитанными при сборке (раньше браузер на каждом запуске раскодировал 6 картинок
 #     и перебирал их пиксели, feetOf в a_ui.js). Тот же расчёт: нижний непрозрачный ряд и ширина лап в полосе 6 % над ним
 from PIL import Image as _FI

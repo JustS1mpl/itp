@@ -758,7 +758,7 @@ function settings(){
    SR('💾','Резервная копия','Сохранить или загрузить прогресс','','bk')+
    SR('🧹','Сбросить оформление','Вернуть вид и звук как было','','rs1')+
    SR('🗑️','Сбросить прогресс','Удалит всё, кроме сохранённых кодов и звука','','rs2')+'</div>';
-  h+='<div class="sec">О приложении</div><div class="lst">'+(KBD?SR('⌨️','Горячие клавиши','','','kb'):'')+SR('📖','Прочитать введение','Знакомство с ИТП ещё раз','','intro')+SR('✉️','Связаться с автором',AGM,'','mail')+SR('📜','Условия использования','Бесплатная лицензия, версия '+AGV,'','agr')+SR('🐇','ИТП','«И так, программирование»','<span class="lv" id="egv">'+ITPV+'</span>')+'</div><div style="height:24px"></div>';
+  h+='<div class="sec">О приложении</div><div class="lst">'+(KBD?SR('⌨️','Горячие клавиши','','','kb'):'')+SR('📖','Прочитать введение','Знакомство с ИТП ещё раз','','intro')+SR('📣','Канал ИТП в Telegram','Новые версии и новости · t.me/itpcode','','tg')+SR('✉️','Связаться с автором',AGM,'','mail')+SR('📜','Условия использования','Бесплатная лицензия, версия '+AGV,'','agr')+SR('🐇','ИТП','«И так, программирование»','<span class="lv" id="egv">'+ITPV+'</span>')+'</div><div style="height:24px"></div>';
   scr('settings',h,null);HRE=settings;
   $('x').onclick=function(){(SBACK||profile)()};
   function again(){var yy=window.scrollY;KEEPSCR=1;SKEY='settings';settings();window.scrollTo(0,yy)}
@@ -773,6 +773,7 @@ function settings(){
     else if(a==='bk')backup();
     else if(a==='skl')skills();
     else if(a==='kb')keys();
+    else if(a==='tg')openExt(TGURL);
     else if(a==='mail'){location.href='mailto:'+AGM+'?subject='+encodeURIComponent('ИТП '+ITPV)}
     else if(a==='agr')agView();
     else if(a==='intro'){BACK=function(){settings()};theory(0,0)}

@@ -18,5 +18,8 @@
 
     <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
         <item name="android:background">@drawable/splash</item>
+        <!-- фон системной заставки — фон мордочки: дальше её продолжает заставка самой страницы (a_launch.js) -->
+        <item name="windowSplashScreenBackground">#FBF4F6</item>
+        <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
     </style>
 </resources>

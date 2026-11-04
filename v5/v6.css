@@ -1855,3 +1855,15 @@ html.nat-android ::-webkit-scrollbar{display:none}
 .upvw .w98txt ul{margin:4px 0 0;padding-left:18px}
 .upvw .w98txt li{margin:2px 0}
 .upvw .w98txt .upw{color:#000080}
+/* заставка при запуске на телефоне (a_launch.js): фон — цвет фона логотипа, как у системной заставки Android перед ней,
+   поэтому мордочка переходит без скачка. Мордочка тает, проявляется надпись «ИТП», затем весь экран растворяется в Путь.
+   Надпись — картинка, а не текст: текст при затухании Chrome на телефоне рисовал чужим шрифтом */
+.lnch{position:fixed;inset:0;z-index:2147483000;background:#FBF4F6;transition:opacity .5s cubic-bezier(.4,0,.2,1)}
+.lnch img,.lnch i{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none;-webkit-user-drag:none}
+.lnl{width:178px;height:178px;-webkit-mask:radial-gradient(closest-side,#000 82%,transparent);mask:radial-gradient(closest-side,#000 82%,transparent);transition:opacity .34s cubic-bezier(.4,0,.2,1)}
+.lnw{width:150px;height:52px;background:var(--accent);-webkit-mask-size:100% 100%;mask-size:100% 100%;opacity:0;transition:opacity .36s cubic-bezier(.4,0,.2,1)}
+.lnch.wm .lnl{opacity:0}
+.lnch.wm .lnw{opacity:1;transition-delay:.16s}
+.lnch.go{opacity:0;pointer-events:none}
+/* ссылка на канал ИТП во введении */
+.tgl{color:var(--accent-ink);font-weight:800;text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}

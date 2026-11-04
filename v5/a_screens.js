@@ -74,7 +74,7 @@ function termHtml(d){
   flush();return h}
 function sheet(n,d){var c=fcol(n);modal('<h2><code'+(c?' style="color:'+c+'"':'')+'>'+esc(n)+'</code></h2>'+termHtml(d),[['Понятно']])}
 /* эталон; why — строки «на чём держится решение» (у проекта это его подсказки), note — своя строка про опыт */
-function solModal(sol,why,note){modal('<h2>Как это можно сделать</h2><pre class="cmp">'+hl(sol)+'</pre>'+(why&&why.length?'<p><b>На чём держится решение</b><br>'+why.map(esc).join('<br>')+'</p>':'')+'<p>Это один из вариантов. Если тесты прошли, твоё решение тоже верное.</p><p class="mu">'+(note||'Эталон не влияет на опыт.')+'</p>',[['Закрыть']])}
+function solModal(sol,why,note){modal('<h2>Как это можно сделать</h2><div class="cpw"><button type="button" class="cp" aria-label="Копировать код"></button><pre class="cmp">'+hl(sol)+'</pre></div>'+(why&&why.length?'<p><b>На чём держится решение</b><br>'+why.map(esc).join('<br>')+'</p>':'')+'<p>Это один из вариантов. Если тесты прошли, твоё решение тоже верное.</p><p class="mu">'+(note||'Эталон не влияет на опыт.')+'</p>',[['Закрыть']])}
 function askName(title,val,cb,max){
   modal('<h2>'+esc(title)+'</h2><input class="f n" id="mi" maxlength="'+(max||40)+'" value="'+esc(val)+'" autocomplete="off" aria-label="'+esc(title)+'">',[['Сохранить',function(o){var i=o.querySelector('#mi'),v=i.value.trim();if(!v){i.focus();return false}if(cb(v.slice(0,max||40))===false){i.focus();i.select();return false}}],['Отмена',null,1]]);
   setTimeout(function(){var i=$('mi');if(i){i.focus();i.select()}},40)}

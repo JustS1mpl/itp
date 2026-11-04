@@ -70,10 +70,9 @@ for root, _, files in os.walk(RES):
     if 'splash.png' in files and os.path.basename(root).startswith('drawable'):
         f = os.path.join(root, 'splash.png')
         w, h = Image.open(f).size
-        c = Image.new('RGB', (w, h), APP_BG)
-        n = round(min(w, h) * .32)
-        ic = masked(n, 'r')
-        c.paste(ic, ((w - n) // 2, (h - n) // 2), ic)
+        c = Image.new('RGB', (w, h), BG)       # фон мордочки — как у заставки страницы (a_launch.js), без квадрата
+        n = round(min(w, h) * .4)
+        c.paste(big(n).convert('RGB'), ((w - n) // 2, (h - n) // 2))
         c.save(f)
 
 # --- Windows
