@@ -1860,12 +1860,12 @@ html.nat-android ::-webkit-scrollbar{display:none}
    Надпись — картинка, а не текст: текст при затухании Chrome на телефоне рисовал чужим шрифтом */
 /* 7.1.1: вся последовательность — CSS-анимации прозрачности с задержками, без JS-таймеров: их рисует композитор
    (видеочип), поэтому заставка плавная, даже пока приложение догружается. Пока картинки не декодированы — пауза (.wait) */
-.lnch{position:fixed;inset:0;z-index:2147483000;background:#FBF4F6;will-change:opacity;animation:lnGo .5s cubic-bezier(.4,0,.2,1) 1.2s both}
+.lnch{position:fixed;inset:0;z-index:2147483000;background:#FBF4F6;will-change:opacity;animation:lnGo .25s cubic-bezier(.4,0,.2,1) .6s both}
 .lnch img,.lnch i{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none;-webkit-user-drag:none;will-change:opacity}
-.lnl{width:178px;height:178px;-webkit-mask:radial-gradient(closest-side,#000 82%,transparent);mask:radial-gradient(closest-side,#000 82%,transparent);animation:lnOut .36s cubic-bezier(.4,0,.2,1) .3s both}
-.lnw{width:150px;height:52px;background:var(--accent);-webkit-mask-size:100% 100%;mask-size:100% 100%;opacity:0;animation:lnIn .4s cubic-bezier(.4,0,.2,1) .48s both}
+.lnl{width:178px;height:178px;-webkit-mask:radial-gradient(closest-side,#000 82%,transparent);mask:radial-gradient(closest-side,#000 82%,transparent);animation:lnOut .18s cubic-bezier(.4,0,.2,1) .15s both}
+.lnw{width:150px;height:52px;background:var(--accent);-webkit-mask-size:100% 100%;mask-size:100% 100%;opacity:0;animation:lnIn .2s cubic-bezier(.4,0,.2,1) .24s both}
 .lnch.wait,.lnch.wait .lnl,.lnch.wait .lnw{animation-play-state:paused}
-.lnch.go{animation:lnTap .3s cubic-bezier(.4,0,.2,1) both;pointer-events:none}
+.lnch.go{animation:lnTap .15s cubic-bezier(.4,0,.2,1) both;pointer-events:none}
 @keyframes lnOut{from{opacity:1}to{opacity:0}}
 @keyframes lnIn{from{opacity:0}to{opacity:1}}
 @keyframes lnGo{from{opacity:1}to{opacity:0;visibility:hidden}}
