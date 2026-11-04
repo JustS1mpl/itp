@@ -76,7 +76,19 @@ function eggBind(){
 /* 7.1.1: «Отправить» картинку с подписью. Telegram, WhatsApp и окно «Поделиться» Windows, получив картинку, текст
    выбрасывают — уходила одна картинка без подписи (владелец). Поэтому подпись заранее копируется в буфер: её остаётся
    вставить в сообщение. share() — сразу, в том же нажатии, иначе браузер не откроет окно «Поделиться» */
+/* 7.2.0: в APK у WebView нет navigator.share — отправляем через плагин Share: файл картинки и (если есть) текст.
+   Раньше там была только «Скачать картинку» с title: имя файла, и Telegram подставлял «itp-progress.png» в подпись */
+function natShare(){var C=window.Capacitor,P=C&&C.Plugins;return C&&C.isNativePlatform&&C.isNativePlatform()&&P&&P.Filesystem&&P.Share?P:null}
+function natSend(name,blob,tx,dlg){var P=natShare();return new Promise(function(res,rej){var fr=new FileReader();
+  fr.onload=function(){P.Filesystem.writeFile({path:name,data:String(fr.result).split(',')[1],directory:'CACHE'}).then(function(r){
+    var o={files:[r.uri],dialogTitle:dlg||'Отправить'};if(tx)o.text=tx;return P.Share.share(o)}).then(res,rej)};
+  fr.onerror=rej;fr.readAsDataURL(blob)})}
+function canSend(){return!!(navigator.share||natShare())}
+(function(){var _sf=saveFile;saveFile=function(name,blob){
+  if(natShare()&&/\.png$/.test(name)){natSend(name,blob,'','Сохранить или отправить').catch(function(){});return true}
+  return _sf(name,blob)}})();
 function shareImg(name,blob,tx){
+  if(natShare())return natSend(name,blob,tx).then(function(){ach('share')}).catch(function(){});
   var f;try{f=new File([blob],name,{type:'image/png'})}catch(e){}
   var withFile=!!(f&&navigator.canShare&&navigator.canShare({files:[f]}));
   /* без tx — только картинка (карточка «Я могу…»: владелец — подписи под ней быть не должно) */

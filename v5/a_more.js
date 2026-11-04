@@ -51,8 +51,10 @@ function drawCard(cb){
    на картинку и обратно (до 8), картинка тут же перерисовывается */
 share=function(){
   var tx=shareTxt(),BLOB=null,earned=ACH.filter(function(a){return S.ach[a.id]});
-  var btns=[['Скачать картинку',function(){if(!BLOB){toast('Картинка ещё рисуется');return false}saveFile('itp-progress.png',BLOB);toast('Картинка сохранена');return false}]];
-  if(navigator.share)btns.push(['Отправить…',function(){if(!BLOB){toast('Картинка ещё рисуется');return false}
+  /* 7.2.0: в APK «Скачать» открывала то же окно «Поделиться», только без подписи, — там одна кнопка «Отправить…»:
+     картинка и текст сразу (владелец) */
+  var btns=natShare()?[]:[['Скачать картинку',function(){if(!BLOB){toast('Картинка ещё рисуется');return false}saveFile('itp-progress.png',BLOB);toast('Картинка сохранена');return false}]];
+  if(canSend())btns[natShare()?'unshift':'push'](['Отправить…',function(){if(!BLOB){toast('Картинка ещё рисуется');return false}
     shareImg('itp-progress.png',BLOB,tx);return false}]);
   btns.push(['Копировать текст',function(){copyTxt(tx);return false},1],['Закрыть',null,1]);
   modal('<h2 style="font-size:20px">Поделиться прогрессом</h2><div id="shw" style="min-height:120px"><p class="mu">Рисую картинку…</p></div>'+

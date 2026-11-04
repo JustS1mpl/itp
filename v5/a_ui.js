@@ -527,7 +527,8 @@ function fdOpen(btn){
 /* U1-13: кроличьи норы — сколько пройдено целиком (в профиле и в «Поделиться» — только когда пройдена хотя бы одна) */
 function HN(){return TOPICS.filter(function(t){return t.opt}).length}
 function HD(){return TOPICS.filter(function(t,i){if(!t.opt||!ni(i))return false;for(var j=0;j<ni(i);j++)if(!S.d[i+'-'+j])return false;return true}).length}
-function shareTxt(){var n=ND(),h=HD(),s=streakNow();return'Я учу Python в ИТП! Уже '+G('прошёл','прошла','пройдено')+' '+n+' '+pl(n,['тему','темы','тем'])+(h?' и '+h+' '+pl(h,['кроличью нору','кроличьи норы','кроличьих нор'])+' из '+HN():'')+(s?', '+s+' '+pl(s,['день','дня','дней'])+' подряд':'')+', '+S.xp+' XP. Попробуй и ты!'}
+/* 7.2.0: без обращения было «пройдено 1 тему» — тогда «за плечами 1 тема» (именительный падеж) */
+function shareTxt(){var n=ND(),h=HD(),s=streakNow(),nom=G('','','1')==='1';return'Я учу Python в ИТП! Уже '+(nom?'за плечами':G('прошёл','прошла',''))+' '+n+' '+pl(n,nom?['тема','темы','тем']:['тему','темы','тем'])+(h?' и '+h+' '+pl(h,nom?['кроличья нора','кроличьи норы','кроличьих нор']:['кроличью нору','кроличьи норы','кроличьих нор'])+' из '+HN():'')+(s?', '+s+' '+pl(s,['день','дня','дней'])+' подряд':'')+', '+S.xp+' XP. Попробуй и ты!'}
 /* --- U1-7: «Что ты уже умеешь» — шкала курса как в Duolingo. Очки — пройденные островки (и в норах тоже, вступление не в счёт);
    веха — конец темы: её порог равен числу островков основного курса до неё включительно --- */
 /* значки вех — все из набора Phosphor (duotone, MIT): одна сетка 256, одна толщина, у каждой вехи свой */
@@ -652,7 +653,7 @@ function skShare(k){
   var s=skNow(),m=s.L[k==null?s.k:k],BLOB=null,tx='Я учу Python в ИТП и уже могу '+m.c+'! Пройдено '+s.p+' '+pl(s.p,['островок','островка','островков'])+'.',prev=document.activeElement;
   var o=document.createElement('div');o.className='shov';o.setAttribute('role','dialog');o.setAttribute('aria-modal','true');o.setAttribute('aria-label','Поделиться умением');
   o.innerHTML='<button class="icon shx" aria-label="Закрыть">'+ico('x')+'</button><div class="shcard" id="shcard"><i class="shsk" aria-hidden="true"></i></div>'+
-   '<div class="shbt"><button class="btn shs" id="shsv">'+phi('download-simple')+'Сохранить</button>'+(navigator.share?'<button class="btn shs" id="shgo">'+phi('share-network')+'Отправить</button>':'')+'</div>';
+   '<div class="shbt"><button class="btn shs" id="shsv">'+phi('download-simple')+'Сохранить</button>'+(canSend()?'<button class="btn shs" id="shgo">'+phi('share-network')+'Отправить</button>':'')+'</div>';
   document.body.appendChild(o);snd('open');
   var gone=false;function close(){if(gone)return;gone=true;snd('close');document.removeEventListener('keydown',kd,true);o.classList.add('out');if(prev&&prev.focus)try{prev.focus({preventScroll:true})}catch(e){}setTimeout(function(){o.remove()},RM()?0:200)}
   function kd(e){if(e.key==='Escape'){e.preventDefault();e.stopPropagation();close()}}
