@@ -13,4 +13,6 @@ mkdir -p dist/android
 cp android/app/build/outputs/apk/release/app-release.apk dist/android/ITP.apk
 cp android/app/build/outputs/bundle/release/app-release.aab dist/android/ITP.aab
 npx electron-builder --win nsis portable
+# сайт для iPhone/iPad (и любого браузера): dist/web — загружается на хостинг целиком
+(cd .. && "${PY:-python}" app/web/make_web.py)
 ls -la dist dist/android

@@ -4,7 +4,8 @@
    Только в APK (NATIVE==='android'), только у тех, кто уже прошёл вступление (у новых есть своя заставка), и не при
    «меньше анимаций». Касание — сразу дальше. Для проверки в браузере: адрес с ?launch */
 (function(){
-  var want=NATIVE==='android'||/[?&]launch\b/.test(location.search);
+  /* и на iPhone/iPad, когда ИТП запущен с экрана «Домой» (STANDALONE, a_web.js) — это тоже «приложение на телефоне» */
+  var want=NATIVE==='android'||STANDALONE||/[?&]launch\b/.test(location.search);
   if(!want||!IMG.logo||RM()||!S||!S.nick)return;
   var o=document.createElement('div'),done=0,ts=[];o.className='lnch';o.setAttribute('aria-hidden','true');
   o.innerHTML='<img class="lnl" alt="" src="'+IMG.logo+'">'+(IMG.wordmark?'<i class="lnw" style="-webkit-mask-image:url('+IMG.wordmark+');mask-image:url('+IMG.wordmark+')"></i>':'');

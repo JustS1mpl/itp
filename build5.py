@@ -187,7 +187,7 @@ rep('g[0]=g[0].replace(/\\B(?=(\\d{3})+(?!\\d))/g,",")', 'g[0]=g[0].replace(/\\B
 exec(open('base/msgs.py',encoding='utf-8').read())
 # --- вставка ядра и интерфейса
 core = open('v5/a_core.js', encoding='utf-8').read() + '\n' + open('v5/a_sound.js', encoding='utf-8').read() + '\n' + open('v5/a_ui.js', encoding='utf-8').read()
-for extra in ('v5/a_fix.js','v5/a_fix2.js','v5/a_fix3.js','v5/a_fix4.js','v5/a_more.js','v5/a_dev.js','v5/a_img.js','v5/a_mood.js','v5/a_notify.js','v5/a_out.js','v5/a_py.js','v5/a_turtle.js','v5/a_ux.js','v5/a_screens.js','v5/a_boot.js','v5/a_upd.js','v5/a_launch.js'):
+for extra in ('v5/a_fix.js','v5/a_fix2.js','v5/a_fix3.js','v5/a_fix4.js','v5/a_more.js','v5/a_dev.js','v5/a_img.js','v5/a_mood.js','v5/a_notify.js','v5/a_web.js','v5/a_out.js','v5/a_py.js','v5/a_turtle.js','v5/a_ux.js','v5/a_screens.js','v5/a_boot.js','v5/a_upd.js','v5/a_launch.js'):
     try: core += '\n' + open(extra, encoding='utf-8').read()
     except FileNotFoundError: pass
 anchor = "seedLit();window.addEventListener('resize',function(){if(app.querySelector('.path'))links()});\napplyTheme();"
@@ -243,7 +243,11 @@ s = s.replace('</body>', _blocks + '</body>')
 s = s.replace('v5.1.3', VER).replace('__VER__', VER)
 # --- полное название приложения: «И так, программирование» (сокращение ИТП прежнее)
 assert 'Пайтон' not in s
-rep('<title>ИТП v' + VER + '</title>', '<title>ИТП — И так, программирование</title>\n<meta name="description" content="ИТП («И так, программирование»): учебное приложение по Python для старшеклассников.">\n<meta name="color-scheme" content="light dark">')
+rep('<title>ИТП v' + VER + '</title>', '<title>ИТП — И так, программирование</title>\n<meta name="description" content="ИТП («И так, программирование»): учебное приложение по Python для старшеклассников.">\n<meta name="color-scheme" content="light dark">'
+    # iPhone/iPad (a_web.js): с экрана «Домой» — на весь экран, со своим значком и названием
+    '\n<meta name="apple-mobile-web-app-capable" content="yes">\n<meta name="mobile-web-app-capable" content="yes">'
+    '\n<meta name="apple-mobile-web-app-status-bar-style" content="default">\n<meta name="apple-mobile-web-app-title" content="ИТП">'
+    '\n<link rel="apple-touch-icon" href="apple-touch-icon.png">')
 # пробные сборки 7.0 хранят сохранения под своим ключом: не портят настоящий прогресс 6.x и не берут его себе
 if '-dev' in VER:
     rep("var KEY='pyshag2',", "var KEY='pyshag7dev',")
