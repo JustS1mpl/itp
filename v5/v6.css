@@ -1881,3 +1881,4 @@ html.nat-android ::-webkit-scrollbar{display:none}
 .tcard .qsb pre.cmp,.pj .card .qsb pre.cmp,html.exbig .tcard .qsb pre.cmp{margin:0 0 6px;padding:10px 14px;border:0;border-radius:12px;box-shadow:none;background:color-mix(in srgb,var(--ink) 5%,var(--card))}
 .pj .card details.qsec:first-child{border-top:0;margin-top:0}
 html:not(.exbig) .tcard .pyex>pre.cmp{margin:4px 0 0;padding:10px 14px;border:0;border-radius:12px;box-shadow:none;background:color-mix(in srgb,var(--ink) 5%,var(--card))}
+.kbr button.off{display:none}

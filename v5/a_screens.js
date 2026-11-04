@@ -184,7 +184,7 @@ function initEd(c,cb){
   var sm={'«':'"','»':'"','“':'"','”':'"','„':'"','‘':AP,'’':AP},lastN=-1;
   function fit(){c.style.height='0px';var h=Math.max(ed.dataset.min?+ed.dataset.min:220,c.scrollHeight);c.style.height=h+'px'}
   function sync(){hh.innerHTML=hl(c.value)+'\n';var n=c.value.split('\n').length;if(n!==lastN){var g='';for(var z=1;z<=n;z++)g+=z+'\n';gt.textContent=g;lastN=n}fit();hh.scrollLeft=c.scrollLeft}
-  function fire(){sync();if(cb)cb()}
+  function fire(){sync();if(cb)cb();if(KB.c===c)kbDed()}
   c.onscroll=function(){hh.scrollLeft=c.scrollLeft;c.scrollTop=0};
   c.onkeydown=function(e){if(e.key==='Tab'&&!e.shiftKey&&!e.ctrlKey&&!e.altKey){e.preventDefault();c.setRangeText('    ',c.selectionStart,c.selectionEnd,'end');fire()}};
   c.addEventListener('beforeinput',function(e){
@@ -210,11 +210,14 @@ function initEd(c,cb){
     var p=c.selectionStart,q=c.selectionEnd,v=c.value;
     if(k==='←'||k==='→'){var n=p!==q?(k==='←'?p:q):k==='←'?Math.max(0,p-1):Math.min(v.length,p+1);c.setSelectionRange(n,n);return kbCaret()}
     if(k==='⇥'){c.setRangeText('    ',p,q,'end');return fire()}
+    /* 7.1.1: ⇤ — пара к ⇥: сначала пробелы прямо перед курсором (до 4, до ровного шага), иначе отступ в начале строки */
+    if(k==='⇤'&&p===q){var l0=v.lastIndexOf('\n',p-1)+1,bf=v.slice(l0,p),sp=bf.match(/ *$/)[0].length;
+      if(sp&&sp<bf.length){var n=Math.min(sp,sp%4||4);c.setRangeText('',p-n,p,'end');return fire()}}
     if(k==='⇤'){var ls=v.lastIndexOf('\n',p-1)+1,m=v.slice(ls,ls+4).match(/^ */)[0].length;if(m){c.setRangeText('',ls,ls+m);c.setSelectionRange(Math.max(ls,p-m),Math.max(ls,q-m));fire()}return}
     if(ST('ac')&&p===q&&v[p]===k&&/^[)\]}"']$/.test(k)){c.setSelectionRange(p+1,p+1);return kbCaret()}
     if(pr[k]&&!((k==='"'||k===AP)&&!qo(v,p))){c.setRangeText(k+v.slice(p,q)+pr[k],p,q,'end');c.setSelectionRange(q+1,q+1);return fire()}
     c.setRangeText(k,p,q,'end');fire()}
-  c.addEventListener('focus',function(){if(KBD)return;KB.c=c;KB.ins=ins;kbBar();kbPlace();setTimeout(kbPlace,400)});
+  c.addEventListener('focus',function(){if(KBD)return;KB.c=c;KB.ins=ins;kbBar();kbDed();kbPlace();setTimeout(kbPlace,400)});
   c.addEventListener('blur',function(){setTimeout(kbPlace,150)});
   c.addEventListener('input',function(){if(KB.c===c)requestAnimationFrame(kbCaret)});
   return sync}
@@ -267,7 +270,12 @@ function kbCond(open){
   if(!open){p.innerHTML='';return}
   var k=s.cloneNode(true);k.querySelectorAll('[id]').forEach(function(x){x.removeAttribute('id')});
   p.innerHTML='';p.appendChild(k);qBind(p);p.scrollTop=0;kbCaret()}
+/* 7.1.1: ⇤ пропадает, когда убирать нечего (владелец: «кнопка ничего не делает»; бледной — не надо, пусть исчезает) */
+function kbDed(){var c=KB.c,d=KB.el&&KB.el.querySelector('[data-k="⇤"]');if(!c||!d)return;
+  var v=c.value,p=c.selectionStart,ls=v.lastIndexOf('\n',p-1)+1;d.classList.toggle('off',v.charAt(ls)!==' '&&v.charAt(p-1)!==' ')}
+document.addEventListener('selectionchange',function(){if(KB.c&&document.activeElement===KB.c)kbDed()});
 function kbCaret(){
+  kbDed();
   var c=KB.c,b=KB.el;if(!c||!b||b.hidden)return;
   var vv=window.visualViewport,cs=getComputedStyle(c),lh=parseFloat(cs.lineHeight)||24,pt=parseFloat(cs.paddingTop)||12;
   var ln=c.value.slice(0,c.selectionEnd).split('\n').length-1,y=c.getBoundingClientRect().top+pt+ln*lh;
