@@ -53,8 +53,7 @@ share=function(){
   var tx=shareTxt(),BLOB=null,earned=ACH.filter(function(a){return S.ach[a.id]});
   var btns=[['Скачать картинку',function(){if(!BLOB){toast('Картинка ещё рисуется');return false}saveFile('itp-progress.png',BLOB);toast('Картинка сохранена');return false}]];
   if(navigator.share)btns.push(['Отправить…',function(){if(!BLOB){toast('Картинка ещё рисуется');return false}
-    var d={text:tx},f;try{f=new File([BLOB],'itp-progress.png',{type:'image/png'})}catch(e){}if(f&&navigator.canShare&&navigator.canShare({files:[f]}))d.files=[f];
-    navigator.share(d).then(function(){ach('share')}).catch(function(){});return false}]);
+    shareImg('itp-progress.png',BLOB,tx);return false}]);
   btns.push(['Копировать текст',function(){copyTxt(tx);return false},1],['Закрыть',null,1]);
   modal('<h2 style="font-size:20px">Поделиться прогрессом</h2><div id="shw" style="min-height:120px"><p class="mu">Рисую картинку…</p></div>'+
     (earned.length>SHMAX?'<button type="button" class="btn t shpkb" id="shpk" aria-expanded="false" aria-controls="shpl">'+'🏅 Какие достижения показать</button>'+

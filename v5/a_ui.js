@@ -660,8 +660,7 @@ function skShare(k){
   o.onclick=function(e){if(e.target===o)close()};o.querySelector('.shx').onclick=close;
   function need(){if(!BLOB){toast('Картинка ещё рисуется');return false}return true}
   $('shsv').onclick=function(){if(!need())return;saveFile('itp-skill.png',BLOB);ach('share');toast('Картинка сохранена')};
-  if($('shgo'))$('shgo').onclick=function(){if(!need())return;var d={text:tx},f;try{f=new File([BLOB],'itp-skill.png',{type:'image/png'})}catch(e){}if(f&&navigator.canShare&&navigator.canShare({files:[f]}))d.files=[f];
-    navigator.share(d).then(function(){ach('share')}).catch(function(){})};
+  if($('shgo'))$('shgo').onclick=function(){if(!need())return;shareImg('itp-skill.png',BLOB,tx)};
   setTimeout(function(){var b=$('shsv');if(b)b.focus({preventScroll:true})},60);
   skImg(function(cv){var h=$('shcard');if(!h||gone)return;cv.setAttribute('role','img');cv.setAttribute('aria-label','Картинка: я могу '+m.c);h.innerHTML='';h.appendChild(cv);h.classList.add('rdy');cv.toBlob(function(b){BLOB=b},'image/png')},0,k)}
 function skills(back){
