@@ -1872,3 +1872,12 @@ html.nat-android ::-webkit-scrollbar{display:none}
 .a2i{display:inline-block;width:18px;height:22px;vertical-align:-4px;margin:0 2px;background:var(--blue);
   -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 22' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 1v12M5 5l4-4 4 4M6 9H3v11h12V9h-3'/%3E%3C/svg%3E") center/contain no-repeat;
   mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 22' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 1v12M5 5l4-4 4 4M6 9H3v11h12V9h-3'/%3E%3C/svg%3E") center/contain no-repeat}
+
+/* 7.1.1: раскрывающиеся разделы внутри карточки задания и проекта (Пример, Файлы) — без своей рамки: тонкая линия
+   сверху и серые блоки внутри, вместо трёх рамок одна в другой (карточка, раздел, блок кода) — вариант владельца «B» */
+.tcard details.qsec,.pj .card details.qsec{border:0;border-top:1.5px solid var(--line);border-radius:0;background:none;margin:14px 0 0}
+.tcard details.qsec>summary,.pj .card details.qsec>summary{padding:12px 2px;min-height:44px}
+.tcard .qsb,.pj .card .qsb{padding:0 0 4px}
+.tcard .qsb pre.cmp,.pj .card .qsb pre.cmp,html.exbig .tcard .qsb pre.cmp{margin:0 0 6px;padding:10px 14px;border:0;border-radius:12px;box-shadow:none;background:color-mix(in srgb,var(--ink) 5%,var(--card))}
+.pj .card details.qsec:first-child{border-top:0;margin-top:0}
+html:not(.exbig) .tcard .pyex>pre.cmp{margin:4px 0 0;padding:10px 14px;border:0;border-radius:12px;box-shadow:none;background:color-mix(in srgb,var(--ink) 5%,var(--card))}
