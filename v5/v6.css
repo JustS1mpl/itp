@@ -1858,13 +1858,18 @@ html.nat-android ::-webkit-scrollbar{display:none}
 /* заставка при запуске на телефоне (a_launch.js): фон — цвет фона логотипа, как у системной заставки Android перед ней,
    поэтому мордочка переходит без скачка. Мордочка тает, проявляется надпись «ИТП», затем весь экран растворяется в Путь.
    Надпись — картинка, а не текст: текст при затухании Chrome на телефоне рисовал чужим шрифтом */
-.lnch{position:fixed;inset:0;z-index:2147483000;background:#FBF4F6;transition:opacity .5s cubic-bezier(.4,0,.2,1)}
-.lnch img,.lnch i{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none;-webkit-user-drag:none}
-.lnl{width:178px;height:178px;-webkit-mask:radial-gradient(closest-side,#000 82%,transparent);mask:radial-gradient(closest-side,#000 82%,transparent);transition:opacity .34s cubic-bezier(.4,0,.2,1)}
-.lnw{width:150px;height:52px;background:var(--accent);-webkit-mask-size:100% 100%;mask-size:100% 100%;opacity:0;transition:opacity .36s cubic-bezier(.4,0,.2,1)}
-.lnch.wm .lnl{opacity:0}
-.lnch.wm .lnw{opacity:1;transition-delay:.16s}
-.lnch.go{opacity:0;pointer-events:none}
+/* 7.1.1: вся последовательность — CSS-анимации прозрачности с задержками, без JS-таймеров: их рисует композитор
+   (видеочип), поэтому заставка плавная, даже пока приложение догружается. Пока картинки не декодированы — пауза (.wait) */
+.lnch{position:fixed;inset:0;z-index:2147483000;background:#FBF4F6;will-change:opacity;animation:lnGo .5s cubic-bezier(.4,0,.2,1) 1.2s both}
+.lnch img,.lnch i{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none;-webkit-user-drag:none;will-change:opacity}
+.lnl{width:178px;height:178px;-webkit-mask:radial-gradient(closest-side,#000 82%,transparent);mask:radial-gradient(closest-side,#000 82%,transparent);animation:lnOut .36s cubic-bezier(.4,0,.2,1) .3s both}
+.lnw{width:150px;height:52px;background:var(--accent);-webkit-mask-size:100% 100%;mask-size:100% 100%;opacity:0;animation:lnIn .4s cubic-bezier(.4,0,.2,1) .48s both}
+.lnch.wait,.lnch.wait .lnl,.lnch.wait .lnw{animation-play-state:paused}
+.lnch.go{animation:lnTap .3s cubic-bezier(.4,0,.2,1) both;pointer-events:none}
+@keyframes lnOut{from{opacity:1}to{opacity:0}}
+@keyframes lnIn{from{opacity:0}to{opacity:1}}
+@keyframes lnGo{from{opacity:1}to{opacity:0;visibility:hidden}}
+@keyframes lnTap{from{opacity:1}to{opacity:0;visibility:hidden}}
 /* ссылка на канал ИТП во введении */
 .tgl{color:var(--accent-ink);font-weight:800;text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}
 /* подсказка «Поставь ИТП на экран „Домой“» (a_web.js): значок «Поделиться» Safari — квадрат со стрелкой вверх */
@@ -1880,5 +1885,9 @@ html.nat-android ::-webkit-scrollbar{display:none}
 .tcard .qsb,.pj .card .qsb{padding:0 0 4px}
 .tcard .qsb pre.cmp,.pj .card .qsb pre.cmp,html.exbig .tcard .qsb pre.cmp{margin:0 0 6px;padding:10px 14px;border:0;border-radius:12px;box-shadow:none;background:color-mix(in srgb,var(--ink) 5%,var(--card))}
 .pj .card details.qsec:first-child{border-top:0;margin-top:0}
-html:not(.exbig) .tcard .pyex>pre.cmp{margin:4px 0 0;padding:10px 14px;border:0;border-radius:12px;box-shadow:none;background:color-mix(in srgb,var(--ink) 5%,var(--card))}
+.tcard .pyex>pre.cmp,.pj .card>pre.cmp,html.exbig .exio pre.cmp,html.exbig .pyex .exio pre.cmp{margin:4px 0 0;padding:10px 14px;border:0;border-radius:12px;box-shadow:none;background:color-mix(in srgb,var(--ink) 5%,var(--card))}
 .kbr button.off{display:none}
+/* 7.1.1: и при «Пример в задании: Крупно» — без подложки-панели вокруг (рамка в рамке), как в «Компактно»;
+   «Крупно» теперь только ставит ввод и вывод друг под другом */
+html.exbig .tcard .pyex,html.exbig .pj .card .pyex{background:none;padding:0;margin-top:14px;border-radius:0}
+html.exbig .exio .qlab{margin:8px 0 4px}

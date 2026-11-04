@@ -8,8 +8,8 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         // versionCode — +1 на каждый выпуск в магазин; versionName — как VER в build5.py без «-dev»
-        versionCode 2
-        versionName "7.1.0"
+        versionCode 3
+        versionName "7.1.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
