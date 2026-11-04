@@ -58,10 +58,20 @@ function bkPlaus(r){
     for(var k in at){var v=at[k],m=/^(\d+)-(\d+)$/.exec(k);if(!m||(v!=='full'&&v!=='low'))continue;
       var t=TOPICS[+m[1]],it=t&&t.items&&t.items[+m[2]];if(!it)continue;
       if(v==='low'){cap+=2;continue}
-      cap+=it.t==='project'?(it.bonus>0?it.bonus|0:40):Math.max(60,20+2*Math.max(0,((it.q||[]).length||0)-4))}
-    cap+=750*(Math.floor(mx/7)+1);                      /* цели серии: не больше одной на каждые 7 дней рекорда */
+      /* проект — его бонус (или 40), задача с кодом (test) — 60, вопросы (flash) — 20 + до 2 за каждый ответ подряд после
+         пятого, остальное (на всякий случай) — 60 */
+      cap+=it.t==='project'?(it.bonus>0?it.bonus|0:40):it.t==='flash'?20+2*Math.max(0,((it.q||[]).length||0)-4):60}
+    /* цели серии (7/14/30/50 дней → 70/160/400/750): цель n достижима, только если рекорд ≥ n, и не чаще раза за n дней.
+       7.2.0: раньше тут был запас 750 и при нулевой серии — так «0 → 100 XP» проходило (отчёт друга) */
+    [[7,70],[14,160],[30,400],[50,750]].forEach(function(g){if(mx>=g[0])cap+=g[1]*Math.floor(mx/g[0])});
     if(xp>cap)return E+': опыта больше, чем можно получить за пройденные островки';
+    /* каждое начисление опыта пишется в историю (addXp → hit), а у начавших в 7.x вся жизнь — в пределах истории
+       (она хранит 370 дней): опыт не может быть больше суммы опыта по дням */
+    if(D(reg,T)<365){var hx=0,hh=r.hist&&typeof r.hist==='object'?r.hist:{};for(var q in hh)if(hh[q]&&typeof hh[q].xp==='number')hx+=hh[q].xp;
+      if(xp>hx)return E+': опыта больше, чем записано в истории занятий'}
   }
+  /* отметка «опыт за островок получен» бывает только у пройденного островка (award идёт после bump) */
+  for(var ak in at)if((at[ak]==='full'||at[ak]==='low')&&(r.d||{})[ak]!==1)return E+': опыт за непройденный островок';
   /* достижения: даты и условия */
   var ac=r.ach&&typeof r.ach==='object'?r.ach:{},dd=r.d&&typeof r.d==='object'?r.d:{};
   var tdn=0,tall=0;TOPICS.forEach(function(t,i){if(t.intro)return;tall++;var its=t.items||[];if(its.length&&its.every(function(x,j){return dd[i+'-'+j]===1}))tdn++});
