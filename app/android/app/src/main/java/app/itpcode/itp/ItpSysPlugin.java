@@ -3,6 +3,7 @@ package app.itpcode.itp;
 import android.graphics.Color;
 import android.os.Build;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 
 import androidx.core.graphics.Insets;
@@ -39,10 +40,18 @@ public class ItpSysPlugin extends Plugin {
         View wv = getBridge().getWebView();
         ViewCompat.setOnApplyWindowInsetsListener(wv, (v, ins) -> {
             Insets s = ins.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
+            // клавиатура: во весь экран Android сам страницу не сжимает (adjustResize молчит), и клавиатура
+            // перекрывала низ, в том числе панель символов. Сжимаем WebView до верха клавиатуры сами
+            int ime = ins.isVisible(WindowInsetsCompat.Type.ime()) ? ins.getInsets(WindowInsetsCompat.Type.ime()).bottom : 0;
+            ViewGroup.LayoutParams lp = v.getLayoutParams();
+            if (lp instanceof ViewGroup.MarginLayoutParams && ((ViewGroup.MarginLayoutParams) lp).bottomMargin != ime) {
+                ((ViewGroup.MarginLayoutParams) lp).bottomMargin = ime;
+                v.setLayoutParams(lp);
+            }
             float d = v.getResources().getDisplayMetrics().density;
             JSObject o = new JSObject();
             o.put("top", Math.round(s.top / d));
-            o.put("bottom", Math.round(s.bottom / d));
+            o.put("bottom", ime > 0 ? 0 : Math.round(s.bottom / d));
             o.put("left", Math.round(s.left / d));
             o.put("right", Math.round(s.right / d));
             last = o;

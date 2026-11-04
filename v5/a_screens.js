@@ -246,7 +246,7 @@ function kbFz(d){var i=CFS.indexOf(+ST('cf'));if(i<0)i=2;var n=Math.max(0,Math.m
   S.set=S.set||{};S.set.cf=CFS[n];save();applyPrefs();if(KB.c)KB.c.dispatchEvent(new Event('input'));kbPlace()}
 function kbPlace(){
   var b=KB.el,c=KB.c;if(!b)return;
-  var on=!KBD&&!!c&&c.isConnected&&document.activeElement===c,vv=window.visualViewport;
+  var on=!KBD&&!!ST('kbb')&&!!c&&c.isConnected&&document.activeElement===c,vv=window.visualViewport;
   b.hidden=!on;document.documentElement.classList.toggle('kbo',on);
   if(!on){kbCond(false);return}
   b.querySelector('.kq').hidden=!kbSrc();

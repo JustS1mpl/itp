@@ -944,8 +944,10 @@ input.f.dq{min-height:48px;padding-left:42px;border-radius:var(--pill)}
 @keyframes sheetout{to{transform:translateY(80px);opacity:0}}
 @keyframes pop2{from{transform:translateY(10px);opacity:0}to{transform:none;opacity:1}}
 @keyframes pop2out{to{transform:translateY(6px);opacity:0}}
-@keyframes ipop{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
-@keyframes ipopout{to{opacity:0;transform:translateY(-6px)}}
+/* карточка островка «разворачивается» и «сворачивается» обрезкой, без прозрачности: на телефоне в последних кадрах
+   затухания Chrome рисовал текст карточки чужим шрифтом (владелец, видео) — обрезка перерисовывает карточку как обычно */
+@keyframes ipop{from{clip-path:inset(-14px -40px 100% -40px round var(--r-lg))}to{clip-path:inset(-14px -40px -40px -40px round var(--r-lg))}}
+@keyframes ipopout{from{clip-path:inset(-14px -40px -40px -40px round var(--r-lg))}to{clip-path:inset(-14px -40px 100% -40px round var(--r-lg))}}
 @keyframes fbin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @keyframes toast{0%{opacity:0;transform:translate(-50%,-14px)}10%,84%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,-8px)}}
 @keyframes toastA{0%{opacity:0;transform:translate(-50%,-24px)}9%{opacity:1;transform:translate(-50%,2px)}14%,88%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,-10px)}}
