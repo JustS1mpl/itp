@@ -38,6 +38,8 @@ public class ItpSysPlugin extends Plugin {
             w.setNavigationBarContrastEnforced(false);
         }
         View wv = getBridge().getWebView();
+        wv.setVerticalScrollBarEnabled(false);   // без серой полосы прокрутки справа
+        wv.setHorizontalScrollBarEnabled(false);
         ViewCompat.setOnApplyWindowInsetsListener(wv, (v, ins) -> {
             Insets s = ins.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
             // клавиатура: во весь экран Android сам страницу не сжимает (adjustResize молчит), и клавиатура

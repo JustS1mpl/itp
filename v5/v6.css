@@ -1845,3 +1845,13 @@ html.lite .shov{background:rgba(10,10,12,.92)}
 .bkt.rm .bkl p{transition:none;transform:none}
 @keyframes bkIn{from{opacity:0}}
 @keyframes bkTurn{0%,100%{transform:scaleX(1)}50%{transform:scaleX(0)}}
+/* приложение для Android: полосы прокрутки не показываем (тонкая серая линия справа, владелец), как в браузере телефона */
+html.nat-android{scrollbar-gutter:auto}
+html.nat-android,html.nat-android *{scrollbar-width:none}
+html.nat-android ::-webkit-scrollbar{display:none}
+/* окно «Обновление курса» (a_upd.js): список по темам в белом поле 98-го */
+.upvw .w98txt .upg{margin:0 0 10px}
+.upvw .w98txt .upg:last-child{margin-bottom:0}
+.upvw .w98txt ul{margin:4px 0 0;padding-left:18px}
+.upvw .w98txt li{margin:2px 0}
+.upvw .w98txt .upw{color:#000080}

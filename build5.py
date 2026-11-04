@@ -53,6 +53,8 @@ rep("""'<div class="q">'+esc(q.q)+'</div>'+(q.c?'<pre>'+hl(q.c)+'</pre>':'');
 """'<div class="q">'+esc(q.q)+'</div>'+(q.v||'')+(q.c?'<pre>'+hl(q.c)+'</pre>':'');
     ord.forEach(function(k){h+='<button class="opt" data-k="'+k+'">'+esc(q.o[k])+'</button>'});
     show(h+'<div id="fb"></div><button class="btn" id="go" disabled>Проверить</button>');if(q.v)imgZoom(app);""")
+# тройные кавычки: строка на несколько строк кода целиком зелёная (раньше подсвечивалась только первая пара кавычек)
+rep('function hl(c){var re=/(#[^\\n]*)|(', 'function hl(c){var re=/(#[^\\n]*)|("{3}[\\s\\S]*?(?:"{3}|$)|\'{3}[\\s\\S]*?(?:\'{3}|$)|')
 # Nunito — шесть готовых начертаний (400–900, woff2, assets/nunito_static.json из переменного nunito.b64 через fontTools),
 # а не один переменный шрифт: на телефонах Chrome во время анимаций (прозрачность, сдвиг) временами рисовал текст
 # переменного шрифта запасным (владелец, dev.35). block вместо swap и загрузка всех начертаний сразу — чтобы начертание,
@@ -184,7 +186,7 @@ rep('g[0]=g[0].replace(/\\B(?=(\\d{3})+(?!\\d))/g,",")', 'g[0]=g[0].replace(/\\B
 exec(open('msgs.py',encoding='utf-8').read())
 # --- вставка ядра и интерфейса
 core = open('v5/a_core.js', encoding='utf-8').read() + '\n' + open('v5/a_sound.js', encoding='utf-8').read() + '\n' + open('v5/a_ui.js', encoding='utf-8').read()
-for extra in ('v5/a_fix.js','v5/a_fix2.js','v5/a_fix3.js','v5/a_fix4.js','v5/a_more.js','v5/a_dev.js','v5/a_img.js','v5/a_mood.js','v5/a_notify.js','v5/a_out.js','v5/a_py.js','v5/a_turtle.js','v5/a_ux.js','v5/a_screens.js','v5/a_boot.js'):
+for extra in ('v5/a_fix.js','v5/a_fix2.js','v5/a_fix3.js','v5/a_fix4.js','v5/a_more.js','v5/a_dev.js','v5/a_img.js','v5/a_mood.js','v5/a_notify.js','v5/a_out.js','v5/a_py.js','v5/a_turtle.js','v5/a_ux.js','v5/a_screens.js','v5/a_boot.js','v5/a_upd.js'):
     try: core += '\n' + open(extra, encoding='utf-8').read()
     except FileNotFoundError: pass
 anchor = "seedLit();window.addEventListener('resize',function(){if(app.querySelector('.path'))links()});\napplyTheme();"
