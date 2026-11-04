@@ -10,7 +10,8 @@
 import ast, builtins, html, io, json, re, subprocess, sys, os, tokenize
 
 sys.path.insert(0, os.getcwd())
-CUR = json.load(open('curriculum.json', encoding='utf-8'))
+sys.path.insert(0, os.path.join(os.getcwd(), 'course'))
+CUR = json.load(open('course/curriculum.json', encoding='utf-8'))
 DATA = json.load(open(sys.argv[1] if len(sys.argv) > 1 else 'topics.json', encoding='utf-8'))
 TOPICS, FILESETS = DATA['topics'], DATA['filesets']
 TL = "exec(__import__('sys').stdin.read(), globals())"   # скрытый хвост задач на функции (dsl.TL)

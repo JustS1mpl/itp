@@ -1,0 +1,37 @@
+ИТП («И так, программирование»)
+Copyright (c) 2026 Владислав А. Все права защищены. All rights reserved.
+
+Исходный код открыт только для просмотра. Это НЕ открытая лицензия (не MIT, не GPL и т. п.).
+
+Без письменного разрешения автора запрещено:
+- копировать, изменять, переводить и распространять ИТП целиком или частями — код, тексты, теорию,
+  задания, тесты и решения, рисунки и спрайты кролика, звуки, вид экранов;
+- собирать из этого кода приложения и выкладывать их в магазины приложений (Google Play, RuStore,
+  App Store, Microsoft Store и другие), на сайты, в каналы и файлообменники;
+- выдавать ИТП или его изменённую версию за свою работу;
+- использовать материалы ИТП в других приложениях, курсах, видео, сборниках задач и наборах данных,
+  в том числе для обучения нейросетей.
+
+Можно:
+- читать код на GitHub и изучать, как устроено приложение;
+- сообщать об ошибках и предлагать правки через Issues и Pull Requests — присылая правку,
+  ты соглашаешься, что автор может включить её в ИТП на этих же условиях;
+- пользоваться ИТП для своего обучения на условиях пользовательского соглашения внутри приложения.
+
+Официальные версии выходят только в канале https://t.me/itpcode. Копии из других мест — не от автора.
+
+Чужие части (Python, Pyodide, Skulpt, шрифт Nunito, смайлики Fluent Emoji, значки Phosphor Icons
+и другие) принадлежат своим авторам и распространяются по своим лицензиям — см. docs/THIRD_PARTY.md.
+
+Разрешение и вопросы: itpcode.app@outlook.com
+
+---
+
+ITP ("I tak, programmirovanie")
+Copyright (c) 2026 Vladislav A. All rights reserved.
+
+The source code is published for viewing only. This is not an open-source license. Without the author's
+written permission you may not copy, modify, distribute, publish to app stores, or reuse any part of ITP
+(code, texts, tasks, solutions, artwork, sounds, UI). You may read the code, report issues and propose
+changes. Third-party components keep their own licenses (see docs/THIRD_PARTY.md).
+Official releases: https://t.me/itpcode. Contact: itpcode.app@outlook.com

@@ -1,9 +1,10 @@
 import re, sys, importlib
 sys.path.insert(0, '.')
+sys.path.insert(0, 'course')   # темы курса и dsl — в папке course/
 import dsl
 
 VER = '4.3.0'
-s = open('orig.html', encoding='utf-8').read()
+s = open('base/orig.html', encoding='utf-8').read()
 
 
 def rep(a, b, n=1):
@@ -279,10 +280,10 @@ rep("if(p&&out.slice(-p.length)===p)marks.push([out.length-p.length,p.length]);"
 rep("!(x.a>=0&&x.a<x.o.length)", "!(typeof x.a==='number'&&x.a>=0&&x.a<x.o.length)")
 rep("if(!t.n)e.push(p+'нет поля n');", "if(!t.n)e.push(p+'нет поля n');if(!t.s)e.push(p+'нет поля s (подзаголовок)');")
 
-exec(open('p414.py',encoding='utf-8').read())
-exec(open('p415.py',encoding='utf-8').read())
-exec(open('p420.py',encoding='utf-8').read())
-exec(open('p430.py',encoding='utf-8').read())
+exec(open('base/p414.py',encoding='utf-8').read())
+exec(open('base/p415.py',encoding='utf-8').read())
+exec(open('base/p420.py',encoding='utf-8').read())
+exec(open('base/p430.py',encoding='utf-8').read())
 
 # ---------- темы ----------
 m = re.search(r'var TOPICS=\[.*?\n\];\n', s, re.S)

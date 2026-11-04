@@ -20,7 +20,7 @@ out = open(F, encoding='utf-8').read()
 # общеизвестные строки, которые совпадают с чем угодно и заимствованием не являются
 ALLOW = {'абвгдеёжзийклмнопрстуфхцчшщъыьэюя'}
 # названия тем и нор — из учебного плана владельца (curriculum.json), совпадение со старым курсом здесь не заимствование
-_cur = json.load(open('curriculum.json', encoding='utf-8'))
+_cur = json.load(open('course/curriculum.json', encoding='utf-8'))
 ALLOW |= {e['n'] for e in _cur['topics'] + _cur['holes']}
 hit = sorted(p for p in phr if p in out and p not in ALLOW)
 print('файлов', len(files), 'фраз', len(phr), 'найдено в сборке', len(hit))

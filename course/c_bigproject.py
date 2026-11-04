@@ -9,7 +9,7 @@ from dsl import *
 
 
 def src(name):
-    return io.open('final/' + name, encoding='utf-8').read()
+    return io.open('course/final/' + name, encoding='utf-8').read()
 
 
 CHAT = {'_itp_servers.json': json.dumps({'chat.itp': {'collection': 'messages', 'users': [

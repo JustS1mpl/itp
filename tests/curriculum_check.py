@@ -3,7 +3,7 @@
 Правила стиля названий описаны в docs/CURRICULUM.md («Единый стиль названий»)."""
 import json, re, sys
 
-c = json.load(open('curriculum.json', encoding='utf-8'))
+c = json.load(open('course/curriculum.json', encoding='utf-8'))
 T, H = c['topics'], c['holes']
 ids = [t['id'] for t in T]
 bad = []

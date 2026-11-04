@@ -1056,3 +1056,8 @@ Liquid glass в CSS и SVG (ekino-france / Medium; LogRocket; DEV Community «6 
   запись в системе.
 - Канал ИТП в Telegram (t.me/itpcode): в конце введения и в настройках, «О приложении». Пока приложения нет в
   магазинах, новые версии выходят там.
+- Корень репозитория разобран (владелец): темы курса, content.py, dsl.py, split.py, curriculum.json и final/ — в
+  course/; старая база сборки (orig.html, патчи p4*.py, msgs.py, emofix.py, pyold/pynew.txt) — в base/. Пути в
+  build.py, build5.py, content.py, c_bigproject.py и тестах поправлены; out.html после переноса совпадает побайтно.
+- Добавлен LICENSE: код открыт только для просмотра, все права защищены (как в соглашении внутри приложения);
+  официальные версии — только в t.me/itpcode. ВЫПУСК_APK_EXE.md убран из репозитория (лежит только у автора).

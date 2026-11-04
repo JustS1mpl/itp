@@ -73,6 +73,7 @@ s = s.replace('</style>', "</style><script>try{['400','500','600','700','800','9
 pack = open('assets/emoji_pack.b64').read()
 # U2-6: убрать мелкие подкрашивающие слои по краям (пятна у звезды и др.), см. emofix.py
 import gzip as _egz, base64 as _eb
+sys.path.insert(0, 'base')   # старая база сборки: emofix, msgs, патчи — в папке base/
 from emofix import emo_clean
 _ep, _es = emo_clean(json.loads(_egz.decompress(_eb.b64decode(pack))))
 pack = _eb.b64encode(_egz.compress(json.dumps(_ep, ensure_ascii=False, separators=(',', ':')).encode('utf-8'), 9, mtime=0)).decode()
@@ -84,7 +85,7 @@ mm = "matchMedia('(prefers-reduced-motion:reduce)').matches"
 a = s.index('<script>\nvar ') if '<script>\nvar ' in s else s.index('<script>', s.index('</script>') )
 n = s.count(mm); s = s.replace(mm, 'RM()'); print('RM заменено', n)
 
-rep(open('pyold.txt',encoding='utf8').read(), open('pynew.txt',encoding='utf8').read())
+rep(open('base/pyold.txt',encoding='utf8').read(), open('base/pynew.txt',encoding='utf8').read())
 # --- навигация
 rep("[['home','🏠','Главная'],['oge','📚','ОГЭ/ЕГЭ'],['ed','⌨️','Компилятор'],['prof','🐇','Профиль']]",
     "[['home','🗺️','Путь'],['pr','🎯','Практика'],['ed','💻','Код'],['prof','🐰','Профиль']]")
@@ -183,7 +184,7 @@ rep('d[0]=d[0].replace(/\\B(?=(\\d{3})+(?!\\d))/g,",")', 'd[0]=d[0].replace(/\\B
 rep('g[0]=g[0].replace(/\\B(?=(\\d{3})+(?!\\d))/g,",")', 'g[0]=g[0].replace(/\\B(?=(\\d{3})+(?!\\d))/g,h[7])')
 
 
-exec(open('msgs.py',encoding='utf-8').read())
+exec(open('base/msgs.py',encoding='utf-8').read())
 # --- вставка ядра и интерфейса
 core = open('v5/a_core.js', encoding='utf-8').read() + '\n' + open('v5/a_sound.js', encoding='utf-8').read() + '\n' + open('v5/a_ui.js', encoding='utf-8').read()
 for extra in ('v5/a_fix.js','v5/a_fix2.js','v5/a_fix3.js','v5/a_fix4.js','v5/a_more.js','v5/a_dev.js','v5/a_img.js','v5/a_mood.js','v5/a_notify.js','v5/a_out.js','v5/a_py.js','v5/a_turtle.js','v5/a_ux.js','v5/a_screens.js','v5/a_boot.js','v5/a_upd.js','v5/a_launch.js'):
