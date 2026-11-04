@@ -1069,3 +1069,7 @@ Liquid glass в CSS и SVG (ekino-france / Medium; LogRocket; DEV Community «6 
   Проверено в WebKit (Playwright, iPhone 13): Python 3.13 работает, sw.js регистрируется, ошибок нет.
 - Выпуски на GitHub (Releases): APK и два EXE с подписями, HTML туда не кладём (владелец). На GitHub в About —
   описание и ссылка на t.me/itpcode.
+- Сайт ИТП: основной адрес — https://itpcode.website.yandexcloud.net (Yandex Object Storage, бакет itpcode:
+  Cloudflare у части операторов в России не открывается), запасной — https://itpcode.pages.dev (Cloudflare Pages,
+  выкладка — wrangler pages deploy app/dist/web --project-name itpcode). Обновлять оба одной папкой app/dist/web.
+  У каждого адреса свой прогресс (разные origin) — в постах один основной адрес.

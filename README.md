@@ -7,7 +7,8 @@ Android (APK) и программа для Windows (папка `app/`).
 
 **Скачать:** готовые файлы (APK, установщик для Windows, версия без установки, HTML) выходят в канале
 [t.me/itpcode](https://t.me/itpcode) — там же новости. Текущая версия — **7.1.0**.
-Ещё ИТП открывается прямо в браузере — **[itpcode.pages.dev](https://itpcode.pages.dev)**: на iPhone и iPad его ставят из Safari
+Ещё ИТП открывается прямо в браузере — **[itpcode.website.yandexcloud.net](https://itpcode.website.yandexcloud.net)** (запасной адрес —
+[itpcode.pages.dev](https://itpcode.pages.dev)): на iPhone и iPad его ставят из Safari
 на экран «Домой», и он работает без интернета.
 
 Сторонние библиотеки Python (numpy, pandas, matplotlib и др.) в файл не входят: компилятор докачивает их с CDN Pyodide
