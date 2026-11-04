@@ -79,8 +79,10 @@ function eggBind(){
 function shareImg(name,blob,tx){
   var f;try{f=new File([blob],name,{type:'image/png'})}catch(e){}
   var withFile=!!(f&&navigator.canShare&&navigator.canShare({files:[f]}));
-  if(withFile)copyText(tx).then(function(){toast('Подпись скопирована — вставь её в сообщение')},function(){});
-  return navigator.share(withFile?{files:[f],text:tx}:{text:tx}).then(function(){ach('share')}).catch(function(){})}
+  /* без tx — только картинка (карточка «Я могу…»: владелец — подписи под ней быть не должно) */
+  if(!withFile&&!tx){toast('Отправить картинку отсюда нельзя — сохрани её и отправь как фото');return Promise.resolve()}
+  if(withFile&&tx)copyText(tx).then(function(){toast('Подпись скопирована — вставь её в сообщение')},function(){});
+  return navigator.share(withFile?(tx?{files:[f],text:tx}:{files:[f]}):{text:tx}).then(function(){ach('share')}).catch(function(){})}
 function copyText(t){
   if(navigator.clipboard&&navigator.clipboard.writeText)return navigator.clipboard.writeText(t);
   return new Promise(function(res,rej){var a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0;top:0';document.body.appendChild(a);a.select();try{document.execCommand('copy')?res():rej()}catch(e){rej()}a.remove()});
