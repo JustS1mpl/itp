@@ -48,7 +48,7 @@ function upCheck(n){
 /* канал ИТП в Telegram (владелец, 7.1.0): пока приложения нет в магазинах, новые версии выходят там, и там же новости.
    Ссылка — в конце введения («Добро пожаловать»; вводные темы окно «Обновление курса» не перечисляет) и в настройках,
    «О приложении». На телефоне и в программе для Windows внешние ссылки открываются в браузере системы */
-var TGURL='https://t.me/itpcode';
+var TGURL='https://t.me/itpcode',GHURL='https://github.com/JustS1mpl/itp';  /* код открыт с 2026-11-04 */
 function openExt(u){var a=document.createElement('a');a.href=u;a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove()}
 (function(){var t=TOPICS[0],it=t&&t.intro&&t.items&&t.items[0];if(!it||it.t!=='theory'||/t\.me\/itpcode/.test(it.html))return;
   it.html+='<h3>Новости и обновления</h3><p>У ИТП есть канал в Telegram — <a class="tgl" href="'+TGURL+'" target="_blank" rel="noopener">t.me/itpcode</a>. Пока приложения нет в магазинах, новые версии выходят там. Ещё там новости, планы и то, над чем идёт работа.</p>'})();
