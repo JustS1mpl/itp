@@ -8,7 +8,7 @@
 #   sw.js                 — хранит страницу и значки; новая версия сайта приходит при следующем запуске
 #   _headers              — sw.js и index.html не кэшировать надолго (Netlify и Cloudflare Pages читают этот файл)
 # Запуск из корня репозитория: python app/web/make_web.py   (нужен Pillow; перед этим — сборка out5.html)
-import json, os, re, shutil
+import hashlib, json, os, re, shutil
 from PIL import Image
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -21,6 +21,9 @@ if os.path.isdir(OUT):
     shutil.rmtree(OUT)
 os.makedirs(OUT)
 shutil.copyfile(os.path.join(ROOT, 'out5.html'), os.path.join(OUT, 'index.html'))
+# отпечаток страницы — в имени кэша sw.js: перевыложили сайт с изменённым ИТП (даже без новой версии) — sw.js другой,
+# и у тех, кто поставил ИТП на экран «Домой», страница обновится при следующем запуске
+HASH = hashlib.sha256(open(os.path.join(OUT, 'index.html'), 'rb').read()).hexdigest()[:10]
 
 
 def icon(n, pad=0.0):
@@ -57,7 +60,9 @@ json.dump({
 SW = '''/* ИТП %(v)s: страница и значки хранятся на устройстве — с экрана «Домой» ИТП открывается и без интернета.
    Новая версия сайта (другой sw.js) скачивается в фоне и включается при следующем запуске. Библиотеки Python с CDN
    (numpy и др.) сюда не входят: их кэширует сам браузер. */
-var C = 'itp-%(v)s', FILES = ['./', 'index.html', 'manifest.webmanifest', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png', 'favicon.png'];
+/* index.html не храним отдельно: хостинг (Cloudflare Pages) перенаправляет /index.html на /, а Safari не отдаёт
+   из кэша страницы с перенаправлением */
+var C = 'itp-%(v)s-%(h)s', FILES = ['./', 'manifest.webmanifest', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png', 'favicon.png'];
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(C).then(function (c) { return c.addAll(FILES) }).then(function () { return self.skipWaiting() }));
 });
@@ -70,10 +75,10 @@ self.addEventListener('fetch', function (e) {
   var r = e.request;
   if (r.method !== 'GET' || new URL(r.url).origin !== location.origin) return;
   e.respondWith(caches.match(r, { ignoreSearch: true }).then(function (hit) {
-    return hit || (r.mode === 'navigate' ? caches.match('index.html') : null) || fetch(r);
+    return hit || (r.mode === 'navigate' ? caches.match('./') : null) || fetch(r);
   }).then(function (x) { return x || fetch(r) }));
 });
-''' % {'v': VER}
+''' % {'v': VER, 'h': HASH}
 open(os.path.join(OUT, 'sw.js'), 'w', encoding='utf-8').write(SW)
 
 open(os.path.join(OUT, '_headers'), 'w', encoding='utf-8').write(
