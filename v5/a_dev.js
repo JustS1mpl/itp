@@ -1,6 +1,8 @@
 /* ===================== Режим разработчика ===================== */
-var DVN='TheCreatorOfNothing',DVC=null;
-function DEV(){return S&&S.nick===DVN}
+/* 7.1.1: режим разработчика — только в сборке для владельца (ITP_DEV=1 python build5.py): ник виден в открытом коде на
+   GitHub, и в обычной сборке любой включил бы себе «+500 ⭐» и любую серию */
+var DEVB=/*DEVBUILD*/0,DVN='TheCreatorOfNothing',DVC=null;
+function DEV(){return !!DEVB&&!!S&&S.nick===DVN}
 (function(){
   var _t=task,_q=quiz,_p=project,_th=theory,_h=home;
   task=function(i,j,k){DVC={t:'task',i:i,j:j,k:k};return _t.apply(this,arguments)};
