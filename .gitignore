@@ -24,3 +24,16 @@ tests/_wav/
 # инструкция по выпуску в магазины — только у автора, не в открытом репозитории
 ВЫПУСК_APK_EXE.md
 .wrangler/
+
+# внутренние заметки и правила для ИИ — только на компьютере владельца (7.3.1)
+DECISIONES.md
+DESIGN.md
+PRODUCT.md
+PROGRESS.md
+docs/BACKLOG_*.md
+docs/CURRICULUM.md
+docs/UX_MOBILE.md
+docs/prompt_for_ai_*.md
+CLAUDE.md
+AGENTS.md
+.claude/
