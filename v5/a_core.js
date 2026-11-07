@@ -93,6 +93,8 @@ function clean(r){
   var a={};if(r.ach&&typeof r.ach==='object'&&!Array.isArray(r.ach))for(var k in r.ach)if(/^[a-z0-9]{2,12}$/.test(k)&&vdate(r.ach[k])&&Object.keys(a).length<60)a[k]=r.ach[k];o.ach=a;
   var cn=(r.cn&&typeof r.cn==='object')?r.cn:{};
   var cnum=function(k){return Number.isInteger(cn[k])&&cn[k]>=0?Math.min(cn[k],99999):0};
+  /* 7.3.0: xd — опыт за островки убранных нор (migr7): отметок о нём больше нет, а опыт остался */
+  o.xd=Number.isInteger(r.xd)&&r.xd>=0?Math.min(r.xd,99999):0;
   o.cn={ne:cnum('ne'),nn:cnum('nn'),nd:vdate(cn.nd),gn:cnum('gn'),gd:vdate(cn.gd),pf:cnum('pf'),pj:cnum('pj'),rc:cnum('rc')};
   var hu={};if(r.hu&&typeof r.hu==='object'&&!Array.isArray(r.hu))for(var h in r.hu)if(/^\d{1,3}$/.test(h)&&+h<TOPICS.length&&r.hu[h])hu[h]=1;o.hu=hu;
   o.rp=vdate(r.rp);o.rnd=r.rnd?1:0;

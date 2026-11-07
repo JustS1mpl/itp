@@ -10,7 +10,10 @@
 function migr7(r){
   if(!r||typeof r!=='object'||Array.isArray(r)||!(r.mv>=5)||r.mv>=7)return r;
   var M=[0,1,2,3,4,5,6,7,8,9,-1,10,11,12,13,14,15,16,18,19,20,21,22,23,24,25,26,27,28,29,30,31,33,34,36,37,38,39,40,41,-1,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61];
-  var m=function(i){return i<M.length?M[i]:-1},o={};
+  var m=function(i){return i<M.length?M[i]:-1},o={},xd=0;
+  /* опыт за островки убранных нор остаётся, а отметки уходят — запоминаем, сколько его могло быть (с запасом: проект до 200) */
+  if(r.at&&typeof r.at==='object')for(var ak in r.at){var ap=ak.split('-');if(/^\d+$/.test(ap[0])&&m(+ap[0])<0)xd+=r.at[ak]==='full'?200:r.at[ak]==='low'?2:0}
+  if(xd)o.xd=(Number.isInteger(r.xd)?r.xd:0)+xd;
   for(var k in r)if(Object.prototype.hasOwnProperty.call(r,k))o[k]=r[k];
   ['d','tk','at','es','dr','hu'].forEach(function(f){var x=r[f];if(!x||typeof x!=='object'||Array.isArray(x))return;var y={};
     Object.keys(x).forEach(function(key){var p=key.split('-');if(!/^\d+$/.test(p[0]))return;var n=m(+p[0]);if(n<0)return;p[0]=String(n);y[p.join('-')]=x[key]});o[f]=y});
