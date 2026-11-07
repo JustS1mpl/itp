@@ -1,7 +1,7 @@
 {
   "name": "itp",
   "productName": "ИТП",
-  "version": "7.3.0",
+  "version": "7.3.1",
   "description": "ИТП — И так, программирование: курс Python",
   "author": "ИТП",
   "main": "desktop/main.js",

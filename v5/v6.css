@@ -1923,3 +1923,6 @@ html.exbig .exio .qlab{margin:8px 0 4px}
 .egmore{display:block;margin:-2px 0 12px;padding:6px 0;border:0;background:none;font:inherit;font-size:.875rem;font-weight:800;color:var(--accent);cursor:pointer}
 .egcode{margin:4px 0 16px}.egcode .edh{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .egct{font-weight:900;font-size:.9375rem}
+/* 7.3.1: Путь длинный (60+ тем, сотни островков) — темы за экраном не рисуются, пока до них не докрутили (лаги прокрутки).
+   Высота неотрисованной темы — запомненная (auto) или примерная; карточка островка может выходить за низ темы — запас на отрисовку */
+#app .topic:not(.hole){content-visibility:auto;contain-intrinsic-size:auto 760px;overflow-clip-margin:420px}

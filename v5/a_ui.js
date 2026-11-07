@@ -172,9 +172,29 @@ var LRO=null,LFT=0;
 var ZZ=[0,56,0,-56];
 function lkX(el){var m=/translateX\((-?[\d.]+)px\)/.exec(el.style.transform||'');return m?+m[1]:0}
 function links(){curOnce(links0)}
+/* 7.3.1: тропинки строятся только у тем рядом с экраном, остальные — когда до них докрутят. Раньше считались все 60+ тем
+   разом, и чтение размеров вперемешку с записью сдвигов пересчитывало раскладку всей страницы (Путь лагал при открытии
+   и прокрутке) */
+var LIO=null;
 function links0(){
+  if(LIO){LIO.disconnect();LIO=null}
+  var ps=[].slice.call(app.querySelectorAll('.path')),M=1200,vh=innerHeight;
+  /* размер берём у самой темы, а не у тропинки внутри: тему за экраном браузер не раскладывает, и замер внутри неё заставил бы */
+  var rs=ps.map(function(pa){return(pa.closest('.topic')||pa).getBoundingClientRect()}),later=[];
+  ps.forEach(function(pa,k){if(rs[k].bottom>-M&&rs[k].top<vh+M)linkPath(pa);else later.push(pa)});
+  if(later.length&&window.IntersectionObserver){
+    var io=LIO=new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting||e.target.dataset.lsz)return;io.unobserve(e.target);curOnce(function(){linkPath(e.target)})})},{rootMargin:M+'px 0px'});
+    later.forEach(function(pa){delete pa.dataset.lsz;io.observe(pa)});
+    /* остальные — в свободное время по одной теме, чтобы к прокрутке всё было готово; IntersectionObserver — подстраховка */
+    var ric=window.requestIdleCallback||function(f){return setTimeout(function(){f({timeRemaining:function(){return 8}})},60)};
+    var pump=function(dl){if(LIO!==io)return;while(later.length&&dl.timeRemaining()>6){var pa=later.shift();if(pa.isConnected&&!pa.dataset.lsz){io.unobserve(pa);curOnce(function(){linkPath(pa)})}}if(later.length)ric(pump,{timeout:1500})};
+    ric(pump,{timeout:1500})}
+  else later.forEach(linkPath);
+  linksWatch();
+}
+function linkPath(pa){
   var ns='http://www.w3.org/2000/svg';
-  app.querySelectorAll('.path').forEach(function(pa){
+  (function(){
     var old=pa.querySelector('.cn');if(old)old.remove();
     var it=pa.querySelectorAll('.ilw'),i=pa.dataset.i;
     if(it.length<2)return;
@@ -216,8 +236,7 @@ function links0(){
       f[0].style.transition='stroke-dashoffset .9s cubic-bezier(.4,0,.2,1) '+(n*.9)+'s';f[0].style.strokeDashoffset=0;
       setTimeout(function(){f[1].classList.remove('wait');if(!RM()){var ic=f[1].querySelector('.isl');if(ic)f[1].style.setProperty('--ti',getComputedStyle(ic).getPropertyValue('--ti'));f[1].classList.add('unl');snd('unlock');setTimeout(function(){f[1].classList.remove('unl')},950)}},900*(n+1)+60);
     });
-  });
-  linksWatch();
+  })();
 }
 /* перерисовка, если размер колонки изменился (подгрузился шрифт, перенеслась подпись) */
 function linksWatch(){
@@ -335,7 +354,7 @@ function home0(){BACK=home;fzApply();
     if(t.opt)return;if(!t.intro)num++;if(!vis(i))return;
     var c=0;(t.items||[]).forEach(function(x,j){if(S.d[i+'-'+j])c++});
     var pc=Math.round(c/Math.max(1,ni(i))*100),dn=tdone(i);
-    h+='<section class="topic'+(t.intro?' intro':'')+(REV&&!t.intro?' rv':'')+'" aria-label="'+esc(t.intro?t.n:'Тема '+num+': '+t.n)+'">'+(t.intro?'<div class="ihead"><h2>'+esc(t.n)+'</h2><p class="mu">'+esc(t.s||'')+'</p></div>':'<div class="thead'+(dn?' done':'')+(i===ci?' now':'')+'"><div class="tn'+(dn?' ok':'')+'" aria-hidden="true">'+(dn?'':num)+'</div><div class="tt"><h2>'+esc(t.n)+'</h2><div class="mu">'+esc(t.s||'')+((i<S.start||i<FRN()[0])&&!dn?' · пропущено':'')+'</div></div><div class="ring" style="--p:'+pc+'" role="img" aria-label="Пройдено '+c+' из '+ni(i)+'"><span>'+c+'/'+ni(i)+'</span></div></div>')+'<div class="path'+(RM()?'':' stg')+'" data-i="'+i+'">';
+    h+='<section class="topic'+(t.intro?' intro':'')+(REV&&!t.intro?' rv':'')+'" style="contain-intrinsic-size:auto '+(60+131*(t.items||[]).length)+'px" aria-label="'+esc(t.intro?t.n:'Тема '+num+': '+t.n)+'">'+(t.intro?'<div class="ihead"><h2>'+esc(t.n)+'</h2><p class="mu">'+esc(t.s||'')+'</p></div>':'<div class="thead'+(dn?' done':'')+(i===ci?' now':'')+'"><div class="tn'+(dn?' ok':'')+'" aria-hidden="true">'+(dn?'':num)+'</div><div class="tt"><h2>'+esc(t.n)+'</h2><div class="mu">'+esc(t.s||'')+((i<S.start||i<FRN()[0])&&!dn?' · пропущено':'')+'</div></div><div class="ring" style="--p:'+pc+'" role="img" aria-label="Пройдено '+c+' из '+ni(i)+'"><span>'+c+'/'+ni(i)+'</span></div></div>')+'<div class="path'+(RM()?'':' stg')+'" data-i="'+i+'">';
     /* нора — примерно за пять островков до конца темы, у островка, сдвинутого вбок (нечётный), в свободном месте с другой стороны */
     if(!HOP){HOP={};TOPICS.forEach(function(x,o){if(x.opt&&holeVis(o))HOP[o]=1})}
     var hp=holeSpots(i);
@@ -345,7 +364,7 @@ function home0(){BACK=home;fzApply();
       if(hw)w=w.replace('<div class="ilw','<div data-b="'+ZZ[j%4]+'" data-hw="'+hw+'" class="ilw nhb').replace(/<\/div>$/,burrow(hp[j],j%4===1?'l':'r')+'</div>');
       h+=w}
     h+='</div></section>'});
-  scr('home',h+'<aside class="jump" aria-label="Быстрый переход"><button id="jmp" aria-label="К текущему островку">'+ico('arrow')+'</button></aside>','home');bindHead(home);links();
+  scr('home',h+'<aside class="jump" aria-label="Быстрый переход"><button id="jmp" aria-label="К текущему островку">'+ico('arrow')+'</button></aside>','home');bindHead(home);requestAnimationFrame(function(){if(app.querySelector('.path'))links()});
   app.querySelectorAll('.isl').forEach(function(b){b.onclick=function(e){e.stopPropagation();islandPop(b)}});
   app.querySelectorAll('.bur').forEach(function(b){b.onclick=function(e){e.stopPropagation();popClose();hole(+b.dataset.o)}});
   var c=app.querySelector('.isl.cur');if(c&&!REV)c.scrollIntoView({block:'center'});
