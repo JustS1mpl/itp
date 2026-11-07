@@ -1,5 +1,5 @@
 /* ===================== ИТП — ядро: настройки, сохранение, звук, серия, цели, достижения ===================== */
-function defset(){return{acc:'',exl:'c',tz:100,anim:'full',vol:70,sfx:1,vib:1,emo:1,ty:1,toc:1,rep:1,ln:1,ac:1,cf:15,gc:1,nt:1,ni:2,nh:19,kbb:1,bg:1,bgp:'dots',ks:0,ph:'card',sh:'v',fl:'tilt'}}
+function defset(){return{acc:'',exl:'c',tz:100,anim:'full',vol:70,sfx:1,vib:1,emo:1,ty:1,toc:1,rep:1,ln:1,ac:1,cf:15,gc:1,nt:1,ni:2,nh:19,kbb:1,bg:1,bgp:'dots',ks:0,ph:'card',sh:'v',fl:'tilt',fzs:1}}
 function ST(k){return S.set&&S.set[k]!==undefined?S.set[k]:defset()[k]}
 /* слабое устройство (мало памяти или ядер, экономия трафика): без размытия под панелями, Python — только когда открыт урок */
 function WEAK(){var n=navigator,c=n.connection;return !!((n.deviceMemory&&n.deviceMemory<=3)||(n.hardwareConcurrency&&n.hardwareConcurrency<=4)||(c&&c.saveData))}
@@ -76,9 +76,9 @@ function clean(r){
   var o=clean0(r);o.mv=6;r=(r&&typeof r==='object'&&!Array.isArray(r))?r:{};
   var s=(r.set&&typeof r.set==='object'&&!Array.isArray(r.set))?r.set:{},q={};
   var pick=function(k,list){q[k]=list.indexOf(s[k])>=0?s[k]:defset()[k]},bl=function(k){q[k]=s[k]===0||s[k]===false?0:(s[k]===1||s[k]===true?1:defset()[k])};
-  pick('acc',['','carrot','pink','blue','violet']);pick('tz',[90,100,115,130]);pick('anim',['full','less','off']);pick('cf',[11,13,15,17,19]);pick('ni',[1,2,3]);pick('nh',[9,13,17,19,21]);pick('sh',['v','h']);pick('ph',['card','corner','pop']);pick('fl',['tilt','flat']);pick('bgp',['dots','rain','none']);
+  pick('acc',['','carrot','pink','blue','violet']);pick('tz',[90,100,115,130]);pick('anim',['full','less','off']);pick('cf',[11,13,15,17,19]);pick('ni',[1,2,3]);pick('nh',[9,13,17,19,21]);pick('sh',['v','h']);pick('ph',['card','corner','pop']);pick('fl',['tilt']);pick('bgp',['dots','rain','none']);
   q.vol=typeof s.vol==='number'&&s.vol>=0&&s.vol<=100?Math.round(s.vol):defset().vol;
-  ['sfx','vib','emo','ty','toc','rep','ln','ac','gc','bg','ks','nt','kbb'].forEach(bl);
+  ['sfx','vib','emo','ty','toc','rep','ln','ac','gc','bg','ks','nt','kbb','fzs'].forEach(bl);
   /* «Минимализм» убран (6.9.0): у кого он был включён, узор на фоне возвращается таким, каким был до минимализма (mb) */
   if(s.mn===1||s.mn===true)q.bg=s.mb===0||s.mb===false?0:1;
   /* узор фона стал выбором (dev.22): у кого «Узор на фоне» был выключен — ровный фон */
@@ -89,7 +89,7 @@ function clean(r){
   o.wk=vdate(r.wk);
   var f=(r.fz&&typeof r.fz==='object')?r.fz:{},u=[];
   if(Array.isArray(f.u))f.u.forEach(function(x){if(vdate(x)&&u.indexOf(x)<0&&u.length<80)u.push(x)});
-  o.fz={n:Number.isInteger(f.n)&&f.n>=0&&f.n<=2?f.n:0,p:Number.isInteger(f.p)&&f.p>=0&&f.p<=14?f.p:0,u:u.sort()};
+  o.fz={n:Number.isInteger(f.n)&&f.n>=0&&f.n<=3?f.n:0,p:Number.isInteger(f.p)&&f.p>=0&&f.p<=14?f.p:0,u:u.sort()};
   var a={};if(r.ach&&typeof r.ach==='object'&&!Array.isArray(r.ach))for(var k in r.ach)if(/^[a-z0-9]{2,12}$/.test(k)&&vdate(r.ach[k])&&Object.keys(a).length<60)a[k]=r.ach[k];o.ach=a;
   var cn=(r.cn&&typeof r.cn==='object')?r.cn:{};
   var cnum=function(k){return Number.isInteger(cn[k])&&cn[k]>=0?Math.min(cn[k],99999):0};
@@ -115,7 +115,7 @@ function applyPrefs(){
   r.setAttribute('data-theme',th);
   if(ST('acc'))r.setAttribute('data-acc',ST('acc'));else r.removeAttribute('data-acc');
   r.style.setProperty('--tz',ST('tz')/100);r.style.setProperty('--cf',ST('cf')+'px');
-  r.setAttribute('data-anim',ST('anim'));r.setAttribute('data-fl',ST('fl'));r.classList.toggle('noln',!ST('ln'));r.setAttribute('data-ph',ST('ph'));r.setAttribute('data-bgp',ST('bgp'));r.classList.toggle('lite',WEAK());r.classList.toggle('exbig',ST('exl')==='b');
+  r.setAttribute('data-anim',ST('anim'));r.classList.toggle('noln',!ST('ln'));r.setAttribute('data-ph',ST('ph'));r.setAttribute('data-bgp',ST('bgp'));r.classList.toggle('lite',WEAK());r.classList.toggle('exbig',ST('exl')==='b');
   var m=document.querySelector('meta[name=theme-color]');if(!m){m=document.createElement('meta');m.name='theme-color';document.head.appendChild(m)}
   m.content=th==='dark'?'#171315':'#FBF7F5';
 }
@@ -179,7 +179,7 @@ function fzApply(){
   setTimeout(function(){snd('freeze');toast('Серия сохранена: заморозка потрачена ('+miss+')','');ach('ice2')},500);
   return miss}
 function fzEarn(){
-  if(S.fz.n>=2){S.fz.p=0;return}
+  if(S.fz.n>=3){S.fz.p=0;return}
   S.fz.p++;if(S.fz.p>=15){S.fz.p=0;S.fz.n++;toast('Новая заморозка серии! Теперь их: '+S.fz.n);snd('freeze');ach('ice')}}
 /* --- цели --- */
 /* U1-9: цель серии и опыт за неё: чем дольше, тем больше */

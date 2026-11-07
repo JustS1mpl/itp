@@ -858,14 +858,6 @@ button.tile.tbig:active{transform:scale(.97)}
 .fsx em,.fsx .fsn,.fbk{display:none}
 .fsd{position:absolute;left:50%;bottom:-4px;width:50px;height:10px;margin-left:-18px;background:radial-gradient(ellipse at center,rgba(40,20,10,.42),rgba(40,20,10,0) 70%);pointer-events:none;z-index:-1}
 :root[data-theme=dark] .fsd{background:radial-gradient(ellipse at center,rgba(0,0,0,.6),rgba(0,0,0,0) 70%)}
-:root[data-fl=flat] .fd{width:13px;perspective:none}
-:root[data-fl=flat] .fb3{position:static;width:100%;height:100%;margin:0;transform:none;transform-style:flat}
-:root[data-fl=flat] .ff{display:none}
-:root[data-fl=flat] .fsd{width:18px;margin-left:-9px;bottom:-3px;height:6px}
-:root[data-fl=flat] .fsx{position:relative;left:auto;top:auto;width:100%;height:100%;margin:0;transform:none;border-radius:3px 3px 1px 1px;padding:0;justify-content:space-between;align-items:center;background:linear-gradient(90deg,rgba(255,255,255,.3),rgba(255,255,255,0) 28%,rgba(0,0,0,0) 68%,rgba(0,0,0,.22)),var(--fc);box-shadow:inset 0 0 0 1px rgba(0,0,0,.14),0 2px 3px rgba(0,0,0,.2)}
-:root[data-fl=flat] .fsx .fsn{display:block;width:6px;height:4px;margin-top:4px;border-radius:1px;background:rgba(0,0,0,.35)}
-:root[data-fl=flat] .fsx em{display:grid;place-items:center;width:11px;height:24px;margin-bottom:7px;border-radius:3px;background:#fffdf8;box-shadow:inset 0 0 0 1px rgba(0,0,0,.1);font-style:normal;font-size:.9rem;line-height:1}
-:root[data-fl=flat] .fsx em .em{width:.7rem;height:.7rem}
 .fwin{text-align:center}
 .fwin h2{margin:16px 0 6px}.fd2{font-size:1rem}
 .fface{position:relative;width:160px;height:160px;margin:6px auto 0;background:var(--fc);border-radius:10px 10px 22px 10px;box-shadow:inset 0 0 0 3px rgba(255,255,255,.18),0 14px 28px -8px rgba(0,0,0,.4);animation:flipin .6s var(--e-spring) both;transform-origin:50% 60%}
@@ -1891,3 +1883,17 @@ html.nat-android ::-webkit-scrollbar{display:none}
    «Крупно» теперь только ставит ввод и вывод друг под другом */
 html.exbig .tcard .pyex,html.exbig .pj .card .pyex{background:none;padding:0;margin-top:14px;border-radius:0}
 html.exbig .exio .qlab{margin:8px 0 4px}
+/* 7.3: карточка серии — число и морковка одним блоком, по центру (раньше морковка жила в своей колонке и съезжала вниз);
+   число не больше морковки */
+.tile.tbig{display:flex!important;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden}
+.tile.tbig>.tsn{display:flex;flex-direction:column;align-items:center;min-width:0}
+.tile.tbig .tsn b{display:inline-flex;align-items:center;white-space:nowrap;font-size:30cqi;line-height:1}
+.tile.tbig.d2 .tsn b{font-size:25cqi}.tile.tbig.d3 .tsn b{font-size:20cqi}
+.tile.tbig .tsc{display:inline-flex;align-items:center;margin-left:.04em;font-size:1em;line-height:1;font-style:normal}
+.tile.tbig .tsc>.em{width:.95em;height:.95em;display:block;transform:translateY(-.03em)}
+.tile.tbig .tsn small{margin-top:6px;text-align:center}
+/* заморозки: три снежинки столбиком в углу, будто иней налип на край; потраченные — бледные. Скрываются в настройках */
+.tile.tbig .tfz{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:3px}
+.tile.tbig .tfz i{display:block;font-style:normal;line-height:0;opacity:.18;filter:grayscale(1)}
+.tile.tbig .tfz i.on{opacity:1;filter:drop-shadow(0 0 4px color-mix(in srgb,var(--ice) 60%,transparent))}
+.tile.tbig .tfz .em{width:16px;height:16px}

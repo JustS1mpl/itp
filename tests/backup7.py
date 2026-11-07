@@ -15,7 +15,9 @@ JS_SETUP = r'''()=>{
     return exportData()};
   /* старый пользователь с 6.x: опыт перенесён, даты регистрации до 7.0, серия 40 */
   window.mkOld=function(){
-    S=clean({nick:'Старый',reg:'2026-03-01',start:0,xp:5200,streak:40,max:61,last:T,ach:{w1:'2026-03-10',m1:'2026-05-01'}});save();
+    S=clean({nick:'Старый',reg:'2026-03-01',start:0,xp:5200,streak:40,max:61,last:T,ach:{w1:'2026-03-10',m1:'2026-05-01'}});
+    /* с HISTV каждый день серии штатно попадает в историю */
+    for(var d=HISTV;d<=T;d=dadd(d,1))S.hist[d]={xp:20,les:1};save();
     return exportData()};
   /* «взлом»: поменять данные и честно пересчитать s секретом из кода */
   window.forge=function(txt,f){var o=JSON.parse(txt),d=JSON.parse(o.p);f(d.data);o.p=JSON.stringify(d);o.s=sig(o.p,SECRET);return JSON.stringify(o)};

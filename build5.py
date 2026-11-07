@@ -22,7 +22,7 @@ rep("(cut?'\\n…вывод обрезан':'')","(cut?'\\n…вывод обр�
 
 rep("function fixErr(e,code){if(!e)return e;","function fixErr(e,code){if(!e)return e;try{e=itpTrFull(e)}catch(_x){}")
 rep("function fin2(err){","function fin2(err){if(err&&/^SystemExit\\b/.test(err))err=null;")
-rep("function isOpen(i,j){var k=i+'-'+j;", "function isOpen(i,j){if(typeof DEV==='function'&&DEV())return 1;var k=i+'-'+j;if(TOPICS[i].opt)return S.d[k]||ocur(i)===k?1:0;if(j===0&&IT(i,0).t==='theory')return 1;")
+rep("function isOpen(i,j){var k=i+'-'+j;", "function isOpen(i,j){if(typeof DEV==='function'&&DEV())return 1;if(TCH()&&IT(i,j).t==='theory')return 1;var k=i+'-'+j;if(TOPICS[i].opt)return S.d[k]||ocur(i)===k?1:0;if(j===0&&IT(i,0).t==='theory')return 1;")
 rep("function nxI(i,j){if(!(i<S.start)||TOPICS[i].intro)return false;", "function nxI(i,j){if(!(i<S.start||i<FRN()[0])||TOPICS[i].intro)return false;")
 # пропущенные и оставшиеся позади островки: теория открыта всегда, остальное — когда прочитана ближайшая теория перед ним
 # (раньше требовалась вся теория темы до островка, и ученик не понимал, почему следующий островок закрыт)

@@ -96,7 +96,7 @@ function dvAct(a){
   if(a==='lv'){var l=lvlInfo(S.xp).l,n=0;while(lvlInfo(S.xp).l===l&&n++<400)addXp(10);save();dvRe();toast('Уровень: '+lvlInfo(S.xp).l);return}
   if(a==='st'){var t=day(new Date());if(S.last!==t){S.last=t;S.streak=(S.streak||0)+1}else S.streak++;if(S.streak>S.max)S.max=S.streak;save();dvRe();toast('Серия: '+S.streak);return}
   if(a==='st0'){S.streak=0;save();dvRe();toast('Серия сброшена');return}
-  if(a==='fz'){S.fz.n=Math.min(2,S.fz.n+1);save();dvRe();toast('Заморозок: '+S.fz.n);return}
+  if(a==='fz'){S.fz.n=Math.min(3,S.fz.n+1);save();dvRe();toast('Заморозок: '+S.fz.n);return}
   if(a==='fzm'){S.fz.n=Math.max(0,S.fz.n-1);save();dvRe();toast('Заморозок: '+S.fz.n);return}
   if(a==='fz0'){S.fz.n=0;S.fz.p=0;save();dvRe();toast('Заморозок: 0');return}
   if(a==='all'){TOPICS.forEach(function(t,i){t.items.forEach(function(x,j){dvDone(i,j)})});toast('Все островки пройдены');dvClose();return home()}
@@ -130,3 +130,6 @@ function dvIntroEnd(soft){
   save=P.sv;fzApply=P.fa;crtCrash=P.cc;if(!soft)S=JSON.parse(P.bk);
   var x=document.getElementById('dvpx');if(x)x.remove();
   if(!soft){crtClose();['shards','bsod'].forEach(function(id){var e=document.getElementById(id);if(e)e.remove()});document.documentElement.classList.remove('crt-on');home();window.scrollTo(0,0)}}
+/* 7.3: ник teacher42 (регистр не важен) — учительский просмотр: открыта вся теория, включая норы, чтобы показывать её
+   на уроке; задачи и проекты открываются как обычно, опыт и прогресс не трогаются */
+function TCH(){return !!S&&typeof S.nick==='string'&&S.nick.trim().toLowerCase()==='teacher42'}
