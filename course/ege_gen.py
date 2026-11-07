@@ -208,7 +208,9 @@ def practice(n):
     for x in _P:
         if x['task'] != n:
             continue
-        d = {'id': x['num'], 'src': x['source'], 'h': md(x['statement_md']), 'a': str(x['answer']).strip(), 'u': x['url'], 'tu': x['tutor']}
+        # без фамилий в контенте (правило владельца): пометки авторов задач «(И. Фамилия)» убираем, авторство — по ссылке на КомпЕГЭ
+        st = re.sub(r'\(\**(?:[А-ЯЁ]\.\s?){1,2}[А-ЯЁ][а-яё-]+\**\)\s*', '', x['statement_md'])
+        d = {'id': x['num'], 'src': x['source'], 'h': md(st), 'a': str(x['answer']).strip(), 'u': x['url'], 'tu': x['tutor']}
         if x.get('subtype') and x['subtype'] != 'основной':
             d['st'] = x['subtype']
         if x['files']:
