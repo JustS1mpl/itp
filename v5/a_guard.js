@@ -86,5 +86,5 @@ function bkPlaus(r){
 /* импорт: сначала прежние проверки (формат, s, типы), потом правдоподобность — до того, как что-то поменяется */
 (function(){var _imp=importData;importData=function(txt){
   try{var o=JSON.parse(txt),d=o&&typeof o.p==='string'&&typeof o.s==='string'&&o.s===sig(o.p,SECRET)?JSON.parse(o.p):null;
-    if(d&&d.data&&typeof d.data==='object'&&!Array.isArray(d.data)){var e=bkPlaus(d.data);if(e)return e}}catch(e){}
+    if(d&&d.data&&typeof d.data==='object'&&!Array.isArray(d.data)){var e=bkPlaus(migr7(d.data));if(e)return e}}catch(e){}
   return _imp(txt)}})();

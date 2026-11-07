@@ -14,6 +14,8 @@ sys.path.insert(0, os.path.join(os.getcwd(), 'course'))
 CUR = json.load(open('course/curriculum.json', encoding='utf-8'))
 DATA = json.load(open(sys.argv[1] if len(sys.argv) > 1 else 'topics.json', encoding='utf-8'))
 TOPICS, FILESETS = DATA['topics'], DATA['filesets']
+# 7.3.0: норы ЕГЭ — справочник к экзамену (главы из теории + тренажёр в «Практике»), правила темы курса к ним не применяются
+TOPICS = [t for t in TOPICS if not any(it.get('ch') for it in t['items'])]
 TL = "exec(__import__('sys').stdin.read(), globals())"   # скрытый хвост задач на функции (dsl.TL)
 
 # конструкция → названия терминов, которые её объясняют (термин обязателен в теме, которая её вводит)

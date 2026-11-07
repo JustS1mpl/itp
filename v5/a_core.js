@@ -72,8 +72,8 @@ function from6(r){
   var o={};for(var k in r)if(Object.prototype.hasOwnProperty.call(r,k)&&['d','tk','at','es','dr','hu','start','skk','rp','lt','cur'].indexOf(k)<0)o[k]=r[k];
   o.mv=5;try{appSet({from6:1})}catch(e){}return o}
 function clean(r){
-  r=migr(from6(r));
-  var o=clean0(r);o.mv=6;r=(r&&typeof r==='object'&&!Array.isArray(r))?r:{};
+  r=migr7(migr(from6(r)));
+  var o=clean0(r);o.mv=7;r=(r&&typeof r==='object'&&!Array.isArray(r))?r:{};
   var s=(r.set&&typeof r.set==='object'&&!Array.isArray(r.set))?r.set:{},q={};
   var pick=function(k,list){q[k]=list.indexOf(s[k])>=0?s[k]:defset()[k]},bl=function(k){q[k]=s[k]===0||s[k]===false?0:(s[k]===1||s[k]===true?1:defset()[k])};
   pick('acc',['','carrot','pink','blue','violet']);pick('tz',[90,100,115,130]);pick('anim',['full','less','off']);pick('cf',[11,13,15,17,19]);pick('ni',[1,2,3]);pick('nh',[9,13,17,19,21]);pick('sh',['v','h']);pick('ph',['card','corner','pop']);pick('fl',['tilt']);pick('bgp',['dots','rain','none']);

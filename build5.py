@@ -1,6 +1,6 @@
 import re, sys, json, os
 sys.path.insert(0, '.')
-VER = '7.2.0'
+VER = '7.3.0'
 s = open('base43.html', encoding='utf-8').read()
 
 def rep(a, b, n=1):
@@ -187,7 +187,7 @@ rep('g[0]=g[0].replace(/\\B(?=(\\d{3})+(?!\\d))/g,",")', 'g[0]=g[0].replace(/\\B
 exec(open('base/msgs.py',encoding='utf-8').read())
 # --- вставка ядра и интерфейса
 core = open('v5/a_core.js', encoding='utf-8').read() + '\n' + open('v5/a_sound.js', encoding='utf-8').read() + '\n' + open('v5/a_ui.js', encoding='utf-8').read()
-for extra in ('v5/a_fix.js','v5/a_fix2.js','v5/a_fix3.js','v5/a_fix4.js','v5/a_more.js','v5/a_dev.js','v5/a_guard.js','v5/a_img.js','v5/a_mood.js','v5/a_notify.js','v5/a_web.js','v5/a_out.js','v5/a_py.js','v5/a_turtle.js','v5/a_ux.js','v5/a_screens.js','v5/a_boot.js','v5/a_upd.js','v5/a_launch.js'):
+for extra in ('v5/a_fix.js','v5/a_fix2.js','v5/a_fix3.js','v5/a_fix4.js','v5/a_more.js','v5/a_dev.js','v5/a_guard.js','v5/a_ege.js','v5/a_img.js','v5/a_mood.js','v5/a_notify.js','v5/a_web.js','v5/a_out.js','v5/a_py.js','v5/a_turtle.js','v5/a_ux.js','v5/a_screens.js','v5/a_boot.js','v5/a_upd.js','v5/a_launch.js'):
     try: core += '\n' + open(extra, encoding='utf-8').read()
     except FileNotFoundError: pass
 # режим разработчика (ник TheCreatorOfNothing) — только в сборке для владельца: ITP_DEV=1 python build5.py
